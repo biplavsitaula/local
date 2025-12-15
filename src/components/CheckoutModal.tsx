@@ -1,13 +1,14 @@
 import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
+import {IPaymentCheckbox} from "@/interface/IPaymentCheckout"
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-};
+// type Props = {
+//   open: boolean;
+//   onClose: () => void;
+// };
 
-const CheckoutModal = ({ open, onClose }: Props) => {
+const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const { copy } = useLanguage();
   const { items, total } = useCart();
   const [paid, setPaid] = useState(false);
