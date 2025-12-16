@@ -2,40 +2,46 @@
 
 @layer base {
   :root {
-    --background: 0 0% 98%;
-    --foreground: 0 0% 10%;
+    --background: 0 0% 5%;
+    --foreground: 40 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 10%;
+    --card: 0 0% 8%;
+    --card-foreground: 40 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 10%;
+    --popover: 0 0% 10%;
+    --popover-foreground: 40 20% 95%;
 
     --primary: 25 95% 53%;
-    --primary-foreground: 0 0% 100%;
+    --primary-foreground: 0 0% 5%;
 
-    --secondary: 0 0% 96%;
-    --secondary-foreground: 0 0% 10%;
+    --secondary: 0 0% 12%;
+    --secondary-foreground: 40 15% 85%;
 
-    --muted: 0 0% 94%;
-    --muted-foreground: 0 0% 45%;
+    --muted: 0 0% 15%;
+    --muted-foreground: 0 0% 55%;
 
-    --accent: 45 100% 51%;
-    --accent-foreground: 0 0% 10%;
+    --accent: 38 92% 50%;
+    --accent-foreground: 0 0% 5%;
 
-    --destructive: 0 84% 60%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 90%;
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 5%;
+
+    --border: 0 0% 18%;
+    --input: 0 0% 15%;
     --ring: 25 95% 53%;
 
     --radius: 0.75rem;
 
     /* Flame colors */
-    --flame-red: 0 80% 50%;
+    --flame-red: 0 72% 51%;
     --flame-orange: 25 95% 53%;
-    --flame-yellow: 45 100% 51%;
+    --flame-yellow: 45 93% 47%;
     --flame-gold: 38 90% 55%;
 
     /* Galaxy colors */
@@ -43,13 +49,18 @@
     --galaxy-blue: 230 70% 20%;
     --galaxy-dark: 260 40% 8%;
 
+    /* Chart colors */
+    --chart-1: 25 95% 53%;
+    --chart-2: 0 72% 51%;
+    --chart-3: 45 93% 47%;
+    --chart-4: 142 76% 36%;
+    --chart-5: 280 60% 50%;
+
     /* Gradients */
-    --gradient-flame: linear-gradient(
-      135deg,
-      hsl(0 80% 50%),
-      hsl(25 95% 53%),
-      hsl(45 100% 51%)
-    );
+    --gradient-gold: linear-gradient(135deg, hsl(25 95% 53%), hsl(0 72% 51%));
+    --gradient-flame: linear-gradient(135deg, hsl(45 93% 47%), hsl(25 95% 53%), hsl(0 72% 51%));
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 4%));
     --gradient-galaxy: linear-gradient(
       180deg,
       hsl(260 40% 8%),
@@ -57,19 +68,24 @@
       hsl(260 40% 8%)
     );
 
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Shadows */
+    --shadow-glow: 0 0 40px hsl(25 95% 53% / 0.2);
+    --shadow-card: 0 4px 24px hsl(0 0% 0% / 0.5);
+
+    /* Sidebar */
+    --sidebar-background: 0 0% 4%;
+    --sidebar-foreground: 40 15% 85%;
+    --sidebar-primary: 25 95% 53%;
+    --sidebar-primary-foreground: 0 0% 5%;
+    --sidebar-accent: 0 0% 12%;
+    --sidebar-accent-foreground: 40 15% 90%;
+    --sidebar-border: 0 0% 12%;
+    --sidebar-ring: 25 95% 53%;
   }
 
   .dark {
-    --background: 260 40% 6%;
-    --foreground: 0 0% 95%;
+    --background: 220 20% 8%;
+    --foreground: 40 20% 95%;
 
     --card: 260 35% 10%;
     --card-foreground: 0 0% 95%;
@@ -115,48 +131,40 @@
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: var(--font-poppins), sans-serif;
+    font-family: var(--font-dm-sans), 'DM Sans', sans-serif;
     font-synthesis: none;
     text-rendering: optimizeLegibility;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
-  h1,
-  h2,
-  h3,
-  h4,
-  h5,
-  h6 {
-    font-family: var(--font-cinzel), serif;
+  h1, h2, h3, h4, h5, h6, .font-display {
+    font-family: var(--font-playfair), 'Playfair Display', serif;
   }
 
-  /* Custom Scrollbar with Flame Gradient */
-  /* WebKit browsers (Chrome, Safari, Edge) */
+  /* Custom Scrollbar */
   ::-webkit-scrollbar {
-    width: 12px;
-    height: 12px;
+    width: 8px;
+    height: 8px;
   }
 
   ::-webkit-scrollbar-track {
     background: hsl(var(--background));
-    border-radius: 6px;
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--gradient-flame);
-    border-radius: 6px;
-    border: 2px solid hsl(var(--background));
+    background: hsl(var(--muted));
+    border-radius: 9999px;
   }
 
   ::-webkit-scrollbar-thumb:hover {
-    opacity: 0.9;
+    background: hsl(var(--muted-foreground) / 0.5);
   }
 
   /* Firefox */
   * {
     scrollbar-width: thin;
-    scrollbar-color: hsl(var(--flame-orange)) hsl(var(--background));
+    scrollbar-color: hsl(var(--muted)) hsl(var(--background));
   }
 }
 
@@ -248,6 +256,35 @@
 }
 
 @layer utilities {
+  .glass-card {
+    background-color: hsl(var(--card) / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(var(--border) / 0.5);
+  }
+
+  .glow-amber {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+
+  .gradient-card {
+    background: var(--gradient-card);
+  }
+
+  .gradient-dark {
+    background: var(--gradient-dark);
+  }
+
+  .text-gradient {
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background: var(--gradient-gold);
+  }
+
   .text-balance {
     text-wrap: balance;
   }
