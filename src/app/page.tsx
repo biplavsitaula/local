@@ -1,20 +1,19 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import AgeDeniedScreen from "@/components/AgeDeniedScreen";
-import AgeVerificationModal from "@/components/AgeVerificationModal";
+import AgeDeniedScreen from "@/components/features/age-verification/AgeDeniedScreen";
+import AgeVerificationModal from "@/components/features/age-verification/AgeVerificationModal";
 import CategorySection from "@/components/CategorySection";
 import CheckoutModal from "@/components/CheckoutModal";
 import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
-import ProductGrid from "@/components/ProductGrid";
+import ProductGrid from "@/components/features/product/ProductGrid";
 import PromoBanner from "@/components/PromoBanner";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-
-type AgeStatus = "pending" | "verified" | "denied";
+import { AgeStatus } from "@/types";
 
 const Index: React.FC = () => {
   const [ageStatus, setAgeStatus] = useState<AgeStatus>("pending");

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
-import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -11,14 +10,9 @@ import {
 } from '@/components/ui/dialog';
 import { ShoppingCart, Plus, Minus, Wine, Droplets, Tag } from 'lucide-react';
 import { toast } from 'sonner';
+import { IProductDetailModalProps } from '@/interface/IProductDetailModalProps';
 
-interface ProductDetailModalProps {
-  product: Product;
-  isOpen: boolean;
-  onClose: () => void;
-}
-
-const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
+const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
   product,
   isOpen,
   onClose,

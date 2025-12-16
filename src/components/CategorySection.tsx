@@ -2,13 +2,9 @@ import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { categories } from '@/data/products';
 import { ArrowRight } from 'lucide-react';
+import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
 
-interface CategorySectionProps {
-  selected: string;
-  onSelect: (value: string) => void;
-}
-
-const CategorySection: React.FC<CategorySectionProps> = ({ selected, onSelect }) => {
+const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }) => {
   const { language, t } = useLanguage();
 
   const categoryImages: Record<string, string> = {

@@ -16,3 +16,5 @@ export type CartItem = {
   product: Product;
   quantity: number;
 };
+
+export type AgeStatus = "pending" | "verified" | "denied";

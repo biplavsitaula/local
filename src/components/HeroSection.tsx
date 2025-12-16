@@ -1,7 +1,7 @@
-import React from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { Button } from '@/components/ui/button';
-import { ArrowRight, Sparkles } from 'lucide-react';
+import React from "react";
+import { useLanguage } from "@/contexts/LanguageContext";
+import { Button } from "@/components/ui/button";
+import { ArrowRight, Sparkles } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
@@ -11,7 +11,10 @@ const HeroSection: React.FC = () => {
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-flame-orange/10 rounded-full blur-3xl animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-flame-red/10 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1s' }} />
+        <div
+          className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-flame-red/10 rounded-full blur-3xl animate-pulse"
+          style={{ animationDelay: "1s" }}
+        />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-flame-yellow/5 rounded-full blur-3xl" />
       </div>
 
@@ -20,26 +23,29 @@ const HeroSection: React.FC = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-flame-orange/30 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-flame-yellow" />
-            <span className="text-sm font-medium text-foreground">Premium Collection 2024</span>
+            <span className="text-sm font-medium text-foreground">
+              Premium Collection 2024
+            </span>
           </div>
 
           {/* Main Title */}
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
-            <span className="flame-text">{t('heroTitle')}</span>
+            <span className="flame-text">{t("heroTitle")}</span>
           </h1>
 
           {/* Subtitle */}
           <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
-            {t('heroSubtitle')}
+            {t("heroSubtitle")}
           </p>
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
             <Button
               size="lg"
-              className="bg-gradient-to-r from-flame-red via-flame-orange to-flame-yellow text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group"
+              variant="default"
+              className="bg-flame-gradient text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
             >
-              {t('shopNow')}
+              {t("shopNow")}
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
             <Button
@@ -47,7 +53,7 @@ const HeroSection: React.FC = () => {
               variant="outline"
               className="border-flame-orange/50 text-foreground hover:bg-flame-orange/10 px-8 py-6 text-lg"
             >
-              {t('viewCollection')}
+              {t("viewCollection")}
             </Button>
           </div>
 

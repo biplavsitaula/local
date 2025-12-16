@@ -5,7 +5,7 @@ import { Product } from '@/types';
 import { Button } from '@/components/ui/button';
 import { ShoppingCart, Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import ProductDetailModal from '@/components/ProductDetailModal';
+import ProductDetailModal from '@/components/features/product/ProductDetailModal';
 import { products } from '@/data/products';
 
 interface ProductCardProps {

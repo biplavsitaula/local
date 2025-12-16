@@ -3,10 +3,6 @@ import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import {IPaymentCheckbox} from "@/interface/IPaymentCheckout"
 
-// type Props = {
-//   open: boolean;
-//   onClose: () => void;
-// };
 
 const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const { copy } = useLanguage();

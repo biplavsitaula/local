@@ -3,13 +3,9 @@ import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Button } from "@/components/ui/button";
 import { Flame, Wine, AlertTriangle } from "lucide-react";
+import { IAgeVerificationModalProps } from "@/interface/IAgeVerificationModalProps";
 
-interface AgeVerificationModalProps {
-  onVerified: () => void;
-  onDenied: () => void;
-}
-
-const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({
+const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
   onVerified,
   onDenied,
 }) => {
@@ -57,7 +53,8 @@ const AgeVerificationModal: React.FC<AgeVerificationModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-4">
             <Button
               onClick={onVerified}
-              className="flex-1 bg-gradient-to-r from-flame-red via-flame-orange to-flame-yellow text-primary-foreground font-semibold py-6 text-lg hover:opacity-90 transition-opacity"
+              variant="default"
+              className="flex-1 bg-flame-gradient text-primary-foreground font-semibold py-6 text-lg hover:opacity-90 transition-opacity border-0"
             >
               {t("ageYes")}
             </Button>
