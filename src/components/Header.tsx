@@ -23,7 +23,9 @@ import {
   Minus,
   Plus,
   Trash2,
+  User,
 } from "lucide-react";
+import Link from "next/link";
 import { IHeaderProps } from "@/interface/IHeaderProps";
 
 const Header: React.FC<IHeaderProps> = ({
@@ -51,14 +53,36 @@ const Header: React.FC<IHeaderProps> = ({
       <div className="container mx-auto px-4">
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
-          <a href="/" className="flex items-center gap-2 shrink-0">
+          <Link href="/" className="flex items-center gap-2 shrink-0">
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-flame-red via-flame-orange to-flame-yellow flex items-center justify-center">
               <Flame className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-xl font-display font-bold hidden sm:block flame-text">
               Flame Beverage
             </span>
-          </a>
+          </Link>
+
+          {/* Navigation Links - Desktop */}
+          <nav className="hidden lg:flex items-center gap-6">
+            <Link
+              href="/products"
+              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+            >
+              {t("allProducts")}
+            </Link>
+            <Link
+              href="/#categories"
+              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+            >
+              {t("categories")}
+            </Link>
+            <Link
+              href="/offers"
+              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+            >
+              {t("offers")}
+            </Link>
+          </nav>
 
           {/* Search - Desktop */}
           <div className="hidden md:flex flex-1 max-w-xl relative">
@@ -74,15 +98,25 @@ const Header: React.FC<IHeaderProps> = ({
 
           {/* Actions */}
           <div className="flex items-center gap-2">
+            {/* Login Button */}
+            <Link href="/login">
+              <Button
+                variant="outline"
+                className="hidden sm:flex items-center gap-2 text-foreground border-border hover:bg-secondary/80"
+              >
+                <User className="w-4 h-4" />
+                {t("login")}
+              </Button>
+            </Link>
+
             {/* Language Toggle */}
             <Button
-              variant="ghost"
-              size="icon"
+              variant="outline"
+              className="hidden sm:flex items-center gap-2 text-foreground border-border hover:bg-secondary/80"
               onClick={() => setLanguage(language === "en" ? "np" : "en")}
-              className="text-foreground hover:text-flame-orange hover:bg-secondary/80"
             >
-              <Globe className="w-5 h-5" />
-              <span className="sr-only">Language</span>
+              <Globe className="w-4 h-4" />
+              <span>{language === "en" ? "नेपाली" : "English"}</span>
             </Button>
 
             {/* Theme Toggle */}
@@ -104,17 +138,15 @@ const Header: React.FC<IHeaderProps> = ({
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
                 <Button
-                  variant="ghost"
-                  size="icon"
-                  className="relative text-foreground hover:text-flame-orange hover:bg-secondary/80"
+                  className="bg-gradient-to-r from-flame-orange to-flame-red text-white hover:shadow-lg hover:shadow-flame-orange/30 flex items-center gap-2"
                 >
-                  <ShoppingCart className="w-5 h-5" />
+                  <ShoppingCart className="w-4 h-4" />
+                  <span className="hidden sm:inline">{t("myCart")}</span>
                   {totalItems > 0 && (
-                    <span className="absolute -top-1 -right-1 w-5 h-5 bg-flame-orange text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="w-5 h-5 bg-white text-flame-orange text-xs font-bold rounded-full flex items-center justify-center">
                       {totalItems}
                     </span>
                   )}
-                  <span className="sr-only">{t("myCart")}</span>
                 </Button>
               </SheetTrigger>
               <SheetContent className="w-full sm:max-w-md bg-card border-border">
@@ -238,6 +270,43 @@ const Header: React.FC<IHeaderProps> = ({
             </Button>
           </div>
         </div>
+
+        {/* Mobile Menu */}
+        {isMenuOpen && (
+          <div className="lg:hidden pb-4 border-t border-border/40 pt-4">
+            <nav className="flex flex-col gap-3">
+              <Link
+                href="/products"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+              >
+                {t("allProducts")}
+              </Link>
+              <Link
+                href="/#categories"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+              >
+                {t("categories")}
+              </Link>
+              <Link
+                href="/offers"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+              >
+                {t("offers")}
+              </Link>
+              <Link
+                href="/login"
+                onClick={() => setIsMenuOpen(false)}
+                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2 flex items-center gap-2"
+              >
+                <User className="w-4 h-4" />
+                {t("login")}
+              </Link>
+            </nav>
+          </div>
+        )}
 
         {/* Mobile Search */}
         <div className="md:hidden pb-4">

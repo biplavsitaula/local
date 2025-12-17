@@ -3,14 +3,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { Flame, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
+import Link from 'next/link';
 
 const Footer: React.FC = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
 
   return (
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
@@ -39,20 +40,75 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-semibold text-foreground mb-4">
+            <h4 className="font-display font-semibold text-golden mb-4">
               {t('quickLinks')}
             </h4>
             <ul className="space-y-2">
-              {['Home', 'Products', 'About Us', 'Contact', 'FAQ'].map((link) => (
-                <li key={link}>
-                  <a
-                    href="#"
-                    className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
-                  >
-                    {link}
-                  </a>
-                </li>
-              ))}
+              <li>
+                <Link
+                  href="/"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('home')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/products"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('allProducts')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/#categories"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('categories')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/offers"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('offers')}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="font-display font-semibold text-golden mb-4">
+              {language === 'en' ? 'Legal' : 'कानूनी'}
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/about"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('aboutUs')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/terms"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('termsConditions')}
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/privacy"
+                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                >
+                  {t('privacyPolicy')}
+                </Link>
+              </li>
             </ul>
           </div>
 
