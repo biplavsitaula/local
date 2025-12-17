@@ -21,11 +21,9 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-secondary/50 border border-flame-orange/30 backdrop-blur-sm">
+          <div className="inline-flex items-center gap-2 shadow-sm shadow-flame-gold px-4 py-2 rounded-full bg-secondary/50 border border-flame-gold text-flame-gold backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-flame-yellow" />
-            <span className="text-sm font-medium text-foreground">
-              Premium Collection 2024
-            </span>
+            <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
 
           {/* Main Title */}
@@ -43,7 +41,7 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               variant="default"
-              className="bg-flame-gradient text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
+              className="gradient-gold text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
             >
               {t("shopNow")}
               <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
@@ -51,7 +49,7 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-flame-orange/50 text-foreground hover:bg-flame-orange/10 px-8 py-6 text-lg"
+              className="border-border/50 text-foreground hover:bg-card/10 px-8 py-6 text-lg"
             >
               {t("viewCollection")}
             </Button>

@@ -1,30 +1,30 @@
-import { NavLink } from '@/components/NavLink';
-import { 
-  LayoutDashboard, 
-  Package, 
-  BarChart3, 
-  AlertTriangle, 
-  Star, 
+import { NavLink } from "@/components/NavLink";
+import {
+  LayoutDashboard,
+  Package,
+  BarChart3,
+  AlertTriangle,
+  Star,
   TrendingUp,
   ThumbsUp,
   Settings,
   Flame,
   LogOut,
   ShoppingCart,
-  CreditCard
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
+  CreditCard,
+} from "lucide-react";
+import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { title: 'Dashboard', icon: LayoutDashboard, path: '/' },
-  { title: 'Products', icon: Package, path: '/products' },
-  { title: 'Orders', icon: ShoppingCart, path: '/orders' },
-  { title: 'Payments', icon: CreditCard, path: '/payments' },
-  { title: 'Analytics', icon: BarChart3, path: '/analytics' },
-  { title: 'Stock Alerts', icon: AlertTriangle, path: '/alerts' },
-  { title: 'Top Sellers', icon: TrendingUp, path: '/top-sellers' },
-  { title: 'Recommended', icon: ThumbsUp, path: '/recommended' },
-  { title: 'Reviews', icon: Star, path: '/reviews' },
+  { title: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { title: "Products", icon: Package, path: "/admin/products" },
+  { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+  { title: "Payments", icon: CreditCard, path: "/admin/payments" },
+  // { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
+  // { title: "Stock Alerts", icon: AlertTriangle, path: "/admin/alerts" },
+  // { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },
+  // { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
+  // { title: "Reviews", icon: Star, path: "/admin/reviews" },
 ];
 
 export function AdminSidebar() {
@@ -37,7 +37,9 @@ export function AdminSidebar() {
             <Flame className="h-6 w-6 text-primary-foreground" />
           </div>
           <div>
-            <h1 className="font-display text-xl font-bold text-flame-orange">Flame Beverage</h1>
+            <h1 className="font-display text-xl font-bold text-flame-orange">
+              Flame Beverage
+            </h1>
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
         </div>

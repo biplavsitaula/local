@@ -41,11 +41,11 @@ const Header: React.FC<IHeaderProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
       {/* Promo Banner */}
-      <div className="bg-gradient-to-r from-flame-red via-flame-orange to-flame-yellow text-primary-foreground text-center py-2 px-4 text-sm font-medium">
+      <div className="gradient-gold text-primary-foreground text-center py-2 px-4 text-sm font-medium">
         <span className="hidden sm:inline">
-          🔥 {t("freeDelivery")} | ⚡ {t("hourDelivery")} 🔥
+          {t("freeDelivery")} | {t("hourDelivery")}
         </span>
-        <span className="sm:hidden">🔥 {t("freeDelivery")}</span>
+        <span className="sm:hidden">{t("freeDelivery")}</span>
       </div>
 
       <div className="container mx-auto px-4">

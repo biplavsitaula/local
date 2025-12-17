@@ -10,6 +10,7 @@ export type Product = {
   tag?: string;
   volume?: string;
   alcohol?: string;
+  stock?: number;
 };
 
 export type CartItem = {

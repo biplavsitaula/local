@@ -1,3 +1,5 @@
+"use client";
+
 import { createContext, useContext, useMemo, useState, ReactNode } from "react";
 import { CartItem, Product } from "@/types";
 

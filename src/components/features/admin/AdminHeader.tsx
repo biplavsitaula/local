@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { Search, User } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { AddProductModal } from '@/components/features/admin/AddProductModal';
+import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
 import { NotificationDropdown } from '@/components/features/admin/NotificationDropdown';
 import { ExportButton } from '@/components/features/admin/ExportButton';
 
