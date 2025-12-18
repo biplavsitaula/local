@@ -90,10 +90,10 @@ const Products: React.FC = () => {
         <div className="container mx-auto px-4">
           <div className="flex h-16 items-center justify-between gap-4">
             <Link href="/" className="flex items-center gap-2">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-gradient-to-r from-flame-orange to-flame-red">
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-gradient">
                 <Flame className="h-6 w-6 text-card" />
               </div>
-              <span className="hidden font-display text-xl font-bold text-golden sm:block">Flame Beverage</span>
+              <span className="hidden font-display text-xl font-bold text-ternary-text sm:block">Flame Beverage</span>
             </Link>
             <div className="flex items-center gap-2">
               <button onClick={() => setLanguage(language === 'en' ? 'np' : 'en')} className="flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
@@ -103,7 +103,7 @@ const Products: React.FC = () => {
               <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted">
                 {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
-              <Link href="/" className="flex items-center gap-2 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red px-4 py-2 font-medium text-card transition-all hover:shadow-lg hover:shadow-flame-orange/30">
+              <Link href="/" className="flex items-center gap-2 rounded-lg bg-primary-gradient px-4 py-2 font-medium text-text-inverse transition-all hover:shadow-primary-lg">
                 <ShoppingCart className="h-5 w-5" />
                 {totalItems > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-card text-xs font-bold text-primary">{totalItems}</span>}
               </Link>
@@ -116,7 +116,7 @@ const Products: React.FC = () => {
         <div className="container mx-auto px-4">
           {/* Page Header */}
           <div className="mb-8">
-            <h1 className="text-3xl md:text-4xl font-bold font-display text-golden mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold font-display text-ternary-text mb-2">
               {t('allProducts')}
             </h1>
             <p className="text-muted-foreground">
@@ -134,7 +134,7 @@ const Products: React.FC = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={t('searchPlaceholder')}
-                className="w-full pl-12 pr-4 py-3 bg-card/80 backdrop-blur-sm border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20 transition-all"
+                className="w-full pl-12 pr-4 py-3 bg-card/80 backdrop-blur-sm border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20 transition-all"
               />
               {searchQuery && (
                 <button
@@ -154,7 +154,7 @@ const Products: React.FC = () => {
               <SlidersHorizontal className="h-5 w-5" />
               Filters
               {hasActiveFilters && (
-                <span className="h-2 w-2 bg-flame-orange rounded-full"></span>
+                <span className="h-2 w-2 bg-primary-btn rounded-full"></span>
               )}
             </button>
 
@@ -165,7 +165,7 @@ const Products: React.FC = () => {
                 <select
                   value={selectedCategory || ''}
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
-                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-flame-orange cursor-pointer"
+                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                 >
                   <option value="">All Categories</option>
                   {categories.map((cat) => (
@@ -185,7 +185,7 @@ const Products: React.FC = () => {
                     const [min, max] = e.target.value.split('-').map(Number);
                     setPriceRange([min, max]);
                   }}
-                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-flame-orange cursor-pointer"
+                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                 >
                   <option value="0-100000">All Prices</option>
                   <option value="0-1000">Under Rs. 1,000</option>
@@ -202,7 +202,7 @@ const Products: React.FC = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-flame-orange cursor-pointer"
+                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                 >
                   <option value="newest">{t('newest')}</option>
                   <option value="lowToHigh">{t('lowToHigh')}</option>
@@ -215,13 +215,13 @@ const Products: React.FC = () => {
               <div className="flex items-center bg-card/80 border border-border rounded-xl overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-3 transition-colors ${viewMode === 'grid' ? 'bg-flame-orange text-white' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`p-3 transition-colors ${viewMode === 'grid' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <Grid3X3 className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-3 transition-colors ${viewMode === 'list' ? 'bg-flame-orange text-white' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`p-3 transition-colors ${viewMode === 'list' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <List className="h-5 w-5" />
                 </button>
@@ -231,7 +231,7 @@ const Products: React.FC = () => {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-3 text-flame-orange hover:text-flame-yellow transition-colors"
+                  className="px-4 py-3 text-primary-text hover:text-ternary-text transition-colors"
                 >
                   Clear All
                 </button>
@@ -297,7 +297,7 @@ const Products: React.FC = () => {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="w-full py-3 text-flame-orange border border-flame-orange rounded-xl hover:bg-flame-orange/10 transition-colors"
+                  className="w-full py-3 text-primary-text border border-primary-border rounded-xl hover:bg-primary-btn/10 transition-colors"
                 >
                   Clear All Filters
                 </button>
@@ -311,8 +311,8 @@ const Products: React.FC = () => {
               onClick={() => setSelectedCategory(null)}
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
                 !selectedCategory
-                  ? 'bg-gradient-to-r from-flame-orange to-flame-red text-white'
-                  : 'bg-card/80 border border-border text-foreground hover:border-flame-orange'
+                  ? 'bg-primary-gradient text-text-inverse'
+                  : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
               }`}
             >
               All
@@ -323,8 +323,8 @@ const Products: React.FC = () => {
                 onClick={() => setSelectedCategory(cat.id)}
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
                   selectedCategory === cat.id
-                    ? 'bg-gradient-to-r from-flame-orange to-flame-red text-white'
-                    : 'bg-card/80 border border-border text-foreground hover:border-flame-orange'
+                    ? 'bg-primary-gradient text-text-inverse'
+                    : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
                 }`}
               >
                 <span>{cat.icon}</span>
@@ -363,7 +363,7 @@ const Products: React.FC = () => {
               <p className="text-muted-foreground mb-6">Try adjusting your filters or search query</p>
               <button
                 onClick={clearFilters}
-                className="px-6 py-3 bg-gradient-to-r from-flame-orange to-flame-red text-white rounded-xl hover:shadow-lg transition-all"
+                className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all"
               >
                 Clear All Filters
               </button>

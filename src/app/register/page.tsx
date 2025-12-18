@@ -32,7 +32,7 @@ const Register = () => {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-gradient-to-br from-flame-red to-flame-orange">
+            <div className="p-3 rounded-full bg-primary-gradient">
               <Flame className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -51,7 +51,7 @@ const Register = () => {
             <Link href="/login" className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors">
               {language === "en" ? "Login" : "लगइन"}
             </Link>
-            <button className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red text-white font-medium">
+            <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
               {language === "en" ? "Register" : "दर्ता"}
             </button>
           </div>
@@ -70,7 +70,7 @@ const Register = () => {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder={language === "en" ? "Enter your full name" : "तपाईंको पूरा नाम प्रविष्ट गर्नुहोस्"}
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
               </div>
@@ -88,7 +88,7 @@ const Register = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder={language === "en" ? "Enter your email" : "तपाईंको इमेल प्रविष्ट गर्नुहोस्"}
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
               </div>
@@ -108,7 +108,7 @@ const Register = () => {
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                     placeholder={language === "en" ? "98XXXXXXXX" : "९८XXXXXXXX"}
-                    className="flex-1 pl-4 pr-4 py-3 bg-background border border-border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                    className="flex-1 pl-4 pr-4 py-3 bg-background border border-border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                     required
                   />
                 </div>
@@ -127,7 +127,7 @@ const Register = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={language === "en" ? "Enter your password" : "तपाईंको पासवर्ड प्रविष्ट गर्नुहोस्"}
-                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
                 <button
@@ -152,7 +152,7 @@ const Register = () => {
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
                   placeholder={language === "en" ? "Confirm your password" : "तपाईंको पासवर्ड पुष्टि गर्नुहोस्"}
-                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
                 <button
@@ -172,29 +172,29 @@ const Register = () => {
                 id="terms"
                 checked={formData.agreeToTerms}
                 onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                className="mt-1 w-4 h-4 rounded border-border text-flame-orange focus:ring-flame-orange"
+                className="mt-1 w-4 h-4 rounded border-border text-primary-text focus:ring-primary-border"
                 required
               />
               <label htmlFor="terms" className="text-sm text-muted-foreground">
                 {language === "en" ? (
                   <>
                     I agree to the{" "}
-                    <Link href="/terms" className="text-flame-orange hover:text-flame-red">
+                    <Link href="/terms" className="text-primary-text hover:text-secondary-text">
                       Terms of Service
                     </Link>{" "}
                     and{" "}
-                    <Link href="/privacy" className="text-flame-orange hover:text-flame-red">
+                    <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
                       Privacy Policy
                     </Link>
                   </>
                 ) : (
                   <>
                     म{" "}
-                    <Link href="/terms" className="text-flame-orange hover:text-flame-red">
+                    <Link href="/terms" className="text-primary-text hover:text-secondary-text">
                       सेवा सर्तहरू
                     </Link>{" "}
                     र{" "}
-                    <Link href="/privacy" className="text-flame-orange hover:text-flame-red">
+                    <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
                       गोपनीयता नीति
                     </Link>{" "}
                     सँग सहमत छु
@@ -206,7 +206,7 @@ const Register = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red text-white font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-flame-orange/30 transition-all"
+              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all"
             >
               <Flame className="w-5 h-5" />
               {language === "en" ? "Create Account" : "खाता सिर्जना गर्नुहोस्"}
@@ -250,4 +250,5 @@ const Register = () => {
 };
 
 export default Register;
+
 

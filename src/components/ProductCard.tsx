@@ -39,7 +39,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Badges */}
       <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
         {product.isNew && (
-          <span className="rounded-full bg-gradient-to-r from-flame-orange to-flame-red px-3 py-1 text-xs font-bold text-card">
+          <span className="rounded-full bg-primary-gradient px-3 py-1 text-xs font-bold text-text-inverse">
             NEW
           </span>
         )}
@@ -78,7 +78,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Content */}
       <div className="p-4">
         <p className="text-xs text-muted-foreground capitalize">{product.category}</p>
-        <h3 className="mt-1 line-clamp-1 font-display text-lg font-bold text-golden">
+        <h3 className="mt-1 line-clamp-1 font-display text-lg font-bold text-tertiary-text">
           {language === 'en' ? product.name : product.nameNe}
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -126,7 +126,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           <button
             onClick={handleAddToCart}
             disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary bg-transparent py-2.5 font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary-border bg-btn-outline py-2.5 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ShoppingCart className="h-4 w-4" />
             <span className="hidden sm:inline">{t('addToCart')}</span>
@@ -134,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           <button
             onClick={handleBuyNow}
             disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red py-2.5 font-medium text-card transition-all hover:shadow-lg hover:shadow-flame-orange/30 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-2.5 font-medium text-text-inverse transition-all hover:shadow-primary-lg disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Zap className="h-4 w-4" />
             <span className="hidden sm:inline">{t('buyNow')}</span>
@@ -146,4 +146,5 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 };
 
 export default ProductCard;
+
 

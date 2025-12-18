@@ -27,7 +27,7 @@ const Login = () => {
         {/* Logo and Title */}
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-gradient-to-br from-flame-red to-flame-orange">
+            <div className="p-3 rounded-full bg-primary-gradient">
               <Flame className="w-8 h-8 text-white" />
             </div>
           </div>
@@ -43,7 +43,7 @@ const Login = () => {
         <div className="bg-card rounded-2xl border border-border p-8 shadow-xl">
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
-            <button className="flex-1 py-3 px-4 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red text-white font-medium">
+            <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
               {language === "en" ? "Login" : "लगइन"}
             </button>
             <Link href="/register" className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors">
@@ -65,7 +65,7 @@ const Login = () => {
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder={language === "en" ? "Enter your email" : "तपाईंको इमेल प्रविष्ट गर्नुहोस्"}
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
               </div>
@@ -83,7 +83,7 @@ const Login = () => {
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={language === "en" ? "Enter your password" : "तपाईंको पासवर्ड प्रविष्ट गर्नुहोस्"}
-                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-flame-orange focus:ring-2 focus:ring-flame-orange/20"
+                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
                 <button
@@ -98,7 +98,7 @@ const Login = () => {
 
             {/* Forgot Password */}
             <div className="flex justify-end">
-              <Link href="#" className="text-sm text-flame-orange hover:text-flame-red">
+              <Link href="#" className="text-sm text-primary-text hover:text-secondary-text">
                 {language === "en" ? "Forgot Password?" : "पासवर्ड बिर्सनुभयो?"}
               </Link>
             </div>
@@ -106,7 +106,7 @@ const Login = () => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red text-white font-semibold flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-flame-orange/30 transition-all"
+              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all"
             >
               <Flame className="w-5 h-5" />
               {language === "en" ? "Login" : "लगइन"}
@@ -150,4 +150,5 @@ const Login = () => {
 };
 
 export default Login;
+
 

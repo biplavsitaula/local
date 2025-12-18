@@ -16,11 +16,11 @@ export default function NotFound() {
 
       {/* Modal */}
       <div className="relative z-10 w-full max-w-md mx-4 animate-scale-in">
-        <div className="glass-dark rounded-2xl p-8 text-center border border-flame-orange/20 shadow-2xl">
+        <div className="glass-dark rounded-2xl p-8 text-center border border-border-primary-accent shadow-2xl">
           {/* Icon */}
           <div className="flex justify-center mb-6">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-flame-red via-flame-orange to-flame-yellow flex items-center justify-center animate-pulse-glow">
+              <div className="w-20 h-20 rounded-full bg-flame-gradient flex items-center justify-center animate-pulse-glow">
                 <AlertTriangle className="w-10 h-10 text-primary-foreground" />
               </div>
             </div>
@@ -45,7 +45,7 @@ export default function NotFound() {
             <Button
               onClick={() => router.back()}
               variant="outline"
-              className="flex-1 border-flame-orange/50 text-foreground hover:bg-flame-orange/10 py-6 text-lg"
+              className="flex-1 border-primary-border/50 text-foreground hover:bg-primary-btn/10 py-6 text-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               Go Back
@@ -53,7 +53,7 @@ export default function NotFound() {
             <Button
               asChild
               variant="default"
-              className="flex-1 bg-flame-gradient text-primary-foreground font-semibold py-6 text-lg hover:opacity-90 transition-opacity border-0"
+              className="flex-1 bg-primary-gradient text-text-inverse font-semibold py-6 text-lg hover:opacity-90 transition-opacity border-0"
             >
               <Link href="/">
                 <Home className="w-5 h-5 mr-2" />

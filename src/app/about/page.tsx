@@ -27,11 +27,11 @@ const AboutUs = () => {
         {/* Hero Section */}
         <div className="text-center mb-16">
           <div className="flex justify-center mb-6">
-            <div className="p-4 rounded-full bg-gradient-to-br from-flame-red to-flame-orange">
+            <div className="p-4 rounded-full bg-primary-gradient">
               <Flame className="w-12 h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-5xl font-display font-bold text-golden mb-4">
+          <h1 className="text-3xl md:text-5xl font-display font-bold text-ternary-text mb-4">
             {t("aboutFlameBeverage")}
           </h1>
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
@@ -46,7 +46,7 @@ const AboutUs = () => {
               key={index}
               className="bg-card rounded-xl p-6 text-center border border-border hover:border-golden transition-colors"
             >
-              <div className="text-3xl md:text-4xl font-bold text-golden mb-2">{stat.value}</div>
+              <div className="text-3xl md:text-4xl font-bold text-ternary-text mb-2">{stat.value}</div>
               <div className="text-muted-foreground">{stat.label}</div>
             </div>
           ))}
@@ -55,7 +55,7 @@ const AboutUs = () => {
         {/* Our Story */}
         <div className="grid md:grid-cols-2 gap-12 mb-16">
           <div>
-            <h2 className="text-2xl font-display font-bold text-golden mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-ternary-text mb-4 flex items-center gap-2">
               <Users className="w-6 h-6" />
               {t("ourStory")}
             </h2>
@@ -67,7 +67,7 @@ const AboutUs = () => {
             </p>
           </div>
           <div>
-            <h2 className="text-2xl font-display font-bold text-golden mb-4 flex items-center gap-2">
+            <h2 className="text-2xl font-display font-bold text-ternary-text mb-4 flex items-center gap-2">
               <Award className="w-6 h-6" />
               {t("whyChooseUs")}
             </h2>
@@ -91,13 +91,13 @@ const AboutUs = () => {
 
         {/* Contact Info */}
         <div className="bg-card rounded-xl p-8 border border-border">
-          <h2 className="text-2xl font-display font-bold text-golden mb-6 text-center">
+          <h2 className="text-2xl font-display font-bold text-ternary-text mb-6 text-center">
             {t("customerService")}
           </h2>
           <div className="grid md:grid-cols-3 gap-6">
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-flame-red/20">
-                <MapPin className="w-6 h-6 text-flame-red" />
+              <div className="p-3 rounded-full bg-secondary-btn/20">
+                <MapPin className="w-6 h-6 text-secondary-text" />
               </div>
               <div>
                 <div className="font-medium text-foreground">
@@ -107,8 +107,8 @@ const AboutUs = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-flame-orange/20">
-                <Phone className="w-6 h-6 text-flame-orange" />
+              <div className="p-3 rounded-full bg-primary-btn/20">
+                <Phone className="w-6 h-6 text-primary-text" />
               </div>
               <div>
                 <div className="font-medium text-foreground">
@@ -118,8 +118,8 @@ const AboutUs = () => {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="p-3 rounded-full bg-flame-yellow/20">
-                <Mail className="w-6 h-6 text-flame-yellow" />
+              <div className="p-3 rounded-full bg-ternary-btn/20">
+                <Mail className="w-6 h-6 text-ternary-text" />
               </div>
               <div>
                 <div className="font-medium text-foreground">

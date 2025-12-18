@@ -52,11 +52,11 @@ const PrivacyPolicy = () => {
       <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-golden/20">
-              <Shield className="w-8 h-8 text-golden" />
+            <div className="p-3 rounded-full bg-ternary-text/20">
+              <Shield className="w-8 h-8 text-ternary-text" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-golden mb-4">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-ternary-text mb-4">
             {t("privacyPolicy")}
           </h1>
           <p className="text-muted-foreground">
@@ -76,11 +76,11 @@ const PrivacyPolicy = () => {
             return (
               <div key={index} className="bg-card rounded-xl p-6 border border-border">
                 <div className="flex items-start gap-4">
-                  <div className="p-2 rounded-lg bg-golden/20 shrink-0">
-                    <Icon className="w-5 h-5 text-golden" />
+                  <div className="p-2 rounded-lg bg-ternary-text/20 shrink-0">
+                    <Icon className="w-5 h-5 text-ternary-text" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-semibold text-golden mb-3">{section.title}</h2>
+                    <h2 className="text-xl font-semibold text-ternary-text mb-3">{section.title}</h2>
                     <p className="text-muted-foreground leading-relaxed">{section.content}</p>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ const PrivacyPolicy = () => {
         </div>
 
         <div className="mt-12 p-6 bg-card rounded-xl border border-golden/20">
-          <h3 className="text-lg font-semibold text-golden mb-3">
+          <h3 className="text-lg font-semibold text-ternary-text mb-3">
             {t("customerService")}
           </h3>
           <p className="text-muted-foreground mb-4">

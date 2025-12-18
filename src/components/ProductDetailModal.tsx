@@ -52,7 +52,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               className="h-full w-full object-cover"
             />
             {product.isNew && (
-              <span className="absolute left-4 top-4 rounded-full bg-gradient-to-r from-flame-orange to-flame-red px-4 py-1.5 text-sm font-bold text-card">
+              <span className="absolute left-4 top-4 rounded-full bg-primary-gradient px-4 py-1.5 text-sm font-bold text-text-inverse">
                 NEW
               </span>
             )}
@@ -66,7 +66,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
           {/* Details */}
           <div className="flex flex-col">
             <p className="text-sm uppercase tracking-wide text-muted-foreground">{product.category}</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-golden">
+            <h2 className="mt-2 font-display text-3xl font-bold text-tertiary-text">
               {language === 'en' ? product.name : product.nameNe}
             </h2>
 
@@ -156,7 +156,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-flame-orange to-flame-red py-3 font-semibold text-card transition-all hover:shadow-lg hover:shadow-flame-orange/30"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-3 font-semibold text-text-inverse transition-all hover:shadow-primary-lg"
                   >
                     <Zap className="h-5 w-5" />
                     {t('buyNow')}
@@ -172,4 +172,5 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
 };
 
 export default ProductDetailModal;
+
 

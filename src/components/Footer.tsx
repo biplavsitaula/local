@@ -15,7 +15,7 @@ const Footer: React.FC = () => {
           {/* Brand */}
           <div className="space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-flame-red via-flame-orange to-flame-yellow flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center">
                 <Flame className="w-6 h-6 text-primary-foreground" />
               </div>
               <span className="text-xl font-display font-bold flame-text">
@@ -26,13 +26,13 @@ const Footer: React.FC = () => {
               Your premium destination for the finest spirits and beverages. Quality guaranteed.
             </p>
             <div className="flex gap-4">
-              <a href="#" className="text-muted-foreground hover:text-flame-orange transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary-text transition-colors">
                 <Facebook className="w-5 h-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-flame-orange transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary-text transition-colors">
                 <Instagram className="w-5 h-5" />
               </a>
-              <a href="#" className="text-muted-foreground hover:text-flame-orange transition-colors">
+              <a href="#" className="text-muted-foreground hover:text-primary-text transition-colors">
                 <Twitter className="w-5 h-5" />
               </a>
             </div>
@@ -40,14 +40,14 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className="font-display font-semibold text-golden mb-4">
+            <h4 className="font-display font-semibold text-ternary-text mb-4">
               {t('quickLinks')}
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('home')}
                 </Link>
@@ -55,7 +55,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/products"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('allProducts')}
                 </Link>
@@ -63,7 +63,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/#categories"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('categories')}
                 </Link>
@@ -71,7 +71,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/offers"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('offers')}
                 </Link>
@@ -81,14 +81,14 @@ const Footer: React.FC = () => {
 
           {/* Legal */}
           <div>
-            <h4 className="font-display font-semibold text-golden mb-4">
+            <h4 className="font-display font-semibold text-ternary-text mb-4">
               {language === 'en' ? 'Legal' : 'कानूनी'}
             </h4>
             <ul className="space-y-2">
               <li>
                 <Link
                   href="/about"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('aboutUs')}
                 </Link>
@@ -96,7 +96,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/terms"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('termsConditions')}
                 </Link>
@@ -104,7 +104,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/privacy"
-                  className="text-sm text-muted-foreground hover:text-flame-orange transition-colors"
+                  className="text-sm text-muted-foreground hover:text-primary-text transition-colors"
                 >
                   {t('privacyPolicy')}
                 </Link>
@@ -119,15 +119,15 @@ const Footer: React.FC = () => {
             </h4>
             <ul className="space-y-3">
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Phone className="w-4 h-4 text-flame-orange" />
+                <Phone className="w-4 h-4 text-primary-text" />
                 <span>+977 9800000000</span>
               </li>
               <li className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Mail className="w-4 h-4 text-flame-orange" />
+                <Mail className="w-4 h-4 text-primary-text" />
                 <span>info@flamebeverage.com</span>
               </li>
               <li className="flex items-start gap-2 text-sm text-muted-foreground">
-                <MapPin className="w-4 h-4 text-flame-orange shrink-0 mt-0.5" />
+                <MapPin className="w-4 h-4 text-primary-text shrink-0 mt-0.5" />
                 <span>Kathmandu, Nepal</span>
               </li>
             </ul>
@@ -147,7 +147,7 @@ const Footer: React.FC = () => {
                 placeholder="Your email"
                 className="bg-secondary/50 border-border/50"
               />
-              <Button className="bg-flame-orange hover:bg-flame-red text-primary-foreground shrink-0">
+              <Button className="bg-primary-btn hover:bg-primary-hover text-primary-foreground shrink-0">
                 <Mail className="w-4 h-4" />
               </Button>
             </div>
@@ -160,7 +160,7 @@ const Footer: React.FC = () => {
             {t('copyright')}
           </p>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <span className="text-flame-orange">🔞</span>
+            <span className="text-primary-text">🔞</span>
             <span>{t('drinkResponsibly')}</span>
           </div>
         </div>

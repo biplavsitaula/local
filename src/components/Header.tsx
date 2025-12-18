@@ -54,7 +54,7 @@ const Header: React.FC<IHeaderProps> = ({
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-flame-red via-flame-orange to-flame-yellow flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center">
               <Flame className="w-6 h-6 text-primary-foreground" />
             </div>
             <span className="text-xl font-display font-bold hidden sm:block flame-text">
@@ -66,19 +66,19 @@ const Header: React.FC<IHeaderProps> = ({
           <nav className="hidden lg:flex items-center gap-6">
             <Link
               href="/products"
-              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
             >
               {t("allProducts")}
             </Link>
             <Link
               href="/#categories"
-              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
             >
               {t("categories")}
             </Link>
             <Link
               href="/offers"
-              className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors"
+              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
             >
               {t("offers")}
             </Link>
@@ -92,7 +92,7 @@ const Header: React.FC<IHeaderProps> = ({
               placeholder={t("search")}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-secondary/50 border-border/50 focus:border-flame-orange"
+              className="pl-10 bg-secondary/50 border-border/50 focus:border-primary-border"
             />
           </div>
 
@@ -124,7 +124,7 @@ const Header: React.FC<IHeaderProps> = ({
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-foreground hover:text-flame-orange hover:bg-secondary/80"
+              className="text-foreground hover:text-primary-text hover:bg-secondary/80"
             >
               {theme === "dark" ? (
                 <Sun className="w-5 h-5" />
@@ -138,12 +138,12 @@ const Header: React.FC<IHeaderProps> = ({
             <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
               <SheetTrigger asChild>
                 <Button
-                  className="bg-gradient-to-r from-flame-orange to-flame-red text-white hover:shadow-lg hover:shadow-flame-orange/30 flex items-center gap-2"
+                  className="bg-primary-gradient text-text-inverse hover:shadow-primary-lg flex items-center gap-2"
                 >
                   <ShoppingCart className="w-4 h-4" />
                   <span className="hidden sm:inline">{t("myCart")}</span>
                   {totalItems > 0 && (
-                    <span className="w-5 h-5 bg-white text-flame-orange text-xs font-bold rounded-full flex items-center justify-center">
+                    <span className="w-5 h-5 bg-white text-primary-text text-xs font-bold rounded-full flex items-center justify-center">
                       {totalItems}
                     </span>
                   )}
@@ -182,7 +182,7 @@ const Header: React.FC<IHeaderProps> = ({
                               <p className="text-xs text-muted-foreground">
                                 {item.product.volume}
                               </p>
-                              <p className="text-flame-orange font-semibold mt-1">
+                              <p className="text-primary-text font-semibold mt-1">
                                 Rs. {item.product.price.toLocaleString()}
                               </p>
                               <div className="flex items-center gap-2 mt-2">
@@ -240,7 +240,7 @@ const Header: React.FC<IHeaderProps> = ({
                           </span>
                         </div>
                         <Button
-                          className="w-full bg-gradient-to-r from-flame-red via-flame-orange to-flame-yellow text-primary-foreground font-semibold"
+                          className="w-full bg-primary-gradient text-text-inverse font-semibold"
                           onClick={() => {
                             setIsCartOpen(false);
                             onCheckout?.();
@@ -278,28 +278,28 @@ const Header: React.FC<IHeaderProps> = ({
               <Link
                 href="/products"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
               >
                 {t("allProducts")}
               </Link>
               <Link
                 href="/#categories"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
               >
                 {t("categories")}
               </Link>
               <Link
                 href="/offers"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2"
+                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
               >
                 {t("offers")}
               </Link>
               <Link
                 href="/login"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-flame-orange transition-colors py-2 flex items-center gap-2"
+                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2 flex items-center gap-2"
               >
                 <User className="w-4 h-4" />
                 {t("login")}

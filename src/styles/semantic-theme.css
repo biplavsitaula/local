@@ -1,0 +1,59 @@
+@theme {
+  /*
+   * Semantic color tokens for the app (requested names):
+   * primaryText, primaryBtn, primaryHover, primaryBorder,
+   * secondaryText, secondaryBtn, ternaryText, etc.
+   *
+   * Tailwind v4 generates utilities from these:
+   * - text-primary-text, bg-primary-btn, border-primary-border, etc.
+   */
+
+  /* Brand / Primary (orange) */
+  --color-primary-text: var(--color-flame-orange);
+  --color-primary-btn: var(--color-flame-orange);
+  --color-primary-hover: hsl(25 95% 48%);
+  --color-primary-border: var(--color-flame-orange);
+
+  /* Secondary (red) */
+  --color-secondary-text: var(--color-flame-red);
+  --color-secondary-btn: var(--color-flame-red);
+  --color-secondary-hover: hsl(0 72% 46%);
+  --color-secondary-border: var(--color-flame-red);
+
+  /* Ternary/Tertiary (gold) */
+  --color-ternary-text: var(--color-flame-gold);
+  --color-ternary-btn: var(--color-flame-yellow);
+  --color-ternary-hover: hsl(45 93% 42%);
+  --color-ternary-border: var(--color-flame-yellow);
+
+  /* Alias: tertiary (same as ternary) */
+  --color-tertiary-text: var(--color-ternary-text);
+  --color-tertiary-btn: var(--color-ternary-btn);
+  --color-tertiary-hover: var(--color-ternary-hover);
+  --color-tertiary-border: var(--color-ternary-border);
+
+  /* Text */
+  --color-text-primary: var(--color-foreground);
+  --color-text-secondary: var(--color-muted-foreground);
+  --color-text-inverse: var(--color-primary-foreground);
+
+  /* Borders */
+  --color-border-primary: var(--color-border);
+  --color-border-primary-accent: color-mix(in srgb, var(--color-flame-orange) 50%, transparent);
+
+  /* Button semantic tokens (used by components) */
+  --color-btn-outline: transparent;
+  --color-btn-outline-hover: color-mix(in srgb, var(--color-flame-orange) 10%, transparent);
+  --color-btn-outline-text: var(--color-flame-orange);
+  --color-btn-outline-border: var(--color-flame-orange);
+
+  /* Gradients */
+  --gradient-primary: linear-gradient(135deg, var(--color-flame-orange), var(--color-flame-red));
+  --gradient-primary-hover: linear-gradient(135deg, hsl(25 95% 48%), hsl(0 72% 46%));
+
+  /* Shadows */
+  --shadow-primary: 0 0 20px hsl(25 95% 53% / 0.3);
+  --shadow-primary-lg: 0 0 40px hsl(25 95% 53% / 0.2);
+}
+
+

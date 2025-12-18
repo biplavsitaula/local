@@ -44,7 +44,7 @@ const Offers = () => {
       icon: Sparkles,
       title: t("festivalSpecial"),
       description: t("festivalSpecialDesc"),
-      color: "from-flame-orange to-flame-red",
+      color: "from-primary-btn to-secondary-btn",
     },
   ];
 
@@ -62,7 +62,7 @@ const Offers = () => {
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
       
       <main className="container mx-auto px-4 py-8 pt-24">
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-golden text-center mb-8">
+        <h1 className="text-3xl md:text-4xl font-display font-bold text-ternary-text text-center mb-8">
           {t("specialOffers")}
         </h1>
 
@@ -89,8 +89,8 @@ const Offers = () => {
         {/* Discounted Products */}
         <div className="mb-8">
           <div className="flex items-center gap-3 mb-6">
-            <Percent className="w-8 h-8 text-flame-red" />
-            <h2 className="text-2xl font-display font-bold text-golden">
+            <Percent className="w-8 h-8 text-secondary-text" />
+            <h2 className="text-2xl font-display font-bold text-ternary-text">
               {t("productsOnSale")}
             </h2>
           </div>

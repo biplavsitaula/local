@@ -62,11 +62,11 @@ const TermsAndConditions = () => {
       <main className="container mx-auto px-4 py-8 pt-24 max-w-4xl">
         <div className="text-center mb-12">
           <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-golden/20">
-              <FileText className="w-8 h-8 text-golden" />
+            <div className="p-3 rounded-full bg-ternary-text/20">
+              <FileText className="w-8 h-8 text-ternary-text" />
             </div>
           </div>
-          <h1 className="text-3xl md:text-4xl font-display font-bold text-golden mb-4">
+          <h1 className="text-3xl md:text-4xl font-display font-bold text-ternary-text mb-4">
             {t("termsConditions")}
           </h1>
           <p className="text-muted-foreground">
@@ -77,7 +77,7 @@ const TermsAndConditions = () => {
         <div className="space-y-6">
           {sections.map((section, index) => (
             <div key={index} className="bg-card rounded-xl p-6 border border-border">
-              <h2 className="text-xl font-semibold text-golden mb-3">
+              <h2 className="text-xl font-semibold text-ternary-text mb-3">
                 {section.number}. {section.title}
               </h2>
               <p className="text-muted-foreground leading-relaxed">{section.content}</p>
