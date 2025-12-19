@@ -25,7 +25,7 @@ export function CategoryPieChart({ data }: ICategoryPieChartProps) {
   
   return (
     <div className="glass-card rounded-xl p-6 border border-border/50 opacity-0 animate-fade-in" style={{ animationDelay: '300ms' }}>
-      <h3 className="text-lg font-semibold text-foreground mb-6">Sales by Category</h3>
+      <h3 className="text-lg font-semibold text-foreground mb-6">Products by Category</h3>
       <div className="h-[300px]">
         <ResponsiveContainer width="100%" height="100%">
           <PieChart>

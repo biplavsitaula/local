@@ -20,11 +20,11 @@ const menuItems = [
   { title: "Products", icon: Package, path: "/admin/products" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },
-  // { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
-  // { title: "Stock Alerts", icon: AlertTriangle, path: "/admin/alerts" },
-  // { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },
-  // { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
-  // { title: "Reviews", icon: Star, path: "/admin/reviews" },
+  { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
+  { title: "Stock Alerts", icon: AlertTriangle, path: "/admin/alerts" },
+  { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },
+  { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
+  { title: "Reviews", icon: Star, path: "/admin/reviews" },
 ];
 
 export function AdminSidebar() {
@@ -66,7 +66,7 @@ export function AdminSidebar() {
       {/* Bottom Section */}
       <div className="p-4 border-t border-sidebar-border space-y-1">
         <NavLink
-          to="/settings"
+          to="/admin/settings"
           className="flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground hover:bg-sidebar-accent hover:text-flame-orange transition-colors"
           activeClassName="bg-sidebar-accent text-flame-orange"
         >

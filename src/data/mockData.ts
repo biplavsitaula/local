@@ -8,29 +8,29 @@ export const dashboardStats = {
 };
 
 export const stockData = [
-  { category: 'Whiskey', inStock: 45, lowStock: 8, outOfStock: 2 },
-  { category: 'Vodka', inStock: 32, lowStock: 5, outOfStock: 1 },
-  { category: 'Rum', inStock: 28, lowStock: 4, outOfStock: 3 },
-  { category: 'Wine', inStock: 38, lowStock: 6, outOfStock: 1 },
-  { category: 'Beer', inStock: 52, lowStock: 3, outOfStock: 0 },
-  { category: 'Brandy', inStock: 18, lowStock: 2, outOfStock: 1 },
+  { category: 'Whiskey', inStock: 45, lowStock: 10, outOfStock: 2 },
+  { category: 'Vodka', inStock: 30, lowStock: 10, outOfStock: 5 },
+  { category: 'Cognac', inStock: 20, lowStock: 5, outOfStock: 2 },
+  { category: 'Tequila', inStock: 30, lowStock: 2, outOfStock: 2 },
+  { category: 'Gin', inStock: 40, lowStock: 5, outOfStock: 2 },
+  { category: 'Rum', inStock: 55, lowStock: 10, outOfStock: 5 },
 ];
 
 export const salesData = [
-  { month: 'Jan', sales: 4200 },
+  { month: 'Jan', sales: 4000 },
   { month: 'Feb', sales: 3800 },
-  { month: 'Mar', sales: 4500 },
-  { month: 'Apr', sales: 5200 },
-  { month: 'May', sales: 4800 },
-  { month: 'Jun', sales: 6100 },
+  { month: 'Mar', sales: 4200 },
+  { month: 'Apr', sales: 3900 },
+  { month: 'May', sales: 5500 },
+  { month: 'Jun', sales: 6200 },
 ];
 
 export const categoryData = [
   { name: 'Whiskey', value: 35 },
   { name: 'Vodka', value: 25 },
-  { name: 'Rum', value: 15 },
-  { name: 'Wine', value: 12 },
-  { name: 'Beer', value: 8 },
-  { name: 'Other', value: 5 },
+  { name: 'Cognac', value: 15 },
+  { name: 'Tequila', value: 12 },
+  { name: 'Gin', value: 8 },
+  { name: 'Rum', value: 5 },
 ];
 
