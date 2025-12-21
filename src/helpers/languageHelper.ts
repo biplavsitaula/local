@@ -141,7 +141,9 @@ export type CopyKey =
   | "productsOnSale"
   | "noProductsOnSale"
   | "items"
-  | "processPayment";
+  | "processPayment"
+  | "browseCategories"
+  | "noProductsInCategory";
 
 type Translations = Record<CopyKey, string>;
 

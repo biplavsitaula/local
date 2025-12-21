@@ -182,7 +182,7 @@ const Header: React.FC<IHeaderProps> = ({
               {t("allProducts")}
             </Link>
             <Link
-              href="/#categories"
+              href="/categories"
               className={`text-sm font-medium transition-colors ${
                 theme === 'dark'
                   ? 'text-foreground hover:text-primary-text'

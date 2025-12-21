@@ -9,7 +9,6 @@
   "ageDeniedMessage": "You must be 18 or older to access this website.",
   "underage": "Sorry, you must be 18+ to continue.",
   "recent": "Recent drops",
-  "categories": "Explore categories",
   "search": "Search bottles",
   "filter": "Filter by category",
   "add": "Add to cart",
@@ -136,6 +135,8 @@
   "productsOnSale": "Products on Sale",
   "noProductsOnSale": "No products on sale currently",
   "items": "Items",
-  "processPayment": "Process Payment"
+  "processPayment": "Process Payment",
+  "browseCategories": "Browse Categories",
+  "noProductsInCategory": "No products found in this category"
 }
 

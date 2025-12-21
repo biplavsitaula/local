@@ -1,101 +1,71 @@
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { categories } from '@/data/products';
-import { ArrowRight } from 'lucide-react';
+import { Wine, Beer, GlassWater, Martini, Grape, Cherry } from 'lucide-react';
 import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
 
 const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }) => {
   const { language, t } = useLanguage();
   const { theme } = useTheme();
+  const [mounted, setMounted] = useState(false);
 
-  const categoryImages: Record<string, string> = {
-    All: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&h=300&fit=crop',
-    Whiskey: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&h=300&fit=crop',
-    Vodka: 'https://images.unsplash.com/photo-1614963366795-973eb8748ade?w=400&h=300&fit=crop',
-    Rum: 'https://images.unsplash.com/photo-1609951651556-5334e2706168?w=400&h=300&fit=crop',
-    Wine: 'https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=400&h=300&fit=crop',
-    Beer: 'https://images.unsplash.com/photo-1608270586620-248524c67de9?w=400&h=300&fit=crop',
-    Brandy: 'https://images.unsplash.com/photo-1569078449082-a79eec46a9ea?w=400&h=300&fit=crop',
-    Gin: 'https://images.unsplash.com/photo-1631939046872-79ef3d41d1f1?w=400&h=300&fit=crop',
-    Tequila: 'https://images.unsplash.com/photo-1516535794938-6063878f08cc?w=400&h=300&fit=crop',
-    Cider: 'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=400&h=300&fit=crop',
-    Liqueur: 'https://images.unsplash.com/photo-1527169402691-feff5539e52c?w=400&h=300&fit=crop',
-  };
+  // Prevent hydration mismatch by only rendering after mount
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-  const categoryIcons: Record<string, string> = {
-    All: '🍷',
-    Whiskey: '🥃',
-    Gin: '🍸',
-    Rum: '🍹',
-    Beer: '🍺',
-    Wine: '🍷',
-    Tequila: '🍾',
-    Cider: '🍎',
-    Liqueur: '🥂',
-  };
+  // Main 4 categories matching the design
+  const mainCategories = [
+    { id: 'whisky', name: 'Whisky', nameNe: 'व्हिस्की', icon: Wine, color: 'from-amber-500 to-amber-700' },
+    { id: 'vodka', name: 'Vodka', nameNe: 'भोड्का', icon: GlassWater, color: 'from-blue-400 to-blue-600' },
+    { id: 'rum', name: 'Rum', nameNe: 'रम', icon: Cherry, color: 'from-red-500 to-red-700' },
+    { id: 'beer', name: 'Beer', nameNe: 'बियर', icon: Beer, color: 'from-yellow-500 to-yellow-700' },
+  ];
+
+  // Use default theme during SSR to prevent hydration mismatch
+  const currentTheme = mounted ? theme : 'dark';
 
   return (
-    <section className={`py-16 transition-colors ${
-      theme === 'dark' ? 'bg-secondary/20' : 'bg-gray-50/50'
+    <section className={`py-12 transition-colors ${
+      currentTheme === 'dark' ? 'bg-secondary/20' : 'bg-gray-50/50'
     }`}>
       <div className="container mx-auto px-4">
-        {/* Section Header */}
-        <div className="text-center mb-12">
-          <h2 className={`text-3xl md:text-4xl font-display font-bold mb-4 ${
-            theme === 'dark' ? 'text-foreground' : 'text-gray-900'
-          }`}>
-            {t('categories')}
-          </h2>
-          <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'} style={{ maxWidth: '32rem', margin: '0 auto' }}>
-            Browse our extensive collection by category
-          </p>
-        </div>
-
-        {/* Category Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
-          {categories.map((category, index) => {
+        <h2 className={`mb-8 text-center font-display text-3xl font-bold ${
+          currentTheme === 'dark' ? 'text-foreground' : 'text-gray-900'
+        }`}>
+          {t('categories')}
+        </h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {mainCategories.map((category) => {
             const isSelected = selected === category.name;
-            const categoryKey = category.name.toLowerCase();
+            const Icon = category.icon;
+            
             return (
               <button
                 key={category.id}
-                onClick={() => onSelect(category.name)}
-                className={`group relative overflow-hidden rounded-2xl aspect-[4/3] animate-fade-in card-glow transition-all ${
-                  isSelected ? 'ring-2 ring-flame-orange' : ''
+                onClick={() => onSelect(selected === category.name ? '' : category.name)}
+                className={`group flex flex-col items-center gap-3 rounded-xl border p-4 transition-all duration-300 ${
+                  isSelected
+                    ? `border-flame-orange bg-gradient-to-br ${category.color} shadow-lg shadow-flame-orange/20`
+                    : currentTheme === 'dark'
+                    ? 'border-border bg-card hover:border-flame-orange/50 hover:shadow-md'
+                    : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
                 }`}
-                style={{ animationDelay: `${index * 0.1}s` }}
               >
-                {/* Background Image */}
-                <img
-                  src={categoryImages[category.name] || categoryImages['All']}
-                  alt={category.name}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                  loading="lazy"
-                />
-
-                {/* Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t transition-colors ${
-                  theme === 'dark'
-                    ? `from-background via-background/50 to-transparent ${isSelected ? 'from-flame-orange/20' : ''}`
-                    : `from-white via-white/70 to-transparent ${isSelected ? 'from-orange-200/30' : ''}`
+                <Icon className={`text-3xl transition-transform group-hover:scale-110 ${
+                  isSelected ? 'text-white' : currentTheme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
                 }`} />
-
-                {/* Content */}
-                <div className="absolute inset-0 flex flex-col items-center justify-end p-4 text-center">
-                  <span className="text-4xl mb-2">{categoryIcons[category.name] || '🍷'}</span>
-                  <h3 className={`text-lg font-display font-semibold mb-1 ${
-                    theme === 'dark' ? 'text-foreground' : 'text-gray-900'
-                  }`}>
-                    {language === 'en' ? category.name : category.nameNe}
-                  </h3>
-                  <div className={`flex items-center gap-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity ${
-                    theme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
-                  }`}>
-                    <span>Explore</span>
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                  </div>
-                </div>
+                <span className={`text-sm font-medium ${
+                  isSelected
+                    ? 'text-white'
+                    : currentTheme === 'dark'
+                    ? 'text-foreground'
+                    : 'text-gray-900'
+                }`}>
+                  {language === 'en' ? category.name : category.nameNe}
+                </span>
               </button>
             );
           })}
