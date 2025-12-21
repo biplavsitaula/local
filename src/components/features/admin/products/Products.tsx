@@ -1,13 +1,18 @@
+"use client";
 
 import { ProductTable } from '@/components/features/admin/products/ProductTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ExportButton } from '@/components/features/admin/ExportButton';
 
 const Products = () => {
   return (
       <div className="space-y-6">
-        <div className="opacity-0 animate-fade-in">
-          <h1 className="text-3xl font-display font-bold text-foreground">Products</h1>
-          <p className="text-muted-foreground mt-1">Manage your product inventory</p>
+        <div className="flex items-center justify-between opacity-0 animate-fade-in">
+          <div>
+            <h1 className="text-3xl font-display font-bold text-foreground">Products</h1>
+            <p className="text-muted-foreground mt-1">Manage your product inventory</p>
+          </div>
+          <ExportButton defaultDataType="products" />
         </div>
 
         <Tabs defaultValue="all" className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>

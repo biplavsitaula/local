@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -7,6 +7,7 @@ import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProductStore } from '@/hooks/useProductStore';
 import { useOrderStore, type Order, type Payment } from '@/hooks/useOrderStore';
+import { products as productsData } from '@/data/products';
 import * as XLSX from 'xlsx';
 import jsPDF from 'jspdf';
 import { autoTable } from 'jspdf-autotable';
@@ -21,17 +22,52 @@ const years = [currentYear - 1, currentYear, currentYear + 1];
 
 type DataType = 'products' | 'orders' | 'payments';
 
-export function ExportButton() {
+interface ExportButtonProps {
+  defaultDataType?: DataType;
+}
+
+export function ExportButton({ defaultDataType = 'products' }: ExportButtonProps = {}) {
   const [open, setOpen] = useState(false);
   const [selectedMonth, setSelectedMonth] = useState(String(new Date().getMonth()));
   const [selectedYear, setSelectedYear] = useState(String(currentYear));
-  const [dataType, setDataType] = useState<DataType>('products');
+  const [dataType, setDataType] = useState<DataType>(defaultDataType);
   
-  const { products } = useProductStore();
+  const { products: storeProducts } = useProductStore();
   const { orders, payments } = useOrderStore();
+  
+  // Use products from data file (which has the actual products) or merge with store products
+  const products = productsData.length > 0 ? productsData : storeProducts;
+
+  // Reset dataType to default when dialog opens
+  useEffect(() => {
+    if (open) {
+      setDataType(defaultDataType);
+      
+      // Auto-select a month/year that has data for the selected data type
+      if (defaultDataType === 'payments' && payments.length > 0) {
+        const latestPayment = payments.reduce((latest, p) => {
+          const pDate = new Date(p.createdAt);
+          const latestDate = new Date(latest.createdAt);
+          return pDate > latestDate ? p : latest;
+        });
+        const paymentDate = new Date(latestPayment.createdAt);
+        setSelectedMonth(String(paymentDate.getMonth()));
+        setSelectedYear(String(paymentDate.getFullYear()));
+      } else if (defaultDataType === 'orders' && orders.length > 0) {
+        const latestOrder = orders.reduce((latest, o) => {
+          const oDate = new Date(o.createdAt);
+          const latestDate = new Date(latest.createdAt);
+          return oDate > latestDate ? o : latest;
+        });
+        const orderDate = new Date(latestOrder.createdAt);
+        setSelectedMonth(String(orderDate.getMonth()));
+        setSelectedYear(String(orderDate.getFullYear()));
+      }
+    }
+  }, [open, defaultDataType, payments, orders]);
 
   const exportToExcel = (data: any[], filename: string) => {
-    if (data.length === 0) {
+    if (!data || data.length === 0) {
       toast.error('No data to export');
       return;
     }
@@ -45,8 +81,10 @@ export function ExportButton() {
       
       // Set column widths for better readability
       const maxWidth = 20;
-      const wscols = Object.keys(data[0]).map(() => ({ wch: maxWidth }));
-      ws['!cols'] = wscols;
+      if (data.length > 0 && Object.keys(data[0]).length > 0) {
+        const wscols = Object.keys(data[0]).map(() => ({ wch: maxWidth }));
+        ws['!cols'] = wscols;
+      }
       
       // Add worksheet to workbook
       XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
@@ -153,17 +191,30 @@ export function ExportButton() {
     try {
       switch (dataType) {
         case 'products':
-          return products.map(p => ({
-            Name: p.name || '',
-            Category: p.category || '',
-            Price: `$${(p.price || 0).toFixed(2)}`,
-            Stock: p.stock || 0,
-            Status: p.status || '',
-            Rating: p.rating || 0,
-            Reviews: p.reviews || 0,
-            Sales: p.sales || 0,
-            Recommended: p.isRecommended ? 'Yes' : 'No'
-          }));
+          return products.map(p => {
+            const stock = p.stock ?? 0;
+            let status = 'In Stock';
+            if (stock === 0) {
+              status = 'Out of Stock';
+            } else if (stock <= 20) {
+              status = 'Low Stock';
+            }
+            
+            return {
+              Name: p.name || '',
+              Category: p.category || '',
+              Price: `$${(p.price || 0).toFixed(2)}`,
+              Stock: stock,
+              Status: status,
+              Rating: (p.rating || 0).toFixed(1),
+              Sales: p.sales || 0,
+              'In Stock': p.inStock ? 'Yes' : 'No',
+              'Is New': p.isNew ? 'Yes' : 'No',
+              Volume: p.volume || '',
+              'Alcohol Content': p.alcoholContent || p.alcohol || '',
+              Origin: p.origin || '',
+            };
+          });
         case 'orders':
           return orders
             .filter((o: Order) => {
@@ -214,7 +265,7 @@ export function ExportButton() {
     const data = getFilteredData();
     
     if (data.length === 0) {
-      toast.error(`No ${dataType} data found for the selected month and year`);
+      toast.error(`No ${dataType} data found for ${months[parseInt(selectedMonth)]} ${selectedYear}. Please select a different month/year.`);
       return;
     }
     
@@ -222,13 +273,17 @@ export function ExportButton() {
     const filename = `flame-beverage-${dataType}-${monthName}-${selectedYear}`;
     const title = `${dataType.charAt(0).toUpperCase() + dataType.slice(1)} Report`;
 
-    if (format === 'excel') {
-      exportToExcel(data, filename);
-    } else if (format === 'pdf') {
-      exportToPDF(data, filename, title);
+    try {
+      if (format === 'excel') {
+        exportToExcel(data, filename);
+      } else if (format === 'pdf') {
+        exportToPDF(data, filename, title);
+      }
+      setOpen(false);
+    } catch (error: any) {
+      console.error('Export error:', error);
+      toast.error(`Failed to export ${format.toUpperCase()}: ${error?.message || 'Unknown error'}`);
     }
-    
-    setOpen(false);
   };
 
   return (

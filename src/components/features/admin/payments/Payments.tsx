@@ -58,7 +58,7 @@ export default function Payments() {
             Track all payment records and transactions
           </p>
         </div>
-        <ExportButton />
+        <ExportButton defaultDataType="payments" />
       </div>
 
       <Tabs defaultValue="all" className="opacity-0 animate-fade-in" style={{ animationDelay: "100ms" }}>

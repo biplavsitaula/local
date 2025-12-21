@@ -9,7 +9,7 @@ const Orders = () => {
             <h1 className="text-3xl font-display font-bold text-foreground">Orders</h1>
             <p className="text-muted-foreground mt-1">Manage customer orders and track deliveries</p>
           </div>
-          <ExportButton />
+          <ExportButton defaultDataType="orders" />
         </div>
 
         <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
