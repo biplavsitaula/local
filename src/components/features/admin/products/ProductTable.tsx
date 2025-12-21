@@ -4,7 +4,10 @@
 import { useMemo, useState } from 'react';
 import { products } from '@/data/products';
 import { Product } from '@/types';
-import { ArrowUpDown } from 'lucide-react';
+import { ArrowUpDown, Edit, Trash2 } from 'lucide-react';
+import { AddProductModal } from './AddProductModal';
+import { DeleteProductModal } from './DeleteProductModal';
+import { useProductStore } from '@/hooks/useProductStore';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
@@ -27,6 +30,10 @@ interface ProductTableProps {
 export function ProductTable({ filter }: ProductTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
+  const [editProduct, setEditProduct] = useState<Product | null>(null);
+  const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const { deleteProduct: deleteProductFromStore } = useProductStore();
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -35,6 +42,29 @@ export function ProductTable({ filter }: ProductTableProps) {
     }
     setSortKey(key);
     setSortDir('asc');
+  };
+
+  const handleEdit = (product: Product) => {
+    setEditProduct(product);
+  };
+
+  const handleDeleteClick = (product: Product) => {
+    setDeleteProduct(product);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDeleteConfirm = () => {
+    if (deleteProduct) {
+      const productId = typeof deleteProduct.id === 'string' 
+        ? parseInt(deleteProduct.id) 
+        : deleteProduct.id;
+      deleteProductFromStore(productId);
+      setDeleteProduct(null);
+    }
+  };
+
+  const handleEditModalClose = () => {
+    setEditProduct(null);
   };
 
   const sortedProducts = useMemo(() => {
@@ -117,58 +147,92 @@ export function ProductTable({ filter }: ProductTableProps) {
   );
 
   return (
-    <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border/50">
-              {renderSortableTh('Product', 'name')}
-              {renderSortableTh('Category', 'category')}
-              {renderSortableTh('Price', 'price')}
-              {renderSortableTh('Stock', 'stock')}
-              {renderSortableTh('Status', 'status')}
-              {renderSortableTh('Rating', 'rating')}
-              {renderSortableTh('Sales', 'sales')}
-            </tr>
-          </thead>
-          <tbody>
-            {sortedProducts.length > 0 ? (
-              sortedProducts.map((product) => (
-                <tr key={product.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                  <td className="p-4 text-sm text-foreground">{product.name}</td>
-                  <td className="p-4 text-sm text-muted-foreground capitalize">{product.category}</td>
-                  <td className="p-4 text-sm text-foreground">Rs. {product.price.toLocaleString()}</td>
-                  <td className="p-4 text-sm text-foreground">{getStock(product)}</td>
-                  <td className="p-4">
-                    <span className={`text-xs px-2 py-1 rounded-full ${
-                      getStock(product) > 20 
-                        ? 'bg-success/20 text-success' 
-                        : getStock(product) > 0 
-                        ? 'bg-warning/20 text-warning' 
-                        : 'bg-destructive/20 text-destructive'
-                    }`}>
-                      {getStock(product) > 20 ? 'In Stock' : getStock(product) > 0 ? 'Low Stock' : 'Out of Stock'}
-                    </span>
-                  </td>
-                  <td className="p-4 text-sm text-foreground">
-                    {product.rating ? product.rating.toFixed(1) : '-'}
-                  </td>
-                  <td className="p-4 text-sm text-foreground">
-                    {getSales(product) ? getSales(product).toLocaleString() : '-'}
+    <>
+      <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-border/50">
+                {renderSortableTh('Product', 'name')}
+                {renderSortableTh('Category', 'category')}
+                {renderSortableTh('Price', 'price')}
+                {renderSortableTh('Stock', 'stock')}
+                {renderSortableTh('Status', 'status')}
+                {renderSortableTh('Rating', 'rating')}
+                {renderSortableTh('Sales', 'sales')}
+                <th className="text-right p-4 text-sm font-semibold text-foreground">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedProducts.length > 0 ? (
+                sortedProducts.map((product) => (
+                  <tr key={product.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                    <td className="p-4 text-sm text-foreground">{product.name}</td>
+                    <td className="p-4 text-sm text-muted-foreground capitalize">{product.category}</td>
+                    <td className="p-4 text-sm text-foreground">Rs. {product.price.toLocaleString()}</td>
+                    <td className="p-4 text-sm text-foreground">{getStock(product)}</td>
+                    <td className="p-4">
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        getStock(product) > 20 
+                          ? 'bg-success/20 text-success' 
+                          : getStock(product) > 0 
+                          ? 'bg-warning/20 text-warning' 
+                          : 'bg-destructive/20 text-destructive'
+                      }`}>
+                        {getStock(product) > 20 ? 'In Stock' : getStock(product) > 0 ? 'Low Stock' : 'Out of Stock'}
+                      </span>
+                    </td>
+                    <td className="p-4 text-sm text-foreground">
+                      {product.rating ? product.rating.toFixed(1) : '-'}
+                    </td>
+                    <td className="p-4 text-sm text-foreground">
+                      {getSales(product) ? getSales(product).toLocaleString() : '-'}
+                    </td>
+                    <td className="p-4">
+                      <div className="flex items-center justify-end gap-2">
+                        <button
+                          onClick={() => handleEdit(product)}
+                          className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                          aria-label="Edit product"
+                        >
+                          <Edit className="h-4 w-4 text-muted-foreground" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteClick(product)}
+                          className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                          aria-label="Delete product"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              ) : (
+                <tr>
+                  <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                    No products found
                   </td>
                 </tr>
-              ))
-            ) : (
-              <tr>
-                <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                  No products found
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+      {editProduct && (
+        <AddProductModal
+          product={editProduct}
+          open={true}
+          onOpenChange={handleEditModalClose}
+        />
+      )}
+      <DeleteProductModal
+        open={isDeleteModalOpen}
+        onOpenChange={setIsDeleteModalOpen}
+        product={deleteProduct}
+        onConfirm={handleDeleteConfirm}
+      />
+    </>
   );
 }
 

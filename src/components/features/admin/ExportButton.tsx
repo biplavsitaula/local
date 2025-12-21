@@ -7,6 +7,9 @@ import { Download, FileSpreadsheet, FileText } from 'lucide-react';
 import { toast } from 'sonner';
 import { useProductStore } from '@/hooks/useProductStore';
 import { useOrderStore, type Order, type Payment } from '@/hooks/useOrderStore';
+import * as XLSX from 'xlsx';
+import jsPDF from 'jspdf';
+import { autoTable } from 'jspdf-autotable';
 
 const months = [
   'January', 'February', 'March', 'April', 'May', 'June',
@@ -27,34 +30,35 @@ export function ExportButton() {
   const { products } = useProductStore();
   const { orders, payments } = useOrderStore();
 
-  const exportToCSV = (data: any[], filename: string) => {
+  const exportToExcel = (data: any[], filename: string) => {
     if (data.length === 0) {
       toast.error('No data to export');
       return;
     }
 
-    const headers = Object.keys(data[0]);
-    const csvContent = [
-      headers.join(','),
-      ...data.map(row => 
-        headers.map(header => {
-          let cell = row[header];
-          if (typeof cell === 'object') cell = JSON.stringify(cell);
-          if (typeof cell === 'string' && (cell.includes(',') || cell.includes('"'))) {
-            cell = `"${cell.replace(/"/g, '""')}"`;
-          }
-          return cell;
-        }).join(',')
-      )
-    ].join('\n');
-
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = filename;
-    link.click();
-    URL.revokeObjectURL(link.href);
-    toast.success(`${filename} downloaded successfully`);
+    try {
+      // Create a new workbook
+      const wb = XLSX.utils.book_new();
+      
+      // Convert data to worksheet
+      const ws = XLSX.utils.json_to_sheet(data);
+      
+      // Set column widths for better readability
+      const maxWidth = 20;
+      const wscols = Object.keys(data[0]).map(() => ({ wch: maxWidth }));
+      ws['!cols'] = wscols;
+      
+      // Add worksheet to workbook
+      XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+      
+      // Write file as Excel (.xlsx)
+      XLSX.writeFile(wb, `${filename}.xlsx`);
+      
+      toast.success(`${filename}.xlsx downloaded successfully`);
+    } catch (error: any) {
+      console.error('Error exporting to Excel:', error);
+      toast.error(`Failed to export Excel file: ${error?.message || 'Unknown error'}`);
+    }
   };
 
   const exportToPDF = (data: any[], filename: string, title: string) => {
@@ -63,56 +67,82 @@ export function ExportButton() {
       return;
     }
 
-    const headers = Object.keys(data[0]);
-    
-    const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-      <head>
-        <title>${title}</title>
-        <style>
-          body { font-family: Arial, sans-serif; padding: 20px; }
-          h1 { color: #f97316; text-align: center; }
-          h2 { color: #666; text-align: center; margin-bottom: 20px; }
-          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-          th { background: #f97316; color: white; padding: 10px; text-align: left; font-size: 12px; }
-          td { border: 1px solid #ddd; padding: 8px; font-size: 11px; }
-          tr:nth-child(even) { background: #f9f9f9; }
-          .footer { text-align: center; margin-top: 30px; color: #666; font-size: 12px; }
-        </style>
-      </head>
-      <body>
-        <h1>🔥 Flame Beverage</h1>
-        <h2>${title} - ${months[parseInt(selectedMonth)]} ${selectedYear}</h2>
-        <table>
-          <thead>
-            <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-          </thead>
-          <tbody>
-            ${data.map(row => `
-              <tr>${headers.map(h => {
-                let cell = row[h];
-                if (typeof cell === 'object') cell = JSON.stringify(cell);
-                return `<td>${cell}</td>`;
-              }).join('')}</tr>
-            `).join('')}
-          </tbody>
-        </table>
-        <div class="footer">
-          <p>Generated on ${new Date().toLocaleDateString()}</p>
-          <p>Flame Beverage Admin Panel</p>
-        </div>
-        <script>window.onload = function() { window.print(); }</script>
-      </body>
-      </html>
-    `;
-
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-    } else {
-      toast.error('Please allow popups to export PDF');
+    try {
+      const doc = new jsPDF('landscape', 'mm', 'a4');
+      
+      // Add header
+      doc.setFontSize(20);
+      doc.setTextColor(249, 115, 22); // Orange color #f97316
+      doc.text('🔥 Flame Beverage', doc.internal.pageSize.getWidth() / 2, 15, { align: 'center' });
+      
+      doc.setFontSize(14);
+      doc.setTextColor(102, 102, 102); // Gray color
+      doc.text(
+        `${title} - ${months[parseInt(selectedMonth)]} ${selectedYear}`,
+        doc.internal.pageSize.getWidth() / 2,
+        25,
+        { align: 'center' }
+      );
+      
+      // Prepare table data
+      const headers = Object.keys(data[0]);
+      const rows = data.map(row => 
+        headers.map(header => {
+          let cell = row[header];
+          if (typeof cell === 'object' && cell !== null) {
+            cell = JSON.stringify(cell);
+          }
+          return String(cell || '');
+        })
+      );
+      
+      // Add table using autoTable - function call approach (v5.0.0+)
+      autoTable(doc, {
+        head: [headers],
+        body: rows,
+        startY: 35,
+        theme: 'striped',
+        headStyles: {
+          fillColor: [249, 115, 22], // Orange background
+          textColor: [255, 255, 255], // White text
+          fontStyle: 'bold',
+        },
+        alternateRowStyles: {
+          fillColor: [249, 249, 249], // Light gray for alternate rows
+        },
+        styles: {
+          fontSize: 9,
+          cellPadding: 3,
+        },
+        margin: { top: 35 },
+      });
+      
+      // Add footer
+      const pageCount = (doc as any).internal.getNumberOfPages();
+      for (let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(102, 102, 102);
+        doc.text(
+          `Generated on ${new Date().toLocaleDateString()}`,
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.getHeight() - 10,
+          { align: 'center' }
+        );
+        doc.text(
+          'Flame Beverage Admin Panel',
+          doc.internal.pageSize.getWidth() / 2,
+          doc.internal.pageSize.getHeight() - 5,
+          { align: 'center' }
+        );
+      }
+      
+      // Save PDF
+      doc.save(`${filename}.pdf`);
+      toast.success(`${filename}.pdf downloaded successfully`);
+    } catch (error: any) {
+      console.error('Error exporting to PDF:', error);
+      toast.error(`Failed to export PDF file: ${error?.message || 'Unknown error'}`);
     }
   };
 
@@ -120,64 +150,84 @@ export function ExportButton() {
     const month = parseInt(selectedMonth);
     const year = parseInt(selectedYear);
 
-    switch (dataType) {
-      case 'products':
-        return products.map(p => ({
-          Name: p.name,
-          Category: p.category,
-          Price: `$${p.price.toFixed(2)}`,
-          Stock: p.stock,
-          Status: p.status,
-          Rating: p.rating,
-          Reviews: p.reviews,
-          Sales: p.sales,
-          Recommended: p.isRecommended ? 'Yes' : 'No'
-        }));
-      case 'orders':
-        return orders
-          .filter((o: Order) => {
-            const date = new Date(o.createdAt);
-            return date.getMonth() === month && date.getFullYear() === year;
-          })
-          .map((o: Order) => ({
-            'Bill No': o.billNumber,
-            Customer: o.customerName,
-            Location: o.location,
-            'Total Amount': `$${o.totalAmount.toFixed(2)}`,
-            Status: o.status,
-            'Payment Method': o.paymentMethod === 'cod' ? 'COD' : 'QR',
-            Date: new Date(o.createdAt).toLocaleDateString()
+    try {
+      switch (dataType) {
+        case 'products':
+          return products.map(p => ({
+            Name: p.name || '',
+            Category: p.category || '',
+            Price: `$${(p.price || 0).toFixed(2)}`,
+            Stock: p.stock || 0,
+            Status: p.status || '',
+            Rating: p.rating || 0,
+            Reviews: p.reviews || 0,
+            Sales: p.sales || 0,
+            Recommended: p.isRecommended ? 'Yes' : 'No'
           }));
-      case 'payments':
-        return payments
-          .filter((p: Payment) => {
-            const date = new Date(p.createdAt);
-            return date.getMonth() === month && date.getFullYear() === year;
-          })
-          .map((p: Payment) => ({
-            'Bill No': p.billNumber,
-            Customer: p.customerName,
-            Amount: `$${p.amount.toFixed(2)}`,
-            Method: p.method === 'cod' ? 'COD' : 'QR',
-            Status: p.status,
-            Date: new Date(p.createdAt).toLocaleDateString()
-          }));
-      default:
-        return [];
+        case 'orders':
+          return orders
+            .filter((o: Order) => {
+              try {
+                const date = new Date(o.createdAt);
+                return date.getMonth() === month && date.getFullYear() === year;
+              } catch {
+                return false;
+              }
+            })
+            .map((o: Order) => ({
+              'Bill No': o.billNumber || '',
+              Customer: o.customerName || '',
+              Location: o.location || '',
+              'Total Amount': `$${(o.totalAmount || 0).toFixed(2)}`,
+              Status: o.status || '',
+              'Payment Method': o.paymentMethod === 'cod' ? 'COD' : 'QR',
+              Date: new Date(o.createdAt).toLocaleDateString()
+            }));
+        case 'payments':
+          return payments
+            .filter((p: Payment) => {
+              try {
+                const date = new Date(p.createdAt);
+                return date.getMonth() === month && date.getFullYear() === year;
+              } catch {
+                return false;
+              }
+            })
+            .map((p: Payment) => ({
+              'Bill No': p.billNumber || '',
+              Customer: p.customerName || '',
+              Amount: `$${(p.amount || 0).toFixed(2)}`,
+              Method: p.method === 'cod' ? 'COD' : 'QR',
+              Status: p.status || '',
+              Date: new Date(p.createdAt).toLocaleDateString()
+            }));
+        default:
+          return [];
+      }
+    } catch (error) {
+      console.error('Error filtering data:', error);
+      return [];
     }
   };
 
-  const handleExport = (format: 'csv' | 'pdf') => {
+  const handleExport = (format: 'excel' | 'pdf') => {
     const data = getFilteredData();
+    
+    if (data.length === 0) {
+      toast.error(`No ${dataType} data found for the selected month and year`);
+      return;
+    }
+    
     const monthName = months[parseInt(selectedMonth)];
     const filename = `flame-beverage-${dataType}-${monthName}-${selectedYear}`;
     const title = `${dataType.charAt(0).toUpperCase() + dataType.slice(1)} Report`;
 
-    if (format === 'csv') {
-      exportToCSV(data, `${filename}.csv`);
-    } else {
-      exportToPDF(data, `${filename}.pdf`, title);
+    if (format === 'excel') {
+      exportToExcel(data, filename);
+    } else if (format === 'pdf') {
+      exportToPDF(data, filename, title);
     }
+    
     setOpen(false);
   };
 
@@ -241,10 +291,10 @@ export function ExportButton() {
             <Button 
               variant="outline" 
               className="flex-1 gap-2" 
-              onClick={() => handleExport('csv')}
+              onClick={() => handleExport('excel')}
             >
               <FileSpreadsheet className="h-4 w-4" />
-              Export CSV
+              Export Excel
             </Button>
             <Button 
               variant="outline" 

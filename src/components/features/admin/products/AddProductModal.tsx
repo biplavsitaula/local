@@ -21,8 +21,9 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Upload, Link, Star, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { useProductStore } from "@/hooks/useProductStore";
-import { Product } from "@/types/product";
+import { Product } from "@/types";
 import { cn } from "@/lib/utils";
+import { useEffect } from "react";
 
 const categories = [
   "Whiskey",
@@ -36,9 +37,23 @@ const categories = [
   "Beer",
 ];
 
-export function AddProductModal() {
-  const { addProduct } = useProductStore();
-  const [open, setOpen] = useState(false);
+interface AddProductModalProps {
+  product?: Product | null;
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+}
+
+export function AddProductModal({ 
+  product, 
+  open: controlledOpen, 
+  onOpenChange: controlledOnOpenChange 
+}: AddProductModalProps = {}) {
+  const { addProduct, updateProduct } = useProductStore();
+  const [internalOpen, setInternalOpen] = useState(false);
+  const isEditMode = !!product;
+  const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
+  const setOpen = controlledOnOpenChange || setInternalOpen;
+  
   const [formData, setFormData] = useState({
     name: "",
     category: "",
@@ -50,6 +65,32 @@ export function AddProductModal() {
     isRecommended: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (product && open) {
+      setFormData({
+        name: product.name || "",
+        category: product.category || "",
+        price: product.price?.toString() || "",
+        stock: (product.stock ?? 0).toString(),
+        imageUrl: product.image || "",
+        itemLink: (product as any).itemLink || "",
+        rating: product.rating?.toString() || "",
+        isRecommended: (product as any).isRecommended || false,
+      });
+    } else if (!product && open) {
+      setFormData({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+        imageUrl: "",
+        itemLink: "",
+        rating: "",
+        isRecommended: false,
+      });
+    }
+  }, [product, open]);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -89,36 +130,58 @@ export function AddProductModal() {
     }
 
     const stock = parseInt(formData.stock);
-    let status: Product["status"] = "in-stock";
+    let status: "in-stock" | "out-of-stock" | "low-stock" = "in-stock";
     if (stock === 0) status = "out-of-stock";
     else if (stock <= 10) status = "low-stock";
 
-    addProduct({
-      name: formData.name,
-      category: formData.category,
-      price: parseFloat(formData.price),
-      stock,
-      image: formData.imageUrl,
-      rating: formData.rating ? parseFloat(formData.rating) : 0,
-      reviews: 0,
-      sales: 0,
-      status,
-      itemLink: formData.itemLink,
-      isRecommended: formData.isRecommended,
-    });
+    if (isEditMode && product) {
+      const productId = typeof product.id === 'string' 
+        ? parseInt(product.id) 
+        : (product.id || 0);
+      
+      updateProduct(productId, {
+        name: formData.name,
+        category: formData.category,
+        price: parseFloat(formData.price),
+        stock,
+        image: formData.imageUrl,
+        rating: formData.rating ? parseFloat(formData.rating) : 0,
+        ...(formData.itemLink && { itemLink: formData.itemLink }),
+        isRecommended: formData.isRecommended,
+      } as any);
 
-    toast.success("Product added successfully!");
+      toast.success("Product updated successfully!");
+    } else {
+      addProduct({
+        name: formData.name,
+        category: formData.category,
+        price: parseFloat(formData.price),
+        stock,
+        image: formData.imageUrl,
+        rating: formData.rating ? parseFloat(formData.rating) : 0,
+        reviews: 0,
+        sales: 0,
+        status,
+        itemLink: formData.itemLink,
+        isRecommended: formData.isRecommended,
+      } as any);
+
+      toast.success("Product added successfully!");
+    }
+    
     setOpen(false);
-    setFormData({
-      name: "",
-      category: "",
-      price: "",
-      stock: "",
-      imageUrl: "",
-      itemLink: "",
-      rating: "",
-      isRecommended: false,
-    });
+    if (!isEditMode) {
+      setFormData({
+        name: "",
+        category: "",
+        price: "",
+        stock: "",
+        imageUrl: "",
+        itemLink: "",
+        rating: "",
+        isRecommended: false,
+      });
+    }
     setErrors({});
   };
 
@@ -127,23 +190,13 @@ export function AddProductModal() {
     setErrors({});
   };
 
-  return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => (isOpen ? setOpen(true) : handleClose())}
-    >
-      <DialogTrigger asChild>
-        <Button variant="outline" size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Add Product
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[500px] bg-card border-border">
-        <DialogHeader>
-          <DialogTitle className="text-xl font-display text-flame-orange">
-            Add New Product
-          </DialogTitle>
-        </DialogHeader>
+  const dialogContent = (
+    <DialogContent className="sm:max-w-[500px] bg-card border-border">
+      <DialogHeader>
+        <DialogTitle className="text-xl font-display text-flame-orange">
+          {isEditMode ? "Edit Product" : "Add New Product"}
+        </DialogTitle>
+      </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4 mt-4">
           <div className="space-y-2">
             <Label htmlFor="name" className="text-foreground">
@@ -363,11 +416,33 @@ export function AddProductModal() {
               Cancel
             </Button>
             <Button type="submit" variant="outline" className="flex-1">
-              Add Product
+              {isEditMode ? "Save Changes" : "Add Product"}
             </Button>
           </div>
         </form>
       </DialogContent>
+  );
+
+  if (isEditMode) {
+    return (
+      <Dialog open={open} onOpenChange={setOpen}>
+        {dialogContent}
+      </Dialog>
+    );
+  }
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => (isOpen ? setOpen(true) : handleClose())}
+    >
+      <DialogTrigger asChild>
+        <Button variant="outline" size="lg" className="gap-2">
+          <Plus className="h-5 w-5" />
+          Add Product
+        </Button>
+      </DialogTrigger>
+      {dialogContent}
     </Dialog>
   );
 }
