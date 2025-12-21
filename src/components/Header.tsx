@@ -24,6 +24,10 @@ import {
   Plus,
   Trash2,
   User,
+  Clock,
+  Package,
+  Truck,
+  Gift,
 } from "lucide-react";
 import Link from "next/link";
 import { IHeaderProps } from "@/interface/IHeaderProps";
@@ -64,14 +68,50 @@ const Header: React.FC<IHeaderProps> = ({
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
       {/* Promo Banner */}
       <div 
-        className={`gradient-gold text-primary-foreground text-center py-2 px-4 text-sm font-medium transition-all duration-300 ease-in-out overflow-hidden ${
-          showPromoBanner ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0 py-0'
+        className={`bg-secondary/30 transition-all duration-300 ease-in-out overflow-hidden ${
+          showPromoBanner ? 'max-h-32 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
         }`}
       >
-        <span className="hidden sm:inline">
-          {t("freeDelivery")} | {t("hourDelivery")}
-        </span>
-        <span className="sm:hidden">{t("freeDelivery")}</span>
+        <div className="container mx-auto px-4">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
+            {[
+              {
+                icon: Clock,
+                title: t('hourDelivery'),
+                color: 'from-flame-red to-flame-orange',
+              },
+              {
+                icon: Package,
+                title: t('bulkDiscount'),
+                color: 'from-flame-orange to-flame-yellow',
+              },
+              {
+                icon: Truck,
+                title: t('freeDelivery'),
+                color: 'from-flame-yellow to-flame-gold',
+              },
+              {
+                icon: Gift,
+                title: t('eventOffer'),
+                color: 'from-flame-gold to-flame-orange',
+              },
+            ].map((promo, index) => {
+              const IconComponent = promo.icon;
+              return (
+                <div
+                  key={index}
+                  className="flex items-center gap-2 sm:gap-4 p-2 sm:p-4 rounded-xl bg-card border border-border/50 card-glow"
+                  style={{ animationDelay: `${index * 0.1}s` }}
+                >
+                  <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${promo.color} flex items-center justify-center shrink-0`}>
+                    <IconComponent className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
+                  </div>
+                  <p className="text-xs sm:text-sm font-medium text-foreground">{promo.title}</p>
+                </div>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       <div className="container mx-auto px-4">
