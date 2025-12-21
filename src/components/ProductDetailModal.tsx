@@ -149,14 +149,14 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                 <div className="flex gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-primary bg-transparent py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-primary bg-transparent py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground cursor-pointer"
                   >
                     <ShoppingCart className="h-5 w-5" />
                     {t('addToCart')}
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-3 font-semibold text-text-inverse transition-all hover:shadow-primary-lg"
+                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-3 font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer"
                   >
                     <Zap className="h-5 w-5" />
                     {t('buyNow')}

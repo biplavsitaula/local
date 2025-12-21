@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
@@ -44,16 +44,36 @@ const Header: React.FC<IHeaderProps> = ({
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(true);
+  const bannerStateRef = useRef(true);
 
   useEffect(() => {
-    const handleScroll = () => {
-      // Hide banner when scrolled past hero section (approximately 100px)
+    const SCROLL_THRESHOLD = 100;
+    let ticking = false;
+    let rafId: number | null = null;
+
+    const updateBanner = () => {
       const scrollY = window.scrollY || window.pageYOffset;
-      setShowPromoBanner(scrollY < 100);
+      const shouldShow = scrollY < SCROLL_THRESHOLD;
+      
+      // Only update state if it actually changed
+      if (shouldShow !== bannerStateRef.current) {
+        bannerStateRef.current = shouldShow;
+        setShowPromoBanner(shouldShow);
+      }
+      
+      ticking = false;
+      rafId = null;
+    };
+
+    const handleScroll = () => {
+      if (!ticking) {
+        rafId = window.requestAnimationFrame(updateBanner);
+        ticking = true;
+      }
     };
 
     // Set initial state
-    handleScroll();
+    updateBanner();
 
     // Add scroll event listener
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -61,6 +81,9 @@ const Header: React.FC<IHeaderProps> = ({
     // Cleanup
     return () => {
       window.removeEventListener('scroll', handleScroll);
+      if (rafId !== null) {
+        window.cancelAnimationFrame(rafId);
+      }
     };
   }, []);
 
@@ -69,8 +92,14 @@ const Header: React.FC<IHeaderProps> = ({
       {/* Promo Banner */}
       <div 
         className={`bg-secondary/30 transition-all duration-300 ease-in-out overflow-hidden ${
-          showPromoBanner ? 'max-h-32 opacity-100 py-4' : 'max-h-0 opacity-0 py-0'
+          showPromoBanner ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
+        style={{
+          maxHeight: showPromoBanner ? '128px' : '0',
+          paddingTop: showPromoBanner ? '1rem' : '0',
+          paddingBottom: showPromoBanner ? '1rem' : '0',
+          willChange: 'max-height, opacity',
+        }}
       >
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-4">
