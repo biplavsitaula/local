@@ -96,11 +96,11 @@ const Products: React.FC = () => {
               <span className="hidden font-display text-xl font-bold text-ternary-text sm:block">Flame Beverage</span>
             </Link>
             <div className="flex items-center gap-2">
-              <button onClick={() => setLanguage(language === 'en' ? 'np' : 'en')} className="flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted">
+              <button onClick={() => setLanguage(language === 'en' ? 'np' : 'en')} className="flex items-center gap-1 rounded-lg border border-border bg-background px-3 py-2 text-sm font-medium text-foreground transition-colors hover:bg-muted cursor-pointer">
                 <Globe className="h-4 w-4" />
                 <span className="hidden sm:inline">{language === 'en' ? 'नेपाली' : 'English'}</span>
               </button>
-              <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted">
+              <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted cursor-pointer">
                 {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
               <Link href="/" className="flex items-center gap-2 rounded-lg bg-primary-gradient px-4 py-2 font-medium text-text-inverse transition-all hover:shadow-primary-lg">
@@ -139,7 +139,7 @@ const Products: React.FC = () => {
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -149,7 +149,7 @@ const Products: React.FC = () => {
             {/* Filter Toggle (Mobile) */}
             <button
               onClick={() => setShowFilters(!showFilters)}
-              className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-card/80 border border-border rounded-xl text-foreground"
+              className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-card/80 border border-border rounded-xl text-foreground cursor-pointer"
             >
               <SlidersHorizontal className="h-5 w-5" />
               Filters
@@ -215,13 +215,13 @@ const Products: React.FC = () => {
               <div className="flex items-center bg-card/80 border border-border rounded-xl overflow-hidden">
                 <button
                   onClick={() => setViewMode('grid')}
-                  className={`p-3 transition-colors ${viewMode === 'grid' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`p-3 transition-colors cursor-pointer ${viewMode === 'grid' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <Grid3X3 className="h-5 w-5" />
                 </button>
                 <button
                   onClick={() => setViewMode('list')}
-                  className={`p-3 transition-colors ${viewMode === 'list' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
+                  className={`p-3 transition-colors cursor-pointer ${viewMode === 'list' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
                 >
                   <List className="h-5 w-5" />
                 </button>
@@ -231,7 +231,7 @@ const Products: React.FC = () => {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="px-4 py-3 text-primary-text hover:text-ternary-text transition-colors"
+                  className="px-4 py-3 text-primary-text hover:text-ternary-text transition-colors cursor-pointer"
                 >
                   Clear All
                 </button>
@@ -297,7 +297,7 @@ const Products: React.FC = () => {
               {hasActiveFilters && (
                 <button
                   onClick={clearFilters}
-                  className="w-full py-3 text-primary-text border border-primary-border rounded-xl hover:bg-primary-btn/10 transition-colors"
+                  className="w-full py-3 text-primary-text border border-primary-border rounded-xl hover:bg-primary-btn/10 transition-colors cursor-pointer"
                 >
                   Clear All Filters
                 </button>
@@ -309,7 +309,7 @@ const Products: React.FC = () => {
           <div className="flex flex-wrap gap-2 mb-8">
             <button
               onClick={() => setSelectedCategory(null)}
-              className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
                 !selectedCategory
                   ? 'bg-primary-gradient text-text-inverse'
                   : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
@@ -321,7 +321,7 @@ const Products: React.FC = () => {
               <button
                 key={cat.id}
                 onClick={() => setSelectedCategory(cat.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 cursor-pointer ${
                   selectedCategory === cat.id
                     ? 'bg-primary-gradient text-text-inverse'
                     : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
@@ -363,7 +363,7 @@ const Products: React.FC = () => {
               <p className="text-muted-foreground mb-6">Try adjusting your filters or search query</p>
               <button
                 onClick={clearFilters}
-                className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all"
+                className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
               >
                 Clear All Filters
               </button>

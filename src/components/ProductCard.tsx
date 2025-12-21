@@ -53,7 +53,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Quick View Button */}
       <button
         onClick={() => onViewDetails(product)}
-        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-foreground opacity-0 shadow-lg backdrop-blur-sm transition-all group-hover:opacity-100 hover:bg-primary hover:text-primary-foreground"
+        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-foreground opacity-0 shadow-lg backdrop-blur-sm transition-all group-hover:opacity-100 hover:bg-primary hover:text-primary-foreground cursor-pointer"
       >
         <Eye className="h-5 w-5" />
       </button>
@@ -104,7 +104,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             <div className="flex items-center rounded-lg border border-border">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted"
+                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
               >
                 <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
@@ -113,7 +113,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
               </span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted"
+                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
@@ -126,7 +126,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           <button
             onClick={handleAddToCart}
             disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary-border bg-btn-outline py-2.5 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary-border bg-btn-outline py-2.5 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ShoppingCart className="h-4 w-4" />
             <span className="hidden sm:inline">{t('addToCart')}</span>
@@ -134,7 +134,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           <button
             onClick={handleBuyNow}
             disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-2.5 font-medium text-text-inverse transition-all hover:shadow-primary-lg disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-2.5 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Zap className="h-4 w-4" />
             <span className="hidden sm:inline">{t('buyNow')}</span>

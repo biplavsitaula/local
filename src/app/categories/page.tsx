@@ -107,7 +107,7 @@ const Categories = () => {
               <button
                 key={category.id}
                 onClick={() => setSelectedCategory(isSelected ? null : category.id)}
-                className={`relative p-6 rounded-xl transition-all duration-300 transform hover:scale-105 ${
+                className={`relative p-6 rounded-xl transition-all duration-300 transform hover:scale-105 cursor-pointer ${
                   currentTheme === 'dark'
                     ? isSelected
                       ? `ring-2 ring-flame-orange bg-gradient-to-br ${category.color}`

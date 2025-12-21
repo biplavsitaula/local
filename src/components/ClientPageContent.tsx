@@ -95,7 +95,7 @@ function PageContent() {
                   }`}>
                     <button
                       onClick={handleCloseSeasonalSection}
-                      className={`absolute top-4 right-4 z-10 p-2 rounded-full border transition-colors ${
+                      className={`absolute top-4 right-4 z-10 p-2 rounded-full border transition-colors cursor-pointer ${
                         theme === 'dark'
                           ? 'bg-background/80 hover:bg-background/90 border-border/50 hover:border-border'
                           : 'bg-white/90 hover:bg-white border-gray-300 hover:border-gray-400'
@@ -150,7 +150,7 @@ function PageContent() {
                             </p>
                             <button
                               onClick={() => setSelectedCategory(seasonalTheme.category || "All")}
-                              className="mt-3 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-primary-foreground"
+                              className="mt-3 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-primary-foreground cursor-pointer"
                             >
                               {seasonalTheme.ctaText}
                             </button>

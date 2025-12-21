@@ -38,7 +38,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
       <div className="relative w-full max-w-4xl max-h-[90vh] overflow-auto animate-in fade-in-0 zoom-in-95 rounded-2xl border border-border bg-card shadow-2xl">
         <button
           onClick={onClose}
-          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80"
+          className="absolute right-4 top-4 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
         >
           <X className="h-5 w-5" />
         </button>
@@ -132,14 +132,14 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                   <div className="flex items-center rounded-lg border border-border">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted"
+                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                     >
                       <Minus className="h-4 w-4" />
                     </button>
                     <span className="w-12 text-center font-medium text-foreground">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted"
+                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                     >
                       <Plus className="h-4 w-4" />
                     </button>

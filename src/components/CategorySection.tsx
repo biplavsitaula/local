@@ -46,7 +46,7 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
               <button
                 key={category.id}
                 onClick={() => onSelect(selected === category.name ? '' : category.name)}
-                className={`group flex flex-col items-center gap-3 rounded-xl border p-4 transition-all duration-300 ${
+                className={`group flex flex-col items-center gap-3 rounded-xl border p-4 transition-all duration-300 cursor-pointer ${
                   isSelected
                     ? `border-flame-orange bg-gradient-to-br ${category.color} shadow-lg shadow-flame-orange/20`
                     : currentTheme === 'dark'

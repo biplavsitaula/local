@@ -93,7 +93,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             <div className="flex items-center rounded-lg border border-border">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted"
+                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
               >
                 <Minus className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
@@ -102,7 +102,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
               </span>
               <button
                 onClick={() => setQuantity(quantity + 1)}
-                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted"
+                className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
               >
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
@@ -114,14 +114,14 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <div className="mt-4 flex gap-2">
           <button
             onClick={handleAddToCart}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary bg-transparent py-2.5 font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary bg-transparent py-2.5 font-medium text-primary transition-all hover:bg-primary hover:text-primary-foreground cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             <ShoppingCart className="h-4 w-4" />
             <span className="hidden sm:inline">{t("addToCart")}</span>
           </button>
           <button
             onClick={handleBuyNow}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-flame-gradient py-2.5 font-medium text-card transition-all hover:shadow-lg hover:shadow-flame-orange/30 disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-flame-gradient py-2.5 font-medium text-card transition-all hover:shadow-lg hover:shadow-flame-orange/30 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
           >
             <Zap className="h-4 w-4" />
             <span className="hidden sm:inline">{t("buy")}</span>

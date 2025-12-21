@@ -34,7 +34,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80"
+          className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
         >
           <X className="h-4 w-4" />
         </button>
@@ -46,7 +46,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           </h2>
           <button
             onClick={handleClose}
-            className="text-sm font-medium text-primary-text hover:text-secondary-text underline underline-offset-4 transition-colors"
+            className="text-sm font-medium text-primary-text hover:text-secondary-text underline underline-offset-4 transition-colors cursor-pointer"
           >
             {t("continue")}
           </button>
@@ -60,7 +60,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           <div className="space-y-3">
             <button
               onClick={() => setSelectedPayment("cod")}
-              className={`w-full rounded-xl px-6 py-4 text-left font-semibold transition-all ${
+              className={`w-full rounded-xl px-6 py-4 text-left font-semibold transition-all cursor-pointer ${
                 selectedPayment === "cod"
                   ? "bg-primary-gradient text-text-inverse shadow-primary-lg"
                   : "bg-card border border-border-primary text-text-primary hover:border-border-primary-accent"
@@ -70,7 +70,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             </button>
             <button
               onClick={() => setSelectedPayment("online")}
-              className={`w-full rounded-xl px-6 py-4 text-left font-semibold transition-all ${
+              className={`w-full rounded-xl px-6 py-4 text-left font-semibold transition-all cursor-pointer ${
                 selectedPayment === "online"
                   ? "bg-primary-gradient text-text-inverse shadow-primary-lg"
                   : "bg-card border border-border-primary text-text-primary hover:border-border-primary-accent"
@@ -110,7 +110,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         {!paid && (
           <button
             onClick={handlePayment}
-            className="mt-6 w-full rounded-xl bg-primary-gradient px-6 py-4 font-semibold text-text-inverse transition-all hover:shadow-primary-lg"
+            className="mt-6 w-full rounded-xl bg-primary-gradient px-6 py-4 font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer"
           >
             {t("processPayment")}
           </button>
