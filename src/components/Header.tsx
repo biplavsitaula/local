@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
@@ -39,11 +39,35 @@ const Header: React.FC<IHeaderProps> = ({
     useCart();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [showPromoBanner, setShowPromoBanner] = useState(true);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Hide banner when scrolled past hero section (approximately 100px)
+      const scrollY = window.scrollY || window.pageYOffset;
+      setShowPromoBanner(scrollY < 100);
+    };
+
+    // Set initial state
+    handleScroll();
+
+    // Add scroll event listener
+    window.addEventListener('scroll', handleScroll, { passive: true });
+
+    // Cleanup
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, []);
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
       {/* Promo Banner */}
-      <div className="gradient-gold text-primary-foreground text-center py-2 px-4 text-sm font-medium">
+      <div 
+        className={`gradient-gold text-primary-foreground text-center py-2 px-4 text-sm font-medium transition-all duration-300 ease-in-out overflow-hidden ${
+          showPromoBanner ? 'max-h-12 opacity-100' : 'max-h-0 opacity-0 py-0'
+        }`}
+      >
         <span className="hidden sm:inline">
           {t("freeDelivery")} | {t("hourDelivery")}
         </span>
