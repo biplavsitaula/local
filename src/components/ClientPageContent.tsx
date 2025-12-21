@@ -15,50 +15,26 @@ import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { AgeStatus } from "@/types";
 import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
+import { useTheme } from "@/contexts/ThemeContext";
 
-export function ClientPageContent() {
-  const [ageStatus, setAgeStatus] = useState<AgeStatus>("pending");
+function PageContent() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState<string>("All");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [showSeasonalSection, setShowSeasonalSection] = useState(true);
   const { theme: seasonalTheme } = useSeasonalTheme();
-
-  // Check sessionStorage after mount to avoid hydration mismatch
-  useEffect(() => {
-    if (sessionStorage.getItem("age-verified") === "true") {
-      setAgeStatus("verified");
-    }
-  }, []);
-
-  const handleAgeVerified = () => {
-    sessionStorage.setItem("age-verified", "true");
-    setAgeStatus("verified");
-  };
-
-  const handleAgeDenied = () => {
-    setAgeStatus("denied");
-  };
+  const { theme } = useTheme();
 
   const handleCloseSeasonalSection = () => {
     setShowSeasonalSection(false);
   };
 
   return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <CartProvider>
-          {ageStatus === "pending" && (
-            <AgeVerificationModal
-              onVerified={handleAgeVerified}
-              onDenied={handleAgeDenied}
-            />
-          )}
-
-          {ageStatus === "denied" && <AgeDeniedScreen />}
-
-          {ageStatus === "verified" && (
-            <div className="min-h-screen bg-gradient-to-b from-background via-galaxy-dark to-background text-foreground">
+    <div className={`min-h-screen text-foreground transition-colors ${
+      theme === 'dark'
+        ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
+        : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
+    }`}>
               <Header
                 searchQuery={searchQuery}
                 onSearchChange={setSearchQuery}
@@ -112,30 +88,46 @@ export function ClientPageContent() {
                   </div>
                 </section> */}
                 {showSeasonalSection && (
-                  <section className={`mx-auto max-w-6xl relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} gradient-card p-8 shadow-glow px-4 md:px-8`}>
+                  <section className={`mx-auto max-w-6xl relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors ${
+                    theme === 'dark'
+                      ? 'gradient-card shadow-glow'
+                      : 'bg-white/90 border-orange-200/60 shadow-lg'
+                  }`}>
                     <button
                       onClick={handleCloseSeasonalSection}
-                      className="absolute top-4 right-4 z-10 p-2 rounded-full bg-background/80 hover:bg-background/90 border border-border/50 hover:border-border transition-colors"
+                      className={`absolute top-4 right-4 z-10 p-2 rounded-full border transition-colors ${
+                        theme === 'dark'
+                          ? 'bg-background/80 hover:bg-background/90 border-border/50 hover:border-border'
+                          : 'bg-white/90 hover:bg-white border-gray-300 hover:border-gray-400'
+                      }`}
                       aria-label="Close seasonal section"
                     >
-                      <X className="h-4 w-4 text-foreground" />
+                      <X className={`h-4 w-4 ${theme === 'dark' ? 'text-foreground' : 'text-gray-700'}`} />
                     </button>
                     <div className={`absolute inset-0 ${seasonalTheme.gradient}`} />
                     <div className="relative grid gap-6 md:grid-cols-2 md:items-center">
                       <div className="space-y-3">
-                        <p className="text-sm uppercase tracking-[0.3em] text-flame-orange/80">
+                        <p className={`text-sm uppercase tracking-[0.3em] ${
+                          theme === 'dark' ? 'text-flame-orange/80' : 'text-orange-600'
+                        }`}>
                           {seasonalTheme.subtitle}
                         </p>
-                        <h3 className="text-3xl font-semibold text-foreground">
+                        <h3 className={`text-3xl font-semibold ${
+                          theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+                        }`}>
                           {seasonalTheme.emoji && <span className="mr-2">{seasonalTheme.emoji}</span>}
                           {seasonalTheme.title}
                         </h3>
-                        <p className="text-muted-foreground">
+                        <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
                           {seasonalTheme.description}
                         </p>
-                        <div className="flex flex-wrap gap-2 text-sm text-foreground">
+                        <div className="flex flex-wrap gap-2 text-sm">
                           {seasonalTheme.tags.map((tag, index) => (
-                            <span key={index} className="rounded-full bg-secondary/50 px-3 py-1">
+                            <span key={index} className={`rounded-full px-3 py-1 ${
+                              theme === 'dark'
+                                ? 'bg-secondary/50 text-foreground'
+                                : 'bg-orange-50 text-gray-800 border border-orange-200'
+                            }`}>
                               {tag}
                             </span>
                           ))}
@@ -143,8 +135,12 @@ export function ClientPageContent() {
                       </div>
                       <div className="relative h-56">
                         <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${seasonalTheme.colors.primary} blur-2xl`} />
-                        <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} bg-card/30 p-4 shadow-glow`}>
-                          <div className="text-center text-foreground">
+                        <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} p-4 ${
+                          theme === 'dark'
+                            ? 'bg-card/30 shadow-glow'
+                            : 'bg-white/80 shadow-md'
+                        }`}>
+                          <div className={`text-center ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}>
                             <p className="text-lg font-semibold">Festival Ad</p>
                             <p className="text-sm text-muted-foreground">
                               {seasonalTheme.keyname === 'christmas' && 'Red theme, santa art, event-specific CTA.'}
@@ -170,8 +166,46 @@ export function ClientPageContent() {
                 open={checkoutOpen}
                 onClose={() => setCheckoutOpen(false)}
               />
-            </div>
+    </div>
+  );
+}
+
+export function ClientPageContent() {
+  // Initialize from sessionStorage immediately to avoid showing modal on navigation
+  const [ageStatus, setAgeStatus] = useState<AgeStatus>(() => {
+    // Only check sessionStorage in browser (not during SSR)
+    if (typeof window !== "undefined") {
+      const verified = sessionStorage.getItem("age-verified");
+      if (verified === "true") {
+        return "verified";
+      }
+    }
+    return "pending";
+  });
+
+  const handleAgeVerified = () => {
+    sessionStorage.setItem("age-verified", "true");
+    setAgeStatus("verified");
+  };
+
+  const handleAgeDenied = () => {
+    setAgeStatus("denied");
+  };
+
+  return (
+    <ThemeProvider>
+      <LanguageProvider>
+        <CartProvider>
+          {ageStatus === "pending" && (
+            <AgeVerificationModal
+              onVerified={handleAgeVerified}
+              onDenied={handleAgeDenied}
+            />
           )}
+
+          {ageStatus === "denied" && <AgeDeniedScreen />}
+
+          {ageStatus === "verified" && <PageContent />}
         </CartProvider>
       </LanguageProvider>
     </ThemeProvider>

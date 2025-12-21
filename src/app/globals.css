@@ -82,6 +82,62 @@
 }
 
 @layer base {
+  /* Light theme (default) */
+  :root:not(.dark) {
+    --color-background: hsl(0 0% 98%);
+    --color-foreground: hsl(0 0% 15%);
+    
+    --color-card: hsl(0 0% 100%);
+    --color-card-foreground: hsl(0 0% 15%);
+    
+    --color-popover: hsl(0 0% 100%);
+    --color-popover-foreground: hsl(0 0% 15%);
+    
+    --color-primary: hsl(25 95% 53%);
+    --color-primary-foreground: hsl(0 0% 100%);
+    
+    --color-secondary: hsl(0 0% 96%);
+    --color-secondary-foreground: hsl(0 0% 20%);
+    
+    --color-muted: hsl(0 0% 94%);
+    --color-muted-foreground: hsl(0 0% 45%);
+    
+    --color-accent: hsl(38 92% 50%);
+    --color-accent-foreground: hsl(0 0% 100%);
+    
+    --color-destructive: hsl(0 72% 51%);
+    --color-destructive-foreground: hsl(0 0% 100%);
+    
+    --color-border: hsl(0 0% 85%);
+    --color-input: hsl(0 0% 90%);
+    --color-ring: hsl(25 95% 53%);
+    
+    --color-sidebar: hsl(0 0% 98%);
+    --color-sidebar-background: hsl(0 0% 98%);
+    --color-sidebar-foreground: hsl(0 0% 15%);
+    --color-sidebar-primary: hsl(25 95% 53%);
+    --color-sidebar-primary-foreground: hsl(0 0% 100%);
+    --color-sidebar-accent: hsl(0 0% 94%);
+    --color-sidebar-accent-foreground: hsl(0 0% 20%);
+    --color-sidebar-border: hsl(0 0% 90%);
+    --color-sidebar-ring: hsl(25 95% 53%);
+    
+    /* Light mode semantic colors */
+    --color-bg-primary: hsl(0 0% 98%);
+    --color-bg-secondary: hsl(0 0% 100%);
+    --color-bg-tertiary: hsl(0 0% 96%);
+    --color-bg-muted: hsl(0 0% 94%);
+    
+    --color-border-primary: hsl(0 0% 85%);
+    --color-border-secondary: hsl(0 0% 80%);
+    --color-border-muted: hsl(0 0% 88%);
+    
+    /* Light theme gradients */
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 98%), hsl(0 0% 96%));
+    --gradient-galaxy: linear-gradient(180deg, hsl(45 50% 95%), hsl(25 40% 98%), hsl(45 50% 95%));
+  }
+
   .dark {
     --color-background: hsl(220 20% 8%);
     --color-foreground: hsl(40 20% 95%);
@@ -130,6 +186,11 @@
     --color-border-primary: hsl(260 25% 20%);
     --color-border-secondary: hsl(260 25% 25%);
     --color-border-muted: hsl(260 25% 22%);
+    
+    /* Dark theme gradients */
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
+    --gradient-dark: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 4%));
+    --gradient-galaxy: linear-gradient(180deg, hsl(260 40% 8%), hsl(270 60% 15%), hsl(260 40% 8%));
   }
 }
 

@@ -88,10 +88,16 @@ const Header: React.FC<IHeaderProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 w-full border-b border-border/40 bg-background/80 backdrop-blur-xl">
+    <header className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-colors ${
+      theme === 'dark' 
+        ? 'border-border/40 bg-background/80' 
+        : 'border-border/60 bg-white/95 shadow-sm'
+    }`}>
       {/* Promo Banner */}
       <div 
-        className={`bg-secondary/30 transition-all duration-300 ease-in-out overflow-hidden ${
+        className={`transition-all duration-300 ease-in-out overflow-hidden ${
+          theme === 'dark' ? 'bg-secondary/30' : 'bg-gradient-to-r from-orange-50/80 via-yellow-50/80 to-orange-50/80'
+        } ${
           showPromoBanner ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
         style={{
@@ -129,13 +135,19 @@ const Header: React.FC<IHeaderProps> = ({
               return (
                 <div
                   key={index}
-                  className="flex items-center gap-2 sm:gap-4 p-2 sm:p-4 rounded-xl bg-card border border-border/50 card-glow"
+                  className={`flex items-center gap-2 sm:gap-4 p-2 sm:p-4 rounded-xl border transition-colors ${
+                    theme === 'dark'
+                      ? 'bg-card border-border/50 card-glow'
+                      : 'bg-white/90 border-orange-200/50 shadow-sm hover:shadow-md hover:border-orange-300/60'
+                  }`}
                   style={{ animationDelay: `${index * 0.1}s` }}
                 >
-                  <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${promo.color} flex items-center justify-center shrink-0`}>
+                  <div className={`w-8 h-8 sm:w-12 sm:h-12 rounded-lg bg-gradient-to-br ${promo.color} flex items-center justify-center shrink-0 shadow-md`}>
                     <IconComponent className="w-4 h-4 sm:w-6 sm:h-6 text-primary-foreground" />
                   </div>
-                  <p className="text-xs sm:text-sm font-medium text-foreground">{promo.title}</p>
+                  <p className={`text-xs sm:text-sm font-medium ${
+                    theme === 'dark' ? 'text-foreground' : 'text-gray-800'
+                  }`}>{promo.title}</p>
                 </div>
               );
             })}
@@ -147,10 +159,12 @@ const Header: React.FC<IHeaderProps> = ({
         <div className="flex h-16 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center gap-2 shrink-0">
-            <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center">
+            <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center shadow-md">
               <Flame className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-display font-bold hidden sm:block flame-text">
+            <span className={`text-xl font-display font-bold hidden sm:block ${
+              theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
+            }`}>
               Flame Beverage
             </span>
           </Link>
@@ -159,19 +173,31 @@ const Header: React.FC<IHeaderProps> = ({
           <nav className="hidden lg:flex items-center gap-6">
             <Link
               href="/products"
-              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground hover:text-primary-text'
+                  : 'text-gray-700 hover:text-orange-600'
+              }`}
             >
               {t("allProducts")}
             </Link>
             <Link
               href="/#categories"
-              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground hover:text-primary-text'
+                  : 'text-gray-700 hover:text-orange-600'
+              }`}
             >
               {t("categories")}
             </Link>
             <Link
               href="/offers"
-              className="text-sm font-medium text-foreground hover:text-primary-text transition-colors"
+              className={`text-sm font-medium transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground hover:text-primary-text'
+                  : 'text-gray-700 hover:text-orange-600'
+              }`}
             >
               {t("offers")}
             </Link>
@@ -179,13 +205,19 @@ const Header: React.FC<IHeaderProps> = ({
 
           {/* Search - Desktop */}
           <div className="hidden md:flex flex-1 max-w-xl relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+              theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
+            }`} />
             <Input
               type="text"
               placeholder={t("search")}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-secondary/50 border-border/50 focus:border-primary-border"
+              className={`pl-10 transition-colors ${
+                theme === 'dark'
+                  ? 'bg-secondary/50 border-border/50 focus:border-primary-border'
+                  : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
+              }`}
             />
           </div>
 
@@ -195,7 +227,11 @@ const Header: React.FC<IHeaderProps> = ({
             <Link href="/login">
               <Button
                 variant="outline"
-                className="hidden sm:flex items-center gap-2 text-foreground border-border hover:bg-secondary/80"
+                className={`hidden sm:flex items-center gap-2 transition-colors ${
+                  theme === 'dark'
+                    ? 'text-foreground border-border hover:bg-secondary/80'
+                    : 'text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+                }`}
               >
                 <User className="w-4 h-4" />
                 {t("login")}
@@ -205,7 +241,11 @@ const Header: React.FC<IHeaderProps> = ({
             {/* Language Toggle */}
             <Button
               variant="outline"
-              className="hidden sm:flex items-center gap-2 text-foreground border-border hover:bg-secondary/80"
+              className={`hidden sm:flex items-center gap-2 transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground border-border hover:bg-secondary/80'
+                  : 'text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+              }`}
               onClick={() => setLanguage(language === "en" ? "np" : "en")}
             >
               <Globe className="w-4 h-4" />
@@ -217,7 +257,11 @@ const Header: React.FC<IHeaderProps> = ({
               variant="ghost"
               size="icon"
               onClick={toggleTheme}
-              className="text-foreground hover:text-primary-text hover:bg-secondary/80"
+              className={`transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground hover:text-primary-text hover:bg-secondary/80'
+                  : 'text-gray-700 hover:text-orange-600 hover:bg-gray-100'
+              }`}
             >
               {theme === "dark" ? (
                 <Sun className="w-5 h-5" />
@@ -352,7 +396,11 @@ const Header: React.FC<IHeaderProps> = ({
             <Button
               variant="ghost"
               size="icon"
-              className="md:hidden text-foreground"
+              className={`md:hidden transition-colors ${
+                theme === 'dark'
+                  ? 'text-foreground hover:bg-secondary/80'
+                  : 'text-gray-700 hover:bg-gray-100'
+              }`}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
             >
               {isMenuOpen ? (
@@ -366,33 +414,51 @@ const Header: React.FC<IHeaderProps> = ({
 
         {/* Mobile Menu */}
         {isMenuOpen && (
-          <div className="lg:hidden pb-4 border-t border-border/40 pt-4">
+          <div className={`lg:hidden pb-4 border-t pt-4 transition-colors ${
+            theme === 'dark' ? 'border-border/40' : 'border-gray-200'
+          }`}>
             <nav className="flex flex-col gap-3">
               <Link
                 href="/products"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
+                className={`text-sm font-medium transition-colors py-2 ${
+                  theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
+                }`}
               >
                 {t("allProducts")}
               </Link>
               <Link
                 href="/#categories"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
+                className={`text-sm font-medium transition-colors py-2 ${
+                  theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
+                }`}
               >
                 {t("categories")}
               </Link>
               <Link
                 href="/offers"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2"
+                className={`text-sm font-medium transition-colors py-2 ${
+                  theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
+                }`}
               >
                 {t("offers")}
               </Link>
               <Link
                 href="/login"
                 onClick={() => setIsMenuOpen(false)}
-                className="text-sm font-medium text-foreground hover:text-primary-text transition-colors py-2 flex items-center gap-2"
+                className={`text-sm font-medium transition-colors py-2 flex items-center gap-2 ${
+                  theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
+                }`}
               >
                 <User className="w-4 h-4" />
                 {t("login")}
@@ -404,13 +470,19 @@ const Header: React.FC<IHeaderProps> = ({
         {/* Mobile Search */}
         <div className="md:hidden pb-4">
           <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+              theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
+            }`} />
             <Input
               type="text"
               placeholder={t("search")}
               value={searchQuery}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="pl-10 bg-secondary/50 border-border/50"
+              className={`pl-10 transition-colors ${
+                theme === 'dark'
+                  ? 'bg-secondary/50 border-border/50'
+                  : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
+              }`}
             />
           </div>
         </div>

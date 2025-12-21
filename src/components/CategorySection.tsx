@@ -1,11 +1,13 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useTheme } from '@/contexts/ThemeContext';
 import { categories } from '@/data/products';
 import { ArrowRight } from 'lucide-react';
 import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
 
 const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }) => {
   const { language, t } = useLanguage();
+  const { theme } = useTheme();
 
   const categoryImages: Record<string, string> = {
     All: 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=400&h=300&fit=crop',
@@ -34,14 +36,18 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
   };
 
   return (
-    <section className="py-16 bg-secondary/20">
+    <section className={`py-16 transition-colors ${
+      theme === 'dark' ? 'bg-secondary/20' : 'bg-gray-50/50'
+    }`}>
       <div className="container mx-auto px-4">
         {/* Section Header */}
         <div className="text-center mb-12">
-          <h2 className="text-3xl md:text-4xl font-display font-bold text-foreground mb-4">
+          <h2 className={`text-3xl md:text-4xl font-display font-bold mb-4 ${
+            theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+          }`}>
             {t('categories')}
           </h2>
-          <p className="text-muted-foreground max-w-2xl mx-auto">
+          <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'} style={{ maxWidth: '32rem', margin: '0 auto' }}>
             Browse our extensive collection by category
           </p>
         </div>
@@ -69,17 +75,23 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
                 />
 
                 {/* Overlay */}
-                <div className={`absolute inset-0 bg-gradient-to-t from-background via-background/50 to-transparent ${
-                  isSelected ? 'from-flame-orange/20' : ''
+                <div className={`absolute inset-0 bg-gradient-to-t transition-colors ${
+                  theme === 'dark'
+                    ? `from-background via-background/50 to-transparent ${isSelected ? 'from-flame-orange/20' : ''}`
+                    : `from-white via-white/70 to-transparent ${isSelected ? 'from-orange-200/30' : ''}`
                 }`} />
 
                 {/* Content */}
                 <div className="absolute inset-0 flex flex-col items-center justify-end p-4 text-center">
                   <span className="text-4xl mb-2">{categoryIcons[category.name] || '🍷'}</span>
-                  <h3 className="text-lg font-display font-semibold text-foreground mb-1">
+                  <h3 className={`text-lg font-display font-semibold mb-1 ${
+                    theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+                  }`}>
                     {language === 'en' ? category.name : category.nameNe}
                   </h3>
-                  <div className="flex items-center gap-1 text-sm text-flame-orange opacity-0 group-hover:opacity-100 transition-opacity">
+                  <div className={`flex items-center gap-1 text-sm opacity-0 group-hover:opacity-100 transition-opacity ${
+                    theme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
+                  }`}>
                     <span>Explore</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                   </div>

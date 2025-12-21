@@ -1,13 +1,17 @@
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
+import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Flame } from "lucide-react";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
+  const { theme } = useTheme();
 
   return (
-    <section className="relative min-h-[70vh] flex items-center justify-center overflow-hidden galaxy-bg">
+    <section className={`relative min-h-[70vh] flex items-center justify-center overflow-hidden transition-colors ${
+      theme === 'dark' ? 'galaxy-bg' : 'bg-gradient-to-b from-orange-50/30 via-yellow-50/20 to-orange-50/30'
+    }`}>
       {/* Animated Background Elements */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-flame-orange/10 rounded-full blur-3xl animate-pulse" />
@@ -22,8 +26,12 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 shadow-sm shadow-flame-gold px-4 py-2 rounded-full bg-secondary/50 border border-flame-gold text-flame-gold backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-flame-yellow" />
+          <div className={`inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors ${
+            theme === 'dark'
+              ? 'shadow-flame-gold bg-secondary/50 border border-flame-gold text-flame-gold'
+              : 'shadow-orange-200 bg-white/80 border border-orange-300 text-orange-600'
+          }`}>
+            <Sparkles className={`w-4 h-4 ${theme === 'dark' ? 'text-flame-yellow' : 'text-orange-500'}`} />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
 
@@ -82,7 +90,9 @@ const HeroSection: React.FC = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className={`text-lg sm:text-xl max-w-2xl mx-auto ${
+            theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
+          }`}>
             {t("heroSubtitle")}
           </p>
 
@@ -99,7 +109,11 @@ const HeroSection: React.FC = () => {
             <Button
               size="lg"
               variant="outline"
-              className="border-border/50 text-foreground hover:bg-card/10 px-8 py-6 text-lg"
+              className={`px-8 py-6 text-lg transition-colors ${
+                theme === 'dark'
+                  ? 'border-border/50 text-foreground hover:bg-card/10'
+                  : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400'
+              }`}
             >
               {t("viewCollection")}
             </Button>
@@ -108,23 +122,31 @@ const HeroSection: React.FC = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-6 pt-12 max-w-xl mx-auto">
             <div className="text-center">
-              <p className="text-3xl font-bold flame-text">500+</p>
-              <p className="text-sm text-muted-foreground">Products</p>
+              <p className={`text-3xl font-bold ${
+                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
+              }`}>500+</p>
+              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Products</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold flame-text">1hr</p>
-              <p className="text-sm text-muted-foreground">Delivery</p>
+              <p className={`text-3xl font-bold ${
+                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
+              }`}>1hr</p>
+              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Delivery</p>
             </div>
             <div className="text-center">
-              <p className="text-3xl font-bold flame-text">10k+</p>
-              <p className="text-sm text-muted-foreground">Customers</p>
+              <p className={`text-3xl font-bold ${
+                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
+              }`}>10k+</p>
+              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Customers</p>
             </div>
           </div>
         </div>
       </div>
 
       {/* Bottom Gradient */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-background to-transparent" />
+      <div className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t ${
+        theme === 'dark' ? 'from-background' : 'from-gray-50'
+      } to-transparent`} />
     </section>
   );
 };
