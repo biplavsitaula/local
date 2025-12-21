@@ -12,6 +12,7 @@ import {
   LogOut,
   ShoppingCart,
   CreditCard,
+  Bell,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -20,6 +21,7 @@ const menuItems = [
   { title: "Products", icon: Package, path: "/admin/products" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },
+  { title: "Notifications", icon: Bell, path: "/admin/notifications" },
   { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { title: "Stock Alerts", icon: AlertTriangle, path: "/admin/alerts" },
   { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },

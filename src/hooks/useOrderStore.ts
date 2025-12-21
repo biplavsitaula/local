@@ -1,4 +1,6 @@
 import { create } from 'zustand';
+import { Notification } from '@/types/notification';
+import { initialNotifications } from '@/data/notifications';
 
 export interface Order {
   id: string;
@@ -24,8 +26,13 @@ export interface Payment {
 interface OrderStore {
   orders: Order[];
   payments: Payment[];
+  notifications: Notification[];
   addOrder: (order: Omit<Order, 'id'>) => void;
   addPayment: (payment: Omit<Payment, 'id'>) => void;
+  markNotificationRead: (id: string) => void;
+  markAllNotificationsRead: () => void;
+  getUnreadCount: () => number;
+  getNotificationsByType: (type: Notification['type']) => Notification[];
 }
 
 const initialOrders: Order[] = [
@@ -180,9 +187,10 @@ const initialPayments: Payment[] = [
 let nextOrderId = initialOrders.length + 1;
 let nextPaymentId = initialPayments.length + 1;
 
-export const useOrderStore = create<OrderStore>((set) => ({
+export const useOrderStore = create<OrderStore>((set, get) => ({
   orders: initialOrders,
   payments: initialPayments,
+  notifications: initialNotifications,
   addOrder: (order) =>
     set((state) => ({
       orders: [
@@ -197,5 +205,24 @@ export const useOrderStore = create<OrderStore>((set) => ({
         { ...payment, id: `payment-${nextPaymentId++}` },
       ],
     })),
+  markNotificationRead: (id) =>
+    set((state) => ({
+      notifications: state.notifications.map((notification) =>
+        notification.id === id ? { ...notification, read: true } : notification
+      ),
+    })),
+  markAllNotificationsRead: () =>
+    set((state) => ({
+      notifications: state.notifications.map((notification) => ({
+        ...notification,
+        read: true,
+      })),
+    })),
+  getUnreadCount: () => {
+    return get().notifications.filter((n) => !n.read).length;
+  },
+  getNotificationsByType: (type) => {
+    return get().notifications.filter((n) => n.type === type);
+  },
 }));
 
