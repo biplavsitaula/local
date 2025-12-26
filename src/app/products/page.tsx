@@ -6,16 +6,24 @@ import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { products, categories } from '@/data/products';
 import { Product } from '@/types';
-import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Flame, Sun, Moon, Globe, ShoppingCart } from 'lucide-react';
+import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Flame, Sun, Moon, Globe, ShoppingCart, Minus, Plus, Trash2 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from '@/components/ui/sheet';
 import Link from 'next/link';
 
 const Products: React.FC = () => {
   const { t, language, setLanguage } = useLanguage();
-  const { addToCart, totalItems } = useCart();
+  const { items, addToCart, totalItems, totalPrice, updateQuantity, removeFromCart } = useCart();
   const { theme, toggleTheme } = useTheme();
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -26,6 +34,7 @@ const Products: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
@@ -103,10 +112,122 @@ const Products: React.FC = () => {
               <button onClick={toggleTheme} className="flex h-10 w-10 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-colors hover:bg-muted cursor-pointer">
                 {theme === 'dark' ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
               </button>
-              <Link href="/" className="flex items-center gap-2 rounded-lg bg-primary-gradient px-4 py-2 font-medium text-text-inverse transition-all hover:shadow-primary-lg">
-                <ShoppingCart className="h-5 w-5" />
-                {totalItems > 0 && <span className="flex h-5 w-5 items-center justify-center rounded-full bg-card text-xs font-bold text-primary">{totalItems}</span>}
-              </Link>
+              <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
+                <SheetTrigger asChild>
+                  <Button className="bg-primary-gradient text-text-inverse hover:shadow-primary-lg flex items-center gap-2 cursor-pointer">
+                    <ShoppingCart className="h-5 w-5" />
+                    {totalItems > 0 && (
+                      <span className="w-5 h-5 bg-white text-primary-text text-xs font-bold rounded-full flex items-center justify-center">
+                        {totalItems}
+                      </span>
+                    )}
+                  </Button>
+                </SheetTrigger>
+                <SheetContent className="w-full sm:max-w-md bg-card border-border">
+                  <SheetHeader>
+                    <SheetTitle className="text-foreground font-display">
+                      {t("myCart")}
+                    </SheetTitle>
+                  </SheetHeader>
+                  <div className="mt-6 flex flex-col h-[calc(100vh-180px)]">
+                    {items.length === 0 ? (
+                      <div className="flex-1 flex items-center justify-center text-muted-foreground">
+                        <p>{t("cartEmpty")}</p>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="flex-1 overflow-auto space-y-4 pr-2">
+                          {items.map((item) => (
+                            <div
+                              key={item.product.id}
+                              className="flex gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50"
+                            >
+                              <img
+                                src={item.product.image}
+                                alt={item.product.name}
+                                className="w-16 h-20 object-cover rounded-md"
+                              />
+                              <div className="flex-1 min-w-0">
+                                <h4 className="font-medium text-foreground text-sm truncate">
+                                  {language === "en"
+                                    ? item.product.name
+                                    : item.product.nameNe || item.product.name}
+                                </h4>
+                                <p className="text-xs text-muted-foreground">
+                                  {item.product.volume}
+                                </p>
+                                <p className="text-primary-text font-semibold mt-1">
+                                  Rs. {item.product.price.toLocaleString()}
+                                </p>
+                                <div className="flex items-center gap-2 mt-2">
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-7 w-7 border-border cursor-pointer"
+                                    onClick={() =>
+                                      updateQuantity(
+                                        item.product.id,
+                                        item.quantity - 1
+                                      )
+                                    }
+                                  >
+                                    <Minus className="w-3 h-3" />
+                                  </Button>
+                                  <span className="text-sm font-medium w-6 text-center text-foreground">
+                                    {item.quantity}
+                                  </span>
+                                  <Button
+                                    variant="outline"
+                                    size="icon"
+                                    className="h-7 w-7 border-border cursor-pointer"
+                                    onClick={() =>
+                                      updateQuantity(
+                                        item.product.id,
+                                        item.quantity + 1
+                                      )
+                                    }
+                                  >
+                                    <Plus className="w-3 h-3" />
+                                  </Button>
+                                  <Button
+                                    variant="ghost"
+                                    size="icon"
+                                    className="h-7 w-7 text-destructive hover:text-destructive ml-auto cursor-pointer"
+                                    onClick={() =>
+                                      removeFromCart(item.product.id)
+                                    }
+                                  >
+                                    <Trash2 className="w-4 h-4" />
+                                  </Button>
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="border-t border-border pt-4 mt-4">
+                          <div className="flex justify-between items-center mb-4">
+                            <span className="text-lg font-medium text-foreground">
+                              {t("cartTotal")}
+                            </span>
+                            <span className="text-xl font-bold flame-text">
+                              Rs. {totalPrice.toLocaleString()}
+                            </span>
+                          </div>
+                          <Button
+                            className="w-full bg-primary-gradient text-text-inverse font-semibold cursor-pointer"
+                            onClick={() => {
+                              setIsCartOpen(false);
+                              setCheckoutOpen(true);
+                            }}
+                          >
+                            {t("checkout")}
+                          </Button>
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
             </div>
           </div>
         </div>

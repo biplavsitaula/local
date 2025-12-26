@@ -1,8 +1,13 @@
 import React from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
-import { ShieldX } from 'lucide-react';
+import { ShieldX, ArrowLeft } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
-const AgeDeniedScreen: React.FC = () => {
+interface AgeDeniedScreenProps {
+  onBack?: () => void;
+}
+
+const AgeDeniedScreen: React.FC<AgeDeniedScreenProps> = ({ onBack }) => {
   const { t } = useLanguage();
 
   return (
@@ -16,9 +21,19 @@ const AgeDeniedScreen: React.FC = () => {
         <h1 className="text-3xl font-display font-bold text-foreground mb-4">
           {t('ageDenied')}
         </h1>
-        <p className="text-muted-foreground max-w-md">
+        <p className="text-muted-foreground max-w-md mb-6">
           {t('ageDeniedMessage')}
         </p>
+        {onBack && (
+          <Button
+            onClick={onBack}
+            variant="outline"
+            className="border-flame-orange/50 text-foreground hover:bg-flame-orange/10 cursor-pointer"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            {t('back')}
+          </Button>
+        )}
       </div>
     </div>
   );

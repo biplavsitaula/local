@@ -203,7 +203,9 @@ export function ClientPageContent() {
             />
           )}
 
-          {ageStatus === "denied" && <AgeDeniedScreen />}
+          {ageStatus === "denied" && (
+            <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
+          )}
 
           {ageStatus === "verified" && <PageContent />}
         </CartProvider>

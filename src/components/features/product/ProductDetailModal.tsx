@@ -95,8 +95,13 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
               {/* Price */}
               <div className="pt-2">
                 <p className="text-3xl font-bold flame-text">
-                  Rs. {product.price.toLocaleString()}
+                  Rs. {(product.price * quantity).toLocaleString()}
                 </p>
+                {quantity > 1 && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Rs. {product.price.toLocaleString()} × {quantity}
+                  </p>
+                )}
               </div>
             </div>
 

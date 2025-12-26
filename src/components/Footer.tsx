@@ -219,10 +219,10 @@ const Footer: React.FC = () => {
               <Input
                 type="email"
                 placeholder="Your email"
-                className={theme === 'dark'
+                className={`flex-1 ${theme === 'dark'
                   ? 'bg-secondary/50 border-border/50'
                   : 'bg-gray-50 border-gray-200 focus:border-orange-400'
-                }
+                }`}
               />
               <Button className="bg-primary-btn hover:bg-primary-hover text-primary-foreground shrink-0">
                 <Mail className="w-4 h-4" />

@@ -88,11 +88,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
         {/* Price */}
         <div className="mt-3 flex items-center gap-2">
           <span className="text-xl font-bold text-primary">
-            Rs. {product.price.toLocaleString()}
+            Rs. {(product.price * quantity).toLocaleString()}
           </span>
           {product.originalPrice && (
             <span className="text-sm text-muted-foreground line-through">
-              Rs. {product.originalPrice.toLocaleString()}
+              Rs. {(product.originalPrice * quantity).toLocaleString()}
+            </span>
+          )}
+          {quantity > 1 && (
+            <span className="text-xs text-muted-foreground">
+              (Rs. {product.price.toLocaleString()} × {quantity})
             </span>
           )}
         </div>
