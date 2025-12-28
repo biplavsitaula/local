@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
+import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -41,6 +42,7 @@ const Header: React.FC<IHeaderProps> = ({
   const { theme, toggleTheme } = useTheme();
   const { items, totalItems, totalPrice, updateQuantity, removeFromCart } =
     useCart();
+  const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showPromoBanner, setShowPromoBanner] = useState(true);
@@ -174,9 +176,13 @@ const Header: React.FC<IHeaderProps> = ({
             <Link
               href="/products"
               className={`text-sm font-medium transition-colors ${
-                theme === 'dark'
-                  ? 'text-foreground hover:text-primary-text'
-                  : 'text-gray-700 hover:text-orange-600'
+                pathname === '/products'
+                  ? theme === 'dark'
+                    ? 'text-primary-text font-semibold'
+                    : 'text-orange-600 font-semibold'
+                  : theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
               }`}
             >
               {t("allProducts")}
@@ -184,9 +190,13 @@ const Header: React.FC<IHeaderProps> = ({
             <Link
               href="/categories"
               className={`text-sm font-medium transition-colors ${
-                theme === 'dark'
-                  ? 'text-foreground hover:text-primary-text'
-                  : 'text-gray-700 hover:text-orange-600'
+                pathname === '/categories'
+                  ? theme === 'dark'
+                    ? 'text-primary-text font-semibold'
+                    : 'text-orange-600 font-semibold'
+                  : theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
               }`}
             >
               {t("categories")}
@@ -194,9 +204,13 @@ const Header: React.FC<IHeaderProps> = ({
             <Link
               href="/offers"
               className={`text-sm font-medium transition-colors ${
-                theme === 'dark'
-                  ? 'text-foreground hover:text-primary-text'
-                  : 'text-gray-700 hover:text-orange-600'
+                pathname === '/offers'
+                  ? theme === 'dark'
+                    ? 'text-primary-text font-semibold'
+                    : 'text-orange-600 font-semibold'
+                  : theme === 'dark'
+                    ? 'text-foreground hover:text-primary-text'
+                    : 'text-gray-700 hover:text-orange-600'
               }`}
             >
               {t("offers")}
@@ -422,20 +436,28 @@ const Header: React.FC<IHeaderProps> = ({
                 href="/products"
                 onClick={() => setIsMenuOpen(false)}
                 className={`text-sm font-medium transition-colors py-2 ${
-                  theme === 'dark'
-                    ? 'text-foreground hover:text-primary-text'
-                    : 'text-gray-700 hover:text-orange-600'
+                  pathname === '/products'
+                    ? theme === 'dark'
+                      ? 'text-primary-text font-semibold'
+                      : 'text-orange-600 font-semibold'
+                    : theme === 'dark'
+                      ? 'text-foreground hover:text-primary-text'
+                      : 'text-gray-700 hover:text-orange-600'
                 }`}
               >
                 {t("allProducts")}
               </Link>
               <Link
-                href="/#categories"
+                href="/categories"
                 onClick={() => setIsMenuOpen(false)}
                 className={`text-sm font-medium transition-colors py-2 ${
-                  theme === 'dark'
-                    ? 'text-foreground hover:text-primary-text'
-                    : 'text-gray-700 hover:text-orange-600'
+                  pathname === '/categories'
+                    ? theme === 'dark'
+                      ? 'text-primary-text font-semibold'
+                      : 'text-orange-600 font-semibold'
+                    : theme === 'dark'
+                      ? 'text-foreground hover:text-primary-text'
+                      : 'text-gray-700 hover:text-orange-600'
                 }`}
               >
                 {t("categories")}
@@ -444,9 +466,13 @@ const Header: React.FC<IHeaderProps> = ({
                 href="/offers"
                 onClick={() => setIsMenuOpen(false)}
                 className={`text-sm font-medium transition-colors py-2 ${
-                  theme === 'dark'
-                    ? 'text-foreground hover:text-primary-text'
-                    : 'text-gray-700 hover:text-orange-600'
+                  pathname === '/offers'
+                    ? theme === 'dark'
+                      ? 'text-primary-text font-semibold'
+                      : 'text-orange-600 font-semibold'
+                    : theme === 'dark'
+                      ? 'text-foreground hover:text-primary-text'
+                      : 'text-gray-700 hover:text-orange-600'
                 }`}
               >
                 {t("offers")}
