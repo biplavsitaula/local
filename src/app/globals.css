@@ -634,6 +634,24 @@
   animation: pulse-glow 2s ease-in-out infinite;
 }
 
+@keyframes flameRise {
+  0% {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+}
+
+.animate-flame-rise {
+  animation: flameRise 2s ease-in-out infinite;
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;
