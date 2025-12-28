@@ -160,7 +160,13 @@ export type CopyKey =
   | "items"
   | "processPayment"
   | "browseCategories"
-  | "noProductsInCategory";
+  | "noProductsInCategory"
+  | "categoryWhisky"
+  | "categoryVodka"
+  | "categoryRum"
+  | "categoryBeer"
+  | "categoryWine"
+  | "categoryGin";
 
 type Translations = Record<CopyKey, string>;
 

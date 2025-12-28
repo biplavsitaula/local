@@ -20,15 +20,12 @@
   "cartEmpty": "Your cart is empty.",
   "cartTotal": "Total",
   "checkout": "Checkout",
-  "empty": "Your cart is empty.",
-  "delivery": "1-hour delivery",
   "hourDelivery": "1-hour delivery",
   "freeDelivery": "Free delivery on orders 2000+",
   "bulkDiscount": "12 bottle bundle offer",
   "eventOffer": "Seasonal event offers",
   "discount": "12 bottle bundle offer",
   "fast": "Fast delivery windows",
-  "free": "Free delivery on 2000+",
   "festival": "Seasonal spotlight",
   "paymentTitle": "Choose payment method",
   "cod": "Cash on Delivery",
@@ -156,6 +153,12 @@
   "items": "Items",
   "processPayment": "Process Payment",
   "browseCategories": "Browse Categories",
-  "noProductsInCategory": "No products found in this category"
+  "noProductsInCategory": "No products found in this category",
+  "categoryWhisky": "Whiskey",
+  "categoryVodka": "Vodka",
+  "categoryRum": "Rum",
+  "categoryBeer": "Beer",
+  "categoryWine": "Wine",
+  "categoryGin": "Gin"
 }
 

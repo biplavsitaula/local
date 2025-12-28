@@ -29,19 +29,22 @@ const Categories = () => {
   }, []);
 
   const categories = [
-    { id: "whisky", icon: Wine, color: "from-amber-500 to-amber-700" },
-    { id: "vodka", icon: GlassWater, color: "from-blue-400 to-blue-600" },
-    { id: "rum", icon: Cherry, color: "from-red-500 to-red-700" },
-    { id: "beer", icon: Beer, color: "from-yellow-500 to-yellow-700" },
+    { id: "whisky", icon: Wine, color: "from-amber-500 to-amber-700", key: "categoryWhisky" },
+    { id: "vodka", icon: GlassWater, color: "from-blue-400 to-blue-600", key: "categoryVodka" },
+    { id: "rum", icon: Cherry, color: "from-red-500 to-red-700", key: "categoryRum" },
+    { id: "beer", icon: Beer, color: "from-yellow-500 to-yellow-700", key: "categoryBeer" },
   ];
 
-  const categoryNames: Record<string, Record<string, string>> = {
-    whisky: { en: "Whiskey", ne: "व्हिस्की" },
-    vodka: { en: "Vodka", ne: "भोड्का" },
-    rum: { en: "Rum", ne: "रम" },
-    beer: { en: "Beer", ne: "बियर" },
-    wine: { en: "Wine", ne: "वाइन" },
-    gin: { en: "Gin", ne: "जिन" },
+  const getCategoryName = (categoryId: string): string => {
+    const categoryMap: Record<string, string> = {
+      whisky: "categoryWhisky",
+      vodka: "categoryVodka",
+      rum: "categoryRum",
+      beer: "categoryBeer",
+      wine: "categoryWine",
+      gin: "categoryGin",
+    };
+    return t(categoryMap[categoryId] as any) || categoryId;
   };
 
   const filteredProducts = useMemo(() => {
@@ -111,10 +114,10 @@ const Categories = () => {
                   currentTheme === 'dark'
                     ? isSelected
                       ? `ring-2 ring-flame-orange bg-gradient-to-br ${category.color}`
-                      : "bg-card hover:bg-card/80 border border-border"
+                      : "bg-card hover:bg-card/80 border border-border hover:border-flame-orange/50"
                     : isSelected
                       ? `ring-2 ring-orange-500 bg-gradient-to-br ${category.color}`
-                      : "bg-white hover:bg-gray-50 border border-gray-200 shadow-sm"
+                      : "bg-white hover:bg-gray-50 border border-gray-200 hover:border-orange-400 shadow-sm"
                 }`}
               >
                 <div className="flex flex-col items-center gap-3">
@@ -136,7 +139,7 @@ const Categories = () => {
                         : "text-gray-900"
                     }`}
                   >
-                    {categoryNames[category.id][language]}
+                    {t(category.key as any)}
                   </span>
                 </div>
               </button>
@@ -152,7 +155,7 @@ const Categories = () => {
             }`}
           >
             {selectedCategory
-              ? categoryNames[selectedCategory][language]
+              ? getCategoryName(selectedCategory)
               : t('allProducts')}
             <span
               className={`text-lg ml-2 ${

@@ -156,6 +156,12 @@
   "items": "वस्तुहरू",
   "processPayment": "भुक्तानी प्रशोधन गर्नुहोस्",
   "browseCategories": "श्रेणीहरू हेर्नुहोस्",
-  "noProductsInCategory": "यस श्रेणीमा कुनै उत्पादन फेला परेन"
+  "noProductsInCategory": "यस श्रेणीमा कुनै उत्पादन फेला परेन",
+  "categoryWhisky": "व्हिस्की",
+  "categoryVodka": "भोड्का",
+  "categoryRum": "रम",
+  "categoryBeer": "बियर",
+  "categoryWine": "वाइन",
+  "categoryGin": "जिन"
 }
 
