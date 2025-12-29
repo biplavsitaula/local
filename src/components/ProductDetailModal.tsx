@@ -10,27 +10,35 @@ import { toast } from 'sonner';
 interface ProductDetailModalProps {
   product: Product;
   onClose: () => void;
-  onBuyNow: (product: Product) => void;
+  onBuyNow: (product: Product, quantity?: number) => void;
+  onAddToCart?: (product: Product, quantity: number) => void;
 }
 
-const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClose, onBuyNow }) => {
+const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClose, onBuyNow, onAddToCart }) => {
   const { language, t } = useLanguage();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
 
   const handleAddToCart = () => {
     addToCart(product, quantity);
-    toast.success(
-      language === 'en' ? 'Added to Cart!' : 'कार्टमा थपियो!',
-      {
-        description: `${quantity}x ${language === 'en' ? product.name : product.nameNe}`,
-      }
-    );
+    if (onAddToCart) {
+      onAddToCart(product, quantity);
+    } else {
+      toast.success(
+        language === 'en' ? 'Added to Cart!' : 'कार्टमा थपियो!',
+        {
+          description: `${quantity}x ${language === 'en' ? product.name : product.nameNe}`,
+        }
+      );
+    }
   };
 
   const handleBuyNow = () => {
     addToCart(product, quantity);
-    onBuyNow(product);
+    if (onAddToCart) {
+      onAddToCart(product, quantity);
+    }
+    onBuyNow(product, quantity);
   };
 
   return (

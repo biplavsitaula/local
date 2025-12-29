@@ -12,6 +12,7 @@ import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
+import CartNotification from '@/components/CartNotification';
 
 const Products: React.FC = () => {
   const { t, language } = useLanguage();
@@ -27,6 +28,8 @@ const Products: React.FC = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [showFilters, setShowFilters] = useState(false);
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+  const [notificationQuantity, setNotificationQuantity] = useState(1);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -74,9 +77,17 @@ const Products: React.FC = () => {
     return filtered;
   }, [searchQuery, selectedCategory, sortBy, priceRange]);
 
-  const handleBuyNow = (product: Product) => {
-    addToCart(product, 1);
+  const handleBuyNow = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
     setCheckoutOpen(true);
+  };
+
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onAddToCart, so we just show notification
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
   };
 
   const handleCheckout = () => {
@@ -347,6 +358,7 @@ const Products: React.FC = () => {
                   product={product}
                   onBuyNow={handleBuyNow}
                   onViewDetails={setSelectedProduct}
+                  onAddToCart={handleAddToCart}
                 />
               ))}
             </div>
@@ -374,6 +386,7 @@ const Products: React.FC = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onBuyNow={handleBuyNow}
+          onAddToCart={handleAddToCart}
         />
       )}
 
@@ -381,6 +394,12 @@ const Products: React.FC = () => {
       <CheckoutModal
         open={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
+      />
+
+      <CartNotification
+        product={notificationProduct}
+        quantity={notificationQuantity}
+        onClose={() => setNotificationProduct(null)}
       />
     </div>
   );

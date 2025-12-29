@@ -10,6 +10,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
+import CartNotification from "@/components/CartNotification";
 import { Percent, Clock, Truck, Gift, Sparkles } from "lucide-react";
 
 const Offers = () => {
@@ -18,6 +19,8 @@ const Offers = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+  const [notificationQuantity, setNotificationQuantity] = useState(1);
 
   const discountedProducts = products.filter((p) => p.originalPrice && p.originalPrice > p.price);
 
@@ -48,9 +51,17 @@ const Offers = () => {
     },
   ];
 
-  const handleBuyNow = (product: Product) => {
-    addToCart(product, 1);
+  const handleBuyNow = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
     setCheckoutOpen(true);
+  };
+
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onAddToCart, so we just show notification
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
   };
 
   const handleCheckout = () => {
@@ -103,6 +114,7 @@ const Offers = () => {
                   product={product}
                   onViewDetails={setSelectedProduct}
                   onBuyNow={handleBuyNow}
+                  onAddToCart={handleAddToCart}
                 />
               ))}
             </div>
@@ -124,6 +136,7 @@ const Offers = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onBuyNow={handleBuyNow}
+          onAddToCart={handleAddToCart}
         />
       )}
 
@@ -131,6 +144,12 @@ const Offers = () => {
       <CheckoutModal
         open={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
+      />
+
+      <CartNotification
+        product={notificationProduct}
+        quantity={notificationQuantity}
+        onClose={() => setNotificationProduct(null)}
       />
     </div>
   );

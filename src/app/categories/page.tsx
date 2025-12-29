@@ -12,6 +12,7 @@ import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
+import CartNotification from "@/components/CartNotification";
 
 const Categories = () => {
   const { t, language } = useLanguage();
@@ -22,6 +23,8 @@ const Categories = () => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+  const [notificationQuantity, setNotificationQuantity] = useState(1);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -69,9 +72,17 @@ const Categories = () => {
     return filtered;
   }, [selectedCategory, searchQuery]);
 
-  const handleBuyNow = (product: Product) => {
-    addToCart(product, 1);
+  const handleBuyNow = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
     setCheckoutOpen(true);
+  };
+
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    // ProductCard already adds to cart before calling onAddToCart, so we just show notification
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
   };
 
   const handleCheckout = () => {
@@ -176,6 +187,7 @@ const Categories = () => {
                 product={product}
                 onViewDetails={setSelectedProduct}
                 onBuyNow={handleBuyNow}
+                onAddToCart={handleAddToCart}
               />
             ))}
           </div>
@@ -199,12 +211,19 @@ const Categories = () => {
           product={selectedProduct}
           onClose={() => setSelectedProduct(null)}
           onBuyNow={handleBuyNow}
+          onAddToCart={handleAddToCart}
         />
       )}
 
       <CheckoutModal
         open={checkoutOpen}
         onClose={() => setCheckoutOpen(false)}
+      />
+
+      <CartNotification
+        product={notificationProduct}
+        quantity={notificationQuantity}
+        onClose={() => setNotificationProduct(null)}
       />
     </div>
   );
