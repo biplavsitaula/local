@@ -2,12 +2,10 @@
 "use client";
 
 import { useMemo, useState } from 'react';
-import { products } from '@/data/products';
 import { Product } from '@/types';
 import { ArrowUpDown, Edit, Trash2 } from 'lucide-react';
 import { AddProductModal } from './AddProductModal';
 import { DeleteProductModal } from './DeleteProductModal';
-import { useProductStore } from '@/hooks/useProductStore';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
@@ -25,15 +23,16 @@ const getSales = (p: Product) => (p as Product & { sales?: number }).sales ?? 0;
 
 interface ProductTableProps {
   filter: FilterType;
+  products?: Product[];
+  onRefresh?: () => void;
 }
 
-export function ProductTable({ filter }: ProductTableProps) {
+export function ProductTable({ filter, products = [], onRefresh }: ProductTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [editProduct, setEditProduct] = useState<Product | null>(null);
   const [deleteProduct, setDeleteProduct] = useState<Product | null>(null);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const { deleteProduct: deleteProductFromStore } = useProductStore();
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -54,12 +53,13 @@ export function ProductTable({ filter }: ProductTableProps) {
   };
 
   const handleDeleteConfirm = () => {
-    if (deleteProduct) {
-      const productId = typeof deleteProduct.id === 'string' 
-        ? parseInt(deleteProduct.id) 
-        : deleteProduct.id;
-      deleteProductFromStore(productId);
-      setDeleteProduct(null);
+    // The DeleteProductModal now handles the API call and refresh
+    // This callback is called after successful deletion
+    setDeleteProduct(null);
+    
+    // Trigger refresh via the onRefresh callback
+    if (onRefresh) {
+      onRefresh();
     }
   };
 
@@ -68,35 +68,38 @@ export function ProductTable({ filter }: ProductTableProps) {
   };
 
   const sortedProducts = useMemo(() => {
-    let filtered: Product[] = [...products];
+    // Ensure products is always an array
+    const productsArray = Array.isArray(products) ? products : [];
+    
+    let filtered: Product[] = [...productsArray];
 
     switch (filter) {
       case 'out-of-stock':
-        filtered = products.filter((p) => !p.stock || p.stock === 0);
+        filtered = productsArray.filter((p) => !p.stock || p.stock === 0);
         break;
       case 'low-stock':
-        filtered = products.filter((p) => (p.stock || 0) > 0 && (p.stock || 0) <= 20);
+        filtered = productsArray.filter((p) => (p.stock || 0) > 0 && (p.stock || 0) <= 20);
         break;
       case 'top-sellers':
         // Sort by price (assuming higher price = more popular) or by stock movement
-        filtered = [...products].sort((a, b) => b.price - a.price).slice(0, 10);
+        filtered = [...productsArray].sort((a, b) => b.price - a.price).slice(0, 10);
         break;
       case 'top-reviewed':
         // Sort by rating if available, otherwise by price
-        filtered = [...products]
+        filtered = [...productsArray]
           .sort((a, b) => (b.rating || 0) - (a.rating || 0))
           .filter((p) => p.rating && p.rating > 0)
           .slice(0, 10);
         break;
       case 'recommended':
         // Products with tags or high ratings
-        filtered = products
+        filtered = productsArray
           .filter((p) => p.tag || (p.rating && p.rating >= 4))
           .slice(0, 10);
         break;
       case 'all':
       default:
-        filtered = products;
+        filtered = productsArray;
         break;
     }
 
@@ -124,7 +127,7 @@ export function ProductTable({ filter }: ProductTableProps) {
     });
 
     return sorted;
-  }, [filter, sortDir, sortKey]);
+  }, [filter, sortDir, sortKey, products]);
 
   const renderSortableTh = (label: string, columnKey: SortKey) => (
     <th
@@ -224,6 +227,7 @@ export function ProductTable({ filter }: ProductTableProps) {
           product={editProduct}
           open={true}
           onOpenChange={handleEditModalClose}
+          onSuccess={onRefresh}
         />
       )}
       <DeleteProductModal

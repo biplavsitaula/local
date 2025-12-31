@@ -20,10 +20,11 @@ import {
 import { Checkbox } from "@/components/ui/checkbox";
 import { Plus, Upload, Link, Star, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
-import { useProductStore } from "@/hooks/useProductStore";
+import { useProductMutation } from "@/hooks/useProductMutation";
 import { Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
+import { Loader2 } from "lucide-react";
 
 const categories = [
   "Whiskey",
@@ -41,14 +42,16 @@ interface AddProductModalProps {
   product?: Product | null;
   open?: boolean;
   onOpenChange?: (open: boolean) => void;
+  onSuccess?: () => void;
 }
 
 export function AddProductModal({ 
   product, 
   open: controlledOpen, 
-  onOpenChange: controlledOnOpenChange 
+  onOpenChange: controlledOnOpenChange,
+  onSuccess
 }: AddProductModalProps = {}) {
-  const { addProduct, updateProduct } = useProductStore();
+  const { createProductMutation, updateProductMutation, loading, error } = useProductMutation();
   const [internalOpen, setInternalOpen] = useState(false);
   const isEditMode = !!product;
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -121,7 +124,7 @@ export function AddProductModal({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!validateForm()) {
@@ -129,60 +132,68 @@ export function AddProductModal({
       return;
     }
 
-    const stock = parseInt(formData.stock);
-    let status: "in-stock" | "out-of-stock" | "low-stock" = "in-stock";
-    if (stock === 0) status = "out-of-stock";
-    else if (stock <= 10) status = "low-stock";
-
-    if (isEditMode && product) {
-      const productId = typeof product.id === 'string' 
-        ? parseInt(product.id) 
-        : (product.id || 0);
+    try {
+      // Map category to type (API uses 'type' instead of 'category')
+      // Normalize category name to match API expectations
+      let categoryToType = formData.category.toLowerCase();
+      // Handle common variations
+      if (categoryToType === 'whiskey' || categoryToType === 'whisky') {
+        categoryToType = 'whiskey'; // API uses 'whiskey'
+      }
       
-      updateProduct(productId, {
+      // Prepare the product data for API
+      const productData = {
         name: formData.name,
-        category: formData.category,
+        type: categoryToType,
         price: parseFloat(formData.price),
-        stock,
         image: formData.imageUrl,
-        rating: formData.rating ? parseFloat(formData.rating) : 0,
+        ...(formData.rating && { rating: parseFloat(formData.rating) }),
+        ...(formData.stock && { stock: parseInt(formData.stock) }),
         ...(formData.itemLink && { itemLink: formData.itemLink }),
-        isRecommended: formData.isRecommended,
-      } as any);
+        ...(formData.isRecommended && { isRecommended: formData.isRecommended }),
+      };
 
-      toast.success("Product updated successfully!");
-    } else {
-      addProduct({
-        name: formData.name,
-        category: formData.category,
-        price: parseFloat(formData.price),
-        stock,
-        image: formData.imageUrl,
-        rating: formData.rating ? parseFloat(formData.rating) : 0,
-        reviews: 0,
-        sales: 0,
-        status,
-        itemLink: formData.itemLink,
-        isRecommended: formData.isRecommended,
-      } as any);
-
-      toast.success("Product added successfully!");
+      if (isEditMode && product) {
+        // For update, use product.id (which should be the _id from API)
+        const productId = typeof product.id === 'string' ? product.id : String(product.id);
+        
+        await updateProductMutation(productId, productData);
+        toast.success("Product updated successfully!");
+      } else {
+        await createProductMutation(productData);
+        toast.success("Product added successfully!");
+      }
+      
+      // Call onSuccess callback to refresh the product list
+      if (onSuccess) {
+        onSuccess();
+      }
+      
+      // Dispatch custom event to notify other components (like Products page) to refresh
+      // This works for both create and update operations
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('productChanged'));
+      }
+      
+      setOpen(false);
+      if (!isEditMode) {
+        setFormData({
+          name: "",
+          category: "",
+          price: "",
+          stock: "",
+          imageUrl: "",
+          itemLink: "",
+          rating: "",
+          isRecommended: false,
+        });
+      }
+      setErrors({});
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to save product';
+      toast.error(errorMessage);
+      console.error('Error saving product:', err);
     }
-    
-    setOpen(false);
-    if (!isEditMode) {
-      setFormData({
-        name: "",
-        category: "",
-        price: "",
-        stock: "",
-        imageUrl: "",
-        itemLink: "",
-        rating: "",
-        isRecommended: false,
-      });
-    }
-    setErrors({});
   };
 
   const handleClose = () => {
@@ -412,11 +423,24 @@ export function AddProductModal({
               variant="outline"
               className="flex-1"
               onClick={handleClose}
+              disabled={loading}
             >
               Cancel
             </Button>
-            <Button type="submit" variant="outline" className="flex-1">
-              {isEditMode ? "Save Changes" : "Add Product"}
+            <Button 
+              type="submit" 
+              variant="outline" 
+              className="flex-1"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  {isEditMode ? "Saving..." : "Adding..."}
+                </>
+              ) : (
+                isEditMode ? "Save Changes" : "Add Product"
+              )}
             </Button>
           </div>
         </form>
