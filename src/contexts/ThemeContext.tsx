@@ -42,10 +42,23 @@ const setThemeInStorage = (theme: Theme) => {
 };
 
 export const ThemeProvider = ({ children }: { children: ReactNode }) => {
+  // Initialize theme from localStorage immediately (script in layout handles initial class)
   const [theme, setThemeState] = useState<Theme>(() => {
-    // Initialize from localStorage on mount
-    return getThemeFromStorage();
+    // On client, read from localStorage; on server, use default
+    if (typeof window !== "undefined") {
+      return getThemeFromStorage();
+    }
+    return DEFAULT_THEME;
   });
+  const [mounted, setMounted] = useState(false);
+
+  // Mark as mounted after initial render
+  useEffect(() => {
+    setMounted(true);
+    // Sync with what was set by the blocking script
+    const storedTheme = getThemeFromStorage();
+    setThemeState(storedTheme);
+  }, []);
 
   // Update theme when localStorage changes (e.g., from another tab)
   useEffect(() => {
@@ -60,10 +73,12 @@ export const ThemeProvider = ({ children }: { children: ReactNode }) => {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  // Apply theme to document
+  // Apply theme to document whenever theme changes (only after mount to avoid hydration issues)
   useEffect(() => {
-    document.documentElement.classList.toggle("dark", theme === "dark");
-  }, [theme]);
+    if (mounted) {
+      document.documentElement.classList.toggle("dark", theme === "dark");
+    }
+  }, [theme, mounted]);
 
   const setTheme = (newTheme: Theme) => {
     setThemeState(newTheme);
