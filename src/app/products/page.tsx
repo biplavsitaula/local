@@ -4,20 +4,22 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { products, categories } from '@/data/products';
+import { categories } from '@/data/products';
 import { Product } from '@/types';
-import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown } from 'lucide-react';
+import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
+import { useProductList } from '@/hooks/useProductList';
 
 const Products: React.FC = () => {
   const { t, language } = useLanguage();
   const { addToCart } = useCart();
   const { theme } = useTheme();
+  const { products, rawApiData, loading, error } = useProductList();
   const [mounted, setMounted] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -75,7 +77,7 @@ const Products: React.FC = () => {
     }
 
     return filtered;
-  }, [searchQuery, selectedCategory, sortBy, priceRange]);
+  }, [products, searchQuery, selectedCategory, sortBy, priceRange]);
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
     // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
@@ -102,7 +104,6 @@ const Products: React.FC = () => {
   };
 
   const hasActiveFilters = searchQuery || selectedCategory || priceRange[0] > 0 || priceRange[1] < 100000;
-
   return (
     <div className={`min-h-screen transition-colors ${
       currentTheme === 'dark'
@@ -338,15 +339,40 @@ const Products: React.FC = () => {
             ))}
           </div>
 
+          {/* Loading State */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Loading products...</p>
+            </div>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-16">
+              <div className="text-6xl mb-4">⚠️</div>
+              <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
+              >
+                Retry
+              </button>
+            </div>
+          )}
+
           {/* Results Count */}
-          <div className="flex items-center justify-between mb-6">
-            <p className="text-muted-foreground">
-              Showing <span className="text-foreground font-medium">{filteredProducts.length}</span> products
-            </p>
-          </div>
+          {!loading && !error && (
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-muted-foreground">
+                Showing <span className="text-foreground font-medium">{filteredProducts.length}</span> products
+              </p>
+            </div>
+          )}
 
           {/* Products Grid */}
-          {filteredProducts.length > 0 ? (
+          {!loading && !error && filteredProducts.length > 0 ? (
             <div className={`grid gap-6 ${
               viewMode === 'grid' 
                 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' 
@@ -362,7 +388,7 @@ const Products: React.FC = () => {
                 />
               ))}
             </div>
-          ) : (
+          ) : !loading && !error ? (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🍷</div>
               <h3 className="text-xl font-semibold text-foreground mb-2">No products found</h3>
@@ -374,7 +400,7 @@ const Products: React.FC = () => {
                 Clear All Filters
               </button>
             </div>
-          )}
+          ) : null}
         </div>
       </main>
 
