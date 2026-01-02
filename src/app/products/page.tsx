@@ -13,13 +13,15 @@ import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
-import { useProductList } from '@/hooks/useProductList';
+import { productsService, Product as ApiProduct } from '@/services/products.service';
 
 const Products: React.FC = () => {
   const { t, language } = useLanguage();
   const { addToCart } = useCart();
   const { theme } = useTheme();
-  const { products, rawApiData, loading, error } = useProductList();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [mounted, setMounted] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState('');
@@ -32,6 +34,56 @@ const Products: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+
+  // Map API product to internal Product type
+  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
+    const originalPrice = apiProduct.discountPercent
+      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+      : undefined;
+
+    let category = apiProduct.category.toLowerCase();
+    if (category === 'whiskey' || category === 'whisky') {
+      category = 'whisky';
+    }
+
+    return {
+      id: apiProduct._id || apiProduct.id || '',
+      name: apiProduct.name,
+      category,
+      price: apiProduct.price,
+      originalPrice,
+      image: apiProduct.imageUrl || apiProduct.image,
+      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
+      volume: '750ml',
+      alcoholContent: '40%',
+      alcohol: '40%',
+      inStock: (apiProduct.stock || 0) > 0,
+      isNew: false,
+      stock: apiProduct.stock,
+      rating: apiProduct.rating,
+      tag: apiProduct.tag,
+    } as Product;
+  };
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await productsService.getAll({ limit: 1000 });
+        const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+        setProducts(mappedProducts);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -378,9 +430,9 @@ const Products: React.FC = () => {
                 ? 'grid-cols-2 md:grid-cols-3 lg:grid-cols-4' 
                 : 'grid-cols-1'
             }`}>
-              {filteredProducts.map((product) => (
+              {filteredProducts.map((product, index) => (
                 <ProductCard
-                  key={product.id}
+                  key={product.id || `product-${index}`}
                   product={product}
                   onBuyNow={handleBuyNow}
                   onViewDetails={setSelectedProduct}

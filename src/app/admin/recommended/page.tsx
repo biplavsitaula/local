@@ -1,20 +1,39 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { Search, Edit, Eye, Trash2, Package, ThumbsUp, AlertTriangle, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Edit, Eye, Trash2, Package, ThumbsUp, AlertTriangle, Star, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { products } from '@/data/products';
-import { Product } from '@/types';
+import { productsService } from '@/services/products.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
 
-type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
+type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
 
 export default function RecommendedPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('rating');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await productsService.getAll({ view: 'recommended', limit: 100 });
+        setRecommendedProducts(response.data || []);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load recommended products');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchRecommended();
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -25,42 +44,33 @@ export default function RecommendedPage() {
     setSortDir('desc');
   };
 
-  // Get recommended products (those with tags or high ratings >= 4.5)
-  const recommendedProducts = useMemo(() => {
-    return products.filter((p) => p.tag || (p.rating && p.rating >= 4.5));
-  }, []);
-
   // Get top 4 most recommended for sidebar
-  const mostRecommended = useMemo(() => {
-    return [...recommendedProducts]
-      .sort((a, b) => {
-        // Sort by rating first, then by sales
-        const ratingDiff = (b.rating || 0) - (a.rating || 0);
-        if (ratingDiff !== 0) return ratingDiff;
-        return ((b as any).sales || 0) - ((a as any).sales || 0);
-      })
-      .slice(0, 4);
-  }, [recommendedProducts]);
+  const mostRecommended = [...recommendedProducts]
+    .sort((a, b) => {
+      const ratingDiff = (b.rating || 0) - (a.rating || 0);
+      if (ratingDiff !== 0) return ratingDiff;
+      return ((b as any).sales || 0) - ((a as any).sales || 0);
+    })
+    .slice(0, 4);
 
   // Filter and sort for table
-  const filteredAndSorted = useMemo(() => {
-    let filtered = recommendedProducts.filter((p) => {
+  const filteredAndSorted = recommendedProducts
+    .filter((p) => {
       const query = searchQuery.toLowerCase();
       return (
-        p.name.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query)
+        (p.name || '').toLowerCase().includes(query) ||
+        (p.category || '').toLowerCase().includes(query)
       );
-    });
-
-    const dir = sortDir === 'asc' ? 1 : -1;
-    const sorted = [...filtered].sort((a, b) => {
+    })
+    .sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1;
       switch (sortKey) {
         case 'name':
-          return dir * a.name.localeCompare(b.name);
+          return dir * (a.name || '').localeCompare(b.name || '');
         case 'category':
-          return dir * a.category.localeCompare(b.category);
+          return dir * (a.category || '').localeCompare(b.category || '');
         case 'price':
-          return dir * (a.price - b.price);
+          return dir * ((a.price || 0) - (b.price || 0));
         case 'stock':
           return dir * ((a.stock || 0) - (b.stock || 0));
         case 'rating':
@@ -72,11 +82,8 @@ export default function RecommendedPage() {
       }
     });
 
-    return sorted;
-  }, [recommendedProducts, searchQuery, sortKey, sortDir]);
-
-  const getStock = (p: Product) => p.stock ?? 0;
-  const getStatus = (p: Product) => {
+  const getStock = (p: any) => p.stock ?? 0;
+  const getStatus = (p: any) => {
     const stock = getStock(p);
     if (stock === 0) return { label: 'Out of Stock', variant: 'destructive' };
     if (stock <= 10) return { label: 'Low Stock', variant: 'warning' };
@@ -102,6 +109,31 @@ export default function RecommendedPage() {
       </button>
     </th>
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading recommended products...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading recommended products</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
@@ -144,20 +176,20 @@ export default function RecommendedPage() {
               </thead>
               <tbody>
                 {filteredAndSorted.length > 0 ? (
-                  filteredAndSorted.map((product) => {
+                  filteredAndSorted.map((product, index) => {
                     const status = getStatus(product);
                     const stock = getStock(product);
                     const reviews = Math.floor(Math.random() * 200) + 50; // Mock reviews count
                     
                     return (
-                      <tr key={product.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                      <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
-                              {product.image ? (
+                              {product.image || product.imageUrl ? (
                                 <Image
-                                  src={product.image}
-                                  alt={product.name}
+                                  src={product.image || product.imageUrl || ''}
+                                  alt={product.name || ''}
                                   width={40}
                                   height={40}
                                   className="object-cover"
@@ -168,7 +200,7 @@ export default function RecommendedPage() {
                             </div>
                             <div>
                               <p className="text-sm font-medium text-foreground">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{reviews} reviews</p>
+                              <p className="text-xs text-muted-foreground">{product.reviews || 0} reviews</p>
                             </div>
                           </div>
                         </td>
@@ -177,7 +209,7 @@ export default function RecommendedPage() {
                             {product.category}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-foreground">${product.price.toLocaleString()}</td>
+                        <td className="p-4 text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
                         <td className="p-4">
                           <div>
                             <p className="text-sm text-foreground">{stock} units</p>
@@ -249,15 +281,15 @@ export default function RecommendedPage() {
               const rank = index + 1;
               return (
                 <div
-                  key={product.id}
+                  key={product.id || product._id || `recommended-${index}`}
                   className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/30 transition-colors"
                 >
                   <div className="text-lg font-bold text-flame-orange w-6">#{rank}</div>
                   <div className="w-12 h-12 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {product.image ? (
+                    {product.image || product.imageUrl ? (
                       <Image
-                        src={product.image}
-                        alt={product.name}
+                        src={product.image || product.imageUrl || ''}
+                        alt={product.name || ''}
                         width={48}
                         height={48}
                         className="object-cover"
@@ -272,7 +304,7 @@ export default function RecommendedPage() {
                       {product.category}
                     </span>
                     <div className="flex items-center gap-2 mt-1">
-                      <p className="text-sm font-semibold text-foreground">${product.price.toLocaleString()}</p>
+                      <p className="text-sm font-semibold text-foreground">${(product.price || 0).toLocaleString()}</p>
                       {product.rating && (
                         <span className="flex items-center gap-1 text-xs text-muted-foreground">
                           <Star className="h-3 w-3 text-yellow-400 fill-yellow-400" />

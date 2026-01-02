@@ -3,6 +3,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles, Flame } from "lucide-react";
+import Link from "next/link";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
@@ -98,25 +99,29 @@ const HeroSection: React.FC = () => {
 
           {/* CTA Buttons */}
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
-            <Button
-              size="lg"
-              variant="default"
-              className="gradient-gold text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
-            >
-              {t("shopNow")}
-              <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className={`px-8 py-6 text-lg transition-colors ${
-                theme === 'dark'
-                  ? 'border-border/50 text-foreground hover:bg-card/10'
-                  : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400'
-              }`}
-            >
-              {t("viewCollection")}
-            </Button>
+            <Link href="/products">
+              <Button
+                size="lg"
+                variant="default"
+                className="gradient-gold text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
+              >
+                Explore Collection
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+            </Link>
+            <Link href="/categories">
+              <Button
+                size="lg"
+                variant="outline"
+                className={`px-8 py-6 text-lg transition-colors ${
+                  theme === 'dark'
+                    ? 'border-border/50 text-foreground hover:bg-card/10'
+                    : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400'
+                }`}
+              >
+                Categories
+              </Button>
+            </Link>
           </div>
 
           {/* Stats */}

@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
-import { products } from "@/data/products";
+import { productsService, Product as ApiProduct } from "@/services/products.service";
 import { Product } from "@/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,16 +11,69 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
-import { Percent, Clock, Truck, Gift, Sparkles } from "lucide-react";
+import { Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle } from "lucide-react";
 
 const Offers = () => {
   const { t } = useLanguage();
   const { addToCart } = useCart();
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+
+  // Map API product to internal Product type
+  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
+    const originalPrice = apiProduct.discountPercent
+      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+      : undefined;
+
+    let category = apiProduct.category.toLowerCase();
+    if (category === 'whiskey' || category === 'whisky') {
+      category = 'whisky';
+    }
+
+    return {
+      id: apiProduct._id || apiProduct.id || '',
+      name: apiProduct.name,
+      category,
+      price: apiProduct.price,
+      originalPrice,
+      image: apiProduct.imageUrl || apiProduct.image,
+      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
+      volume: '750ml',
+      alcoholContent: '40%',
+      alcohol: '40%',
+      inStock: (apiProduct.stock || 0) > 0,
+      isNew: false,
+      stock: apiProduct.stock,
+      rating: apiProduct.rating,
+      tag: apiProduct.tag,
+    } as Product;
+  };
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await productsService.getAll({ limit: 1000 });
+        const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+        setProducts(mappedProducts);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const discountedProducts = products.filter((p) => p.originalPrice && p.originalPrice > p.price);
 
@@ -106,25 +159,53 @@ const Offers = () => {
             </h2>
           </div>
 
-          {discountedProducts.length > 0 ? (
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-              {discountedProducts.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onViewDetails={setSelectedProduct}
-                  onBuyNow={handleBuyNow}
-                  onAddToCart={handleAddToCart}
-                />
-              ))}
+          {/* Loading State */}
+          {loading && (
+            <div className="flex flex-col items-center justify-center py-16">
+              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+              <p className="text-muted-foreground">Loading products...</p>
             </div>
-          ) : (
-            <div className="text-center py-12 bg-card rounded-xl">
-              <Percent className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
-              <p className="text-muted-foreground text-lg">
-                {t("noProductsOnSale")}
-              </p>
+          )}
+
+          {/* Error State */}
+          {error && !loading && (
+            <div className="text-center py-16 bg-card rounded-xl">
+              <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+              <p className="text-muted-foreground mb-6">{error}</p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
+              >
+                Retry
+              </button>
             </div>
+          )}
+
+          {/* Products Grid */}
+          {!loading && !error && (
+            <>
+              {discountedProducts.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                  {discountedProducts.map((product, index) => (
+                    <ProductCard
+                      key={product.id || `product-${index}`}
+                      product={product}
+                      onViewDetails={setSelectedProduct}
+                      onBuyNow={handleBuyNow}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="text-center py-12 bg-card rounded-xl">
+                  <Percent className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
+                  <p className="text-muted-foreground text-lg">
+                    {t("noProductsOnSale")}
+                  </p>
+                </div>
+              )}
+            </>
           )}
         </div>
       </main>

@@ -21,9 +21,10 @@ import {
 import { analyticsService } from '@/services/analytics.service';
 import { productsService } from '@/services/products.service';
 import { stockAlertsService } from '@/services/stock-alerts.service';
+import { topSellersService } from '@/services/top-sellers.service';
 import { reviewsService } from '@/services/reviews.service';
 
-const Index = () => {
+const Dashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [stats, setStats] = useState({
@@ -78,7 +79,7 @@ const Index = () => {
 
         // Fetch reviews summary
         const reviewsRes = await reviewsService.getSummary();
-        const totalReviews = reviewsRes.data.totalReviews || 0;
+        const totalReviews = reviewsRes.data?.totalReviews || 0;
 
         // Fetch recent products
         const productsListRes = await productsService.getAll({ limit: 10 });
@@ -212,4 +213,5 @@ const Index = () => {
   );
 };
 
-export default Index;
+export default Dashboard;
+

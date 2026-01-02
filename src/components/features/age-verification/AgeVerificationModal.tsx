@@ -49,8 +49,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
             Age Verification Required
           </h2>
 
+          {/* Message */}
+          <p className="text-lg md:text-xl font-medium text-gray-300 mb-4">
+            {t("ageDeniedMessage")}
+          </p>
+          
           {/* Question */}
-          <p className="text-lg md:text-xl font-medium text-gray-300 mb-10">
+          <p className="text-base md:text-lg font-medium text-gray-400 mb-10">
             {t("ageQuestion")}
           </p>
 

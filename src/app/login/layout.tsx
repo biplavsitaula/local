@@ -2,6 +2,7 @@
 
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function LoginLayout({
   children,
@@ -11,7 +12,9 @@ export default function LoginLayout({
   return (
     <ThemeProvider>
       <LanguageProvider>
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

@@ -1,0 +1,96 @@
+import { apiGet, apiPost, apiPut, apiDelete, ApiResponse } from '@/lib/api';
+
+export interface User {
+  _id?: string;
+  id?: string;
+  fullName: string;
+  email: string;
+  role: 'user' | 'admin' | 'superadmin';
+  mobile?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface RegisterData {
+  fullName: string;
+  email: string;
+  password: string;
+  role?: 'user' | 'admin' | 'superadmin';
+  mobile?: string;
+}
+
+export interface LoginData {
+  email: string;
+  password: string;
+}
+
+export interface LoginResponse {
+  token: string;
+  user: User;
+}
+
+export interface UpdateProfileData {
+  fullName?: string;
+  email?: string;
+  mobile?: string;
+  password?: string;
+}
+
+export const authService = {
+  /**
+   * Register a new user (Public endpoint)
+   */
+  register: async (data: RegisterData): Promise<ApiResponse<LoginResponse>> => {
+    return apiPost<LoginResponse>('/auth/register', data, false);
+  },
+
+  /**
+   * Login user (Public endpoint)
+   */
+  login: async (data: LoginData): Promise<ApiResponse<LoginResponse>> => {
+    return apiPost<LoginResponse>('/auth/login', data, false);
+  },
+
+  /**
+   * Get current user profile
+   */
+  getProfile: async (): Promise<ApiResponse<User>> => {
+    return apiGet<User>('/auth/profile');
+  },
+
+  /**
+   * Update current user profile
+   */
+  updateProfile: async (data: UpdateProfileData): Promise<ApiResponse<User>> => {
+    return apiPut<User>('/auth/profile', data);
+  },
+
+  /**
+   * Get all users (Admin only)
+   */
+  getAllUsers: async (): Promise<ApiResponse<User[]>> => {
+    return apiGet<User[]>('/auth/users');
+  },
+
+  /**
+   * Get user by ID (Admin only)
+   */
+  getUserById: async (id: string): Promise<ApiResponse<User>> => {
+    return apiGet<User>(`/auth/users/${id}`);
+  },
+
+  /**
+   * Update user (Admin only)
+   */
+  updateUser: async (id: string, data: Partial<User>): Promise<ApiResponse<User>> => {
+    return apiPut<User>(`/auth/users/${id}`, data);
+  },
+
+  /**
+   * Delete user (Super Admin only)
+   */
+  deleteUser: async (id: string): Promise<ApiResponse<void>> => {
+    return apiDelete<void>(`/auth/users/${id}`);
+  },
+};
+

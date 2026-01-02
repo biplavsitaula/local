@@ -1,8 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search } from "lucide-react";
-import { useOrderStore } from "@/hooks/useOrderStore";
+import { useMemo, useState, useEffect } from "react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, Loader2, AlertCircle } from "lucide-react";
+import { paymentsService, Payment as ApiPayment } from "@/services/payments.service";
 
 type MethodFilter = "all" | "qr" | "cod";
 type SortKey = "billNumber" | "customerName" | "amount" | "method" | "status" | "createdAt";
@@ -10,6 +10,16 @@ type SortDir = "asc" | "desc";
 
 interface PaymentTableProps {
   methodFilter: MethodFilter;
+}
+
+interface Payment {
+  id: string;
+  billNumber: string;
+  customerName: string;
+  amount: number;
+  method: "cod" | "qr";
+  status: string;
+  createdAt: string;
 }
 
 const getStatusColor = (status: string) => {
@@ -40,10 +50,47 @@ const getMethodPill = (method: "cod" | "qr") => {
 };
 
 export function PaymentTable({ methodFilter }: PaymentTableProps) {
-  const { payments } = useOrderStore();
+  const [payments, setPayments] = useState<Payment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+
+  const mapApiPaymentToPayment = (apiPayment: ApiPayment): Payment => {
+    return {
+      id: apiPayment._id || apiPayment.id || '',
+      billNumber: apiPayment.billNumber,
+      customerName: apiPayment.billNumber, // API might not have customerName, use billNumber as fallback
+      amount: apiPayment.amount,
+      method: apiPayment.method === 'qr' ? 'qr' : 'cod',
+      status: apiPayment.status,
+      createdAt: apiPayment.createdAt,
+    };
+  };
+
+  useEffect(() => {
+    const fetchPayments = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await paymentsService.getAll({
+          method: methodFilter !== 'all' ? methodFilter : undefined,
+          search: query || undefined,
+          limit: 100,
+        });
+        const mappedPayments = (response.data || []).map(mapApiPaymentToPayment);
+        setPayments(mappedPayments);
+      } catch (err: any) {
+        setError(err.message || 'Failed to load payments');
+        setPayments([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPayments();
+  }, [methodFilter, query]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -54,13 +101,35 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
     setSortDir("asc");
   };
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading payments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading payments</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   const rows = useMemo(() => {
     const q = query.trim().toLowerCase();
 
     let list = payments;
-    if (methodFilter !== "all") {
-      list = list.filter((p) => p.method === methodFilter);
-    }
     if (q) {
       list = list.filter(
         (p) =>

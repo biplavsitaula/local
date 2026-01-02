@@ -2,23 +2,36 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Flame, Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { Flame, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
   const { language } = useLanguage();
   const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    router.push("/");
+    setError(null);
+    setIsLoading(true);
+    
+    try {
+      await login(formData.email, formData.password);
+      // Navigation is handled by the auth context
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -103,13 +116,28 @@ const Login = () => {
               </Link>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Flame className="w-5 h-5" />
-              {language === "en" ? "Login" : "लगइन"}
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Flame className="w-5 h-5" />
+              )}
+              {isLoading 
+                ? (language === "en" ? "Logging in..." : "लगइन हुँदैछ...") 
+                : (language === "en" ? "Login" : "लगइन")
+              }
             </button>
           </form>
 

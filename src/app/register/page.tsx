@@ -2,15 +2,19 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Flame, Mail, Lock, Eye, EyeOff, User, Phone } from "lucide-react";
+import { Flame, Mail, Lock, Eye, EyeOff, User, Phone, Loader2 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Register = () => {
   const { language } = useLanguage();
   const router = useRouter();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
@@ -20,10 +24,38 @@ const Register = () => {
     agreeToTerms: false,
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle registration logic here
-    router.push("/");
+    setError(null);
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError(language === "en" ? "Passwords do not match" : "पासवर्डहरू मेल खाँदैनन्");
+      return;
+    }
+
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError(language === "en" ? "Password must be at least 6 characters" : "पासवर्ड कम्तिमा ६ वर्णको हुनुपर्छ");
+      return;
+    }
+
+    setIsLoading(true);
+    
+    try {
+      await register({
+        fullName: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        mobile: formData.phone,
+        role: 'user', // Default role
+      });
+      // Navigation is handled by the auth context
+    } catch (err: any) {
+      setError(err.message || (language === "en" ? "Registration failed. Please try again." : "दर्ता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।"));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -203,13 +235,28 @@ const Register = () => {
               </label>
             </div>
 
+            {/* Error Message */}
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+                {error}
+              </div>
+            )}
+
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all"
+              disabled={isLoading}
+              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              <Flame className="w-5 h-5" />
-              {language === "en" ? "Create Account" : "खाता सिर्जना गर्नुहोस्"}
+              {isLoading ? (
+                <Loader2 className="w-5 h-5 animate-spin" />
+              ) : (
+                <Flame className="w-5 h-5" />
+              )}
+              {isLoading 
+                ? (language === "en" ? "Creating account..." : "खाता सिर्जना हुँदैछ...") 
+                : (language === "en" ? "Create Account" : "खाता सिर्जना गर्नुहोस्")
+              }
             </button>
           </form>
 

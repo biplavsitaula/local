@@ -1,10 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
-import { CreditCard, QrCode, Wallet } from "lucide-react";
+import { useMemo, useEffect, useState } from "react";
+import { CreditCard, QrCode, Wallet, Loader2, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/features/admin/ExportButton";
-import { useOrderStore } from "@/hooks/useOrderStore";
+import { paymentsService } from "@/services/payments.service";
 import { PaymentTable } from "@/components/features/admin/payments/PaymentTable";
 
 type MethodFilter = "all" | "qr" | "cod";
@@ -27,26 +27,77 @@ function SummaryCard({
 }
 
 export default function Payments() {
-  const { payments } = useOrderStore();
+  const [summary, setSummary] = useState({
+    totalPayments: 0,
+    completed: 0,
+    pending: 0,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchSummary = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await paymentsService.getSummary();
+        setSummary({
+          totalPayments: response.data?.totalPayments || 0,
+          completed: response.data?.completed || 0,
+          pending: response.data?.pending || 0,
+        });
+      } catch (err: any) {
+        setError(err.message || 'Failed to load payment summary');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSummary();
+  }, []);
 
   const calcTotals = (method: MethodFilter) => {
-    const list =
-      method === "all" ? payments : payments.filter((p) => p.method === method);
-
-    const total = list.reduce((sum, p) => sum + p.amount, 0);
-    const completed = list
-      .filter((p) => p.status.toLowerCase().includes("completed") || p.status.toLowerCase().includes("paid"))
-      .reduce((sum, p) => sum + p.amount, 0);
-    const pending = list
-      .filter((p) => p.status.toLowerCase().includes("pending") || p.status.toLowerCase().includes("processing"))
-      .reduce((sum, p) => sum + p.amount, 0);
-
-    return { total, completed, pending };
+    // For filtered views, we'd need to fetch separately or calculate from payments list
+    // For now, return the summary for all
+    if (method === "all") {
+      return {
+        totalPayments: summary?.totalPayments || 0,
+        completed: summary?.completed || 0,
+        pending: summary?.pending || 0,
+      };
+    }
+    // For filtered views, we'd need additional API calls or client-side filtering
+    return { totalPayments: 0, completed: 0, pending: 0 };
   };
 
-  const totalsAll = useMemo(() => calcTotals("all"), [payments]);
-  const totalsQr = useMemo(() => calcTotals("qr"), [payments]);
-  const totalsCod = useMemo(() => calcTotals("cod"), [payments]);
+  const totalsAll = useMemo(() => calcTotals("all"), [summary]);
+  const totalsQr = useMemo(() => calcTotals("qr"), [summary]);
+  const totalsCod = useMemo(() => calcTotals("cod"), [summary]);
+
+  if (loading && !summary.totalPayments) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading payments...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error && !summary.totalPayments) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading payments</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">

@@ -1,53 +1,107 @@
 "use client";
 
-import { useMemo } from 'react';
-import { DollarSign, ShoppingCart, TrendingUp, Package } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { DollarSign, ShoppingCart, TrendingUp, Package, Loader2, AlertCircle } from 'lucide-react';
 import { StatCard } from '@/components/features/admin/StatCard';
 import { SalesChart } from '@/components/features/admin/SalesChart';
 import { StockChart } from '@/components/features/admin/StockChart';
 import { CategoryPieChart } from '@/components/features/admin/CategoryPieChart';
-import { products } from '@/data/products';
-import { salesData, stockData, categoryData } from '@/data/mockData';
+import { analyticsService } from '@/services/analytics.service';
 
 export default function AnalyticsPage() {
-  // Calculate analytics from products
-  const analytics = useMemo(() => {
-    const totalRevenue = products.reduce((sum, p) => sum + (p.price * (p.sales || 0)), 0);
-    const totalSales = products.reduce((sum, p) => sum + (p.sales || 0), 0);
-    const avgOrderValue = totalSales > 0 ? totalRevenue / totalSales : 0;
-    const productsSold = products.reduce((sum, p) => sum + (p.sales || 0), 0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [analytics, setAnalytics] = useState({
+    totalRevenue: 0,
+    totalSales: 0,
+    avgOrderValue: 0,
+    productsSold: 0,
+    totalRevenueGrowth: 0,
+    totalSalesGrowth: 0,
+    avgOrderValueGrowth: 0,
+    productsSoldGrowth: 0,
+  });
+  const [salesData, setSalesData] = useState<any[]>([]);
+  const [stockData, setStockData] = useState<any[]>([]);
+  const [categoryData, setCategoryData] = useState<any[]>([]);
+  const [revenueByCategoryData, setRevenueByCategoryData] = useState<any[]>([]);
 
-    // Calculate revenue by category
-    const revenueByCategory = products.reduce((acc, p) => {
-      const category = p.category.charAt(0).toUpperCase() + p.category.slice(1);
-      const revenue = (p.price * (p.sales || 0));
-      if (!acc[category]) {
-        acc[category] = 0;
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        // Fetch analytics summary
+        const summaryRes = await analyticsService.getSummary();
+        setAnalytics(summaryRes.data || {});
+
+        // Fetch sales trend
+        const salesTrendRes = await analyticsService.getSalesTrend();
+        setSalesData((salesTrendRes.data || []).map(item => ({
+          month: item.month,
+          sales: item.sales,
+        })));
+
+        // Fetch stock by category
+        const stockByCategoryRes = await analyticsService.getStockByCategory();
+        setStockData(stockByCategoryRes.data || []);
+
+        // Fetch products by category
+        const productsByCategoryRes = await analyticsService.getProductsByCategory();
+        setCategoryData(productsByCategoryRes.data || []);
+
+        // Fetch revenue by category
+        const revenueByCategoryRes = await analyticsService.getRevenueByCategory();
+        const revenueData = revenueByCategoryRes.data || [];
+        const totalCategoryRevenue = revenueData.reduce((sum, item) => sum + (item.value || 0), 0);
+        setRevenueByCategoryData(
+          revenueData
+            .map(item => ({
+              ...item,
+              percentage: totalCategoryRevenue > 0 ? Math.round((item.value / totalCategoryRevenue) * 100) : 0,
+            }))
+            .sort((a, b) => (b.value || 0) - (a.value || 0))
+        );
+      } catch (err: any) {
+        setError(err.message || 'Failed to load analytics');
+        console.error('Analytics error:', err);
+      } finally {
+        setLoading(false);
       }
-      acc[category] += revenue;
-      return acc;
-    }, {} as Record<string, number>);
-
-    const totalCategoryRevenue = Object.values(revenueByCategory).reduce((sum, val) => sum + val, 0);
-    const revenueByCategoryData = Object.entries(revenueByCategory)
-      .map(([name, value]) => ({
-        name,
-        value: Math.round(value),
-        percentage: Math.round((value / totalCategoryRevenue) * 100)
-      }))
-      .sort((a, b) => b.value - a.value);
-
-    return {
-      totalRevenue,
-      totalSales,
-      avgOrderValue,
-      productsSold,
-      revenueByCategoryData
     };
+
+    fetchAnalytics();
   }, []);
 
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading analytics...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading analytics</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Format revenue
-  const formatRevenue = (value: number) => {
+  const formatRevenue = (value: number | undefined) => {
+    if (!value || isNaN(value)) return '$0';
     if (value >= 1000000) {
       return `$${(value / 1000000).toFixed(1)}M`;
     } else if (value >= 1000) {
@@ -70,31 +124,31 @@ export default function AnalyticsPage() {
           title="Total Revenue"
           value={formatRevenue(analytics.totalRevenue)}
           icon={DollarSign}
-          trend={{ isPositive: true, value: 15 }}
+          trend={{ isPositive: true, value: analytics.totalRevenueGrowth || 15 }}
           variant="success"
           delay={0}
         />
         <StatCard
           title="Total Sales"
-          value={analytics.totalSales.toLocaleString()}
+          value={(analytics.totalSales || 0).toLocaleString()}
           icon={ShoppingCart}
-          trend={{ isPositive: true, value: 8 }}
+          trend={{ isPositive: true, value: analytics.totalSalesGrowth || 8 }}
           variant="default"
           delay={100}
         />
         <StatCard
           title="Avg Order Value"
-          value={`$${analytics.avgOrderValue.toFixed(2)}`}
+          value={`$${(analytics.avgOrderValue || 0).toFixed(2)}`}
           icon={TrendingUp}
-          trend={{ isPositive: true, value: 3 }}
+          trend={{ isPositive: true, value: analytics.avgOrderValueGrowth || 3 }}
           variant="default"
           delay={200}
         />
         <StatCard
           title="Products Sold"
-          value={analytics.productsSold.toLocaleString()}
+          value={(analytics.productsSold || 0).toLocaleString()}
           icon={Package}
-          trend={{ isPositive: true, value: 12 }}
+          trend={{ isPositive: true, value: analytics.productsSoldGrowth || 12 }}
           variant="default"
           delay={300}
         />
@@ -114,12 +168,12 @@ export default function AnalyticsPage() {
         <div className="glass-card rounded-xl p-6 border border-border/50 opacity-0 animate-fade-in" style={{ animationDelay: '400ms' }}>
           <h3 className="text-lg font-semibold text-foreground mb-6">Revenue by Category</h3>
           <div className="space-y-4">
-            {analytics.revenueByCategoryData.map((item, index) => (
-              <div key={item.name} className="space-y-2">
+            {revenueByCategoryData.map((item, index) => (
+              <div key={item.name || `category-${index}`} className="space-y-2">
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-foreground">{item.name}</span>
+                  <span className="text-sm font-medium text-foreground">{item.name || 'Unknown'}</span>
                   <span className="text-sm text-muted-foreground">
-                    {formatRevenue(item.value)} ({item.percentage}%)
+                    {formatRevenue(item.value)} ({item.percentage || 0}%)
                   </span>
                 </div>
                 <div className="w-full bg-secondary/30 rounded-full h-2 overflow-hidden">

@@ -1,11 +1,11 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { Product } from "@/types";
-import { ShoppingCart, Zap, Plus, Minus, Eye } from "lucide-react";
+import { ShoppingCart, Zap, Plus, Minus, Eye, Loader2, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import ProductDetailModal from "@/components/features/product/ProductDetailModal";
-import { products } from "@/data/products";
+import { productsService, Product as ApiProduct } from "@/services/products.service";
 
 interface ProductCardProps {
   product: Product;
@@ -138,17 +138,72 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   onCheckout,
 }) => {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Map API product to internal Product type
+  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
+    const originalPrice = apiProduct.discountPercent
+      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+      : undefined;
+
+    let category = apiProduct.category.toLowerCase();
+    if (category === 'whiskey' || category === 'whisky') {
+      category = 'whisky';
+    }
+
+    return {
+      id: apiProduct._id || apiProduct.id || '',
+      name: apiProduct.name,
+      nameNe: apiProduct.name, // Use name as fallback if nameNe not available
+      category,
+      price: apiProduct.price,
+      originalPrice,
+      image: apiProduct.imageUrl || apiProduct.image,
+      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
+      volume: '750ml',
+      alcoholContent: '40%',
+      alcohol: '40%',
+      inStock: (apiProduct.stock || 0) > 0,
+      isNew: false,
+      stock: apiProduct.stock,
+      rating: apiProduct.rating,
+      tag: apiProduct.tag,
+    } as Product;
+  };
+
+  // Fetch products from API
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await productsService.getAll({ limit: 1000 });
+        const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+        setProducts(mappedProducts);
+      } catch (err: any) {
+        setError(err.message || 'Failed to fetch products');
+        setProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProducts();
+  }, []);
 
   const filteredProducts = useMemo(() => {
     return products.filter((product) => {
       const matchesSearch =
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.description.toLowerCase().includes(searchQuery.toLowerCase());
+        (product.nameNe && product.nameNe.toLowerCase().includes(searchQuery.toLowerCase())) ||
+        (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()));
       const matchesCategory =
         selectedCategory === "All" || product.category === selectedCategory;
       return matchesSearch && matchesCategory;
     });
-  }, [searchQuery, selectedCategory]);
+  }, [products, searchQuery, selectedCategory]);
 
   const handleBuyNow = (product: Product) => {
     if (onCheckout) {
@@ -163,22 +218,50 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   return (
     <>
       <section className="container mx-auto px-4">
-        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onBuyNow={handleBuyNow}
-              onViewDetails={handleViewDetails}
-            />
-          ))}
-        </div>
-        {filteredProducts.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No products found matching your criteria.
-            </p>
+        {/* Loading State */}
+        {loading && (
+          <div className="flex flex-col items-center justify-center py-16">
+            <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Loading products...</p>
           </div>
+        )}
+
+        {/* Error State */}
+        {error && !loading && (
+          <div className="text-center py-16">
+            <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+            <p className="text-muted-foreground mb-6">{error}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
+            >
+              Retry
+            </button>
+          </div>
+        )}
+
+        {/* Products Grid */}
+        {!loading && !error && (
+          <>
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 md:gap-6">
+              {filteredProducts.map((product, index) => (
+                <ProductCard
+                  key={product.id || `product-${index}`}
+                  product={product}
+                  onBuyNow={handleBuyNow}
+                  onViewDetails={handleViewDetails}
+                />
+              ))}
+            </div>
+            {filteredProducts.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-muted-foreground">
+                  No products found matching your criteria.
+                </p>
+              </div>
+            )}
+          </>
         )}
       </section>
       {selectedProduct && (

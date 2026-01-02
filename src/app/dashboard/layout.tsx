@@ -6,11 +6,11 @@ import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 
-interface AdminLayoutProps {
+interface DashboardLayoutProps {
   children: React.ReactNode;
 }
 
-export default function AdminLayout({ children }: AdminLayoutProps) {
+export default function DashboardLayout({ children }: DashboardLayoutProps) {
   return (
     <ThemeProvider>
       <LanguageProvider>
@@ -27,3 +27,13 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     </ThemeProvider>
   );
 }
+
+
+
+
+
+
+
+
+
+

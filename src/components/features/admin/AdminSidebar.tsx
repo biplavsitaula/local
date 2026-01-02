@@ -17,7 +17,7 @@ import {
 import { cn } from "@/lib/utils";
 
 const menuItems = [
-  { title: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { title: "Products", icon: Package, path: "/admin/products" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },

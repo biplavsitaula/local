@@ -1,46 +1,77 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { Search, Edit, Eye, Trash2, Package, Star } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Edit, Eye, Trash2, Package, Star, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { products } from '@/data/products';
-import { Product } from '@/types';
+import { reviewsService } from '@/services/reviews.service';
+import { productsService } from '@/services/products.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
 
-type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
+type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
-
-// Mock review counts for products
-const mockReviewCounts: Record<string, number> = {
-  '3': 456, // Captain Morgan Spiced Rum
-  '6': 312, // Bombay Sapphire Gin
-  '2': 234, // Grey Goose Vodka
-  '7': 187, // Jose Cuervo (Don Julio 1942 proxy)
-  '4': 167, // Moet & Chandon
-  '1': 156, // Johnnie Walker Black Label
-  '8': 98,  // Hennessy VS Cognac
-  '13': 89, // Chivas Regal (Macallan proxy)
-};
-
-// Mock rating distribution
-const ratingDistribution = [
-  { stars: 5, count: 892 },
-  { stars: 4, count: 489 },
-  { stars: 3, count: 204 },
-  { stars: 2, count: 85 },
-  { stars: 1, count: 29 },
-];
-
-const totalReviews = ratingDistribution.reduce((sum, r) => sum + r.count, 0);
-const averageRating = (
-  ratingDistribution.reduce((sum, r) => sum + (r.stars * r.count), 0) / totalReviews
-).toFixed(1);
 
 export default function ReviewsPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('rating');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [mostReviewedProducts, setMostReviewedProducts] = useState<any[]>([]);
+  const [reviewSummary, setReviewSummary] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [summaryRes, mostReviewedRes] = await Promise.all([
+          reviewsService.getSummary(),
+          reviewsService.getMostReviewed(10),
+        ]);
+
+        setReviewSummary(summaryRes.data || {});
+        
+        // Fetch product details for most reviewed
+        const mostReviewedData = mostReviewedRes.data || [];
+        const productIds = mostReviewedData
+          .map((item: any) => item.productId)
+          .filter((id: string) => id && id !== 'undefined' && id !== undefined);
+        
+        if (productIds.length > 0) {
+          const productsPromises = productIds.map((id: string) => 
+            productsService.getById(id).catch(() => ({ data: null }))
+          );
+          const productsRes = await Promise.all(productsPromises);
+          
+          const productsWithReviews = productsRes
+            .map((res, index) => {
+              if (!res.data) return null;
+              // Find the matching review data by productId
+              const reviewData = mostReviewedData.find((item: any) => item.productId === productIds[index]);
+              return {
+                ...res.data,
+                reviewCount: reviewData?.count || 0,
+              };
+            })
+            .filter((product) => product !== null); // Remove null entries
+          
+          setMostReviewedProducts(productsWithReviews);
+        } else {
+          setMostReviewedProducts([]);
+        }
+
+      } catch (err: any) {
+        setError(err.message || 'Failed to load reviews');
+        setMostReviewedProducts([]);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -51,39 +82,27 @@ export default function ReviewsPage() {
     setSortDir('desc');
   };
 
-  // Get products with review counts, sorted by review count
-  const mostReviewedProducts = useMemo(() => {
-    return products
-      .map((p) => ({
-        ...p,
-        reviewCount: mockReviewCounts[p.id] || Math.floor(Math.random() * 200) + 50,
-      }))
-      .filter((p) => p.reviewCount > 0)
-      .sort((a, b) => b.reviewCount - a.reviewCount);
-  }, []);
-
   // Get top 5 for the card
   const top5Reviewed = mostReviewedProducts.slice(0, 5);
 
   // Filter and sort for table
-  const filteredAndSorted = useMemo(() => {
-    let filtered = mostReviewedProducts.filter((p) => {
+  const filteredAndSorted = mostReviewedProducts
+    .filter((p) => {
       const query = searchQuery.toLowerCase();
       return (
-        p.name.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query)
+        (p.name || '').toLowerCase().includes(query) ||
+        (p.category || '').toLowerCase().includes(query)
       );
-    });
-
-    const dir = sortDir === 'asc' ? 1 : -1;
-    const sorted = [...filtered].sort((a, b) => {
+    })
+    .sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1;
       switch (sortKey) {
         case 'name':
-          return dir * a.name.localeCompare(b.name);
+          return dir * (a.name || '').localeCompare(b.name || '');
         case 'category':
-          return dir * a.category.localeCompare(b.category);
+          return dir * (a.category || '').localeCompare(b.category || '');
         case 'price':
-          return dir * (a.price - b.price);
+          return dir * ((a.price || 0) - (b.price || 0));
         case 'stock':
           return dir * ((a.stock || 0) - (b.stock || 0));
         case 'rating':
@@ -95,16 +114,43 @@ export default function ReviewsPage() {
       }
     });
 
-    return sorted;
-  }, [mostReviewedProducts, searchQuery, sortKey, sortDir]);
-
-  const getStock = (p: Product) => p.stock ?? 0;
-  const getStatus = (p: Product) => {
+  const getStock = (p: any) => p.stock ?? 0;
+  const getStatus = (p: any) => {
     const stock = getStock(p);
     if (stock === 0) return { label: 'Out of Stock', variant: 'destructive' };
     if (stock <= 20) return { label: 'Low Stock', variant: 'warning' };
     return { label: 'In Stock', variant: 'success' };
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading reviews...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading reviews</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  const totalReviews = reviewSummary?.totalReviews || 0;
+  const averageRating = reviewSummary?.averageRating?.toFixed(1) || '0.0';
+  const ratingDistribution = reviewSummary?.ratingDistribution || [];
+  const maxReviewCount = Math.max(...ratingDistribution.map((r: any) => r.count || 0), 1);
 
   const renderSortableTh = (label: string, columnKey: SortKey) => (
     <th
@@ -126,7 +172,6 @@ export default function ReviewsPage() {
     </th>
   );
 
-  const maxReviewCount = Math.max(...ratingDistribution.map((r) => r.count));
 
   return (
     <div className="space-y-6">
@@ -151,10 +196,10 @@ export default function ReviewsPage() {
                 className="flex items-center gap-4 p-3 rounded-lg hover:bg-secondary/30 transition-colors"
               >
                 <div className="w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                  {product.image ? (
+                  {product.image || product.imageUrl ? (
                     <Image
-                      src={product.image}
-                      alt={product.name}
+                      src={product.image || product.imageUrl || ''}
+                      alt={product.name || ''}
                       width={48}
                       height={48}
                       className="object-cover rounded-full"
@@ -170,7 +215,7 @@ export default function ReviewsPage() {
                   </span>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm font-semibold text-foreground">{(product as any).reviewCount}</p>
+                  <p className="text-sm font-semibold text-foreground">{(product as any).reviewCount || 0}</p>
                   <p className="text-xs text-muted-foreground">reviews</p>
                 </div>
               </div>
@@ -203,7 +248,7 @@ export default function ReviewsPage() {
           {/* Rating Distribution */}
           <div className="space-y-3">
             <p className="text-sm font-semibold text-foreground mb-3">Rating Distribution</p>
-            {ratingDistribution.map((rating) => (
+            {ratingDistribution.map((rating: any) => (
               <div key={rating.stars} className="space-y-1">
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
@@ -215,7 +260,7 @@ export default function ReviewsPage() {
                 <div className="w-full bg-secondary/30 rounded-full h-2 overflow-hidden">
                   <div
                     className="h-full bg-flame-gradient transition-all duration-500"
-                    style={{ width: `${(rating.count / maxReviewCount) * 100}%` }}
+                    style={{ width: `${((rating.count || 0) / maxReviewCount) * 100}%` }}
                   />
                 </div>
               </div>
@@ -267,10 +312,10 @@ export default function ReviewsPage() {
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
-                              {product.image ? (
+                              {product.image || product.imageUrl ? (
                                 <Image
-                                  src={product.image}
-                                  alt={product.name}
+                                  src={product.image || product.imageUrl || ''}
+                                  alt={product.name || ''}
                                   width={40}
                                   height={40}
                                   className="object-cover"
@@ -281,7 +326,7 @@ export default function ReviewsPage() {
                             </div>
                             <div>
                               <p className="text-sm font-medium text-foreground">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{reviewCount} reviews</p>
+                              <p className="text-xs text-muted-foreground">{(product as any).reviewCount || 0} reviews</p>
                             </div>
                           </div>
                         </td>
@@ -290,7 +335,7 @@ export default function ReviewsPage() {
                             {product.category}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-foreground">${product.price.toLocaleString()}</td>
+                        <td className="p-4 text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
                         <td className="p-4 text-sm text-foreground">{stock} units</td>
                         <td className="p-4">
                           <span className={`text-xs px-2 py-1 rounded-full ${

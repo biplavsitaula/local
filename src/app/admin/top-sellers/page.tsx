@@ -1,20 +1,46 @@
 "use client";
 
-import { useState, useMemo } from 'react';
-import { Search, Edit, Eye, Trash2, Package, TrendingUp } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Search, Edit, Eye, Trash2, Package, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { products } from '@/data/products';
-import { Product } from '@/types';
+import { topSellersService } from '@/services/top-sellers.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
 
-type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
+type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
 
 export default function TopSellersPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('sales');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [topSellingProducts, setTopSellingProducts] = useState<any[]>([]);
+  const [insights, setInsights] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchTopSellers = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const [productsRes, insightsRes] = await Promise.all([
+          topSellersService.getProducts(),
+          topSellersService.getInsights(),
+        ]);
+
+        setTopSellingProducts(productsRes.data || []);
+        setInsights(insightsRes.data || {});
+      } catch (err: any) {
+        setError(err.message || 'Failed to load top sellers');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchTopSellers();
+  }, []);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -25,36 +51,27 @@ export default function TopSellersPage() {
     setSortDir('desc');
   };
 
-  // Get top selling products sorted by sales
-  const topSellingProducts = useMemo(() => {
-    return [...products]
-      .filter((p) => (p as any).sales && (p as any).sales > 0)
-      .sort((a, b) => ((b as any).sales || 0) - ((a as any).sales || 0))
-      .slice(0, 10);
-  }, []);
-
   // Get top 3 for cards
   const top3Products = topSellingProducts.slice(0, 3);
 
   // Filter and sort for table
-  const filteredAndSorted = useMemo(() => {
-    let filtered = topSellingProducts.filter((p) => {
+  const filteredAndSorted = topSellingProducts
+    .filter((p) => {
       const query = searchQuery.toLowerCase();
       return (
-        p.name.toLowerCase().includes(query) ||
-        p.category.toLowerCase().includes(query)
+        (p.name || '').toLowerCase().includes(query) ||
+        (p.category || '').toLowerCase().includes(query)
       );
-    });
-
-    const dir = sortDir === 'asc' ? 1 : -1;
-    const sorted = [...filtered].sort((a, b) => {
+    })
+    .sort((a, b) => {
+      const dir = sortDir === 'asc' ? 1 : -1;
       switch (sortKey) {
         case 'name':
-          return dir * a.name.localeCompare(b.name);
+          return dir * (a.name || '').localeCompare(b.name || '');
         case 'category':
-          return dir * a.category.localeCompare(b.category);
+          return dir * (a.category || '').localeCompare(b.category || '');
         case 'price':
-          return dir * (a.price - b.price);
+          return dir * ((a.price || 0) - (b.price || 0));
         case 'stock':
           return dir * ((a.stock || 0) - (b.stock || 0));
         case 'rating':
@@ -66,11 +83,8 @@ export default function TopSellersPage() {
       }
     });
 
-    return sorted;
-  }, [topSellingProducts, searchQuery, sortKey, sortDir]);
-
-  const getStock = (p: Product) => p.stock ?? 0;
-  const getStatus = (p: Product) => {
+  const getStock = (p: any) => p.stock ?? 0;
+  const getStatus = (p: any) => {
     const stock = getStock(p);
     if (stock === 0) return { label: 'Out of Stock', variant: 'destructive' };
     if (stock <= 20) return { label: 'Low Stock', variant: 'warning' };
@@ -97,12 +111,45 @@ export default function TopSellersPage() {
     </th>
   );
 
-  // Calculate peak sales day (mock data)
-  const peakSalesDay = {
+  // Calculate peak sales day from insights
+  const peakSalesDay = insights ? {
+    day: insights.peakSalesDay || 'Saturday',
+    percentage: 45,
+    unitsSold: 567
+  } : {
     day: 'Saturday',
     percentage: 45,
     unitsSold: 567
   };
+
+  // Get insights data
+  const trendingCategory = insights?.trendingCategory || 'N/A';
+  const bestCategory = insights?.bestCategory || 'N/A';
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading top sellers...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4 text-center">
+          <AlertCircle className="h-8 w-8 text-destructive" />
+          <div>
+            <p className="text-lg font-semibold text-foreground mb-2">Error loading top sellers</p>
+            <p className="text-muted-foreground">{error}</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -112,27 +159,27 @@ export default function TopSellersPage() {
         <p className="text-muted-foreground mt-1">View your best performing products.</p>
       </div>
 
-      {/* Top Section: Cards and Peak Sales */}
+      {/* Top Section: Cards and Insights */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Top Selling Products Cards */}
         <div className="lg:col-span-2 space-y-4">
           <h2 className="text-xl font-semibold text-foreground">Top Selling Products</h2>
           <div className="space-y-3">
             {top3Products.map((product, index) => {
-              const rank = index + 3; // Starting from 3 (since top 2 are in table)
+              const rank = index + 1; // Starting from 1
               const sales = (product as any).sales || 0;
               
               return (
                 <div
-                  key={product.id}
+                  key={product.id || product._id || `top-product-${index}`}
                   className="glass-card rounded-xl p-4 border border-border/50 flex items-center gap-4 hover:scale-[1.01] transition-transform"
                 >
                   <div className="text-2xl font-bold text-flame-orange w-8">{rank}</div>
                   <div className="w-12 h-12 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
-                    {product.image ? (
+                    {product.image || product.imageUrl ? (
                       <Image
-                        src={product.image}
-                        alt={product.name}
+                        src={product.image || product.imageUrl || ''}
+                        alt={product.name || ''}
                         width={48}
                         height={48}
                         className="object-cover"
@@ -146,7 +193,7 @@ export default function TopSellersPage() {
                     <p className="text-xs text-muted-foreground capitalize">{product.category}</p>
                   </div>
                   <div className="text-right">
-                    <p className="text-sm font-semibold text-foreground">{sales.toLocaleString()} sold</p>
+                    <p className="text-sm font-semibold text-foreground">{(product.sales || 0).toLocaleString()} sold</p>
                   </div>
                 </div>
               );
@@ -154,17 +201,21 @@ export default function TopSellersPage() {
           </div>
         </div>
 
-        {/* Peak Sales Day Card */}
+        {/* Sales Insights Card */}
         <div className="glass-card rounded-xl p-6 border border-border/50">
+          <h3 className="text-lg font-semibold text-foreground mb-4">Sales Insights</h3>
           <div className="space-y-4">
             <div>
-              <p className="text-sm text-muted-foreground">Units sold this month</p>
-              <p className="text-3xl font-bold text-foreground">{peakSalesDay.unitsSold}</p>
+              <p className="text-sm text-muted-foreground mb-1">Trending Category</p>
+              <p className="text-xl font-bold text-flame-orange capitalize">{trendingCategory}</p>
             </div>
-            <div className="pt-4 border-t border-border/50">
-              <p className="text-sm font-semibold text-foreground mb-2">Peak Sales Day</p>
-              <p className="text-2xl font-bold text-flame-orange mb-1">{peakSalesDay.day}</p>
-              <p className="text-sm text-muted-foreground">{peakSalesDay.percentage}% of weekly sales</p>
+            <div className="pt-3 border-t border-border/50">
+              <p className="text-sm text-muted-foreground mb-1">Best Category</p>
+              <p className="text-xl font-bold text-success capitalize">{bestCategory}</p>
+            </div>
+            <div className="pt-3 border-t border-border/50">
+              <p className="text-sm text-muted-foreground mb-1">Peak Sales Day</p>
+              <p className="text-xl font-bold text-foreground">{peakSalesDay.day}</p>
             </div>
           </div>
         </div>
@@ -203,21 +254,21 @@ export default function TopSellersPage() {
               </thead>
               <tbody>
                 {filteredAndSorted.length > 0 ? (
-                  filteredAndSorted.map((product) => {
+                  filteredAndSorted.map((product, index) => {
                     const status = getStatus(product);
                     const stock = getStock(product);
                     const reviews = Math.floor(Math.random() * 500) + 100; // Mock reviews count
                     const sales = (product as any).sales || 0;
                     
                     return (
-                      <tr key={product.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                      <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                         <td className="p-4">
                           <div className="flex items-center gap-3">
                             <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
-                              {product.image ? (
+                              {product.image || product.imageUrl ? (
                                 <Image
-                                  src={product.image}
-                                  alt={product.name}
+                                  src={product.image || product.imageUrl || ''}
+                                  alt={product.name || ''}
                                   width={40}
                                   height={40}
                                   className="object-cover"
@@ -228,7 +279,7 @@ export default function TopSellersPage() {
                             </div>
                             <div>
                               <p className="text-sm font-medium text-foreground">{product.name}</p>
-                              <p className="text-xs text-muted-foreground">{reviews} reviews</p>
+                              <p className="text-xs text-muted-foreground">{product.reviews || 0} reviews</p>
                             </div>
                           </div>
                         </td>
@@ -237,7 +288,7 @@ export default function TopSellersPage() {
                             {product.category}
                           </span>
                         </td>
-                        <td className="p-4 text-sm text-foreground">${product.price.toLocaleString()}</td>
+                        <td className="p-4 text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
                         <td className="p-4 text-sm text-foreground">{stock} units</td>
                         <td className="p-4">
                           <span className={`text-xs px-2 py-1 rounded-full ${
@@ -258,7 +309,7 @@ export default function TopSellersPage() {
                             </span>
                           ) : '-'}
                         </td>
-                        <td className="p-4 text-sm text-foreground">{sales.toLocaleString()}</td>
+                        <td className="p-4 text-sm text-foreground">{(product.sales || 0).toLocaleString()}</td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
                             <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">

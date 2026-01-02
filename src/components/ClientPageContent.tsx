@@ -1,7 +1,8 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { X } from "lucide-react";
+import { X, ArrowRight, Loader2, AlertCircle } from "lucide-react";
+import Link from "next/link";
 import AgeDeniedScreen from "@/components/features/age-verification/AgeDeniedScreen";
 import AgeVerificationModal from "@/components/features/age-verification/AgeVerificationModal";
 import CategorySection from "@/components/CategorySection";
@@ -10,12 +11,17 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ProductGrid from "@/components/features/product/ProductGrid";
+import ProductCard from "@/components/ProductCard";
+import ProductDetailModal from "@/components/ProductDetailModal";
+import CartNotification from "@/components/CartNotification";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AgeStatus } from "@/types";
+import { AgeStatus, Product } from "@/types";
 import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useCart } from "@/contexts/CartContext";
+import { productsService, Product as ApiProduct } from "@/services/products.service";
 
 function PageContent() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,6 +30,127 @@ function PageContent() {
   const [showSeasonalSection, setShowSeasonalSection] = useState(true);
   const { theme: seasonalTheme } = useSeasonalTheme();
   const { theme } = useTheme();
+  const { addToCart } = useCart();
+  const [recentArrivals, setRecentArrivals] = useState<Product[]>([]);
+  const [mostRecommended, setMostRecommended] = useState<Product[]>([]);
+  const [loadingRecent, setLoadingRecent] = useState(true);
+  const [loadingRecommended, setLoadingRecommended] = useState(true);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+  const [notificationQuantity, setNotificationQuantity] = useState(1);
+
+  // Map API product to internal Product type
+  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
+    const originalPrice = apiProduct.discountPercent
+      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+      : undefined;
+
+    let category = apiProduct.category.toLowerCase();
+    if (category === 'whiskey' || category === 'whisky') {
+      category = 'whisky';
+    }
+
+    return {
+      id: apiProduct._id || apiProduct.id || '',
+      name: apiProduct.name,
+      nameNe: apiProduct.name,
+      category,
+      price: apiProduct.price,
+      originalPrice,
+      image: apiProduct.imageUrl || apiProduct.image,
+      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
+      volume: '750ml',
+      alcoholContent: '40%',
+      alcohol: '40%',
+      inStock: (apiProduct.stock || 0) > 0,
+      isNew: true, // Mark as new for recent arrivals
+      stock: apiProduct.stock,
+      rating: apiProduct.rating,
+      tag: apiProduct.tag || 'NEW',
+    } as Product;
+  };
+
+  // Fetch recent arrivals (newest products)
+  useEffect(() => {
+    const fetchRecentArrivals = async () => {
+      try {
+        setLoadingRecent(true);
+        // Try to fetch products sorted by createdAt (newest first)
+        const response = await productsService.getAll({ 
+          sortBy: 'createdAt',
+          sortOrder: 'desc',
+          limit: 20 // Fetch more to ensure we have enough after filtering
+        });
+        
+        let products = response.data || [];
+        
+        // If no products with createdAt, try updatedAt
+        if (products.length === 0) {
+          const altResponse = await productsService.getAll({ 
+            sortBy: 'updatedAt',
+            sortOrder: 'desc',
+            limit: 20
+          });
+          products = altResponse.data || [];
+        }
+        
+        // Sort by createdAt or updatedAt if available, otherwise use the order from API
+        const sortedProducts = [...products].sort((a, b) => {
+          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 
+                        (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
+          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 
+                        (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+          return dateB - dateA; // Descending order (newest first)
+        });
+        
+        // Take the first 8 products and map them
+        const mappedProducts = sortedProducts.slice(0, 8).map(mapApiProductToProduct);
+        setRecentArrivals(mappedProducts);
+      } catch (err: any) {
+        console.error('Error fetching recent arrivals:', err);
+        setRecentArrivals([]);
+      } finally {
+        setLoadingRecent(false);
+      }
+    };
+
+    fetchRecentArrivals();
+  }, []);
+
+  // Fetch most recommended products
+  useEffect(() => {
+    const fetchMostRecommended = async () => {
+      try {
+        setLoadingRecommended(true);
+        const response = await productsService.getAll({ 
+          view: 'recommended',
+          limit: 8 
+        });
+        const mappedProducts = (response.data || []).slice(0, 8).map(mapApiProductToProduct);
+        setMostRecommended(mappedProducts);
+      } catch (err: any) {
+        console.error('Error fetching most recommended:', err);
+        setMostRecommended([]);
+      } finally {
+        setLoadingRecommended(false);
+      }
+    };
+
+    fetchMostRecommended();
+  }, []);
+
+  const handleBuyNow = (product: Product, quantity: number = 1) => {
+    addToCart(product, quantity);
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
+    setCheckoutOpen(true);
+  };
+
+  const handleAddToCart = (product: Product, quantity: number = 1) => {
+    addToCart(product, quantity);
+    setNotificationProduct(product);
+    setNotificationQuantity(quantity);
+  };
 
   const handleCloseSeasonalSection = () => {
     setShowSeasonalSection(false);
@@ -42,11 +169,95 @@ function PageContent() {
               />
               <main className="flex flex-col gap-12">
                 <HeroSection />
-                <ProductGrid
-                  searchQuery={searchQuery}
-                  selectedCategory={selectedCategory}
-                  onCheckout={() => setCheckoutOpen(true)}
-                />
+                
+                {/* Recent Arrivals Section */}
+                <section className="container mx-auto px-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className={`text-3xl font-display font-bold ${
+                      theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                    }`}>
+                      Recent Arrivals
+                    </h2>
+                    <Link 
+                      href="/products"
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-primary-text hover:text-flame-orange' 
+                          : 'text-orange-600 hover:text-orange-700'
+                      }`}
+                    >
+                      View All
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                  
+                  {loadingRecent ? (
+                    <div className="flex items-center justify-center py-16">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : recentArrivals.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {recentArrivals.map((product, index) => (
+                        <ProductCard
+                          key={product.id || `recent-${index}`}
+                          product={product}
+                          onBuyNow={handleBuyNow}
+                          onViewDetails={setSelectedProduct}
+                          onAddToCart={handleAddToCart}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-muted-foreground">No recent arrivals found.</p>
+                    </div>
+                  )}
+                </section>
+
+                {/* Most Recommended Section */}
+                <section className="container mx-auto px-4">
+                  <div className="flex items-center justify-between mb-6">
+                    <h2 className={`text-3xl font-display font-bold ${
+                      theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                    }`}>
+                      Most Recommended
+                    </h2>
+                    <Link 
+                      href="/products"
+                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                        theme === 'dark' 
+                          ? 'text-primary-text hover:text-flame-orange' 
+                          : 'text-orange-600 hover:text-orange-700'
+                      }`}
+                    >
+                      View All
+                      <ArrowRight className="w-4 h-4" />
+                    </Link>
+                  </div>
+                  
+                  {loadingRecommended ? (
+                    <div className="flex items-center justify-center py-16">
+                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                    </div>
+                  ) : mostRecommended.length > 0 ? (
+                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                      {mostRecommended.map((product, index) => (
+                        <ProductCard
+                          key={product.id || `recommended-${index}`}
+                          product={product}
+                          onBuyNow={handleBuyNow}
+                          onViewDetails={setSelectedProduct}
+                          onAddToCart={handleAddToCart}
+                        />
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-12">
+                      <p className="text-muted-foreground">No recommended products found.</p>
+                    </div>
+                  )}
+                </section>
+
                 <CategorySection
                   selected={selectedCategory}
                   onSelect={(value: string) =>
@@ -55,6 +266,20 @@ function PageContent() {
                     )
                   }
                 />
+
+                {/* Products Section */}
+                <section className="container mx-auto px-4">
+                  <h2 className={`text-3xl font-display font-bold mb-6 ${
+                    theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                  }`}>
+                    All Products
+                  </h2>
+                  <ProductGrid
+                    searchQuery={searchQuery}
+                    selectedCategory={selectedCategory}
+                    onCheckout={() => setCheckoutOpen(true)}
+                  />
+                </section>
                 {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">
                   <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-orange/30 to-flame-red/20 p-4 text-foreground shadow-glow">
                     <p className="text-lg font-semibold">1-hour delivery</p>
@@ -166,6 +391,23 @@ function PageContent() {
                 open={checkoutOpen}
                 onClose={() => setCheckoutOpen(false)}
               />
+
+              {/* Product Detail Modal */}
+              {selectedProduct && (
+                <ProductDetailModal
+                  product={selectedProduct}
+                  onClose={() => setSelectedProduct(null)}
+                  onBuyNow={handleBuyNow}
+                  onAddToCart={handleAddToCart}
+                />
+              )}
+
+              {/* Cart Notification */}
+              <CartNotification
+                product={notificationProduct}
+                quantity={notificationQuantity}
+                onClose={() => setNotificationProduct(null)}
+              />
     </div>
   );
 }
@@ -207,7 +449,9 @@ export function ClientPageContent() {
             <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
           )}
 
-          {ageStatus === "verified" && <PageContent />}
+          {ageStatus === "verified" && (
+            <PageContent />
+          )}
         </CartProvider>
       </LanguageProvider>
     </ThemeProvider>

@@ -1,19 +1,79 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { ProductTable } from '@/components/features/admin/products/ProductTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExportButton } from '@/components/features/admin/ExportButton';
-import { useProductList } from '@/hooks/useProductList';
+import { productsService, Product } from '@/services/products.service';
 import { Loader2, AlertCircle } from 'lucide-react';
+import { Product as ProductType } from '@/types';
 
 const Products = () => {
-  const { products, loading, error, refetch } = useProductList();
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [currentFilter, setCurrentFilter] = useState<string>('all');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+
+  const mapApiProductToProduct = (apiProduct: Product): ProductType => {
+    return {
+      id: apiProduct._id || apiProduct.id || '',
+      name: apiProduct.name,
+      category: apiProduct.category,
+      price: apiProduct.price,
+      image: apiProduct.imageUrl || apiProduct.image,
+      stock: apiProduct.stock,
+      rating: apiProduct.rating,
+      tag: apiProduct.tag,
+      description: apiProduct.description,
+      sales: apiProduct.sales,
+    } as ProductType;
+  };
+
+  const fetchProducts = useCallback(async (filter: string, search?: string, pageNum?: number) => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const viewMap: Record<string, 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'most-reviewed' | 'recommended'> = {
+        'all': 'all',
+        'out-of-stock': 'out-of-stock',
+        'low-stock': 'low-stock',
+        'top-sellers': 'top-sellers',
+        'top-reviewed': 'most-reviewed',
+        'recommended': 'recommended',
+      };
+
+      const filters = {
+        view: viewMap[filter] || 'all' as const,
+        search: search || undefined,
+        page: pageNum || page,
+        limit: 50,
+      };
+
+      const response = await productsService.getAll(filters);
+      const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+      
+      setProducts(mappedProducts);
+      setTotalPages(response.pagination?.pages || 1);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load products');
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
+  }, [page]);
+
+  useEffect(() => {
+    fetchProducts(currentFilter, searchQuery);
+  }, [currentFilter, searchQuery, fetchProducts]);
 
   // Listen for product changed event (added or updated) to refresh the list
   useEffect(() => {
     const handleProductChanged = () => {
-      refetch();
+      fetchProducts(currentFilter, searchQuery);
     };
 
     window.addEventListener('productChanged', handleProductChanged);
@@ -21,7 +81,11 @@ const Products = () => {
     return () => {
       window.removeEventListener('productChanged', handleProductChanged);
     };
-  }, [refetch]);
+  }, [currentFilter, searchQuery, fetchProducts]);
+
+  const refetch = useCallback(() => {
+    fetchProducts(currentFilter, searchQuery);
+  }, [currentFilter, searchQuery, fetchProducts]);
 
   if (loading) {
     return (
@@ -54,9 +118,6 @@ const Products = () => {
     );
   }
 
-  // Ensure products is always an array
-  const productsArray = Array.isArray(products) ? products : [];
-
   return (
       <div className="space-y-6">
         <div className="flex items-center justify-between opacity-0 animate-fade-in">
@@ -67,32 +128,40 @@ const Products = () => {
           <ExportButton defaultDataType="products" />
         </div>
 
-        <Tabs defaultValue="all" className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
+        <Tabs 
+          defaultValue="all" 
+          className="opacity-0 animate-fade-in" 
+          style={{ animationDelay: '100ms' }}
+          onValueChange={(value) => {
+            setCurrentFilter(value);
+            setPage(1);
+          }}
+        >
           <TabsList className="bg-secondary/50">
             <TabsTrigger value="all">All Products</TabsTrigger>
             <TabsTrigger value="out-of-stock">Out of Stock</TabsTrigger>
             <TabsTrigger value="low-stock">Low Stock</TabsTrigger>
             <TabsTrigger value="top-sellers">Top Sellers</TabsTrigger>
             <TabsTrigger value="top-reviewed">Most Reviewed</TabsTrigger>
-            <TabsTrigger value="recommended">Recommended</TabsTrigger>
+          <TabsTrigger value="recommended">Recommended</TabsTrigger>
           </TabsList>
           <TabsContent value="all" className="mt-6">
-            <ProductTable filter="all" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="all" products={products} onRefresh={refetch} />
           </TabsContent>
           <TabsContent value="out-of-stock" className="mt-6">
-            <ProductTable filter="out-of-stock" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="out-of-stock" products={products} onRefresh={refetch} />
           </TabsContent>
           <TabsContent value="low-stock" className="mt-6">
-            <ProductTable filter="low-stock" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="low-stock" products={products} onRefresh={refetch} />
           </TabsContent>
           <TabsContent value="top-sellers" className="mt-6">
-            <ProductTable filter="top-sellers" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="top-sellers" products={products} onRefresh={refetch} />
           </TabsContent>
           <TabsContent value="top-reviewed" className="mt-6">
-            <ProductTable filter="top-reviewed" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="top-reviewed" products={products} onRefresh={refetch} />
           </TabsContent>
           <TabsContent value="recommended" className="mt-6">
-            <ProductTable filter="recommended" products={productsArray} onRefresh={refetch} />
+            <ProductTable filter="recommended" products={products} onRefresh={refetch} />
           </TabsContent>
         </Tabs>
       </div>
