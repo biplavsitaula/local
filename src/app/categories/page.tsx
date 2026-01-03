@@ -30,32 +30,54 @@ const Categories = () => {
   const [notificationQuantity, setNotificationQuantity] = useState(1);
 
   // Map API product to internal Product type
-  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-    const originalPrice = apiProduct.discountPercent
-      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+  const mapApiProductToProduct = (apiProduct: any): Product => {
+    // Calculate original price if there's a discount
+    const originalPrice = apiProduct.discountPercent && apiProduct.discountPercent > 0
+      ? apiProduct.price / (1 - apiProduct.discountPercent / 100)
       : undefined;
 
-    let category = apiProduct.category.toLowerCase();
+    // Normalize category
+    let category = (apiProduct.category || '').toLowerCase();
     if (category === 'whiskey' || category === 'whisky') {
       category = 'whisky';
     }
 
+    // Use finalPrice if available, otherwise use price
+    const finalPrice = apiProduct.finalPrice || apiProduct.price;
+
+    // Format alcohol percentage
+    const alcoholPercentage = apiProduct.alcoholPercentage 
+      ? `${apiProduct.alcoholPercentage}%`
+      : undefined;
+
+    // Determine tag based on isRecommended or status
+    let tag = apiProduct.tag;
+    if (!tag && apiProduct.isRecommended) {
+      tag = 'RECOMMENDED';
+    }
+
+    // Check if product is new (created within last 30 days)
+    const isNew = apiProduct.createdAt 
+      ? (Date.now() - new Date(apiProduct.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
+      : false;
+
     return {
       id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name,
+      name: apiProduct.name || '',
       category,
-      price: apiProduct.price,
-      originalPrice,
-      image: apiProduct.imageUrl || apiProduct.image,
-      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
-      volume: '750ml',
-      alcoholContent: '40%',
-      alcohol: '40%',
-      inStock: (apiProduct.stock || 0) > 0,
-      isNew: false,
-      stock: apiProduct.stock,
+      price: finalPrice,
+      originalPrice: originalPrice ? Math.round(originalPrice * 100) / 100 : undefined,
+      image: apiProduct.imageUrl || apiProduct.image || '',
+      description: apiProduct.description || `Premium ${apiProduct.category || 'Beverage'} - ${apiProduct.name || 'Product'}`,
+      volume: apiProduct.volume || '750ml',
+      alcoholContent: alcoholPercentage,
+      alcohol: alcoholPercentage,
+      inStock: (apiProduct.stock || 0) > 0 && apiProduct.status !== 'Out of Stock',
+      isNew,
+      stock: apiProduct.stock || 0,
       rating: apiProduct.rating,
-      tag: apiProduct.tag,
+      tag,
+      sales: apiProduct.totalSold,
     } as Product;
   };
 
@@ -66,9 +88,26 @@ const Categories = () => {
         setLoading(true);
         setError(null);
         const response = await productsService.getAll({ limit: 1000 });
-        const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+        
+        // Debug logging
+        console.log('API Response:', response);
+        console.log('Products data:', response.data);
+        console.log('Products count:', response.data?.length || 0);
+        
+        if (!response.data || !Array.isArray(response.data)) {
+          console.error('Invalid response data:', response);
+          setError('Invalid response format from server');
+          setProducts([]);
+          return;
+        }
+
+        const mappedProducts = response.data.map(mapApiProductToProduct);
+        console.log('Mapped products:', mappedProducts);
+        console.log('Mapped products count:', mappedProducts.length);
+        
         setProducts(mappedProducts);
       } catch (err: any) {
+        console.error('Error fetching products:', err);
         setError(err.message || 'Failed to fetch products');
         setProducts([]);
       } finally {
@@ -89,18 +128,27 @@ const Categories = () => {
     { id: "vodka", icon: GlassWater, color: "from-blue-400 to-blue-600", key: "categoryVodka" },
     { id: "rum", icon: Cherry, color: "from-red-500 to-red-700", key: "categoryRum" },
     { id: "beer", icon: Beer, color: "from-yellow-500 to-yellow-700", key: "categoryBeer" },
+    { id: "gin", icon: Martini, color: "from-green-500 to-green-700", key: "categoryGin" },
+    { id: "tequila", icon: Grape, color: "from-purple-500 to-purple-700", key: "categoryTequila" },
+    { id: "cognac", icon: Wine, color: "from-amber-600 to-amber-800", key: "categoryCognac" },
+    { id: "champagne", icon: GlassWater, color: "from-yellow-400 to-yellow-600", key: "categoryChampagne" },
   ];
 
   const getCategoryName = (categoryId: string): string => {
     const categoryMap: Record<string, string> = {
       whisky: "categoryWhisky",
+      whiskey: "categoryWhisky",
       vodka: "categoryVodka",
       rum: "categoryRum",
       beer: "categoryBeer",
       wine: "categoryWine",
       gin: "categoryGin",
+      tequila: "categoryTequila",
+      cognac: "categoryCognac",
+      champagne: "categoryChampagne",
     };
-    return t(categoryMap[categoryId] as any) || categoryId;
+    const normalizedId = categoryId.toLowerCase();
+    return t(categoryMap[normalizedId] as any) || categoryId;
   };
 
   const filteredProducts = useMemo(() => {
@@ -108,7 +156,15 @@ const Categories = () => {
 
     // Category filter
     if (selectedCategory) {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
+      filtered = filtered.filter((p) => {
+        const productCategory = p.category.toLowerCase();
+        const selectedCategoryLower = selectedCategory.toLowerCase();
+        // Handle variations like whiskey/whisky
+        if (selectedCategoryLower === 'whisky' || selectedCategoryLower === 'whiskey') {
+          return productCategory === 'whisky' || productCategory === 'whiskey';
+        }
+        return productCategory === selectedCategoryLower;
+      });
     }
 
     // Search filter
@@ -123,7 +179,7 @@ const Categories = () => {
     }
 
     return filtered;
-  }, [selectedCategory, searchQuery]);
+  }, [products, selectedCategory, searchQuery]);
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
     // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
@@ -269,17 +325,24 @@ const Categories = () => {
                   />
                 ))}
               </div>
-            ) : (
+            ) : !loading && !error ? (
               <div className="text-center py-12">
                 <p
                   className={`text-lg ${
                     currentTheme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
                   }`}
                 >
-                  {t('noProductsInCategory')}
+                  {selectedCategory 
+                    ? t('noProductsInCategory') 
+                    : 'No products found'}
                 </p>
+                {products.length === 0 && (
+                  <p className="text-sm text-muted-foreground mt-2">
+                    Try refreshing the page or check your connection.
+                  </p>
+                )}
               </div>
-            )}
+            ) : null}
           </>
         )}
       </main>
