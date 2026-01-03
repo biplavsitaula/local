@@ -26,6 +26,7 @@ export default function AnalyticsPage() {
   const [categoryData, setCategoryData] = useState<any[]>([]);
   const [revenueByCategoryData, setRevenueByCategoryData] = useState<any[]>([]);
 
+
   useEffect(() => {
     const fetchAnalytics = async () => {
       try {
@@ -73,6 +74,9 @@ export default function AnalyticsPage() {
 
     fetchAnalytics();
   }, []);
+
+  console.log(salesData,'sales data')
+console.log(stockData,'stock data')
 
   if (loading) {
     return (
@@ -138,12 +142,21 @@ export default function AnalyticsPage() {
         />
         <StatCard
           title="Avg Order Value"
+          value={`$${Number(analytics.avgOrderValue || 0).toFixed(2)}`}
+          icon={TrendingUp}
+          trend={{ isPositive: true, value: Number(analytics.avgOrderValueGrowth || 3) }}
+          variant="default"
+          delay={200}
+        />
+
+        {/* <StatCard
+          title="Avg Order Value"
           value={`$${(analytics.avgOrderValue || 0).toFixed(2)}`}
           icon={TrendingUp}
           trend={{ isPositive: true, value: analytics.avgOrderValueGrowth || 3 }}
           variant="default"
           delay={200}
-        />
+        /> */}
         <StatCard
           title="Products Sold"
           value={(analytics.productsSold || 0).toLocaleString()}

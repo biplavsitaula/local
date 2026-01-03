@@ -298,6 +298,7 @@ export default function AlertsPage() {
       </div>
     );
   }
+  console.log(outOfStockProducts,'outOfStockProducts')
 
   return (
     <div className="space-y-8">
@@ -309,14 +310,17 @@ export default function AlertsPage() {
 
       {/* Out of Stock Products */}
       <StockProductTable
-        products={outOfStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
+        // products={outOfStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
+          products={outOfStockProducts.filter(p => p != null)}
+
         title="Out of Stock Products"
         onReorder={handleReorder}
       />
 
       {/* Low Stock Products */}
       <StockProductTable
-        products={lowStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
+        // products={lowStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
+        products={lowStockProducts.filter(p => p !=null)}
         title="Low Stock Products"
         onReorder={handleReorder}
       />
