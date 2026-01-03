@@ -271,7 +271,7 @@ const Categories = () => {
         {loading && (
           <div className="flex flex-col items-center justify-center py-16">
             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-            <p className="text-muted-foreground">Loading products...</p>
+            <p className="text-muted-foreground">{t('loadingProducts' as any)}</p>
           </div>
         )}
 
@@ -279,13 +279,13 @@ const Categories = () => {
         {error && !loading && (
           <div className="text-center py-16">
             <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-            <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+            <h3 className="text-xl font-semibold text-foreground mb-2">{t('errorLoadingProducts' as any)}</h3>
             <p className="text-muted-foreground mb-6">{error}</p>
             <button
               onClick={() => window.location.reload()}
               className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
             >
-              Retry
+              {t('retry' as any)}
             </button>
           </div>
         )}
@@ -334,11 +334,11 @@ const Categories = () => {
                 >
                   {selectedCategory 
                     ? t('noProductsInCategory') 
-                    : 'No products found'}
+                    : t('noProductsFound' as any)}
                 </p>
                 {products.length === 0 && (
                   <p className="text-sm text-muted-foreground mt-2">
-                    Try refreshing the page or check your connection.
+                    {t('tryRefreshing' as any)}
                   </p>
                 )}
               </div>

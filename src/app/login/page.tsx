@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Login = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const router = useRouter();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -48,7 +48,7 @@ const Login = () => {
             Flame Beverage
           </h1>
           <p className="text-muted-foreground">
-            {language === "en" ? "Welcome back! Please login to continue" : "फिर्ता स्वागत छ! कृपया जारी राख्न लगइन गर्नुहोस्"}
+            {t('welcomeBack' as any)}
           </p>
         </div>
 
@@ -57,7 +57,7 @@ const Login = () => {
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
             <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
-              {language === "en" ? "Login" : "लगइन"}
+              {t('login')}
             </button>
             <Link href="/register" className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors">
               {language === "en" ? "Register" : "दर्ता"}
@@ -69,7 +69,7 @@ const Login = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Email Address" : "इमेल ठेगाना"}
+                {t('emailAddress' as any)}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -77,7 +77,7 @@ const Login = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder={language === "en" ? "Enter your email" : "तपाईंको इमेल प्रविष्ट गर्नुहोस्"}
+                  placeholder={t('enterEmail' as any)}
                   className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -87,7 +87,7 @@ const Login = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Password" : "पासवर्ड"}
+                {t('password' as any)}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -95,7 +95,7 @@ const Login = () => {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={language === "en" ? "Enter your password" : "तपाईंको पासवर्ड प्रविष्ट गर्नुहोस्"}
+                  placeholder={t('enterPassword' as any)}
                   className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -112,7 +112,7 @@ const Login = () => {
             {/* Forgot Password */}
             <div className="flex justify-end">
               <Link href="#" className="text-sm text-primary-text hover:text-secondary-text">
-                {language === "en" ? "Forgot Password?" : "पासवर्ड बिर्सनुभयो?"}
+                {t('forgotPassword' as any)}
               </Link>
             </div>
 
@@ -135,8 +135,8 @@ const Login = () => {
                 <Flame className="w-5 h-5" />
               )}
               {isLoading 
-                ? (language === "en" ? "Logging in..." : "लगइन हुँदैछ...") 
-                : (language === "en" ? "Login" : "लगइन")
+                ? t('loggingIn' as any)
+                : t('login')
               }
             </button>
           </form>
@@ -148,7 +148,7 @@ const Login = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                {language === "en" ? "OR CONTINUE WITH" : "वा जारी राख्नुहोस्"}
+                {t('orContinueWith' as any)}
               </span>
             </div>
           </div>
@@ -157,11 +157,11 @@ const Login = () => {
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
               <span className="text-xl">G</span>
-              <span className="font-medium">{language === "en" ? "Google" : "गुगल"}</span>
+              <span className="font-medium">{t('google' as any)}</span>
             </button>
             <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
               <span className="text-xl">f</span>
-              <span className="font-medium">{language === "en" ? "Facebook" : "फेसबुक"}</span>
+              <span className="font-medium">{t('facebook' as any)}</span>
             </button>
           </div>
         </div>
@@ -169,7 +169,7 @@ const Login = () => {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-            ← {language === "en" ? "Back to Home" : "घर फर्कनुहोस्"}
+            ← {t('backToHome' as any)}
           </Link>
         </div>
       </div>

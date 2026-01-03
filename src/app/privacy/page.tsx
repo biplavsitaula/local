@@ -97,8 +97,8 @@ const PrivacyPolicy = () => {
             {t("privacyContactDesc")}
           </p>
           <p className="text-foreground">
-            Email: privacy@flamebeverage.com<br />
-            Phone: +977-1-4XXXXXX
+            {t('privacyEmail')}<br />
+            {t('privacyPhone')}
           </p>
         </div>
       </main>

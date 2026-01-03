@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
 
 const Register = () => {
-  const { language } = useLanguage();
+  const { language, t } = useLanguage();
   const router = useRouter();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
@@ -72,7 +72,7 @@ const Register = () => {
             Flame Beverage
           </h1>
           <p className="text-muted-foreground">
-            {language === "en" ? "Create your account to get started" : "सुरु गर्न आफ्नो खाता सिर्जना गर्नुहोस्"}
+            {t('createAccount')}
           </p>
         </div>
 
@@ -81,7 +81,7 @@ const Register = () => {
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
             <Link href="/login" className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors">
-              {language === "en" ? "Login" : "लगइन"}
+              {t('login')}
             </Link>
             <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
               {language === "en" ? "Register" : "दर्ता"}
@@ -93,7 +93,7 @@ const Register = () => {
             {/* Full Name */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Full Name" : "पूरा नाम"}
+                {t('fullName')}
               </label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -101,7 +101,7 @@ const Register = () => {
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                  placeholder={language === "en" ? "Enter your full name" : "तपाईंको पूरा नाम प्रविष्ट गर्नुहोस्"}
+                  placeholder={t('enterFullName')}
                   className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -111,7 +111,7 @@ const Register = () => {
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Email Address" : "इमेल ठेगाना"}
+                {t('emailAddress')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -119,7 +119,7 @@ const Register = () => {
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder={language === "en" ? "Enter your email" : "तपाईंको इमेल प्रविष्ट गर्नुहोस्"}
+                  placeholder={t('enterEmail')}
                   className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -129,7 +129,7 @@ const Register = () => {
             {/* Phone */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Phone Number" : "फोन नम्बर"}
+                {t('phoneNumber')}
               </label>
               <div className="relative">
                 <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -139,7 +139,7 @@ const Register = () => {
                     type="tel"
                     value={formData.phone}
                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                    placeholder={language === "en" ? "98XXXXXXXX" : "९८XXXXXXXX"}
+                    placeholder={t('phonePlaceholder')}
                     className="flex-1 pl-4 pr-4 py-3 bg-background border border-border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                     required
                   />
@@ -150,7 +150,7 @@ const Register = () => {
             {/* Password */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Password" : "पासवर्ड"}
+                {t('password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -158,7 +158,7 @@ const Register = () => {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={language === "en" ? "Enter your password" : "तपाईंको पासवर्ड प्रविष्ट गर्नुहोस्"}
+                  placeholder={t('enterPassword')}
                   className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -175,7 +175,7 @@ const Register = () => {
             {/* Confirm Password */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
-                {language === "en" ? "Confirm Password" : "पासवर्ड पुष्टि गर्नुहोस्"}
+                {t('confirmPassword')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
@@ -183,7 +183,7 @@ const Register = () => {
                   type={showConfirmPassword ? "text" : "password"}
                   value={formData.confirmPassword}
                   onChange={(e) => setFormData({ ...formData, confirmPassword: e.target.value })}
-                  placeholder={language === "en" ? "Confirm your password" : "तपाईंको पासवर्ड पुष्टि गर्नुहोस्"}
+                  placeholder={t('confirmPasswordPlaceholder')}
                   className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -208,30 +208,14 @@ const Register = () => {
                 required
               />
               <label htmlFor="terms" className="text-sm text-muted-foreground">
-                {language === "en" ? (
-                  <>
-                    I agree to the{" "}
-                    <Link href="/terms" className="text-primary-text hover:text-secondary-text">
-                      Terms of Service
-                    </Link>{" "}
-                    and{" "}
-                    <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
-                      Privacy Policy
-                    </Link>
-                  </>
-                ) : (
-                  <>
-                    म{" "}
-                    <Link href="/terms" className="text-primary-text hover:text-secondary-text">
-                      सेवा सर्तहरू
-                    </Link>{" "}
-                    र{" "}
-                    <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
-                      गोपनीयता नीति
-                    </Link>{" "}
-                    सँग सहमत छु
-                  </>
-                )}
+                {t('iAgreeTo')}{" "}
+                <Link href="/terms" className="text-primary-text hover:text-secondary-text">
+                  {t('termsOfService')}
+                </Link>{" "}
+                {t('and')}{" "}
+                <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
+                  {t('privacyPolicy')}
+                </Link>
               </label>
             </div>
 
@@ -254,8 +238,8 @@ const Register = () => {
                 <Flame className="w-5 h-5" />
               )}
               {isLoading 
-                ? (language === "en" ? "Creating account..." : "खाता सिर्जना हुँदैछ...") 
-                : (language === "en" ? "Create Account" : "खाता सिर्जना गर्नुहोस्")
+                ? t('creatingAccount')
+                : t('createAccountButton')
               }
             </button>
           </form>
@@ -267,7 +251,7 @@ const Register = () => {
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                {language === "en" ? "OR CONTINUE WITH" : "वा जारी राख्नुहोस्"}
+                {t('orContinueWith')}
               </span>
             </div>
           </div>
@@ -276,11 +260,11 @@ const Register = () => {
           <div className="grid grid-cols-2 gap-4">
             <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
               <span className="text-xl">G</span>
-              <span className="font-medium">{language === "en" ? "Google" : "गुगल"}</span>
+              <span className="font-medium">{t('google')}</span>
             </button>
             <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
               <span className="text-xl">f</span>
-              <span className="font-medium">{language === "en" ? "Facebook" : "फेसबुक"}</span>
+              <span className="font-medium">{t('facebook')}</span>
             </button>
           </div>
         </div>
@@ -288,7 +272,7 @@ const Register = () => {
         {/* Back to Home */}
         <div className="text-center mt-6">
           <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-            ← {language === "en" ? "Back to Home" : "घर फर्कनुहोस्"}
+            ← {t('backToHome')}
           </Link>
         </div>
       </div>

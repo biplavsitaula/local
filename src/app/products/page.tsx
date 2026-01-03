@@ -178,7 +178,7 @@ const Products: React.FC = () => {
               {t('allProducts')}
             </h1>
             <p className={currentTheme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
-              Discover our premium collection of spirits and beverages
+              {t('discoverCollection')}
             </p>
           </div>
 
@@ -210,7 +210,7 @@ const Products: React.FC = () => {
               className="lg:hidden flex items-center justify-center gap-2 px-4 py-3 bg-card/80 border border-border rounded-xl text-foreground cursor-pointer"
             >
               <SlidersHorizontal className="h-5 w-5" />
-              Filters
+              {t('filters')}
               {hasActiveFilters && (
                 <span className="h-2 w-2 bg-primary-btn rounded-full"></span>
               )}
@@ -225,7 +225,7 @@ const Products: React.FC = () => {
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
                   className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">{t('allCategories')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                     {language === 'en' ? cat.name : cat.nameNe}
@@ -245,12 +245,12 @@ const Products: React.FC = () => {
                   }}
                   className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                 >
-                  <option value="0-100000">All Prices</option>
-                  <option value="0-1000">Under Rs. 1,000</option>
-                  <option value="1000-3000">Rs. 1,000 - 3,000</option>
-                  <option value="3000-5000">Rs. 3,000 - 5,000</option>
-                  <option value="5000-10000">Rs. 5,000 - 10,000</option>
-                  <option value="10000-100000">Above Rs. 10,000</option>
+                  <option value="0-100000">{t('allPrices')}</option>
+                  <option value="0-1000">{t('under1000')}</option>
+                  <option value="1000-3000">{t('price1000to3000')}</option>
+                  <option value="3000-5000">{t('price3000to5000')}</option>
+                  <option value="5000-10000">{t('price5000to10000')}</option>
+                  <option value="10000-100000">{t('above10000')}</option>
                 </select>
                 <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
               </div>
@@ -291,7 +291,7 @@ const Products: React.FC = () => {
                   onClick={clearFilters}
                   className="px-4 py-3 text-primary-text hover:text-ternary-text transition-colors cursor-pointer"
                 >
-                  Clear All
+                  {t('clearAllFilters')}
                 </button>
               )}
             </div>
@@ -302,13 +302,13 @@ const Products: React.FC = () => {
             <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
               {/* Category */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Category</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t('category')}</label>
                 <select
                   value={selectedCategory || ''}
                   onChange={(e) => setSelectedCategory(e.target.value || null)}
                   className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
                 >
-                  <option value="">All Categories</option>
+                  <option value="">{t('allCategories')}</option>
                   {categories.map((cat) => (
                     <option key={cat.id} value={cat.id}>
                     {language === 'en' ? cat.name : cat.nameNe}
@@ -319,7 +319,7 @@ const Products: React.FC = () => {
 
               {/* Price Range */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Price Range</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t('priceRange')}</label>
                 <select
                   value={`${priceRange[0]}-${priceRange[1]}`}
                   onChange={(e) => {
@@ -328,18 +328,18 @@ const Products: React.FC = () => {
                   }}
                   className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
                 >
-                  <option value="0-100000">All Prices</option>
-                  <option value="0-1000">Under Rs. 1,000</option>
-                  <option value="1000-3000">Rs. 1,000 - 3,000</option>
-                  <option value="3000-5000">Rs. 3,000 - 5,000</option>
-                  <option value="5000-10000">Rs. 5,000 - 10,000</option>
-                  <option value="10000-100000">Above Rs. 10,000</option>
+                  <option value="0-100000">{t('allPrices')}</option>
+                  <option value="0-1000">{t('under1000')}</option>
+                  <option value="1000-3000">{t('price1000to3000')}</option>
+                  <option value="3000-5000">{t('price3000to5000')}</option>
+                  <option value="5000-10000">{t('price5000to10000')}</option>
+                  <option value="10000-100000">{t('above10000')}</option>
                 </select>
               </div>
 
               {/* Sort */}
               <div>
-                <label className="text-sm font-medium text-foreground mb-2 block">Sort By</label>
+                <label className="text-sm font-medium text-foreground mb-2 block">{t('sortBy')}</label>
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
@@ -357,7 +357,7 @@ const Products: React.FC = () => {
                   onClick={clearFilters}
                   className="w-full py-3 text-primary-text border border-primary-border rounded-xl hover:bg-primary-btn/10 transition-colors cursor-pointer"
                 >
-                  Clear All Filters
+                  {t('clearAllFilters')}
                 </button>
               )}
             </div>
@@ -373,7 +373,7 @@ const Products: React.FC = () => {
                   : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
               }`}
             >
-              All
+              {t('all')}
             </button>
             {categories.map((cat) => (
               <button
@@ -395,7 +395,7 @@ const Products: React.FC = () => {
           {loading && (
             <div className="flex flex-col items-center justify-center py-16">
               <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-              <p className="text-muted-foreground">Loading products...</p>
+              <p className="text-muted-foreground">{t('loadingProducts')}</p>
             </div>
           )}
 
@@ -403,13 +403,13 @@ const Products: React.FC = () => {
           {error && !loading && (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+              <h3 className="text-xl font-semibold text-foreground mb-2">{t('errorLoadingProducts')}</h3>
               <p className="text-muted-foreground mb-6">{error}</p>
               <button
                 onClick={() => window.location.reload()}
                 className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
               >
-                Retry
+                {t('retry')}
               </button>
             </div>
           )}
@@ -418,7 +418,7 @@ const Products: React.FC = () => {
           {!loading && !error && (
             <div className="flex items-center justify-between mb-6">
               <p className="text-muted-foreground">
-                Showing <span className="text-foreground font-medium">{filteredProducts.length}</span> products
+                {t('showingProducts')} <span className="text-foreground font-medium">{filteredProducts.length}</span> {t('productsCount')}
               </p>
             </div>
           )}
@@ -443,13 +443,13 @@ const Products: React.FC = () => {
           ) : !loading && !error ? (
             <div className="text-center py-16">
               <div className="text-6xl mb-4">🍷</div>
-              <h3 className="text-xl font-semibold text-foreground mb-2">No products found</h3>
-              <p className="text-muted-foreground mb-6">Try adjusting your filters or search query</p>
+              <h3 className="text-xl font-semibold text-foreground mb-2">{t('noProductsFound')}</h3>
+              <p className="text-muted-foreground mb-6">{t('tryAdjustingFilters')}</p>
               <button
                 onClick={clearFilters}
                 className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
               >
-                Clear All Filters
+                {t('clearAllFilters')}
               </button>
             </div>
           ) : null}

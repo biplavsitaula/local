@@ -5,9 +5,11 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
+import { useLanguage } from "@/contexts/LanguageContext";
 
 export default function NotFound() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
@@ -32,12 +34,12 @@ export default function NotFound() {
           </h1>
 
           <h2 className="text-2xl font-display font-semibold text-foreground mb-4">
-            Page Not Found
+            {t('pageNotFound' as any)}
           </h2>
 
           {/* Message */}
           <p className="text-lg font-medium text-foreground mb-8 text-muted-foreground">
-            The page you're looking for doesn't exist or has been moved.
+            {t('pageNotFoundMessage' as any)}
           </p>
 
           {/* Buttons */}
@@ -48,7 +50,7 @@ export default function NotFound() {
               className="flex-1 border-primary-border/50 text-foreground hover:bg-primary-btn/10 py-6 text-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
-              Go Back
+              {t('goBack' as any)}
             </Button>
             <Button
               asChild
@@ -57,7 +59,7 @@ export default function NotFound() {
             >
               <Link href="/">
                 <Home className="w-5 h-5 mr-2" />
-                Go Home
+                {t('goHome' as any)}
               </Link>
             </Button>
           </div>
