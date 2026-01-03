@@ -9,9 +9,6 @@ import {
 
 import { tokenManager } from '@/lib/api';
 
-const testToken = tokenManager.getToken();
-
-
 /**
  * Create a new product
  * @param productData - Product data to create
@@ -21,10 +18,16 @@ export const createProduct = async (
   productData: CreateProductRequest
 ): Promise<CreateProductResponse> => {
   try {
+    const token = tokenManager.getToken();
+
+    if (!token) {
+      throw new Error("No auth token found");
+    }
     const response = await fetch(getUrl('/api/products'), {
       method: 'POST',
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
       },
       body: JSON.stringify(productData),
     });
@@ -127,10 +130,16 @@ export const deleteProduct = async (
   productId: string
 ): Promise<DeleteProductResponse> => {
   try {
+    const token = tokenManager.getToken();
+
+    if (!token) {
+      throw new Error("No auth token found");
+    }
     const response = await fetch(getUrl(`/api/products/${productId}`), {
       method: 'DELETE',
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
       },
     });
 
