@@ -7,6 +7,11 @@ import {
   DeleteProductResponse,
 } from '@/types/productRequest';
 
+import { tokenManager } from '@/lib/api';
+
+const testToken = tokenManager.getToken();
+
+
 /**
  * Create a new product
  * @param productData - Product data to create
@@ -45,15 +50,54 @@ export const createProduct = async (
  * @param productData - Product data to update
  * @returns Promise<UpdateProductResponse> - Updated product response
  */
+// export const updateProduct = async (
+//   productId: string,
+//   productData: UpdateProductRequest
+// ): Promise<UpdateProductResponse> => {
+//   try {
+//     const token = tokenManager.getToken();
+//     console.log(token, '==================token')
+  
+    
+//     const response = await fetch(getUrl(`/api/products/${productId}`), {
+//       method: 'PUT',
+//       headers: {
+//         'Content-Type': 'application/json',
+//       },
+//       body: JSON.stringify(productData),
+//     });
+
+//     if (!response.ok) {
+//       const errorData = await response.json().catch(() => ({}));
+//       throw new Error(
+//         errorData.message || `Failed to update product: ${response.statusText}`
+//       );
+//     }
+
+//     const responseData: UpdateProductResponse = await response.json();
+//     return responseData;
+//   } catch (error) {
+//     console.error('Error updating product:', error);
+//     throw error;
+//   }
+// };
+
 export const updateProduct = async (
   productId: string,
   productData: UpdateProductRequest
 ): Promise<UpdateProductResponse> => {
   try {
+    const token = tokenManager.getToken();
+
+    if (!token) {
+      throw new Error("No auth token found");
+    }
+
     const response = await fetch(getUrl(`/api/products/${productId}`), {
-      method: 'PUT',
+      method: "PUT",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
       },
       body: JSON.stringify(productData),
     });
@@ -68,10 +112,11 @@ export const updateProduct = async (
     const responseData: UpdateProductResponse = await response.json();
     return responseData;
   } catch (error) {
-    console.error('Error updating product:', error);
+    console.error("Error updating product:", error);
     throw error;
   }
 };
+
 
 /**
  * Delete a product
