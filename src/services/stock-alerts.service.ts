@@ -15,33 +15,102 @@ export interface ReorderReport {
   lowStockCount: number;
 }
 
+export interface StockAlertFilters {
+  search?: string;
+  category?: string;
+  sortBy?: string;
+  sortOrder?: 'asc' | 'desc';
+  page?: number;
+  limit?: number;
+}
+
+export interface LowStockFilters {
+  threshold?: number;
+  search?: string;
+  category?: string;
+  page?: number;
+  limit?: number;
+}
+
 export const stockAlertsService = {
   /**
-   * Get out of stock products
+   * Get out of stock products (Admin only)
    */
-  getOutOfStock: async (): Promise<ApiResponse<StockAlert[]>> => {
-    return apiGet<StockAlert[]>('/stock-alerts/out-of-stock');
+  getOutOfStock: async (filters?: StockAlertFilters): Promise<ApiResponse<StockAlert[]>> => {
+    try {
+      return await apiGet<StockAlert[]>('/stock-alerts/out-of-stock', filters);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Out of stock endpoint not available, returning empty array');
+        return {
+          success: true,
+          message: 'Out of stock alerts not available',
+          data: [],
+        };
+      }
+      throw error;
+    }
   },
 
   /**
-   * Get low stock products
+   * Get low stock products (Admin only)
    */
-  getLowStock: async (threshold?: number): Promise<ApiResponse<StockAlert[]>> => {
-    return apiGet<StockAlert[]>('/stock-alerts/low-stock', threshold ? { threshold } : undefined);
+  getLowStock: async (filters?: LowStockFilters): Promise<ApiResponse<StockAlert[]>> => {
+    try {
+      return await apiGet<StockAlert[]>('/stock-alerts/low-stock', filters);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Low stock endpoint not available, returning empty array');
+        return {
+          success: true,
+          message: 'Low stock alerts not available',
+          data: [],
+        };
+      }
+      throw error;
+    }
   },
 
   /**
-   * Get all stock alerts
+   * Get all stock alerts (Admin only)
+   * Returns: { outOfStock, goingToBeOutOfStock, lowStock }
    */
-  getAll: async (threshold?: number): Promise<ApiResponse<StockAlert[]>> => {
-    return apiGet<StockAlert[]>('/stock-alerts/all', threshold ? { threshold } : undefined);
+  getAll: async (threshold?: number): Promise<ApiResponse<{
+    outOfStock: StockAlert[];
+    goingToBeOutOfStock: StockAlert[];
+    lowStock: StockAlert[];
+  }>> => {
+    try {
+      return await apiGet<{
+        outOfStock: StockAlert[];
+        goingToBeOutOfStock: StockAlert[];
+        lowStock: StockAlert[];
+      }>('/stock-alerts/all', threshold ? { threshold } : undefined);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('All stock alerts endpoint not available, returning empty data');
+        return {
+          success: true,
+          message: 'Stock alerts not available',
+          data: {
+            outOfStock: [],
+            goingToBeOutOfStock: [],
+            lowStock: [],
+          },
+        };
+      }
+      throw error;
+    }
   },
 
   /**
-   * Get reorder report
+   * Get reorder report (Admin only)
    */
-  getReorderReport: async (): Promise<ApiResponse<ReorderReport>> => {
-    return apiGet<ReorderReport>('/stock-alerts/reorder-report');
+  getReorderReport: async (threshold?: number): Promise<ApiResponse<ReorderReport>> => {
+    return apiGet<ReorderReport>('/stock-alerts/reorder-report', threshold ? { threshold } : undefined);
   },
 
   /**
@@ -51,6 +120,10 @@ export const stockAlertsService = {
     return apiPut<Product>(`/stock-alerts/reorder/${id}`, { quantity });
   },
 };
+
+
+
+
 
 
 

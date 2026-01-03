@@ -31,24 +31,41 @@ export interface PaymentFilters {
 
 export const paymentsService = {
   /**
-   * Get all payments with filters
+   * Get all payments with filters (Public endpoint)
    */
   getAll: async (filters?: PaymentFilters): Promise<ApiResponse<Payment[]>> => {
-    return apiGet<Payment[]>('/payments', filters);
+    return apiGet<Payment[]>('/payments', filters, false);
   },
 
   /**
-   * Get payment summary
+   * Get payment summary (Public endpoint)
    */
   getSummary: async (): Promise<ApiResponse<PaymentSummary>> => {
-    return apiGet<PaymentSummary>('/payments/summary');
+    try {
+      return await apiGet<PaymentSummary>('/payments/summary', undefined, false);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Payment summary endpoint not available, returning default values');
+        return {
+          success: true,
+          message: 'Payment summary not available',
+          data: {
+            totalPayments: 0,
+            completed: 0,
+            pending: 0,
+          },
+        };
+      }
+      throw error;
+    }
   },
 
   /**
-   * Get a single payment by ID
+   * Get a single payment by ID (Public endpoint)
    */
   getById: async (id: string): Promise<ApiResponse<Payment>> => {
-    return apiGet<Payment>(`/payments/${id}`);
+    return apiGet<Payment>(`/payments/${id}`, undefined, false);
   },
 
   /**

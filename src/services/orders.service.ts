@@ -40,24 +40,43 @@ export interface OrderFilters {
 
 export const ordersService = {
   /**
-   * Get all orders with filters
+   * Get all orders with filters (Public endpoint)
    */
   getAll: async (filters?: OrderFilters): Promise<ApiResponse<Order[]>> => {
-    return apiGet<Order[]>('/orders', filters);
+    try {
+      return await apiGet<Order[]>('/orders', filters, false);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Orders endpoint not available, returning empty array');
+        return {
+          success: true,
+          message: 'Orders not available',
+          data: [],
+          pagination: {
+            page: 1,
+            limit: filters?.limit || 10,
+            total: 0,
+            pages: 0,
+          },
+        };
+      }
+      throw error;
+    }
   },
 
   /**
-   * Get a single order by ID
+   * Get a single order by ID (Public endpoint)
    */
   getById: async (id: string): Promise<ApiResponse<Order>> => {
-    return apiGet<Order>(`/orders/${id}`);
+    return apiGet<Order>(`/orders/${id}`, undefined, false);
   },
 
   /**
-   * Get order by bill number
+   * Get order by bill number (Public endpoint)
    */
   getByBillNumber: async (billNumber: string): Promise<ApiResponse<Order>> => {
-    return apiGet<Order>(`/orders/bill/${billNumber}`);
+    return apiGet<Order>(`/orders/bill/${billNumber}`, undefined, false);
   },
 
   /**

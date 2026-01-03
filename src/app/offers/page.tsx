@@ -26,31 +26,50 @@ const Offers = () => {
   const [notificationQuantity, setNotificationQuantity] = useState(1);
 
   // Map API product to internal Product type
-  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-    const originalPrice = apiProduct.discountPercent
-      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
-      : undefined;
+  const mapApiProductToProduct = (apiProduct: any): Product => {
+    // Handle multiple possible discount field names from API
+    const discountPercent = apiProduct.discountPercent || apiProduct.discountPercentage || apiProduct.discount || 0;
+    const discountAmount = apiProduct.discountAmount || 0;
+    const finalPrice = apiProduct.finalPrice;
+    
+    // Calculate original price if there's a discount
+    let originalPrice: number | undefined = undefined;
+    if (discountPercent > 0) {
+      // If discountPercent exists, calculate original price
+      originalPrice = Math.round((apiProduct.price / (1 - discountPercent / 100)) * 100) / 100;
+    } else if (discountAmount > 0 && finalPrice) {
+      // If discountAmount exists, original price = finalPrice + discountAmount
+      originalPrice = finalPrice + discountAmount;
+    } else if (discountAmount > 0) {
+      // If only discountAmount exists, original price = price + discountAmount
+      originalPrice = (apiProduct.price || 0) + discountAmount;
+    }
 
-    let category = apiProduct.category.toLowerCase();
+    // Handle API response structure: type instead of category
+    const categoryValue = apiProduct.type || apiProduct.category || '';
+    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
     if (category === 'whiskey' || category === 'whisky') {
       category = 'whisky';
     }
 
+    // Use finalPrice if available, otherwise use price
+    const productPrice = finalPrice || apiProduct.price || 0;
+
     return {
       id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name,
+      name: apiProduct.name || '',
       category,
-      price: apiProduct.price,
+      price: productPrice,
       originalPrice,
-      image: apiProduct.imageUrl || apiProduct.image,
-      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
-      volume: '750ml',
-      alcoholContent: '40%',
-      alcohol: '40%',
+      image: apiProduct.image || apiProduct.imageUrl || '',
+      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
+      volume: apiProduct.volume || '750ml',
+      alcoholContent: apiProduct.alcoholContent || apiProduct.alcohol || '40%',
+      alcohol: apiProduct.alcohol || apiProduct.alcoholContent || '40%',
       inStock: (apiProduct.stock || 0) > 0,
       isNew: false,
-      stock: apiProduct.stock,
-      rating: apiProduct.rating,
+      stock: apiProduct.stock || 0,
+      rating: apiProduct.rating || 0,
       tag: apiProduct.tag,
     } as Product;
   };
@@ -63,6 +82,8 @@ const Offers = () => {
         setError(null);
         const response = await productsService.getAll({ limit: 1000 });
         const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+        console.log('Fetched products:', mappedProducts);
+        console.log('Products with discounts:', mappedProducts.filter(p => p.originalPrice && p.originalPrice > p.price));
         setProducts(mappedProducts);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch products');
@@ -75,7 +96,15 @@ const Offers = () => {
     fetchProducts();
   }, []);
 
-  const discountedProducts = products.filter((p) => p.originalPrice && p.originalPrice > p.price);
+  // Filter products that have discounts (originalPrice > price)
+  // Also include products that have discountPercent, discountAmount, or finalPrice fields
+  const discountedProducts = products.filter((p) => {
+    // Check if product has an original price higher than current price
+    if (p.originalPrice && p.originalPrice > p.price) {
+      return true;
+    }
+    return false;
+  });
 
   const offers = [
     {
@@ -120,6 +149,9 @@ const Offers = () => {
   const handleCheckout = () => {
     setCheckoutOpen(true);
   };
+  
+  console.log('Discounted products count:', discountedProducts.length);
+  console.log('All products:', products);
 
   return (
     <div className="min-h-screen bg-background">

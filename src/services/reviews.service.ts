@@ -43,14 +43,44 @@ export const reviewsService = {
    * Get review summary (Public endpoint)
    */
   getSummary: async (): Promise<ApiResponse<ReviewSummary>> => {
-    return apiGet<ReviewSummary>('/reviews/summary', undefined, false);
+    try {
+      return await apiGet<ReviewSummary>('/reviews/summary', undefined, false);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Review summary endpoint not available, returning default values');
+        return {
+          success: true,
+          message: 'Review summary not available',
+          data: {
+            totalReviews: 0,
+            averageRating: 0,
+            ratingDistribution: [],
+          },
+        };
+      }
+      throw error;
+    }
   },
 
   /**
    * Get most reviewed products (Public endpoint)
    */
   getMostReviewed: async (limit?: number): Promise<ApiResponse<any[]>> => {
-    return apiGet<any[]>('/reviews/most-reviewed', limit ? { limit } : undefined, false);
+    try {
+      return await apiGet<any[]>('/reviews/most-reviewed', limit ? { limit } : undefined, false);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+        console.warn('Most reviewed products endpoint not available, returning empty array');
+        return {
+          success: true,
+          message: 'Most reviewed products not available',
+          data: [],
+        };
+      }
+      throw error;
+    }
   },
 
   /**

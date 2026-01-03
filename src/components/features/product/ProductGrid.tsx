@@ -143,32 +143,36 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   const [error, setError] = useState<string | null>(null);
 
   // Map API product to internal Product type
-  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-    const originalPrice = apiProduct.discountPercent
-      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
-      : undefined;
-
-    let category = apiProduct.category.toLowerCase();
+  const mapApiProductToProduct = (apiProduct: any): Product => {
+    // Handle API response structure: type instead of category, image instead of imageUrl
+    const categoryValue = apiProduct.type || apiProduct.category || '';
+    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
+    
+    // Normalize category names
     if (category === 'whiskey' || category === 'whisky') {
       category = 'whisky';
     }
 
+    const originalPrice = apiProduct.discountPercent
+      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
+      : undefined;
+
     return {
       id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name,
-      nameNe: apiProduct.name, // Use name as fallback if nameNe not available
+      name: apiProduct.name || '',
+      nameNe: apiProduct.nameNe || apiProduct.name || '', // Use name as fallback if nameNe not available
       category,
-      price: apiProduct.price,
+      price: apiProduct.price || 0,
       originalPrice,
-      image: apiProduct.imageUrl || apiProduct.image,
-      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
-      volume: '750ml',
-      alcoholContent: '40%',
-      alcohol: '40%',
+      image: apiProduct.image || apiProduct.imageUrl || '',
+      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
+      volume: apiProduct.volume || '750ml',
+      alcoholContent: apiProduct.alcoholContent || apiProduct.alcohol || '40%',
+      alcohol: apiProduct.alcohol || apiProduct.alcoholContent || '40%',
       inStock: (apiProduct.stock || 0) > 0,
       isNew: false,
-      stock: apiProduct.stock,
-      rating: apiProduct.rating,
+      stock: apiProduct.stock || 0,
+      rating: apiProduct.rating || 0,
       tag: apiProduct.tag,
     } as Product;
   };

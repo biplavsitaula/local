@@ -20,6 +20,11 @@ export interface NotificationFilters {
   limit?: number;
 }
 
+export interface NotificationsResponse {
+  notifications: Notification[];
+  unreadCount?: number;
+}
+
 export interface CreateNotificationData {
   type: string;
   title: string;
@@ -31,10 +36,22 @@ export interface CreateNotificationData {
 
 export const notificationsService = {
   /**
-   * Get all notifications with filters
+   * Get all notifications with filters (Admin only)
+   * Returns notifications and unreadCount
    */
-  getAll: async (filters?: NotificationFilters): Promise<ApiResponse<Notification[]>> => {
-    return apiGet<Notification[]>('/notifications', filters);
+  getAll: async (filters?: NotificationFilters): Promise<ApiResponse<NotificationsResponse>> => {
+    const response = await apiGet<NotificationsResponse>('/notifications', filters);
+    // Handle backward compatibility: if response.data is an array, wrap it
+    if (Array.isArray(response.data)) {
+      return {
+        ...response,
+        data: {
+          notifications: response.data as any,
+          unreadCount: 0,
+        },
+      };
+    }
+    return response;
   },
 
   /**

@@ -17,18 +17,21 @@ const Products = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
-  const mapApiProductToProduct = (apiProduct: Product): ProductType => {
+  const mapApiProductToProduct = (apiProduct: any): ProductType => {
+    // Handle API response structure: type instead of category, image instead of imageUrl
+    const category = (apiProduct.type || apiProduct.category || '').toLowerCase();
+    
     return {
       id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name,
-      category: apiProduct.category,
-      price: apiProduct.price,
-      image: apiProduct.imageUrl || apiProduct.image,
-      stock: apiProduct.stock,
-      rating: apiProduct.rating,
+      name: apiProduct.name || '',
+      category: category || 'other',
+      price: apiProduct.price || 0,
+      image: apiProduct.image || apiProduct.imageUrl || '',
+      stock: apiProduct.stock || 0,
+      rating: apiProduct.rating || 0,
       tag: apiProduct.tag,
-      description: apiProduct.description,
-      sales: apiProduct.sales,
+      description: apiProduct.description || '',
+      sales: apiProduct.sales || apiProduct.totalSold || 0,
     } as ProductType;
   };
 

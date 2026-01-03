@@ -36,12 +36,29 @@ export interface UpdateProfileData {
   password?: string;
 }
 
+export interface UserFilters {
+  role?: 'user' | 'admin' | 'superadmin';
+  search?: string;
+  isActive?: boolean;
+  page?: number;
+  limit?: number;
+}
+
 export const authService = {
   /**
    * Register a new user (Public endpoint)
    */
   register: async (data: RegisterData): Promise<ApiResponse<LoginResponse>> => {
-    return apiPost<LoginResponse>('/auth/register', data, false);
+    try {
+      return await apiPost<LoginResponse>('/auth/register', data, false);
+    } catch (error: any) {
+      // Handle 404 or other errors gracefully
+      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot POST')) {
+        console.error('Registration endpoint not available:', error.message);
+        throw new Error('Registration service is currently unavailable. Please try again later.');
+      }
+      throw error;
+    }
   },
 
   /**
@@ -68,8 +85,8 @@ export const authService = {
   /**
    * Get all users (Admin only)
    */
-  getAllUsers: async (): Promise<ApiResponse<User[]>> => {
-    return apiGet<User[]>('/auth/users');
+  getAllUsers: async (filters?: UserFilters): Promise<ApiResponse<User[]>> => {
+    return apiGet<User[]>('/auth/users', filters);
   },
 
   /**

@@ -41,19 +41,21 @@ const Products: React.FC = () => {
       ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
       : undefined;
 
-    let category = apiProduct.category.toLowerCase();
+    // Handle API response structure: type instead of category
+    const categoryValue = apiProduct.type || apiProduct.category || '';
+    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
     if (category === 'whiskey' || category === 'whisky') {
       category = 'whisky';
     }
 
     return {
       id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name,
+      name: apiProduct.name || '',
       category,
-      price: apiProduct.price,
+      price: apiProduct.price || 0,
       originalPrice,
-      image: apiProduct.imageUrl || apiProduct.image,
-      description: apiProduct.description || `Premium ${apiProduct.category} - ${apiProduct.name}`,
+      image: apiProduct.image || apiProduct.imageUrl || '',
+      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
       volume: '750ml',
       alcoholContent: '40%',
       alcohol: '40%',

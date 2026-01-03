@@ -1,6 +1,7 @@
 import { tokenManager } from '@/lib/api';
+import { getApiUrl } from '@/lib/constant';
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+const API_BASE_URL = getApiUrl();
 
 export const exportService = {
   /**

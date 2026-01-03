@@ -243,7 +243,7 @@ export default function AlertsPage() {
 
         const [outOfStockRes, lowStockRes] = await Promise.all([
           stockAlertsService.getOutOfStock(),
-          stockAlertsService.getLowStock(10),
+          stockAlertsService.getLowStock({ threshold: 10 }),
         ]);
 
         setOutOfStockProducts(outOfStockRes.data || []);
@@ -265,7 +265,7 @@ export default function AlertsPage() {
       // Refresh alerts
       const [outOfStockRes, lowStockRes] = await Promise.all([
         stockAlertsService.getOutOfStock(),
-        stockAlertsService.getLowStock(10),
+        stockAlertsService.getLowStock({ threshold: 10 }),
       ]);
       setOutOfStockProducts(outOfStockRes.data || []);
       setLowStockProducts(lowStockRes.data || []);

@@ -2,7 +2,9 @@
  * API Base Configuration
  */
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
+import { getApiUrl } from '@/lib/constant';
+
+const API_BASE_URL = getApiUrl();
 
 export interface ApiResponse<T> {
   success: boolean;
@@ -75,9 +77,9 @@ async function apiFetch<T>(
   // Get token if authentication is required
   const token = requireAuth ? tokenManager.getToken() : null;
   
-  const headers: HeadersInit = {
+  const headers: Record<string, string> = {
     'Content-Type': 'application/json',
-    ...options?.headers,
+    ...(options?.headers as Record<string, string>),
   };
   
   // Add Authorization header if token exists
@@ -99,10 +101,27 @@ async function apiFetch<T>(
 
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({ message: 'An error occurred' }));
-    throw new Error(errorData.message || `HTTP error! status: ${response.status}`);
+    const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+    // Include status code in error message for better error handling
+    const error = new Error(errorMessage);
+    (error as any).status = response.status;
+    throw error;
   }
 
-  return response.json();
+  const data = await response.json();
+  
+  // Handle API responses that may not have 'success' field
+  // If response has 'data' field, wrap it in ApiResponse format
+  if (data && 'data' in data && !('success' in data)) {
+    return {
+      success: true,
+      message: data.message || 'Success',
+      data: data.data,
+      pagination: data.pagination,
+    } as ApiResponse<T>;
+  }
+  
+  return data;
 }
 
 /**

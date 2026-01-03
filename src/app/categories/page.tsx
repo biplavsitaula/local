@@ -36,8 +36,9 @@ const Categories = () => {
       ? apiProduct.price / (1 - apiProduct.discountPercent / 100)
       : undefined;
 
-    // Normalize category
-    let category = (apiProduct.category || '').toLowerCase();
+    // Normalize category - handle API response structure: type instead of category
+    const categoryValue = apiProduct.type || apiProduct.category || '';
+    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
     if (category === 'whiskey' || category === 'whisky') {
       category = 'whisky';
     }
@@ -67,8 +68,8 @@ const Categories = () => {
       category,
       price: finalPrice,
       originalPrice: originalPrice ? Math.round(originalPrice * 100) / 100 : undefined,
-      image: apiProduct.imageUrl || apiProduct.image || '',
-      description: apiProduct.description || `Premium ${apiProduct.category || 'Beverage'} - ${apiProduct.name || 'Product'}`,
+      image: apiProduct.image || apiProduct.imageUrl || '',
+      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
       volume: apiProduct.volume || '750ml',
       alcoholContent: alcoholPercentage,
       alcohol: alcoholPercentage,
