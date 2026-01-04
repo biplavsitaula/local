@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useState, useEffect } from "react";
 import { X, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
@@ -23,440 +24,460 @@ import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
 
+
 function PageContent() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState<string>("All");
-  const [checkoutOpen, setCheckoutOpen] = useState(false);
-  const [showSeasonalSection, setShowSeasonalSection] = useState(true);
-  const { theme: seasonalTheme } = useSeasonalTheme();
-  const { theme } = useTheme();
-  const { addToCart } = useCart();
-  const [recentArrivals, setRecentArrivals] = useState<Product[]>([]);
-  const [mostRecommended, setMostRecommended] = useState<Product[]>([]);
-  const [loadingRecent, setLoadingRecent] = useState(true);
-  const [loadingRecommended, setLoadingRecommended] = useState(true);
-  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
-  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
-  const [notificationQuantity, setNotificationQuantity] = useState(1);
+ const [searchQuery, setSearchQuery] = useState("");
+ const [selectedCategory, setSelectedCategory] = useState<string>("All");
+ const [checkoutOpen, setCheckoutOpen] = useState(false);
+ const [showSeasonalSection, setShowSeasonalSection] = useState(true);
+ const { theme: seasonalTheme } = useSeasonalTheme();
+ const { theme } = useTheme();
+ const { addToCart } = useCart();
+ const [recentArrivals, setRecentArrivals] = useState<Product[]>([]);
+ const [mostRecommended, setMostRecommended] = useState<Product[]>([]);
+ const [loadingRecent, setLoadingRecent] = useState(true);
+ const [loadingRecommended, setLoadingRecommended] = useState(true);
+ const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+ const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+ const [notificationQuantity, setNotificationQuantity] = useState(1);
 
-  // Map API product to internal Product type
-  const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-    const originalPrice = apiProduct.discountPercent
-      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
-      : undefined;
 
-    // Handle API response structure: type instead of category
-    const categoryValue = apiProduct.type || apiProduct.category || '';
-    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
-    if (category === 'whiskey' || category === 'whisky') {
-      category = 'whisky';
-    }
+ // Map API product to internal Product type
+ const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
+   // Handle API response structure: type instead of category
+   const categoryValue = apiProduct.type || apiProduct.category || '';
+   // Keep original category name from API (capitalized)
+   const category = categoryValue || 'Other';
 
-    return {
-      id: apiProduct._id || apiProduct.id || '',
-      name: apiProduct.name || '',
-      nameNe: apiProduct.nameNe || apiProduct.name || '',
-      category,
-      price: apiProduct.price || 0,
-      originalPrice,
-      image: apiProduct.image || apiProduct.imageUrl || '',
-      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
-      volume: '750ml',
-      alcoholContent: '40%',
-      alcohol: '40%',
-      inStock: (apiProduct.stock || 0) > 0,
-      isNew: true, // Mark as new for recent arrivals
-      stock: apiProduct.stock,
-      rating: apiProduct.rating,
-      tag: apiProduct.tag || 'NEW',
-    } as Product;
-  };
 
-  // Fetch recent arrivals (newest products)
-  useEffect(() => {
-    const fetchRecentArrivals = async () => {
-      try {
-        setLoadingRecent(true);
-        // Try to fetch products sorted by createdAt (newest first)
-        const response = await productsService.getAll({ 
-          sortBy: 'createdAt',
-          sortOrder: 'desc',
-          limit: 20 // Fetch more to ensure we have enough after filtering
-        });
-        
-        let products = response.data || [];
-        
-        // If no products with createdAt, try updatedAt
-        if (products.length === 0) {
-          const altResponse = await productsService.getAll({ 
-            sortBy: 'updatedAt',
-            sortOrder: 'desc',
-            limit: 20
-          });
-          products = altResponse.data || [];
-        }
-        
-        // Sort by createdAt or updatedAt if available, otherwise use the order from API
-        const sortedProducts = [...products].sort((a, b) => {
-          const dateA = a.createdAt ? new Date(a.createdAt).getTime() : 
-                        (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
-          const dateB = b.createdAt ? new Date(b.createdAt).getTime() : 
-                        (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
-          return dateB - dateA; // Descending order (newest first)
-        });
-        
-        // Take the first 8 products and map them
-        const mappedProducts = sortedProducts.slice(0, 8).map(mapApiProductToProduct);
-        setRecentArrivals(mappedProducts);
-      } catch (err: any) {
-        console.error('Error fetching recent arrivals:', err);
-        setRecentArrivals([]);
-      } finally {
-        setLoadingRecent(false);
-      }
-    };
+   return {
+     id: apiProduct._id || apiProduct.id || '',
+     name: apiProduct.name || '',
+     nameNe: apiProduct.nameNe || apiProduct.name || '',
+     category,
+     price: apiProduct.finalPrice || apiProduct.price || 0,
+     originalPrice: apiProduct.discountPercent ? apiProduct.price : undefined,
+     image: apiProduct.image || apiProduct.imageUrl || '',
+     description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
+     volume: apiProduct.volume || '750ml',
+     alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+     alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+     inStock: (apiProduct.stock || 0) > 0,
+     isNew: true, // Mark as new for recent arrivals
+     stock: apiProduct.stock,
+     rating: apiProduct.rating,
+     tag: apiProduct.discountPercent ? `${apiProduct.discountPercent}% OFF` : (apiProduct.tag || 'NEW'),
+   } as Product;
+ };
 
-    fetchRecentArrivals();
-  }, []);
 
-  // Fetch most recommended products
-  useEffect(() => {
-    const fetchMostRecommended = async () => {
-      try {
-        setLoadingRecommended(true);
-        const response = await productsService.getAll({ 
-          view: 'recommended',
-          limit: 8 
-        });
-        const mappedProducts = (response.data || []).slice(0, 8).map(mapApiProductToProduct);
-        setMostRecommended(mappedProducts);
-      } catch (err: any) {
-        console.error('Error fetching most recommended:', err);
-        setMostRecommended([]);
-      } finally {
-        setLoadingRecommended(false);
-      }
-    };
+ // Fetch recent arrivals (newest products)
+ useEffect(() => {
+   const fetchRecentArrivals = async () => {
+     try {
+       setLoadingRecent(true);
+       // Try to fetch products sorted by createdAt (newest first)
+       const response = await productsService.getAll({
+         sortBy: 'createdAt',
+         sortOrder: 'desc',
+         limit: 20 // Fetch more to ensure we have enough after filtering
+       });
+      
+       let products = response.data || [];
+      
+       // If no products with createdAt, try updatedAt
+       if (products.length === 0) {
+         const altResponse = await productsService.getAll({
+           sortBy: 'updatedAt',
+           sortOrder: 'desc',
+           limit: 20
+         });
+         products = altResponse.data || [];
+       }
+      
+       // Sort by createdAt or updatedAt if available, otherwise use the order from API
+       const sortedProducts = [...products].sort((a, b) => {
+         const dateA = a.createdAt ? new Date(a.createdAt).getTime() :
+                       (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
+         const dateB = b.createdAt ? new Date(b.createdAt).getTime() :
+                       (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+         return dateB - dateA; // Descending order (newest first)
+       });
+      
+       // Take the first 8 products and map them
+       const mappedProducts = sortedProducts.slice(0, 8).map(mapApiProductToProduct);
+       setRecentArrivals(mappedProducts);
+     } catch (err: any) {
+       console.error('Error fetching recent arrivals:', err);
+       setRecentArrivals([]);
+     } finally {
+       setLoadingRecent(false);
+     }
+   };
 
-    fetchMostRecommended();
-  }, []);
 
-  const handleBuyNow = (product: Product, quantity: number = 1) => {
-    addToCart(product, quantity);
-    setNotificationProduct(product);
-    setNotificationQuantity(quantity);
-    setCheckoutOpen(true);
-  };
+   fetchRecentArrivals();
+ }, []);
 
-  const handleAddToCart = (product: Product, quantity: number = 1) => {
-    addToCart(product, quantity);
-    setNotificationProduct(product);
-    setNotificationQuantity(quantity);
-  };
 
-  const handleCloseSeasonalSection = () => {
-    setShowSeasonalSection(false);
-  };
+ // Fetch most recommended products
+ useEffect(() => {
+   const fetchMostRecommended = async () => {
+     try {
+       setLoadingRecommended(true);
+       const response = await productsService.getAll({
+         view: 'recommended',
+         limit: 8
+       });
+       const mappedProducts = (response.data || []).slice(0, 8).map(mapApiProductToProduct);
+       setMostRecommended(mappedProducts);
+     } catch (err: any) {
+       console.error('Error fetching most recommended:', err);
+       setMostRecommended([]);
+     } finally {
+       setLoadingRecommended(false);
+     }
+   };
 
-  return (
-    <div className={`min-h-screen text-foreground transition-colors ${
-      theme === 'dark'
-        ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
-        : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
-    }`}>
-              <Header
-                searchQuery={searchQuery}
-                onSearchChange={setSearchQuery}
-                onCheckout={() => setCheckoutOpen(true)}
-              />
-              <main className="flex flex-col gap-12">
-                <HeroSection />
+
+   fetchMostRecommended();
+ }, []);
+
+
+ const handleBuyNow = (product: Product, quantity: number = 1) => {
+   addToCart(product, quantity);
+   setNotificationProduct(product);
+   setNotificationQuantity(quantity);
+   setCheckoutOpen(true);
+ };
+
+
+ const handleAddToCart = (product: Product, quantity: number = 1) => {
+   addToCart(product, quantity);
+   setNotificationProduct(product);
+   setNotificationQuantity(quantity);
+ };
+
+
+ const handleCloseSeasonalSection = () => {
+   setShowSeasonalSection(false);
+ };
+
+
+ return (
+   <div className={`min-h-screen text-foreground transition-colors ${
+     theme === 'dark'
+       ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
+       : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
+   }`}>
+             <Header
+               searchQuery={searchQuery}
+               onSearchChange={setSearchQuery}
+               onCheckout={() => setCheckoutOpen(true)}
+             />
+             <main className="flex flex-col gap-12">
+               <HeroSection />
+              
+               {/* Recent Arrivals Section */}
+               <section className="container mx-auto px-4">
+                 <div className="flex items-center justify-between mb-6">
+                   <h2 className={`text-3xl font-display font-bold ${
+                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                   }`}>
+                     Recent Arrivals
+                   </h2>
+                   <Link
+                     href="/products"
+                     className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                       theme === 'dark'
+                         ? 'text-primary-text hover:text-flame-orange'
+                         : 'text-orange-600 hover:text-orange-700'
+                     }`}
+                   >
+                     View All
+                     <ArrowRight className="w-4 h-4" />
+                   </Link>
+                 </div>
                 
-                {/* Recent Arrivals Section */}
-                <section className="container mx-auto px-4">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className={`text-3xl font-display font-bold ${
-                      theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                    }`}>
-                      Recent Arrivals
-                    </h2>
-                    <Link 
-                      href="/products"
-                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                        theme === 'dark' 
-                          ? 'text-primary-text hover:text-flame-orange' 
-                          : 'text-orange-600 hover:text-orange-700'
-                      }`}
-                    >
-                      View All
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                  
-                  {loadingRecent ? (
-                    <div className="flex items-center justify-center py-16">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : recentArrivals.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {recentArrivals.map((product, index) => (
-                        <ProductCard
-                          key={product.id || `recent-${index}`}
-                          product={product}
-                          onBuyNow={handleBuyNow}
-                          onViewDetails={setSelectedProduct}
-                          onAddToCart={handleAddToCart}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">No recent arrivals found.</p>
-                    </div>
-                  )}
-                </section>
+                 {loadingRecent ? (
+                   <div className="flex items-center justify-center py-16">
+                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                   </div>
+                 ) : recentArrivals.length > 0 ? (
+                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                     {recentArrivals.map((product, index) => (
+                       <ProductCard
+                         key={product.id || `recent-${index}`}
+                         product={product}
+                         onBuyNow={handleBuyNow}
+                         onViewDetails={setSelectedProduct}
+                         onAddToCart={handleAddToCart}
+                       />
+                     ))}
+                   </div>
+                 ) : (
+                   <div className="text-center py-12">
+                     <p className="text-muted-foreground">No recent arrivals found.</p>
+                   </div>
+                 )}
+               </section>
 
-                {/* Most Recommended Section */}
-                <section className="container mx-auto px-4">
-                  <div className="flex items-center justify-between mb-6">
-                    <h2 className={`text-3xl font-display font-bold ${
-                      theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                    }`}>
-                      Most Recommended
-                    </h2>
-                    <Link 
-                      href="/products"
-                      className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                        theme === 'dark' 
-                          ? 'text-primary-text hover:text-flame-orange' 
-                          : 'text-orange-600 hover:text-orange-700'
-                      }`}
-                    >
-                      View All
-                      <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  </div>
-                  
-                  {loadingRecommended ? (
-                    <div className="flex items-center justify-center py-16">
-                      <Loader2 className="h-8 w-8 animate-spin text-primary" />
-                    </div>
-                  ) : mostRecommended.length > 0 ? (
-                    <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                      {mostRecommended.map((product, index) => (
-                        <ProductCard
-                          key={product.id || `recommended-${index}`}
-                          product={product}
-                          onBuyNow={handleBuyNow}
-                          onViewDetails={setSelectedProduct}
-                          onAddToCart={handleAddToCart}
-                        />
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="text-center py-12">
-                      <p className="text-muted-foreground">No recommended products found.</p>
-                    </div>
-                  )}
-                </section>
 
-                <CategorySection
-                  selected={selectedCategory}
-                  onSelect={(value: string) =>
-                    setSelectedCategory(
-                      selectedCategory === value ? "All" : value
-                    )
-                  }
-                />
+               {/* Most Recommended Section */}
+               <section className="container mx-auto px-4">
+                 <div className="flex items-center justify-between mb-6">
+                   <h2 className={`text-3xl font-display font-bold ${
+                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                   }`}>
+                     Most Recommended
+                   </h2>
+                   <Link
+                     href="/products"
+                     className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                       theme === 'dark'
+                         ? 'text-primary-text hover:text-flame-orange'
+                         : 'text-orange-600 hover:text-orange-700'
+                     }`}
+                   >
+                     View All
+                     <ArrowRight className="w-4 h-4" />
+                   </Link>
+                 </div>
+                
+                 {loadingRecommended ? (
+                   <div className="flex items-center justify-center py-16">
+                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                   </div>
+                 ) : mostRecommended.length > 0 ? (
+                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                     {mostRecommended.map((product, index) => (
+                       <ProductCard
+                         key={product.id || `recommended-${index}`}
+                         product={product}
+                         onBuyNow={handleBuyNow}
+                         onViewDetails={setSelectedProduct}
+                         onAddToCart={handleAddToCart}
+                       />
+                     ))}
+                   </div>
+                 ) : (
+                   <div className="text-center py-12">
+                     <p className="text-muted-foreground">No recommended products found.</p>
+                   </div>
+                 )}
+               </section>
 
-                {/* Products Section */}
-                <section className="container mx-auto px-4">
-                  <h2 className={`text-3xl font-display font-bold mb-6 ${
-                    theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                  }`}>
-                    All Products
-                  </h2>
-                  <ProductGrid
-                    searchQuery={searchQuery}
-                    selectedCategory={selectedCategory}
-                    onCheckout={() => setCheckoutOpen(true)}
-                  />
-                </section>
-                {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">
-                  <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-orange/30 to-flame-red/20 p-4 text-foreground shadow-glow">
-                    <p className="text-lg font-semibold">1-hour delivery</p>
-                    <p className="text-sm text-muted-foreground">
-                      Track to your door in lightning speed.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
-                    <p className="text-lg font-semibold">
-                      12 bottle bundle offer
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Stock up & save across categories.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
-                    <p className="text-lg font-semibold">
-                      Fast delivery windows
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Predictable time windows with alerts.
-                    </p>
-                  </div>
-                  <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-red/30 to-flame-orange/30 p-4 text-foreground shadow-glow">
-                    <p className="text-lg font-semibold">
-                      Free delivery on 2000+
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Visible at top, hides on scroll.
-                    </p>
-                  </div>
-                </section> */}
-                {showSeasonalSection && (
-                  <section className={`mx-auto max-w-6xl relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors ${
-                    theme === 'dark'
-                      ? 'gradient-card shadow-glow'
-                      : 'bg-white/90 border-orange-200/60 shadow-lg'
-                  }`}>
-                    <button
-                      onClick={handleCloseSeasonalSection}
-                      className={`absolute top-4 right-4 z-10 p-2 rounded-full border transition-colors cursor-pointer ${
-                        theme === 'dark'
-                          ? 'bg-background/80 hover:bg-background/90 border-border/50 hover:border-border'
-                          : 'bg-white/90 hover:bg-white border-gray-300 hover:border-gray-400'
-                      }`}
-                      aria-label="Close seasonal section"
-                    >
-                      <X className={`h-4 w-4 ${theme === 'dark' ? 'text-foreground' : 'text-gray-700'}`} />
-                    </button>
-                    <div className={`absolute inset-0 ${seasonalTheme.gradient}`} />
-                    <div className="relative grid gap-6 md:grid-cols-2 md:items-center">
-                      <div className="space-y-3">
-                        <p className={`text-sm uppercase tracking-[0.3em] ${
-                          theme === 'dark' ? 'text-flame-orange/80' : 'text-orange-600'
-                        }`}>
-                          {seasonalTheme.subtitle}
-                        </p>
-                        <h3 className={`text-3xl font-semibold ${
-                          theme === 'dark' ? 'text-foreground' : 'text-gray-900'
-                        }`}>
-                          {seasonalTheme.emoji && <span className="mr-2">{seasonalTheme.emoji}</span>}
-                          {seasonalTheme.title}
-                        </h3>
-                        <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
-                          {seasonalTheme.description}
-                        </p>
-                        <div className="flex flex-wrap gap-2 text-sm">
-                          {seasonalTheme.tags.map((tag, index) => (
-                            <span key={index} className={`rounded-full px-3 py-1 ${
-                              theme === 'dark'
-                                ? 'bg-secondary/50 text-foreground'
-                                : 'bg-orange-50 text-gray-800 border border-orange-200'
-                            }`}>
-                              {tag}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                      <div className="relative h-56">
-                        <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${seasonalTheme.colors.primary} blur-2xl`} />
-                        <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} p-4 ${
-                          theme === 'dark'
-                            ? 'bg-card/30 shadow-glow'
-                            : 'bg-white/80 shadow-md'
-                        }`}>
-                          <div className={`text-center ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}>
-                            <p className="text-lg font-semibold">Festival Ad</p>
-                            <p className="text-sm text-muted-foreground">
-                              {seasonalTheme.keyname === 'christmas' && 'Red theme, santa art, event-specific CTA.'}
-                              {seasonalTheme.keyname === 'thanksgiving' && 'Amber theme, harvest art, thanksgiving CTA.'}
-                              {seasonalTheme.keyname === 'newyear' && 'Gold theme, celebration art, new year CTA.'}
-                              {seasonalTheme.keyname === 'default' && 'Premium theme, quality art, collection CTA.'}
-                            </p>
-                            <button
-                              onClick={() => setSelectedCategory(seasonalTheme.category || "All")}
-                              className="mt-3 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-primary-foreground cursor-pointer"
-                            >
-                              {seasonalTheme.ctaText}
-                            </button>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </section>
-                )}
-              </main>
-              <Footer />
-              <CheckoutModal
-                open={checkoutOpen}
-                onClose={() => setCheckoutOpen(false)}
-              />
 
-              {/* Product Detail Modal */}
-              {selectedProduct && (
-                <ProductDetailModal
-                  product={selectedProduct}
-                  onClose={() => setSelectedProduct(null)}
-                  onBuyNow={handleBuyNow}
-                  onAddToCart={handleAddToCart}
-                />
-              )}
+               <CategorySection
+                 selected={selectedCategory}
+                 onSelect={(value: string) =>
+                   setSelectedCategory(
+                     selectedCategory === value ? "All" : value
+                   )
+                 }
+               />
 
-              {/* Cart Notification */}
-              <CartNotification
-                product={notificationProduct}
-                quantity={notificationQuantity}
-                onClose={() => setNotificationProduct(null)}
-              />
-    </div>
-  );
+
+               {/* Products Section */}
+               <section className="container mx-auto px-4">
+                 <h2 className={`text-3xl font-display font-bold mb-6 ${
+                   theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                 }`}>
+                   All Products
+                 </h2>
+                 <ProductGrid
+                   searchQuery={searchQuery}
+                   selectedCategory={selectedCategory}
+                   onCheckout={() => setCheckoutOpen(true)}
+                 />
+               </section>
+               {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">
+                 <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-orange/30 to-flame-red/20 p-4 text-foreground shadow-glow">
+                   <p className="text-lg font-semibold">1-hour delivery</p>
+                   <p className="text-sm text-muted-foreground">
+                     Track to your door in lightning speed.
+                   </p>
+                 </div>
+                 <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
+                   <p className="text-lg font-semibold">
+                     12 bottle bundle offer
+                   </p>
+                   <p className="text-sm text-muted-foreground">
+                     Stock up & save across categories.
+                   </p>
+                 </div>
+                 <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
+                   <p className="text-lg font-semibold">
+                     Fast delivery windows
+                   </p>
+                   <p className="text-sm text-muted-foreground">
+                     Predictable time windows with alerts.
+                   </p>
+                 </div>
+                 <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-red/30 to-flame-orange/30 p-4 text-foreground shadow-glow">
+                   <p className="text-lg font-semibold">
+                     Free delivery on 2000+
+                   </p>
+                   <p className="text-sm text-muted-foreground">
+                     Visible at top, hides on scroll.
+                   </p>
+                 </div>
+               </section> */}
+               {showSeasonalSection && (
+                 <section className={`mx-auto max-w-6xl relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors ${
+                   theme === 'dark'
+                     ? 'gradient-card shadow-glow'
+                     : 'bg-white/90 border-orange-200/60 shadow-lg'
+                 }`}>
+                   <button
+                     onClick={handleCloseSeasonalSection}
+                     className={`absolute top-4 right-4 z-10 p-2 rounded-full border transition-colors cursor-pointer ${
+                       theme === 'dark'
+                         ? 'bg-background/80 hover:bg-background/90 border-border/50 hover:border-border'
+                         : 'bg-white/90 hover:bg-white border-gray-300 hover:border-gray-400'
+                     }`}
+                     aria-label="Close seasonal section"
+                   >
+                     <X className={`h-4 w-4 ${theme === 'dark' ? 'text-foreground' : 'text-gray-700'}`} />
+                   </button>
+                   <div className={`absolute inset-0 ${seasonalTheme.gradient}`} />
+                   <div className="relative grid gap-6 md:grid-cols-2 md:items-center">
+                     <div className="space-y-3">
+                       <p className={`text-sm uppercase tracking-[0.3em] ${
+                         theme === 'dark' ? 'text-flame-orange/80' : 'text-orange-600'
+                       }`}>
+                         {seasonalTheme.subtitle}
+                       </p>
+                       <h3 className={`text-3xl font-semibold ${
+                         theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+                       }`}>
+                         {seasonalTheme.emoji && <span className="mr-2">{seasonalTheme.emoji}</span>}
+                         {seasonalTheme.title}
+                       </h3>
+                       <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
+                         {seasonalTheme.description}
+                       </p>
+                       <div className="flex flex-wrap gap-2 text-sm">
+                         {seasonalTheme.tags.map((tag, index) => (
+                           <span key={index} className={`rounded-full px-3 py-1 ${
+                             theme === 'dark'
+                               ? 'bg-secondary/50 text-foreground'
+                               : 'bg-orange-50 text-gray-800 border border-orange-200'
+                           }`}>
+                             {tag}
+                           </span>
+                         ))}
+                       </div>
+                     </div>
+                     <div className="relative h-56">
+                       <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${seasonalTheme.colors.primary} blur-2xl`} />
+                       <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} p-4 ${
+                         theme === 'dark'
+                           ? 'bg-card/30 shadow-glow'
+                           : 'bg-white/80 shadow-md'
+                       }`}>
+                         <div className={`text-center ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}>
+                           <p className="text-lg font-semibold">Festival Ad</p>
+                           <p className="text-sm text-muted-foreground">
+                             {seasonalTheme.keyname === 'christmas' && 'Red theme, santa art, event-specific CTA.'}
+                             {seasonalTheme.keyname === 'thanksgiving' && 'Amber theme, harvest art, thanksgiving CTA.'}
+                             {seasonalTheme.keyname === 'newyear' && 'Gold theme, celebration art, new year CTA.'}
+                             {seasonalTheme.keyname === 'default' && 'Premium theme, quality art, collection CTA.'}
+                           </p>
+                           <button
+                             onClick={() => setSelectedCategory(seasonalTheme.category || "All")}
+                             className="mt-3 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-primary-foreground cursor-pointer"
+                           >
+                             {seasonalTheme.ctaText}
+                           </button>
+                         </div>
+                       </div>
+                     </div>
+                   </div>
+                 </section>
+               )}
+             </main>
+             <Footer />
+             <CheckoutModal
+               open={checkoutOpen}
+               onClose={() => setCheckoutOpen(false)}
+             />
+
+
+             {/* Product Detail Modal */}
+             {selectedProduct && (
+               <ProductDetailModal
+                 product={selectedProduct}
+                 onClose={() => setSelectedProduct(null)}
+                 onBuyNow={handleBuyNow}
+                 onAddToCart={handleAddToCart}
+               />
+             )}
+
+
+             {/* Cart Notification */}
+             <CartNotification
+               product={notificationProduct}
+               quantity={notificationQuantity}
+               onClose={() => setNotificationProduct(null)}
+             />
+   </div>
+ );
 }
+
 
 export function ClientPageContent() {
-  // Initialize from sessionStorage immediately to avoid showing modal on navigation
-  const [ageStatus, setAgeStatus] = useState<AgeStatus>(() => {
-    // Only check sessionStorage in browser (not during SSR)
-    if (typeof window !== "undefined") {
-      const verified = sessionStorage.getItem("age-verified");
-      if (verified === "true") {
-        return "verified";
-      }
-    }
-    return "pending";
-  });
+ // Initialize from sessionStorage immediately to avoid showing modal on navigation
+ const [ageStatus, setAgeStatus] = useState<AgeStatus>(() => {
+   // Only check sessionStorage in browser (not during SSR)
+   if (typeof window !== "undefined") {
+     const verified = sessionStorage.getItem("age-verified");
+     if (verified === "true") {
+       return "verified";
+     }
+   }
+   return "pending";
+ });
 
-  const handleAgeVerified = () => {
-    sessionStorage.setItem("age-verified", "true");
-    setAgeStatus("verified");
-  };
 
-  const handleAgeDenied = () => {
-    setAgeStatus("denied");
-  };
+ const handleAgeVerified = () => {
+   sessionStorage.setItem("age-verified", "true");
+   setAgeStatus("verified");
+ };
 
-  return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <CartProvider>
-          {ageStatus === "pending" && (
-            <AgeVerificationModal
-              onVerified={handleAgeVerified}
-              onDenied={handleAgeDenied}
-            />
-          )}
 
-          {ageStatus === "denied" && (
-            <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
-          )}
+ const handleAgeDenied = () => {
+   setAgeStatus("denied");
+ };
 
-          {ageStatus === "verified" && (
-            <PageContent />
-          )}
-        </CartProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  );
+
+ return (
+   <ThemeProvider>
+     <LanguageProvider>
+       <CartProvider>
+         {ageStatus === "pending" && (
+           <AgeVerificationModal
+             onVerified={handleAgeVerified}
+             onDenied={handleAgeDenied}
+           />
+         )}
+
+
+         {ageStatus === "denied" && (
+           <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
+         )}
+
+
+         {ageStatus === "verified" && (
+           <PageContent />
+         )}
+       </CartProvider>
+     </LanguageProvider>
+   </ThemeProvider>
+ );
 }
+
+
+
+
 

@@ -1,162 +1,108 @@
-import { getUrl } from '@/lib/constant';
-import {
-  CreateProductRequest,
-  CreateProductResponse,
-  UpdateProductRequest,
-  UpdateProductResponse,
-  DeleteProductResponse,
-} from '@/types/productRequest';
+import { apiGet, apiPost, apiPut, apiDelete, ApiResponse } from '@/lib/api';
 
-import { tokenManager } from '@/lib/api';
 
-/**
- * Create a new product
- * @param productData - Product data to create
- * @returns Promise<CreateProductResponse> - Created product response
- */
-export const createProduct = async (
-  productData: CreateProductRequest
-): Promise<CreateProductResponse> => {
-  try {
-    const token = tokenManager.getToken();
+export interface Product {
+ _id?: string;
+ id?: string;
+ name: string;
+ nameNe?: string;
+ type?: string; // Some APIs use 'type' instead of 'category'
+ category: string;
+ brand?: string;
+ price: number;
+ discountPercent?: number;
+ discountAmount?: number;
+ finalPrice?: number;
+ stock: number;
+ imageUrl?: string;
+ image?: string;
+ description?: string;
+ rating?: number;
+ sales?: number;
+ totalSold?: number;
+ reviewCount?: number;
+ alcoholPercentage?: number;
+ volume?: string;
+ tag?: string;
+ recommended?: boolean;
+ isRecommended?: boolean;
+ status?: string;
+ createdAt?: string;
+ updatedAt?: string;
+}
 
-    if (!token) {
-      throw new Error("No auth token found");
-    }
-    const response = await fetch(getUrl('/api/products'), {
-      method: 'POST',
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
-      },
-      body: JSON.stringify(productData),
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Failed to create product: ${response.statusText}`
-      );
-    }
+export interface ProductFilters {
+ search?: string;
+ category?: string;
+ status?: string;
+ view?: 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'most-reviewed' | 'recommended';
+ sortBy?: string;
+ sortOrder?: 'asc' | 'desc';
+ page?: number;
+ limit?: number;
+}
 
-    const responseData: CreateProductResponse = await response.json();
-    return responseData;
-  } catch (error) {
-    console.error('Error creating product:', error);
-    throw error;
-  }
-};
 
-/**
- * Update an existing product
- * @param productId - Product ID to update
- * @param productData - Product data to update
- * @returns Promise<UpdateProductResponse> - Updated product response
- */
-// export const updateProduct = async (
-//   productId: string,
-//   productData: UpdateProductRequest
-// ): Promise<UpdateProductResponse> => {
-//   try {
-//     const token = tokenManager.getToken();
-//     console.log(token, '==================token')
-  
-    
-//     const response = await fetch(getUrl(`/api/products/${productId}`), {
-//       method: 'PUT',
-//       headers: {
-//         'Content-Type': 'application/json',
-//       },
-//       body: JSON.stringify(productData),
-//     });
+export const productsService = {
+ /**
+  * Get all products with filters (Public endpoint)
+  */
+ getAll: async (filters?: ProductFilters): Promise<ApiResponse<Product[]>> => {
+   return apiGet<Product[]>('/products', filters, false);
+ },
 
-//     if (!response.ok) {
-//       const errorData = await response.json().catch(() => ({}));
-//       throw new Error(
-//         errorData.message || `Failed to update product: ${response.statusText}`
-//       );
-//     }
 
-//     const responseData: UpdateProductResponse = await response.json();
-//     return responseData;
-//   } catch (error) {
-//     console.error('Error updating product:', error);
-//     throw error;
-//   }
-// };
+ /**
+  * Get a single product by ID (Public endpoint)
+  */
+ getById: async (id: string): Promise<ApiResponse<Product>> => {
+   return apiGet<Product>(`/products/${id}`, undefined, false);
+ },
 
-export const updateProduct = async (
-  productId: string,
-  productData: UpdateProductRequest
-): Promise<UpdateProductResponse> => {
-  try {
-    const token = tokenManager.getToken();
 
-    if (!token) {
-      throw new Error("No auth token found");
-    }
+ /**
+  * Create a new product
+  */
+ create: async (product: Partial<Product>): Promise<ApiResponse<Product>> => {
+   return apiPost<Product>('/products', product);
+ },
 
-    const response = await fetch(getUrl(`/api/products/${productId}`), {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
-      },
-      body: JSON.stringify(productData),
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Failed to update product: ${response.statusText}`
-      );
-    }
+ /**
+  * Update a product
+  */
+ update: async (id: string, product: Partial<Product>): Promise<ApiResponse<Product>> => {
+   return apiPut<Product>(`/products/${id}`, product);
+ },
 
-    const responseData: UpdateProductResponse = await response.json();
-    return responseData;
-  } catch (error) {
-    console.error("Error updating product:", error);
-    throw error;
-  }
+
+ /**
+  * Delete a product
+  */
+ delete: async (id: string): Promise<ApiResponse<void>> => {
+   return apiDelete<void>(`/products/${id}`);
+ },
 };
 
 
-/**
- * Delete a product
- * @param productId - Product ID to delete
- * @returns Promise<DeleteProductResponse> - Delete product response
- */
-export const deleteProduct = async (
-  productId: string
-): Promise<DeleteProductResponse> => {
-  try {
-    const token = tokenManager.getToken();
 
-    if (!token) {
-      throw new Error("No auth token found");
-    }
-    const response = await fetch(getUrl(`/api/products/${productId}`), {
-      method: 'DELETE',
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`, // ✅ THIS WAS MISSING
-      },
-    });
 
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(
-        errorData.message || `Failed to delete product: ${response.statusText}`
-      );
-    }
 
-    const responseData: DeleteProductResponse = await response.json();
-    return responseData;
-  } catch (error) {
-    console.error('Error deleting product:', error);
-    throw error;
-  }
-};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
