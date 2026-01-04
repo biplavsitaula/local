@@ -63,34 +63,58 @@ const Dashboard = () => {
         const lowStock = lowStockRes.data?.length || 0;
 
         // Fetch stock by category
+        // API returns: { category, inStock, lowStock, outOfStock }
         const stockByCategoryRes = await analyticsService.getStockByCategory();
         setStockData(stockByCategoryRes.data || []);
 
         // Fetch sales trend
+        // API returns: { month, revenue, count } - map to { month, sales }
         const salesTrendRes = await analyticsService.getSalesTrend();
-        setSalesData((salesTrendRes.data || []).map(item => ({
+        const salesTrendData = salesTrendRes.data || [];
+        const mappedSalesData = salesTrendData.map(item => ({
           month: item.month,
-          sales: item.sales,
-        })));
+          sales: item.revenue || item.sales || 0,
+        }));
+        setSalesData(mappedSalesData);
+
+        // Calculate totals from sales trend data as fallback
+        const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item.revenue || 0), 0);
+        const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item.count || 0), 0);
 
         // Fetch products by category
+        // API returns: { category, count, percentage } - map to { name, value }
         const productsByCategoryRes = await analyticsService.getProductsByCategory();
-        setCategoryData(productsByCategoryRes.data || []);
+        setCategoryData((productsByCategoryRes.data || []).map(item => ({
+          name: item.category || item.name,
+          value: item.count || item.value || 0,
+        })));
 
         // Fetch reviews summary
         const reviewsRes = await reviewsService.getSummary();
         const totalReviews = reviewsRes.data?.totalReviews || 0;
 
-        // Fetch recent products
+        // Fetch recent products and map to expected format
         const productsListRes = await productsService.getAll({ limit: 10 });
-        setProducts(productsListRes.data || []);
+        const mappedProducts = (productsListRes.data || []).map((p: any) => ({
+          id: p._id || p.id,
+          name: p.name,
+          category: p.type || p.category,
+          price: p.price || 0,
+          stock: p.stock ?? 0,
+          rating: p.rating,
+          image: p.image || p.imageUrl || '',
+          description: p.description || '',
+          sales: p.sales || p.totalSold || 0,
+        }));
+        setProducts(mappedProducts);
 
         setStats({
           totalProducts,
           outOfStock,
           lowStock,
-          totalSales: analyticsData?.totalSales || 0,
-          totalRevenue: analyticsData?.totalRevenue || 0,
+          // Use analytics data if available, otherwise use calculated values from sales trend
+          totalSales: analyticsData?.totalSales || calculatedTotalSales,
+          totalRevenue: analyticsData?.totalRevenue || calculatedTotalRevenue,
           totalReviews,
         });
       } catch (err: any) {

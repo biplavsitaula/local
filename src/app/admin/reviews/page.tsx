@@ -1,77 +1,97 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { Search, Edit, Eye, Trash2, Package, Star, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Search, Edit, Trash2, Package, Star, Loader2, AlertCircle, MessageSquare, Eye } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { reviewsService } from '@/services/reviews.service';
-import { productsService } from '@/services/products.service';
+import { reviewsService, Review } from '@/services/reviews.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
+import { EditReviewModal, DeleteReviewModal } from '@/components/features/admin/reviews';
+import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
+import { DeleteProductModal } from '@/components/features/admin/products/DeleteProductModal';
+import { Product } from '@/types';
 
-type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
+type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
+type ReviewSortKey = 'customerName' | 'rating' | 'createdAt' | 'productName';
 type SortDir = 'asc' | 'desc';
 
 export default function ReviewsPage() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [reviewSearchQuery, setReviewSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('rating');
+  const [reviewSortKey, setReviewSortKey] = useState<ReviewSortKey>('createdAt');
   const [sortDir, setSortDir] = useState<SortDir>('desc');
+  const [reviewSortDir, setReviewSortDir] = useState<SortDir>('desc');
   const [mostReviewedProducts, setMostReviewedProducts] = useState<any[]>([]);
+  const [reviews, setReviews] = useState<Review[]>([]);
   const [reviewSummary, setReviewSummary] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Review Modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedReview, setSelectedReview] = useState<Review | null>(null);
+  
+  // Product Modal states (for Most Reviewed Products table)
+  const [editProductModalOpen, setEditProductModalOpen] = useState(false);
+  const [deleteProductModalOpen, setDeleteProductModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [summaryRes, mostReviewedRes, reviewsRes] = await Promise.all([
+        reviewsService.getSummary(),
+        reviewsService.getMostReviewed(10),
+        reviewsService.getAll(),
+      ]);
+
+      setReviewSummary(summaryRes.data || {});
+      
+      // Most reviewed API already returns full product data
+      const mostReviewedData = mostReviewedRes.data || [];
+      const productsWithReviews = mostReviewedData.map((item: any) => ({
+        id: item._id,
+        name: item.name,
+        category: item.category,
+        rating: item.rating,
+        imageUrl: item.imageUrl,
+        reviewCount: item.reviewCount || 0,
+        price: item.price,
+        stock: item.stock,
+        sales: item.sales,
+      }));
+      
+      setMostReviewedProducts(productsWithReviews);
+      setReviews(reviewsRes.data || []);
+
+    } catch (err: any) {
+      setError(err.message || 'Failed to load reviews');
+      setMostReviewedProducts([]);
+      setReviews([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchReviews = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    fetchData();
+  }, [fetchData]);
 
-        const [summaryRes, mostReviewedRes] = await Promise.all([
-          reviewsService.getSummary(),
-          reviewsService.getMostReviewed(10),
-        ]);
-
-        setReviewSummary(summaryRes.data || {});
-        
-        // Fetch product details for most reviewed
-        const mostReviewedData = mostReviewedRes.data || [];
-        const productIds = mostReviewedData
-          .map((item: any) => item.productId)
-          .filter((id: string) => id && id !== 'undefined' && id !== undefined);
-        
-        if (productIds.length > 0) {
-          const productsPromises = productIds.map((id: string) => 
-            productsService.getById(id).catch(() => ({ data: null }))
-          );
-          const productsRes = await Promise.all(productsPromises);
-          
-          const productsWithReviews = productsRes
-            .map((res, index) => {
-              if (!res.data) return null;
-              // Find the matching review data by productId
-              const reviewData = mostReviewedData.find((item: any) => item.productId === productIds[index]);
-              return {
-                ...res.data,
-                reviewCount: reviewData?.count || 0,
-              };
-            })
-            .filter((product) => product !== null); // Remove null entries
-          
-          setMostReviewedProducts(productsWithReviews);
-        } else {
-          setMostReviewedProducts([]);
-        }
-
-      } catch (err: any) {
-        setError(err.message || 'Failed to load reviews');
-        setMostReviewedProducts([]);
-      } finally {
-        setLoading(false);
-      }
+  // Listen for review changes from modals
+  useEffect(() => {
+    const handleReviewChanged = () => {
+      fetchData();
     };
 
-    fetchReviews();
-  }, []);
+    window.addEventListener('reviewChanged', handleReviewChanged);
+    return () => {
+      window.removeEventListener('reviewChanged', handleReviewChanged);
+    };
+  }, [fetchData]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -82,8 +102,88 @@ export default function ReviewsPage() {
     setSortDir('desc');
   };
 
+  const handleReviewSort = (key: ReviewSortKey) => {
+    if (key === reviewSortKey) {
+      setReviewSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+      return;
+    }
+    setReviewSortKey(key);
+    setReviewSortDir('desc');
+  };
+
+  // Handle edit review
+  const handleEditReview = (review: Review) => {
+    setSelectedReview(review);
+    setEditModalOpen(true);
+  };
+
+  // Handle delete review
+  const handleDeleteReview = (review: Review) => {
+    setSelectedReview(review);
+    setDeleteModalOpen(true);
+  };
+
+  // Handle edit product (for Most Reviewed Products table)
+  const handleEditProduct = (product: any) => {
+    // Convert to Product type format
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setEditProductModalOpen(true);
+  };
+
+  // Handle delete product (for Most Reviewed Products table)
+  const handleDeleteProduct = (product: any) => {
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setDeleteProductModalOpen(true);
+  };
+
   // Get top 5 for the card
   const top5Reviewed = mostReviewedProducts.slice(0, 5);
+
+  // Filter and sort reviews
+  const filteredAndSortedReviews = reviews
+    .filter((r) => {
+      const query = reviewSearchQuery.toLowerCase();
+      return (
+        (r.customerName || '').toLowerCase().includes(query) ||
+        (r.productName || '').toLowerCase().includes(query) ||
+        (r.comment || '').toLowerCase().includes(query)
+      );
+    })
+    .sort((a, b) => {
+      const dir = reviewSortDir === 'asc' ? 1 : -1;
+      switch (reviewSortKey) {
+        case 'customerName':
+          return dir * (a.customerName || '').localeCompare(b.customerName || '');
+        case 'productName':
+          return dir * (a.productName || '').localeCompare(b.productName || '');
+        case 'rating':
+          return dir * ((a.rating || 0) - (b.rating || 0));
+        case 'createdAt':
+          return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+        default:
+          return 0;
+      }
+    });
 
   // Filter and sort for table
   const filteredAndSorted = mostReviewedProducts
@@ -109,6 +209,9 @@ export default function ReviewsPage() {
           return dir * ((a.rating || 0) - (b.rating || 0));
         case 'sales':
           return dir * (((a as any).sales || 0) - ((b as any).sales || 0));
+        case 'status':
+          // Sort by stock level (status is derived from stock)
+          return dir * ((a.stock || 0) - (b.stock || 0));
         default:
           return 0;
       }
@@ -149,8 +252,14 @@ export default function ReviewsPage() {
 
   const totalReviews = reviewSummary?.totalReviews || 0;
   const averageRating = reviewSummary?.averageRating?.toFixed(1) || '0.0';
-  const ratingDistribution = reviewSummary?.ratingDistribution || [];
-  const maxReviewCount = Math.max(...ratingDistribution.map((r: any) => r.count || 0), 1);
+  
+  // Convert ratingDistribution from object {"1": 20, "2": 17, ...} to array format
+  const rawDistribution = reviewSummary?.ratingDistribution || {};
+  const ratingDistribution = Object.entries(rawDistribution)
+    .map(([stars, count]) => ({ stars: parseInt(stars), count: count as number }))
+    .sort((a, b) => b.stars - a.stars); // Sort from 5 to 1
+  
+  const maxReviewCount = Math.max(...ratingDistribution.map((r) => r.count || 0), 1);
 
   const renderSortableTh = (label: string, columnKey: SortKey) => (
     <th
@@ -171,6 +280,34 @@ export default function ReviewsPage() {
       </button>
     </th>
   );
+
+  const renderReviewSortableTh = (label: string, columnKey: ReviewSortKey) => (
+    <th
+      className="text-left p-4 text-sm font-semibold text-foreground"
+      aria-sort={
+        reviewSortKey === columnKey ? (reviewSortDir === 'asc' ? 'ascending' : 'descending') : 'none'
+      }
+    >
+      <button
+        type="button"
+        onClick={() => handleReviewSort(columnKey)}
+        className={`inline-flex items-center gap-2 transition-colors ${
+          reviewSortKey === columnKey ? 'text-flame-orange' : 'hover:text-flame-orange'
+        }`}
+      >
+        <span>{label}</span>
+        <ArrowUpDown className="h-4 w-4 opacity-70" />
+      </button>
+    </th>
+  );
+
+  const formatDate = (dateString: string) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  };
 
 
   return (
@@ -361,13 +498,21 @@ export default function ReviewsPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+                            <button 
+                              className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                              onClick={() => handleEditProduct(product)}
+                              title="Edit product"
+                            >
                               <Edit className="h-4 w-4 text-muted-foreground" />
                             </button>
                             <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </button>
-                            <button className="p-2 hover:bg-destructive/10 rounded-lg transition-colors">
+                            <button 
+                              className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                              onClick={() => handleDeleteProduct(product)}
+                              title="Delete product"
+                            >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </button>
                           </div>
@@ -387,6 +532,141 @@ export default function ReviewsPage() {
           </div>
         </div>
       </div>
+
+      {/* Individual Reviews Table */}
+      <div className="space-y-4">
+        <div className="flex items-center gap-2">
+          <MessageSquare className="h-6 w-6 text-flame-orange" />
+          <h2 className="text-2xl font-display font-bold text-foreground">All Reviews</h2>
+        </div>
+        
+        {/* Search Bar for Reviews */}
+        <div className="relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search reviews by customer, product, or comment..."
+            value={reviewSearchQuery}
+            onChange={(e) => setReviewSearchQuery(e.target.value)}
+            className="pl-10 bg-secondary/50 border-border"
+          />
+        </div>
+
+        {/* Reviews Table */}
+        <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full">
+              <thead>
+                <tr className="border-b border-border/50">
+                  {renderReviewSortableTh('Customer', 'customerName')}
+                  {renderReviewSortableTh('Product', 'productName')}
+                  {renderReviewSortableTh('Rating', 'rating')}
+                  <th className="text-left p-4 text-sm font-semibold text-foreground">Comment</th>
+                  {renderReviewSortableTh('Date', 'createdAt')}
+                  <th className="text-left p-4 text-sm font-semibold text-foreground">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredAndSortedReviews.length > 0 ? (
+                  filteredAndSortedReviews.map((review) => {
+                    const reviewId = review._id || review.id || '';
+                    return (
+                      <tr key={reviewId} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                        <td className="p-4">
+                          <p className="text-sm font-medium text-foreground">{review.customerName}</p>
+                        </td>
+                        <td className="p-4">
+                          <p className="text-sm text-foreground">{review.productName || '-'}</p>
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-1">
+                            {[1, 2, 3, 4, 5].map((star) => (
+                              <Star
+                                key={star}
+                                className={`h-4 w-4 ${
+                                  star <= (review.rating || 0)
+                                    ? "text-yellow-400 fill-yellow-400"
+                                    : "text-muted-foreground"
+                                }`}
+                              />
+                            ))}
+                            <span className="ml-2 text-sm text-muted-foreground">
+                              ({review.rating})
+                            </span>
+                          </div>
+                        </td>
+                        <td className="p-4">
+                          <p className="text-sm text-muted-foreground line-clamp-2 max-w-xs">
+                            {review.comment || '-'}
+                          </p>
+                        </td>
+                        <td className="p-4 text-sm text-foreground">
+                          {review.createdAt ? formatDate(review.createdAt) : '-'}
+                        </td>
+                        <td className="p-4">
+                          <div className="flex items-center gap-2">
+                            <button 
+                              className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                              onClick={() => handleEditReview(review)}
+                              title="Edit review"
+                            >
+                              <Edit className="h-4 w-4 text-muted-foreground" />
+                            </button>
+                            <button 
+                              className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                              onClick={() => handleDeleteReview(review)}
+                              title="Delete review"
+                            >
+                              <Trash2 className="h-4 w-4 text-destructive" />
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                      No reviews found
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      {/* Edit Review Modal */}
+      <EditReviewModal
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        review={selectedReview}
+        onSuccess={fetchData}
+      />
+
+      {/* Delete Review Modal */}
+      <DeleteReviewModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        review={selectedReview}
+        onSuccess={fetchData}
+      />
+
+      {/* Edit Product Modal */}
+      <AddProductModal
+        product={selectedProduct}
+        open={editProductModalOpen}
+        onOpenChange={setEditProductModalOpen}
+        onSuccess={fetchData}
+      />
+
+      {/* Delete Product Modal */}
+      <DeleteProductModal
+        open={deleteProductModalOpen}
+        onOpenChange={setDeleteProductModalOpen}
+        product={selectedProduct}
+        onConfirm={fetchData}
+      />
     </div>
   );
 }

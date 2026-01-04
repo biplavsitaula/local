@@ -8,7 +8,7 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import {
   Search,
   Edit,
@@ -22,12 +22,16 @@ import {
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { topSellersService } from "@/services/top-sellers.service";
+import { AddProductModal } from "@/components/features/admin/products/AddProductModal";
+import { DeleteProductModal } from "@/components/features/admin/products/DeleteProductModal";
+import { Product as ProductType } from "@/types";
 
 type SortKey = "name" | "category" | "price" | "stock" | "rating" | "sales";
 type SortDir = "asc" | "desc";
 
 interface Product {
-  _id: string;
+  _id?: string;
+  id?: string;
   name: string;
   category: string;
   price: number;
@@ -47,27 +51,76 @@ export default function TopSellersPage() {
   const [insights, setInsights] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+
+  const fetchData = useCallback(async () => {
+    try {
+      setLoading(true);
+      const [productsRes, insightsRes] = await Promise.all([
+        topSellersService.getProducts(),
+        topSellersService.getInsights(),
+      ]);
+
+      setTopSellingProducts(productsRes.data || []);
+      setInsights(insightsRes.data || null);
+    } catch (err: any) {
+      setError(err.message || "Failed to load data");
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsRes, insightsRes] = await Promise.all([
-          topSellersService.getProducts(),
-          topSellersService.getInsights(),
-        ]);
+    fetchData();
+  }, [fetchData]);
 
-        setTopSellingProducts(productsRes.data || []);
-        setInsights(insightsRes.data || null);
-      } catch (err: any) {
-        setError(err.message || "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
+  // Listen for product changes
+  useEffect(() => {
+    const handleProductChanged = () => {
+      fetchData();
     };
 
-    fetchData();
-  }, []);
+    window.addEventListener('productChanged', handleProductChanged);
+    return () => {
+      window.removeEventListener('productChanged', handleProductChanged);
+    };
+  }, [fetchData]);
+
+  // Handle edit product
+  const handleEditProduct = (product: Product) => {
+    const productData: ProductType = {
+      id: product._id || product.id || '',
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.imageUrl || '',
+      description: '',
+    };
+    setSelectedProduct(productData);
+    setEditModalOpen(true);
+  };
+
+  // Handle delete product
+  const handleDeleteProduct = (product: Product) => {
+    const productData: ProductType = {
+      id: product._id || product.id || '',
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.imageUrl || '',
+      description: '',
+    };
+    setSelectedProduct(productData);
+    setDeleteModalOpen(true);
+  };
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -236,10 +289,26 @@ export default function TopSellersPage() {
                   <td className="p-4">
                     {(p.totalSold || 0).toLocaleString()}
                   </td>
-                  <td className="p-4 flex gap-2">
-                    <Edit size={16} />
-                    <Eye size={16} />
-                    <Trash2 size={16} />
+                  <td className="p-4">
+                    <div className="flex items-center gap-2">
+                      <button 
+                        className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                        onClick={() => handleEditProduct(p)}
+                        title="Edit product"
+                      >
+                        <Edit size={16} className="text-muted-foreground" />
+                      </button>
+                      <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+                        <Eye size={16} className="text-muted-foreground" />
+                      </button>
+                      <button 
+                        className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                        onClick={() => handleDeleteProduct(p)}
+                        title="Delete product"
+                      >
+                        <Trash2 size={16} className="text-destructive" />
+                      </button>
+                    </div>
                   </td>
                 </tr>
               );
@@ -247,6 +316,22 @@ export default function TopSellersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Edit Product Modal */}
+      <AddProductModal
+        product={selectedProduct}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={fetchData}
+      />
+
+      {/* Delete Product Modal */}
+      <DeleteProductModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        product={selectedProduct}
+        onConfirm={fetchData}
+      />
     </div>
   );
 }

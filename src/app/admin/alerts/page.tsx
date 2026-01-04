@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Edit, Eye, Trash2, AlertTriangle, Package, Loader2, AlertCircle, Plus } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -8,6 +8,9 @@ import { stockAlertsService, StockAlert } from '@/services/stock-alerts.service'
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
 import { toast } from 'sonner';
+import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
+import { DeleteProductModal } from '@/components/features/admin/products/DeleteProductModal';
+import { Product } from '@/types';
 
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
@@ -17,9 +20,11 @@ interface StockProductTableProps {
   title: string;
   searchPlaceholder?: string;
   onReorder?: (productId: string, quantity: number) => void;
+  onEdit?: (product: any) => void;
+  onDelete?: (product: any) => void;
 }
 
-function StockProductTable({ products, title, searchPlaceholder = "Search products by name or category...", onReorder }: StockProductTableProps) {
+function StockProductTable({ products, title, searchPlaceholder = "Search products by name or category...", onReorder, onEdit, onDelete }: StockProductTableProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -203,11 +208,22 @@ function StockProductTable({ products, title, searchPlaceholder = "Search produc
                               <Plus className="h-4 w-4 text-success" />
                             </button>
                           )}
-                          <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+                          <button 
+                            className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                            onClick={() => onEdit && onEdit(product)}
+                            title="Edit product"
+                          >
                             <Edit className="h-4 w-4 text-muted-foreground" />
                           </button>
                           <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
                             <Eye className="h-4 w-4 text-muted-foreground" />
+                          </button>
+                          <button 
+                            className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                            onClick={() => onDelete && onDelete(product)}
+                            title="Delete product"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
                           </button>
                         </div>
                       </td>
@@ -234,41 +250,84 @@ export default function AlertsPage() {
   const [lowStockProducts, setLowStockProducts] = useState<StockAlert[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const fetchAlerts = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const [outOfStockRes, lowStockRes] = await Promise.all([
+        stockAlertsService.getOutOfStock(),
+        stockAlertsService.getLowStock({ threshold: 10 }),
+      ]);
+
+      setOutOfStockProducts(outOfStockRes.data || []);
+      setLowStockProducts(lowStockRes.data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load stock alerts');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchAlerts = async () => {
-      try {
-        setLoading(true);
-        setError(null);
+    fetchAlerts();
+  }, [fetchAlerts]);
 
-        const [outOfStockRes, lowStockRes] = await Promise.all([
-          stockAlertsService.getOutOfStock(),
-          stockAlertsService.getLowStock({ threshold: 10 }),
-        ]);
-
-        setOutOfStockProducts(outOfStockRes.data || []);
-        setLowStockProducts(lowStockRes.data || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load stock alerts');
-      } finally {
-        setLoading(false);
-      }
+  // Listen for product changes
+  useEffect(() => {
+    const handleProductChanged = () => {
+      fetchAlerts();
     };
 
-    fetchAlerts();
-  }, []);
+    window.addEventListener('productChanged', handleProductChanged);
+    return () => {
+      window.removeEventListener('productChanged', handleProductChanged);
+    };
+  }, [fetchAlerts]);
+
+  // Handle edit product
+  const handleEditProduct = (product: any) => {
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setEditModalOpen(true);
+  };
+
+  // Handle delete product
+  const handleDeleteProduct = (product: any) => {
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setDeleteModalOpen(true);
+  };
 
   const handleReorder = async (productId: string, quantity: number) => {
     try {
       await stockAlertsService.reorder(productId, quantity);
       toast.success('Reorder request submitted successfully');
-      // Refresh alerts
-      const [outOfStockRes, lowStockRes] = await Promise.all([
-        stockAlertsService.getOutOfStock(),
-        stockAlertsService.getLowStock({ threshold: 10 }),
-      ]);
-      setOutOfStockProducts(outOfStockRes.data || []);
-      setLowStockProducts(lowStockRes.data || []);
+      fetchAlerts();
     } catch (err: any) {
       toast.error(err.message || 'Failed to submit reorder request');
     }
@@ -310,19 +369,36 @@ export default function AlertsPage() {
 
       {/* Out of Stock Products */}
       <StockProductTable
-        // products={outOfStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
-          products={outOfStockProducts.filter(p => p != null)}
-
+        products={outOfStockProducts.filter(p => p != null)}
         title="Out of Stock Products"
         onReorder={handleReorder}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
       />
 
       {/* Low Stock Products */}
       <StockProductTable
-        // products={lowStockProducts.map(alert => alert.product).filter(p => p !== null && p !== undefined)}
-        products={lowStockProducts.filter(p => p !=null)}
+        products={lowStockProducts.filter(p => p != null)}
         title="Low Stock Products"
         onReorder={handleReorder}
+        onEdit={handleEditProduct}
+        onDelete={handleDeleteProduct}
+      />
+
+      {/* Edit Product Modal */}
+      <AddProductModal
+        product={selectedProduct}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={fetchAlerts}
+      />
+
+      {/* Delete Product Modal */}
+      <DeleteProductModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        product={selectedProduct}
+        onConfirm={fetchAlerts}
       />
     </div>
   );

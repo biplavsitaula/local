@@ -1,13 +1,16 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Search, Edit, Eye, Trash2, Package, ThumbsUp, AlertTriangle, Star, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { productsService } from '@/services/products.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
+import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
+import { DeleteProductModal } from '@/components/features/admin/products/DeleteProductModal';
+import { Product } from '@/types';
 
-type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
+type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
 
 export default function RecommendedPage() {
@@ -17,23 +20,72 @@ export default function RecommendedPage() {
   const [recommendedProducts, setRecommendedProducts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Modal states
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  const fetchRecommended = useCallback(async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      const response = await productsService.getAll({ view: 'recommended', limit: 100 });
+      setRecommendedProducts(response.data || []);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load recommended products');
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    const fetchRecommended = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await productsService.getAll({ view: 'recommended', limit: 100 });
-        setRecommendedProducts(response.data || []);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load recommended products');
-      } finally {
-        setLoading(false);
-      }
+    fetchRecommended();
+  }, [fetchRecommended]);
+
+  // Listen for product changes
+  useEffect(() => {
+    const handleProductChanged = () => {
+      fetchRecommended();
     };
 
-    fetchRecommended();
-  }, []);
+    window.addEventListener('productChanged', handleProductChanged);
+    return () => {
+      window.removeEventListener('productChanged', handleProductChanged);
+    };
+  }, [fetchRecommended]);
+
+  // Handle edit product
+  const handleEditProduct = (product: any) => {
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setEditModalOpen(true);
+  };
+
+  // Handle delete product
+  const handleDeleteProduct = (product: any) => {
+    const productData: Product = {
+      id: product.id || product._id,
+      name: product.name,
+      category: product.category,
+      price: product.price || 0,
+      stock: product.stock || 0,
+      rating: product.rating,
+      image: product.image || product.imageUrl || '',
+      description: product.description || '',
+    };
+    setSelectedProduct(productData);
+    setDeleteModalOpen(true);
+  };
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -77,6 +129,9 @@ export default function RecommendedPage() {
           return dir * ((a.rating || 0) - (b.rating || 0));
         case 'sales':
           return dir * (((a as any).sales || 0) - ((b as any).sales || 0));
+        case 'status':
+          // Sort by stock level (status is derived from stock)
+          return dir * ((a.stock || 0) - (b.stock || 0));
         default:
           return 0;
       }
@@ -242,13 +297,21 @@ export default function RecommendedPage() {
                         </td>
                         <td className="p-4">
                           <div className="flex items-center gap-2">
-                            <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+                            <button 
+                              className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                              onClick={() => handleEditProduct(product)}
+                              title="Edit product"
+                            >
                               <Edit className="h-4 w-4 text-muted-foreground" />
                             </button>
                             <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
                               <Eye className="h-4 w-4 text-muted-foreground" />
                             </button>
-                            <button className="p-2 hover:bg-destructive/10 rounded-lg transition-colors">
+                            <button 
+                              className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                              onClick={() => handleDeleteProduct(product)}
+                              title="Delete product"
+                            >
                               <Trash2 className="h-4 w-4 text-destructive" />
                             </button>
                           </div>
@@ -319,6 +382,22 @@ export default function RecommendedPage() {
           </div>
         </div>
       </div>
+
+      {/* Edit Product Modal */}
+      <AddProductModal
+        product={selectedProduct}
+        open={editModalOpen}
+        onOpenChange={setEditModalOpen}
+        onSuccess={fetchRecommended}
+      />
+
+      {/* Delete Product Modal */}
+      <DeleteProductModal
+        open={deleteModalOpen}
+        onOpenChange={setDeleteModalOpen}
+        product={selectedProduct}
+        onConfirm={fetchRecommended}
+      />
     </div>
   );
 }

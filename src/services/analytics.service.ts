@@ -20,7 +20,8 @@ export interface ChartDataPoint {
 export interface SalesTrendData {
   month: string;
   revenue: number;
-  sales: number;
+  count: number;
+  sales?: number;
 }
 
 export const analyticsService = {
