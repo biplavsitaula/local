@@ -6,250 +6,387 @@
 
 
 
+
+
+
+
+
+
+
+
 "use client";
 
-import { useState, useEffect } from "react";
+
+import { useState, useEffect, useCallback } from "react";
 import {
-  Search,
-  Edit,
-  Eye,
-  Trash2,
-  Package,
-  Loader2,
-  AlertCircle,
-  ArrowUpDown,
+ Search,
+ Edit,
+ Eye,
+ Trash2,
+ Package,
+ Loader2,
+ AlertCircle,
+ ArrowUpDown,
 } from "lucide-react";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
 import { topSellersService } from "@/services/top-sellers.service";
+import { AddProductModal } from "@/components/features/admin/products/AddProductModal";
+import { DeleteProductModal } from "@/components/features/admin/products/DeleteProductModal";
+import { Product as ProductType } from "@/types";
+
 
 type SortKey = "name" | "category" | "price" | "stock" | "rating" | "sales";
 type SortDir = "asc" | "desc";
 
+
 interface Product {
-  _id: string;
-  name: string;
-  category: string;
-  price: number;
-  stock: number;
-  rating?: number;
-  imageUrl?: string;
-  totalSold?: number;
-  reviewCount?: number;
-  status?: string;
+ _id?: string;
+ id?: string;
+ name: string;
+ category: string;
+ price: number;
+ stock: number;
+ rating?: number;
+ imageUrl?: string;
+ totalSold?: number;
+ reviewCount?: number;
+ status?: string;
 }
+
 
 export default function TopSellersPage() {
-  const [searchQuery, setSearchQuery] = useState("");
-  const [sortKey, setSortKey] = useState<SortKey>("sales");
-  const [sortDir, setSortDir] = useState<SortDir>("desc");
-  const [topSellingProducts, setTopSellingProducts] = useState<Product[]>([]);
-  const [insights, setInsights] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+ const [searchQuery, setSearchQuery] = useState("");
+ const [sortKey, setSortKey] = useState<SortKey>("sales");
+ const [sortDir, setSortDir] = useState<SortDir>("desc");
+ const [topSellingProducts, setTopSellingProducts] = useState<Product[]>([]);
+ const [insights, setInsights] = useState<any>(null);
+ const [loading, setLoading] = useState(true);
+ const [error, setError] = useState<string | null>(null);
+  // Modal states
+ const [editModalOpen, setEditModalOpen] = useState(false);
+ const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+ const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        setLoading(true);
-        const [productsRes, insightsRes] = await Promise.all([
-          topSellersService.getProducts(),
-          topSellersService.getInsights(),
-        ]);
 
-        setTopSellingProducts(productsRes.data || []);
-        setInsights(insightsRes.data || null);
-      } catch (err: any) {
-        setError(err.message || "Failed to load data");
-      } finally {
-        setLoading(false);
-      }
-    };
+ const fetchData = useCallback(async () => {
+   try {
+     setLoading(true);
+     const [productsRes, insightsRes] = await Promise.all([
+       topSellersService.getProducts(),
+       topSellersService.getInsights(),
+     ]);
 
-    fetchData();
-  }, []);
 
-  const handleSort = (key: SortKey) => {
-    if (key === sortKey) {
-      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
-    } else {
-      setSortKey(key);
-      setSortDir("desc");
-    }
-  };
+     setTopSellingProducts(productsRes.data || []);
+     setInsights(insightsRes.data || null);
+   } catch (err: any) {
+     setError(err.message || "Failed to load data");
+   } finally {
+     setLoading(false);
+   }
+ }, []);
 
-  const top3Products = topSellingProducts.slice(0, 3);
 
-  const filteredAndSorted = topSellingProducts
-    .filter((p) => {
-      const q = searchQuery.toLowerCase();
-      return (
-        p.name.toLowerCase().includes(q) ||
-        p.category.toLowerCase().includes(q)
-      );
-    })
-    .sort((a, b) => {
-      const dir = sortDir === "asc" ? 1 : -1;
-      switch (sortKey) {
-        case "name":
-          return dir * a.name.localeCompare(b.name);
-        case "category":
-          return dir * a.category.localeCompare(b.category);
-        case "price":
-          return dir * (a.price - b.price);
-        case "stock":
-          return dir * (a.stock - b.stock);
-        case "rating":
-          return dir * ((a.rating || 0) - (b.rating || 0));
-        case "sales":
-          return dir * ((a.totalSold || 0) - (b.totalSold || 0));
-        default:
-          return 0;
-      }
-    });
+ useEffect(() => {
+   fetchData();
+ }, [fetchData]);
 
-  const getStatus = (p: Product) => {
-    if (p.stock === 0)
-      return { label: "Out of Stock", color: "text-destructive bg-destructive/20" };
-    if (p.stock <= 20)
-      return { label: "Low Stock", color: "text-warning bg-warning/20" };
-    return { label: "In Stock", color: "text-success bg-success/20" };
-  };
 
-  const trendingCategory =
-    insights?.trendingCategory?.category ||
-    insights?.trendingCategory ||
-    "N/A";
+ // Listen for product changes
+ useEffect(() => {
+   const handleProductChanged = () => {
+     fetchData();
+   };
 
-  const bestCategory = insights?.bestCategory?.category || "N/A";
 
-  const peakSalesDay = insights?.peakSalesDay?.day || "N/A";
+   window.addEventListener('productChanged', handleProductChanged);
+   return () => {
+     window.removeEventListener('productChanged', handleProductChanged);
+   };
+ }, [fetchData]);
 
-  if (loading) {
-    return (
-      <div className="flex justify-center py-20">
-        <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
-      </div>
-    );
-  }
 
-  if (error) {
-    return (
-      <div className="flex justify-center py-20 text-destructive">
-        <AlertCircle className="mr-2" /> {error}
-      </div>
-    );
-  }
+ // Handle edit product
+ const handleEditProduct = (product: Product) => {
+   const productData: ProductType = {
+     id: product._id || product.id || '',
+     name: product.name,
+     category: product.category,
+     price: product.price || 0,
+     stock: product.stock || 0,
+     rating: product.rating,
+     image: product.imageUrl || '',
+     description: '',
+   };
+   setSelectedProduct(productData);
+   setEditModalOpen(true);
+ };
 
-  return (
-    <div className="space-y-6">
-      <h1 className="text-3xl font-bold">Top Sellers</h1>
 
-      {/* TOP 3 CARDS */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 space-y-3">
-          {top3Products.map((p, i) => (
-            <div
-              key={p._id}
-              className="glass-card p-4 rounded-xl flex items-center gap-4"
-            >
-              <div className="text-2xl font-bold text-flame-orange">
-                {i + 1}
-              </div>
-              <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary/50">
-                {p.imageUrl ? (
-                  <Image src={p.imageUrl} alt={p.name} width={48} height={48} />
-                ) : (
-                  <Package />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="font-medium">{p.name}</p>
-                <p className="text-sm text-muted-foreground">{p.category}</p>
-              </div>
-              <p className="font-semibold">
-                {(p.totalSold || 0).toLocaleString()} sold
-              </p>
-            </div>
-          ))}
-        </div>
+ // Handle delete product
+ const handleDeleteProduct = (product: Product) => {
+   const productData: ProductType = {
+     id: product._id || product.id || '',
+     name: product.name,
+     category: product.category,
+     price: product.price || 0,
+     stock: product.stock || 0,
+     rating: product.rating,
+     image: product.imageUrl || '',
+     description: '',
+   };
+   setSelectedProduct(productData);
+   setDeleteModalOpen(true);
+ };
 
-        {/* INSIGHTS */}
-        <div className="glass-card p-6 rounded-xl">
-          <h3 className="font-semibold mb-4">Sales Insights</h3>
-          <p className="text-sm text-muted-foreground">Trending Category</p>
-          <p className="text-xl font-bold text-flame-orange capitalize">
-            {trendingCategory}
-          </p>
 
-          <p className="text-sm mt-3 text-muted-foreground">Best Category</p>
-          <p className="text-xl font-bold text-success capitalize">
-            {bestCategory}
-          </p>
+ const handleSort = (key: SortKey) => {
+   if (key === sortKey) {
+     setSortDir((d) => (d === "asc" ? "desc" : "asc"));
+   } else {
+     setSortKey(key);
+     setSortDir("desc");
+   }
+ };
 
-          <p className="text-sm mt-3 text-muted-foreground">Peak Sales Day</p>
-          <p className="text-xl font-bold">{peakSalesDay}</p>
-        </div>
-      </div>
 
-      {/* SEARCH */}
-      <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
-        <Input
-          className="pl-10"
-          placeholder="Search products..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-      </div>
+ const top3Products = topSellingProducts.slice(0, 3);
 
-      {/* TABLE */}
-      <div className="glass-card rounded-xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr>
-              {["Product", "Category", "Price", "Stock", "Status", "Rating", "Sales"].map(
-                (h) => (
-                  <th key={h} className="p-4 text-left">
-                    {h}
-                  </th>
-                )
-              )}
-              <th className="p-4">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredAndSorted.map((p) => {
-              const status = getStatus(p);
-              return (
-                <tr key={p._id} className="border-t">
-                  <td className="p-4">{p.name}</td>
-                  <td className="p-4">{p.category}</td>
-                  <td className="p-4">${p.price}</td>
-                  <td className="p-4">{p.stock}</td>
-                  <td className="p-4">
-                    <span className={`px-2 py-1 rounded ${status.color}`}>
-                      {status.label}
-                    </span>
-                  </td>
-                  <td className="p-4">{p.rating?.toFixed(1) || "-"}</td>
-                  <td className="p-4">
-                    {(p.totalSold || 0).toLocaleString()}
-                  </td>
-                  <td className="p-4 flex gap-2">
-                    <Edit size={16} />
-                    <Eye size={16} />
-                    <Trash2 size={16} />
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
+
+ const filteredAndSorted = topSellingProducts
+   .filter((p) => {
+     const q = searchQuery.toLowerCase();
+     return (
+       p.name.toLowerCase().includes(q) ||
+       p.category.toLowerCase().includes(q)
+     );
+   })
+   .sort((a, b) => {
+     const dir = sortDir === "asc" ? 1 : -1;
+     switch (sortKey) {
+       case "name":
+         return dir * a.name.localeCompare(b.name);
+       case "category":
+         return dir * a.category.localeCompare(b.category);
+       case "price":
+         return dir * (a.price - b.price);
+       case "stock":
+         return dir * (a.stock - b.stock);
+       case "rating":
+         return dir * ((a.rating || 0) - (b.rating || 0));
+       case "sales":
+         return dir * ((a.totalSold || 0) - (b.totalSold || 0));
+       default:
+         return 0;
+     }
+   });
+
+
+ const getStatus = (p: Product) => {
+   if (p.stock === 0)
+     return { label: "Out of Stock", color: "text-destructive bg-destructive/20" };
+   if (p.stock <= 20)
+     return { label: "Low Stock", color: "text-warning bg-warning/20" };
+   return { label: "In Stock", color: "text-success bg-success/20" };
+ };
+
+
+ const trendingCategory =
+   insights?.trendingCategory?.category ||
+   insights?.trendingCategory ||
+   "N/A";
+
+
+ const bestCategory = insights?.bestCategory?.category || "N/A";
+
+
+ const peakSalesDay = insights?.peakSalesDay?.day || "N/A";
+
+
+ if (loading) {
+   return (
+     <div className="flex justify-center py-20">
+       <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+     </div>
+   );
+ }
+
+
+ if (error) {
+   return (
+     <div className="flex justify-center py-20 text-destructive">
+       <AlertCircle className="mr-2" /> {error}
+     </div>
+   );
+ }
+
+
+ return (
+   <div className="space-y-6">
+     <h1 className="text-3xl font-bold">Top Sellers</h1>
+
+
+     {/* TOP 3 CARDS */}
+     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+       <div className="lg:col-span-2 space-y-3">
+         {top3Products.map((p, i) => (
+           <div
+             key={p._id}
+             className="glass-card p-4 rounded-xl flex items-center gap-4"
+           >
+             <div className="text-2xl font-bold text-flame-orange">
+               {i + 1}
+             </div>
+             <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary/50">
+               {p.imageUrl ? (
+                 <Image src={p.imageUrl} alt={p.name} width={48} height={48} />
+               ) : (
+                 <Package />
+               )}
+             </div>
+             <div className="flex-1">
+               <p className="font-medium">{p.name}</p>
+               <p className="text-sm text-muted-foreground">{p.category}</p>
+             </div>
+             <p className="font-semibold">
+               {(p.totalSold || 0).toLocaleString()} sold
+             </p>
+           </div>
+         ))}
+       </div>
+
+
+       {/* INSIGHTS */}
+       <div className="glass-card p-6 rounded-xl">
+         <h3 className="font-semibold mb-4">Sales Insights</h3>
+         <p className="text-sm text-muted-foreground">Trending Category</p>
+         <p className="text-xl font-bold text-flame-orange capitalize">
+           {trendingCategory}
+         </p>
+
+
+         <p className="text-sm mt-3 text-muted-foreground">Best Category</p>
+         <p className="text-xl font-bold text-success capitalize">
+           {bestCategory}
+         </p>
+
+
+         <p className="text-sm mt-3 text-muted-foreground">Peak Sales Day</p>
+         <p className="text-xl font-bold">{peakSalesDay}</p>
+       </div>
+     </div>
+
+
+     {/* SEARCH */}
+     <div className="relative">
+       <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" />
+       <Input
+         className="pl-10"
+         placeholder="Search products..."
+         value={searchQuery}
+         onChange={(e) => setSearchQuery(e.target.value)}
+       />
+     </div>
+
+
+     {/* TABLE */}
+     <div className="glass-card rounded-xl overflow-hidden">
+       <table className="w-full">
+         <thead>
+           <tr>
+             {["Product", "Category", "Price", "Stock", "Status", "Rating", "Sales"].map(
+               (h) => (
+                 <th key={h} className="p-4 text-left">
+                   {h}
+                 </th>
+               )
+             )}
+             <th className="p-4">Actions</th>
+           </tr>
+         </thead>
+         <tbody>
+           {filteredAndSorted.map((p) => {
+             const status = getStatus(p);
+             return (
+               <tr key={p._id} className="border-t">
+                 <td className="p-4">{p.name}</td>
+                 <td className="p-4">{p.category}</td>
+                 <td className="p-4">${p.price}</td>
+                 <td className="p-4">{p.stock}</td>
+                 <td className="p-4">
+                   <span className={`px-2 py-1 rounded ${status.color}`}>
+                     {status.label}
+                   </span>
+                 </td>
+                 <td className="p-4">{p.rating?.toFixed(1) || "-"}</td>
+                 <td className="p-4">
+                   {(p.totalSold || 0).toLocaleString()}
+                 </td>
+                 <td className="p-4">
+                   <div className="flex items-center gap-2">
+                     <button
+                       className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
+                       onClick={() => handleEditProduct(p)}
+                       title="Edit product"
+                     >
+                       <Edit size={16} className="text-muted-foreground" />
+                     </button>
+                     <button className="p-2 hover:bg-secondary/50 rounded-lg transition-colors">
+                       <Eye size={16} className="text-muted-foreground" />
+                     </button>
+                     <button
+                       className="p-2 hover:bg-destructive/10 rounded-lg transition-colors"
+                       onClick={() => handleDeleteProduct(p)}
+                       title="Delete product"
+                     >
+                       <Trash2 size={16} className="text-destructive" />
+                     </button>
+                   </div>
+                 </td>
+               </tr>
+             );
+           })}
+         </tbody>
+       </table>
+     </div>
+
+
+     {/* Edit Product Modal */}
+     <AddProductModal
+       product={selectedProduct}
+       open={editModalOpen}
+       onOpenChange={setEditModalOpen}
+       onSuccess={fetchData}
+     />
+
+
+     {/* Delete Product Modal */}
+     <DeleteProductModal
+       open={deleteModalOpen}
+       onOpenChange={setDeleteModalOpen}
+       product={selectedProduct}
+       onConfirm={fetchData}
+     />
+   </div>
+ );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -268,6 +405,7 @@ export default function TopSellersPage() {
 
 // "use client";
 
+
 // import { useState, useEffect } from 'react';
 // import { Search, Edit, Eye, Trash2, Package, TrendingUp, Loader2, AlertCircle } from 'lucide-react';
 // import { Input } from '@/components/ui/input';
@@ -275,8 +413,10 @@ export default function TopSellersPage() {
 // import { ArrowUpDown } from 'lucide-react';
 // import Image from 'next/image';
 
+
 // type SortKey = 'name' | 'category' | 'price' | 'stock' | 'rating' | 'sales';
 // type SortDir = 'asc' | 'desc';
+
 
 // export default function TopSellersPage() {
 //   const [searchQuery, setSearchQuery] = useState('');
@@ -287,16 +427,19 @@ export default function TopSellersPage() {
 //   const [loading, setLoading] = useState(true);
 //   const [error, setError] = useState<string | null>(null);
 
+
 //   useEffect(() => {
 //     const fetchTopSellers = async () => {
 //       try {
 //         setLoading(true);
 //         setError(null);
 
+
 //         const [productsRes, insightsRes] = await Promise.all([
 //           topSellersService.getProducts(),
 //           topSellersService.getInsights(),
 //         ]);
+
 
 //         setTopSellingProducts(productsRes.data || []);
 //         setInsights(insightsRes.data || {});
@@ -307,8 +450,10 @@ export default function TopSellersPage() {
 //       }
 //     };
 
+
 //     fetchTopSellers();
 //   }, []);
+
 
 //   const handleSort = (key: SortKey) => {
 //     if (key === sortKey) {
@@ -319,8 +464,10 @@ export default function TopSellersPage() {
 //     setSortDir('desc');
 //   };
 
+
 //   // Get top 3 for cards
 //   const top3Products = topSellingProducts.slice(0, 3);
+
 
 //   // Filter and sort for table
 //   const filteredAndSorted = topSellingProducts
@@ -351,6 +498,7 @@ export default function TopSellersPage() {
 //       }
 //     });
 
+
 //   const getStock = (p: any) => p.stock ?? 0;
 //   const getStatus = (p: any) => {
 //     const stock = getStock(p);
@@ -358,6 +506,7 @@ export default function TopSellersPage() {
 //     if (stock <= 20) return { label: 'Low Stock', variant: 'warning' };
 //     return { label: 'In Stock', variant: 'success' };
 //   };
+
 
 //   const renderSortableTh = (label: string, columnKey: SortKey) => (
 //     <th
@@ -379,6 +528,7 @@ export default function TopSellersPage() {
 //     </th>
 //   );
 
+
 //   // Calculate peak sales day from insights
 //   const peakSalesDay = insights ? {
 //     day: insights.peakSalesDay || 'Saturday',
@@ -390,9 +540,11 @@ export default function TopSellersPage() {
 //     unitsSold: 567
 //   };
 
+
 //   // Get insights data
 //   const trendingCategory = insights?.trendingCategory || 'N/A';
 //   const bestCategory = insights?.bestCategory || 'N/A';
+
 
 //   if (loading) {
 //     return (
@@ -404,6 +556,7 @@ export default function TopSellersPage() {
 //       </div>
 //     );
 //   }
+
 
 //   if (error) {
 //     return (
@@ -419,6 +572,7 @@ export default function TopSellersPage() {
 //     );
 //   }
 
+
 //   return (
 //     <div className="space-y-6">
 //       {/* Header */}
@@ -426,6 +580,7 @@ export default function TopSellersPage() {
 //         <h1 className="text-3xl font-display font-bold text-foreground">Top Sellers</h1>
 //         <p className="text-muted-foreground mt-1">View your best performing products.</p>
 //       </div>
+
 
 //       {/* Top Section: Cards and Insights */}
 //       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -436,7 +591,7 @@ export default function TopSellersPage() {
 //             {top3Products.map((product, index) => {
 //               const rank = index + 1; // Starting from 1
 //               const sales = (product as any).sales || 0;
-              
+            
 //               return (
 //                 <div
 //                   key={product.id || product._id || `top-product-${index}`}
@@ -469,6 +624,7 @@ export default function TopSellersPage() {
 //           </div>
 //         </div>
 
+
 //         {/* Sales Insights Card */}
 //         <div className="glass-card rounded-xl p-6 border border-border/50">
 //           <h3 className="text-lg font-semibold text-foreground mb-4">Sales Insights</h3>
@@ -489,10 +645,11 @@ export default function TopSellersPage() {
 //         </div>
 //       </div>
 
+
 //       {/* Top Selling Products Table */}
 //       <div className="space-y-4">
 //         <h2 className="text-2xl font-display font-bold text-foreground">Top Selling Products</h2>
-        
+      
 //         {/* Search Bar */}
 //         <div className="relative">
 //           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
@@ -503,6 +660,7 @@ export default function TopSellersPage() {
 //             className="pl-10 bg-secondary/50 border-border"
 //           />
 //         </div>
+
 
 //         {/* Table */}
 //         <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
@@ -527,7 +685,7 @@ export default function TopSellersPage() {
 //                     const stock = getStock(product);
 //                     const reviews = Math.floor(Math.random() * 500) + 100; // Mock reviews count
 //                     const sales = (product as any).sales || 0;
-                    
+                  
 //                     return (
 //                       <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
 //                         <td className="p-4">
@@ -609,3 +767,6 @@ export default function TopSellersPage() {
 //     </div>
 //   );
 // }
+
+
+
