@@ -73,7 +73,8 @@ export function AddProductModal({
     if (product && open) {
       setFormData({
         name: product.name || "",
-        category: product.category || "",
+        // category: product.category || "",
+        category: product.category?.toLowerCase() || "",
         price: product.price?.toString() || "",
         stock: (product.stock ?? 0).toString(),
         imageUrl: product.image || "",

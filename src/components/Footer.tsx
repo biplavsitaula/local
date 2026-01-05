@@ -5,6 +5,7 @@ import { Flame, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import Image from 'next/image';
 
 const Footer: React.FC = () => {
   const { t, language } = useLanguage();
@@ -20,9 +21,26 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-            <div className="flex items-center gap-2">
+          <div className="w-[60px] h-[50px] flex items-center">
+            <Image
+              src="/assets/logo.jpeg"
+              alt="Flame logo"
+              width={60}
+              height={50}
+              className="object-contain"
+              priority
+            />
+          </div>
+
+            {/* <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center">
-                <Flame className="w-6 h-6 text-primary-foreground" />
+                <Image
+                  src="/assets/flamelogo.png"
+                  alt="Flame logo"
+                  width={24}
+                  height={24}
+                  className="w-6 h-6 object-contain"
+                />
               </div>
               <span className={`text-xl font-display font-bold ${
                 theme === 'dark'
@@ -31,7 +49,7 @@ const Footer: React.FC = () => {
               }`}>
                 Flame Beverage
               </span>
-            </div>
+            </div> */}
             <p className={`text-sm ${
               theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
             }`}>
