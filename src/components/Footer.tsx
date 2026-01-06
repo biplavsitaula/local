@@ -21,16 +21,19 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Brand */}
           <div className="space-y-4">
-          <div className="w-[60px] h-[50px] flex items-center">
-            <Image
-              src="/assets/logo.jpeg"
-              alt="Flame logo"
-              width={60}
-              height={50}
-              className="object-contain"
-              priority
-            />
+        <div className={`flex items-center gap-3 p-2 rounded-lg ${
+            theme === 'dark' ? 'bg-black' : 'bg-gray-100'
+          }`}>
+              <Image
+                src="/assets/newlogo.png"
+                alt="Flame Beverage logo"
+                width={180}
+                height={48}
+                className="object-contain h-12 w-auto"
+                priority
+              />
           </div>
+
 
             {/* <div className="flex items-center gap-2">
               <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center">
