@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { SeasonalTheme, SeasonalThemeData } from '@/types/seasonal';
+import { seasonalThemesService } from '@/services/seasonal-themes.service';
 
 // Default theme configurations
 const themeConfigs: Record<SeasonalTheme, SeasonalThemeData> = {
@@ -69,51 +70,50 @@ const themeConfigs: Record<SeasonalTheme, SeasonalThemeData> = {
 };
 
 /**
- * Expected API Response Format:
- * {
- *   "keyname": "christmas" | "thanksgiving" | "newyear" | "default"
- * }
- * 
- * The API endpoint can be configured via:
- * 1. Environment variable: NEXT_PUBLIC_SEASONAL_THEME_API
- * 2. Pass directly to hook: useSeasonalTheme('https://your-api.com/theme')
- * 3. Default: '/api/seasonal-theme'
+ * Hook to fetch and use seasonal theme from API
+ * Falls back to default theme if API is unavailable
  */
-interface SeasonalThemeApiResponse {
-  keyname: SeasonalTheme;
-  [key: string]: any; // Allow additional fields from API
-}
-
-export function useSeasonalTheme(apiEndpoint?: string) {
+export function useSeasonalTheme() {
   const [theme, setTheme] = useState<SeasonalThemeData>(themeConfigs.default);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchTheme = async () => {
       try {
-        // Use provided API endpoint or default to environment variable or mock
-        const endpoint = apiEndpoint || process.env.NEXT_PUBLIC_SEASONAL_THEME_API || '/api/seasonal-theme';
+        setLoading(true);
+        const response = await seasonalThemesService.getCurrent();
         
-        let keyname: SeasonalTheme = 'default';
-        
-        try {
-          const response = await fetch(endpoint);
-          if (response.ok) {
-            const data: SeasonalThemeApiResponse = await response.json();
-            keyname = (data.keyname || 'default') as SeasonalTheme;
+        if (response.success && response.data) {
+          const apiData = response.data;
+          const keyname = (apiData.keyname || 'default') as SeasonalTheme;
+          
+          // If API returns full theme data, use it; otherwise use keyname to get from configs
+          if (apiData.title && apiData.description) {
+            // API returned full theme data
+            setTheme({
+              keyname,
+              title: apiData.title,
+              subtitle: apiData.subtitle || 'Seasonal spotlight',
+              description: apiData.description,
+              tags: apiData.tags || [],
+              ctaText: apiData.ctaText || 'Explore collection',
+              category: apiData.category,
+              colors: apiData.colors || themeConfigs[keyname]?.colors || themeConfigs.default.colors,
+              gradient: apiData.gradient || themeConfigs[keyname]?.gradient || themeConfigs.default.gradient,
+              emoji: apiData.emoji,
+            });
           } else {
-            console.warn('Failed to fetch seasonal theme, using default');
+            // API only returned keyname, use config
+            const selectedTheme = themeConfigs[keyname] || themeConfigs.default;
+            setTheme(selectedTheme);
           }
-        } catch (fetchError) {
-          // If API call fails, fall back to default theme
-          console.warn('Error fetching seasonal theme from API, using default:', fetchError);
+        } else {
+          // Fallback to default
+          setTheme(themeConfigs.default);
         }
-        
-        // Validate keyname and get theme config
-        const selectedTheme = themeConfigs[keyname] || themeConfigs.default;
-        setTheme(selectedTheme);
       } catch (error) {
-        console.error('Error setting seasonal theme:', error);
+        console.error('Error fetching seasonal theme:', error);
+        // Fallback to default theme on error
         setTheme(themeConfigs.default);
       } finally {
         setLoading(false);
@@ -121,7 +121,7 @@ export function useSeasonalTheme(apiEndpoint?: string) {
     };
 
     fetchTheme();
-  }, [apiEndpoint]);
+  }, []);
 
   return { theme, loading };
 }

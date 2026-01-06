@@ -1,13 +1,17 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Save } from 'lucide-react';
+import { Save, Loader2 } from 'lucide-react';
+import { settingsService } from '@/services/settings.service';
+import { toast } from 'sonner';
 
 export default function SettingsPage() {
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [notifications, setNotifications] = useState({
     lowStockAlerts: true,
     outOfStockAlerts: true,
@@ -20,15 +24,101 @@ export default function SettingsPage() {
   });
 
   const [storeInfo, setStoreInfo] = useState({
-    storeName: 'LiquorHub Premium Spirits',
-    contactEmail: 'admin@liquorhub.com',
+    storeName: 'Flame Beverage',
+    contactEmail: 'admin@flamebeverage.com',
   });
 
-  const handleSave = () => {
-    // Here you would typically save to backend/localStorage
-    console.log('Saving settings:', { notifications, stockThresholds, storeInfo });
-    // You could add a toast notification here
+  // Fetch settings on mount
+  useEffect(() => {
+    const fetchSettings = async () => {
+      try {
+        setLoading(true);
+        const response = await settingsService.get();
+        
+        if (response.success && response.data) {
+          const settings = response.data;
+          
+          // Update notifications
+          if (settings.notifications) {
+            setNotifications({
+              lowStockAlerts: settings.notifications.lowStockAlerts ?? true,
+              outOfStockAlerts: settings.notifications.outOfStockAlerts ?? true,
+              newReviewNotifications: settings.notifications.newReviewNotifications ?? false,
+            });
+          }
+          
+          // Update stock thresholds
+          if (settings.stockThresholds) {
+            setStockThresholds({
+              lowStock: String(settings.stockThresholds.lowStock ?? 10),
+              criticalStock: String(settings.stockThresholds.criticalStock ?? 5),
+            });
+          }
+          
+          // Update store info
+          if (settings.storeInfo) {
+            setStoreInfo({
+              storeName: settings.storeInfo.storeName || 'Flame Beverage',
+              contactEmail: settings.storeInfo.contactEmail || 'admin@flamebeverage.com',
+            });
+          }
+        }
+      } catch (error: any) {
+        console.error('Error fetching settings:', error);
+        toast.error('Failed to load settings. Using default values.');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchSettings();
+  }, []);
+
+  const handleSave = async () => {
+    try {
+      setSaving(true);
+      
+      const settingsData = {
+        notifications: {
+          lowStockAlerts: notifications.lowStockAlerts,
+          outOfStockAlerts: notifications.outOfStockAlerts,
+          newReviewNotifications: notifications.newReviewNotifications,
+        },
+        stockThresholds: {
+          lowStock: parseInt(stockThresholds.lowStock, 10),
+          criticalStock: parseInt(stockThresholds.criticalStock, 10),
+        },
+        storeInfo: {
+          storeName: storeInfo.storeName,
+          contactEmail: storeInfo.contactEmail,
+        },
+      };
+
+      const response = await settingsService.update(settingsData);
+      
+      if (response.success) {
+        toast.success('Settings saved successfully!');
+      } else {
+        toast.error(response.message || 'Failed to save settings');
+      }
+    } catch (error: any) {
+      console.error('Error saving settings:', error);
+      toast.error(error.message || 'Failed to save settings. Please try again.');
+    } finally {
+      setSaving(false);
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="flex flex-col items-center gap-4">
+          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
+          <p className="text-muted-foreground">Loading settings...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -189,10 +279,20 @@ export default function SettingsPage() {
       <div className="flex justify-end">
         <Button
           onClick={handleSave}
-          className="bg-flame-gradient text-primary-foreground hover:opacity-90"
+          disabled={saving}
+          className="bg-flame-gradient text-primary-foreground hover:opacity-90 disabled:opacity-50"
         >
-          <Save className="h-4 w-4 mr-2" />
-          Save Changes
+          {saving ? (
+            <>
+              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+              Saving...
+            </>
+          ) : (
+            <>
+              <Save className="h-4 w-4 mr-2" />
+              Save Changes
+            </>
+          )}
         </Button>
       </div>
     </div>
