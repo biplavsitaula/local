@@ -2,10 +2,12 @@
 
 
 import { useState, useEffect, useCallback } from 'react';
-import { Bell, CreditCard, ShoppingCart, AlertTriangle, Shield, Info, Check, Loader2, AlertCircle, Trash2, Settings } from 'lucide-react';
+import { Bell, CreditCard, ShoppingCart, AlertTriangle, Shield, Info, Check, Loader2, AlertCircle, Trash2, Settings, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { notificationsService, Notification } from '@/services/notifications.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -50,6 +52,12 @@ export default function NotificationsPage() {
  const [selectedType, setSelectedType] = useState<FilterType>('all');
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
+ const [showFilters, setShowFilters] = useState(false);
+ const [filters, setFilters] = useState({
+   readStatus: '',
+   dateRange: '',
+   search: '',
+ });
 
 
  const fetchNotifications = useCallback(async () => {
@@ -149,6 +157,59 @@ export default function NotificationsPage() {
    return notifications.filter((n) => config.apiTypes.includes(n.type));
  };
 
+ // Apply additional filters
+ const applyFilters = (notificationsList: Notification[]): Notification[] => {
+   let filtered = [...notificationsList];
+
+   // Read status filter
+   if (filters.readStatus) {
+     if (filters.readStatus === 'read') {
+       filtered = filtered.filter(n => n.isRead);
+     } else if (filters.readStatus === 'unread') {
+       filtered = filtered.filter(n => !n.isRead);
+     }
+   }
+
+   // Search filter
+   if (filters.search) {
+     const query = filters.search.toLowerCase();
+     filtered = filtered.filter(n => 
+       (n.title || '').toLowerCase().includes(query) ||
+       (n.message || '').toLowerCase().includes(query) ||
+       (n.type || '').toLowerCase().includes(query)
+     );
+   }
+
+   // Date range filter (last 7 days, 30 days, etc.)
+   if (filters.dateRange) {
+     const now = new Date();
+     let cutoffDate = new Date();
+     if (filters.dateRange === '7d') {
+       cutoffDate.setDate(now.getDate() - 7);
+     } else if (filters.dateRange === '30d') {
+       cutoffDate.setDate(now.getDate() - 30);
+     } else if (filters.dateRange === '90d') {
+       cutoffDate.setDate(now.getDate() - 90);
+     }
+     filtered = filtered.filter(n => {
+       const notificationDate = new Date(n.createdAt);
+       return notificationDate >= cutoffDate;
+     });
+   }
+
+   return filtered;
+ };
+
+ const clearFilters = () => {
+   setFilters({
+     readStatus: '',
+     dateRange: '',
+     search: '',
+   });
+ };
+
+ const hasActiveFilters = filters.readStatus || filters.dateRange || filters.search;
+
 
  // Count notifications by type
  const getTypeCount = (type: FilterType): number => {
@@ -181,7 +242,7 @@ export default function NotificationsPage() {
  };
 
 
- const filteredNotifications = filterByType(selectedType);
+ const filteredNotifications = applyFilters(filterByType(selectedType));
 
 
  if (loading) {
@@ -223,17 +284,109 @@ export default function NotificationsPage() {
            Manage and view all your notifications ({notifications.length} total, {unreadCount} unread)
          </p>
        </div>
-       {unreadCount > 0 && (
+       <div className="flex items-center gap-2">
+         {unreadCount > 0 && (
+           <Button
+             variant="outline"
+             onClick={handleMarkAllAsRead}
+             className="gap-2 border-flame-orange/50 text-flame-orange hover:bg-flame-orange/10"
+           >
+             <Check className="h-4 w-4" />
+             Mark all read ({unreadCount})
+           </Button>
+         )}
          <Button
+           onClick={() => setShowFilters(!showFilters)}
            variant="outline"
-           onClick={handleMarkAllAsRead}
-           className="gap-2 border-flame-orange/50 text-flame-orange hover:bg-flame-orange/10"
+           className="gap-2 border-border"
          >
-           <Check className="h-4 w-4" />
-           Mark all read ({unreadCount})
+           <Filter className="h-4 w-4" />
+           Filters
+           {hasActiveFilters && (
+             <span className="ml-1 h-2 w-2 bg-flame-orange rounded-full" />
+           )}
          </Button>
-       )}
+       </div>
      </div>
+
+     {/* Filter Panel */}
+     {showFilters && (
+       <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4 opacity-0 animate-fade-in" style={{ animationDelay: '50ms' }}>
+         <div className="flex items-center justify-between mb-2">
+           <h3 className="text-sm font-semibold text-foreground">Filter Notifications</h3>
+           <div className="flex items-center gap-2">
+             {hasActiveFilters && (
+               <Button
+                 onClick={clearFilters}
+                 variant="ghost"
+                 size="sm"
+                 className="text-xs h-7"
+               >
+                 Clear All
+               </Button>
+             )}
+             <Button
+               onClick={() => setShowFilters(false)}
+               variant="ghost"
+               size="sm"
+               className="h-7 w-7 p-0"
+             >
+               <X className="h-4 w-4" />
+             </Button>
+           </div>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+           {/* Read Status Filter */}
+           <div className="space-y-2">
+             <label className="text-xs font-medium text-foreground">Read Status</label>
+             <Select
+               value={filters.readStatus || 'all'}
+               onValueChange={(value) => setFilters({ ...filters, readStatus: value === 'all' ? '' : value })}
+             >
+               <SelectTrigger className="bg-secondary/50 border-border">
+                 <SelectValue placeholder="All notifications" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="all">All notifications</SelectItem>
+                 <SelectItem value="unread">Unread only</SelectItem>
+                 <SelectItem value="read">Read only</SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
+
+           {/* Date Range Filter */}
+           <div className="space-y-2">
+             <label className="text-xs font-medium text-foreground">Date Range</label>
+             <Select
+               value={filters.dateRange || 'all'}
+               onValueChange={(value) => setFilters({ ...filters, dateRange: value === 'all' ? '' : value })}
+             >
+               <SelectTrigger className="bg-secondary/50 border-border">
+                 <SelectValue placeholder="All time" />
+               </SelectTrigger>
+               <SelectContent>
+                 <SelectItem value="all">All time</SelectItem>
+                 <SelectItem value="7d">Last 7 days</SelectItem>
+                 <SelectItem value="30d">Last 30 days</SelectItem>
+                 <SelectItem value="90d">Last 90 days</SelectItem>
+               </SelectContent>
+             </Select>
+           </div>
+
+           {/* Search Filter */}
+           <div className="space-y-2">
+             <label className="text-xs font-medium text-foreground">Search</label>
+             <Input
+               placeholder="Search notifications..."
+               value={filters.search}
+               onChange={(e) => setFilters({ ...filters, search: e.target.value })}
+               className="bg-secondary/50 border-border"
+             />
+           </div>
+         </div>
+       </div>
+     )}
 
 
      <div className="glass-card rounded-xl border border-border/50 overflow-hidden opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>

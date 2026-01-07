@@ -1,9 +1,11 @@
 "use client";
 
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Edit, Eye, Trash2, Package, ThumbsUp, AlertTriangle, Star, Loader2, AlertCircle } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Search, Edit, Eye, Trash2, Package, ThumbsUp, AlertTriangle, Star, Loader2, AlertCircle, Filter, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { productsService } from '@/services/products.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
@@ -27,6 +29,14 @@ export default function RecommendedPage() {
  const [editModalOpen, setEditModalOpen] = useState(false);
  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+ const [showFilters, setShowFilters] = useState(false);
+ const [filters, setFilters] = useState({
+   category: '',
+   stockStatus: '',
+   minPrice: '',
+   maxPrice: '',
+   minRating: '',
+ });
 
 
  const fetchRecommended = useCallback(async () => {
@@ -116,14 +126,52 @@ export default function RecommendedPage() {
    .slice(0, 4);
 
 
+ // Get unique categories
+ const categories = useMemo(() => {
+   const cats = new Set<string>();
+   recommendedProducts.forEach(p => {
+     if (p.category) cats.add(p.category);
+   });
+   return Array.from(cats).sort();
+ }, [recommendedProducts]);
+
  // Filter and sort for table
  const filteredAndSorted = recommendedProducts
    .filter((p) => {
      const query = searchQuery.toLowerCase();
-     return (
+     const matchesSearch = (
        (p.name || '').toLowerCase().includes(query) ||
        (p.category || '').toLowerCase().includes(query)
      );
+
+     // Apply additional filters
+     if (filters.category && p.category?.toLowerCase() !== filters.category.toLowerCase()) {
+       return false;
+     }
+
+     if (filters.stockStatus) {
+       const stock = p.stock || 0;
+       if (filters.stockStatus === 'in-stock' && stock <= 20) return false;
+       if (filters.stockStatus === 'low-stock' && (stock === 0 || stock > 20)) return false;
+       if (filters.stockStatus === 'out-of-stock' && stock > 0) return false;
+     }
+
+     if (filters.minPrice) {
+       const min = parseFloat(filters.minPrice);
+       if (!isNaN(min) && (p.price || 0) < min) return false;
+     }
+
+     if (filters.maxPrice) {
+       const max = parseFloat(filters.maxPrice);
+       if (!isNaN(max) && (p.price || 0) > max) return false;
+     }
+
+     if (filters.minRating) {
+       const min = parseFloat(filters.minRating);
+       if (!isNaN(min) && (p.rating || 0) < min) return false;
+     }
+
+     return matchesSearch;
    })
    .sort((a, b) => {
      const dir = sortDir === 'asc' ? 1 : -1;
@@ -156,6 +204,18 @@ export default function RecommendedPage() {
    if (stock <= 10) return { label: 'Low Stock', variant: 'warning' };
    return { label: 'In Stock', variant: 'success' };
  };
+
+ const clearFilters = () => {
+   setFilters({
+     category: '',
+     stockStatus: '',
+     minPrice: '',
+     maxPrice: '',
+     minRating: '',
+   });
+ };
+
+ const hasActiveFilters = filters.category || filters.stockStatus || filters.minPrice || filters.maxPrice || filters.minRating;
 
 
  const renderSortableTh = (label: string, columnKey: SortKey) => (
@@ -220,15 +280,138 @@ export default function RecommendedPage() {
        </div>
 
 
-       {/* Search Bar */}
-       <div className="relative">
-         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-         <Input
-           placeholder="Search products by name or category..."
-           value={searchQuery}
-           onChange={(e) => setSearchQuery(e.target.value)}
-           className="pl-10 bg-secondary/50 border-border"
-         />
+       {/* Search and Filter Bar */}
+       <div className="space-y-4">
+         <div className="flex gap-4">
+           <div className="relative flex-1">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+             <Input
+               placeholder="Search products by name or category..."
+               value={searchQuery}
+               onChange={(e) => setSearchQuery(e.target.value)}
+               className="pl-10 bg-secondary/50 border-border"
+             />
+           </div>
+           <Button
+             onClick={() => setShowFilters(!showFilters)}
+             variant="outline"
+             className="gap-2 border-border"
+           >
+             <Filter className="h-4 w-4" />
+             Filters
+             {hasActiveFilters && (
+               <span className="ml-1 h-2 w-2 bg-flame-orange rounded-full" />
+             )}
+           </Button>
+         </div>
+
+         {/* Filter Panel */}
+         {showFilters && (
+           <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
+             <div className="flex items-center justify-between mb-2">
+               <h3 className="text-sm font-semibold text-foreground">Filter Products</h3>
+               <div className="flex items-center gap-2">
+                 {hasActiveFilters && (
+                   <Button
+                     onClick={clearFilters}
+                     variant="ghost"
+                     size="sm"
+                     className="text-xs h-7"
+                   >
+                     Clear All
+                   </Button>
+                 )}
+                 <Button
+                   onClick={() => setShowFilters(false)}
+                   variant="ghost"
+                   size="sm"
+                   className="h-7 w-7 p-0"
+                 >
+                   <X className="h-4 w-4" />
+                 </Button>
+               </div>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+               {/* Category Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Category</label>
+                 <Select
+                   value={filters.category || 'all'}
+                   onValueChange={(value) => setFilters({ ...filters, category: value === 'all' ? '' : value })}
+                 >
+                   <SelectTrigger className="bg-secondary/50 border-border">
+                     <SelectValue placeholder="All categories" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">All categories</SelectItem>
+                     {categories.map(cat => (
+                       <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               {/* Stock Status Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Stock Status</label>
+                 <Select
+                   value={filters.stockStatus || 'all'}
+                   onValueChange={(value) => setFilters({ ...filters, stockStatus: value === 'all' ? '' : value })}
+                 >
+                   <SelectTrigger className="bg-secondary/50 border-border">
+                     <SelectValue placeholder="All statuses" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">All statuses</SelectItem>
+                     <SelectItem value="in-stock">In Stock</SelectItem>
+                     <SelectItem value="low-stock">Low Stock</SelectItem>
+                     <SelectItem value="out-of-stock">Out of Stock</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               {/* Min Price Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Min Price</label>
+                 <Input
+                   type="number"
+                   placeholder="Min price..."
+                   value={filters.minPrice}
+                   onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
+                   className="bg-secondary/50 border-border"
+                 />
+               </div>
+
+               {/* Max Price Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Max Price</label>
+                 <Input
+                   type="number"
+                   placeholder="Max price..."
+                   value={filters.maxPrice}
+                   onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
+                   className="bg-secondary/50 border-border"
+                 />
+               </div>
+
+               {/* Min Rating Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Min Rating</label>
+                 <Input
+                   type="number"
+                   placeholder="Min rating..."
+                   value={filters.minRating}
+                   onChange={(e) => setFilters({ ...filters, minRating: e.target.value })}
+                   className="bg-secondary/50 border-border"
+                   min="0"
+                   max="5"
+                   step="0.1"
+                 />
+               </div>
+             </div>
+           </div>
+         )}
        </div>
 
 

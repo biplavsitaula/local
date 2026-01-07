@@ -1,8 +1,11 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, Loader2, AlertCircle } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Search, Loader2, AlertCircle, Filter, X } from "lucide-react";
 import { paymentsService, Payment as ApiPayment } from "@/services/payments.service";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type MethodFilter = "all" | "qr" | "cod";
 type SortKey = "billNumber" | "customerName" | "amount" | "method" | "status" | "createdAt";
@@ -59,6 +62,13 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
   const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: '',
+    dateRange: '',
+    minAmount: '',
+    maxAmount: '',
+  });
 
   const mapApiPaymentToPayment = (apiPayment: any): Payment => {
     // Handle API response structure - customer can be an object with fullName
@@ -127,6 +137,8 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
     const q = query.trim().toLowerCase();
 
     let list = payments;
+    
+    // Apply search query
     if (q) {
       list = list.filter(
         (p) =>
@@ -134,6 +146,42 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
           p.customerName.toLowerCase().includes(q) ||
           p.status.toLowerCase().includes(q)
       );
+    }
+
+    // Apply status filter
+    if (filters.status) {
+      list = list.filter(p => p.status.toLowerCase() === filters.status.toLowerCase());
+    }
+
+    // Apply amount range filter
+    if (filters.minAmount) {
+      const min = parseFloat(filters.minAmount);
+      if (!isNaN(min)) {
+        list = list.filter(p => p.amount >= min);
+      }
+    }
+    if (filters.maxAmount) {
+      const max = parseFloat(filters.maxAmount);
+      if (!isNaN(max)) {
+        list = list.filter(p => p.amount <= max);
+      }
+    }
+
+    // Apply date range filter
+    if (filters.dateRange) {
+      const now = new Date();
+      let cutoffDate = new Date();
+      if (filters.dateRange === '7d') {
+        cutoffDate.setDate(now.getDate() - 7);
+      } else if (filters.dateRange === '30d') {
+        cutoffDate.setDate(now.getDate() - 30);
+      } else if (filters.dateRange === '90d') {
+        cutoffDate.setDate(now.getDate() - 90);
+      }
+      list = list.filter(p => {
+        const paymentDate = new Date(p.createdAt);
+        return paymentDate >= cutoffDate;
+      });
     }
 
     const dir = sortDir === "asc" ? 1 : -1;
@@ -155,7 +203,18 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
           return 0;
       }
     });
-  }, [payments, query, sortDir, sortKey]);
+  }, [payments, query, sortDir, sortKey, filters]);
+
+  const clearFilters = () => {
+    setFilters({
+      status: '',
+      dateRange: '',
+      minAmount: '',
+      maxAmount: '',
+    });
+  };
+
+  const hasActiveFilters = filters.status || filters.dateRange || filters.minAmount || filters.maxAmount;
 
   const renderSortableTh = (label: string, columnKey: SortKey) => {
     const isActive = sortKey === columnKey;
@@ -209,17 +268,124 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
   // --------------------
   return (
     <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
-      {/* Search */}
-      <div className="p-4 border-b border-border/50">
-        <div className="relative max-w-md">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search payments..."
-            className="h-10 w-full rounded-md border border-border bg-secondary/30 px-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-          />
+      {/* Search and Filter Bar */}
+      <div className="p-4 border-b border-border/50 space-y-4">
+        <div className="flex gap-4">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Search payments..."
+              className="h-10 w-full rounded-md border border-border bg-secondary/30 px-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+            />
+          </div>
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
+            className="gap-2 border-border"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {hasActiveFilters && (
+              <span className="ml-1 h-2 w-2 bg-flame-orange rounded-full" />
+            )}
+          </Button>
         </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-foreground">Filter Payments</h3>
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <Button
+                    onClick={clearFilters}
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7"
+                  >
+                    Clear All
+                  </Button>
+                )}
+                <Button
+                  onClick={() => setShowFilters(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Status Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Status</label>
+                <Select
+                  value={filters.status || 'all'}
+                  onValueChange={(value) => setFilters({ ...filters, status: value === 'all' ? '' : value })}
+                >
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="pending">Pending</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="failed">Failed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Date Range Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Date Range</label>
+                <Select
+                  value={filters.dateRange || 'all'}
+                  onValueChange={(value) => setFilters({ ...filters, dateRange: value === 'all' ? '' : value })}
+                >
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All time" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All time</SelectItem>
+                    <SelectItem value="7d">Last 7 days</SelectItem>
+                    <SelectItem value="30d">Last 30 days</SelectItem>
+                    <SelectItem value="90d">Last 90 days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Min Amount Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Min Amount</label>
+                <Input
+                  type="number"
+                  placeholder="Min amount..."
+                  value={filters.minAmount}
+                  onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
+                  className="bg-secondary/50 border-border"
+                />
+              </div>
+
+              {/* Max Amount Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Max Amount</label>
+                <Input
+                  type="number"
+                  placeholder="Max amount..."
+                  value={filters.maxAmount}
+                  onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
+                  className="bg-secondary/50 border-border"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="overflow-x-auto">

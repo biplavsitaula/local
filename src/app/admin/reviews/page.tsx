@@ -1,9 +1,11 @@
 "use client";
 
 
-import { useState, useEffect, useCallback } from 'react';
-import { Search, Edit, Trash2, Package, Star, Loader2, AlertCircle, MessageSquare, Eye } from 'lucide-react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
+import { Search, Edit, Trash2, Package, Star, Loader2, AlertCircle, MessageSquare, Eye, Filter, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { reviewsService, Review } from '@/services/reviews.service';
 import { ArrowUpDown } from 'lucide-react';
 import Image from 'next/image';
@@ -38,6 +40,13 @@ export default function ReviewsPage() {
  const [editProductModalOpen, setEditProductModalOpen] = useState(false);
  const [deleteProductModalOpen, setDeleteProductModalOpen] = useState(false);
  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  // Review filters
+ const [showReviewFilters, setShowReviewFilters] = useState(false);
+ const [reviewFilters, setReviewFilters] = useState({
+   rating: '',
+   dateRange: '',
+   product: '',
+ });
 
 
  const fetchData = useCallback(async () => {
@@ -175,15 +184,54 @@ export default function ReviewsPage() {
  const top5Reviewed = mostReviewedProducts.slice(0, 5);
 
 
+ // Get unique products for filter
+ const uniqueProducts = useMemo(() => {
+   const prods = new Set<string>();
+   reviews.forEach(r => {
+     if (r.productName) prods.add(r.productName);
+   });
+   return Array.from(prods).sort();
+ }, [reviews]);
+
  // Filter and sort reviews
  const filteredAndSortedReviews = reviews
    .filter((r) => {
      const query = reviewSearchQuery.toLowerCase();
-     return (
+     const matchesSearch = (
        (r.customerName || '').toLowerCase().includes(query) ||
        (r.productName || '').toLowerCase().includes(query) ||
        (r.comment || '').toLowerCase().includes(query)
      );
+
+     // Apply rating filter
+     if (reviewFilters.rating) {
+       const rating = parseInt(reviewFilters.rating);
+       if (!isNaN(rating) && (r.rating || 0) !== rating) {
+         return false;
+       }
+     }
+
+     // Apply product filter
+     if (reviewFilters.product && r.productName?.toLowerCase() !== reviewFilters.product.toLowerCase()) {
+       return false;
+     }
+
+     // Apply date range filter
+     if (reviewFilters.dateRange) {
+       const now = new Date();
+       let cutoffDate = new Date();
+       if (reviewFilters.dateRange === '7d') {
+         cutoffDate.setDate(now.getDate() - 7);
+       } else if (reviewFilters.dateRange === '30d') {
+         cutoffDate.setDate(now.getDate() - 30);
+       } else if (reviewFilters.dateRange === '90d') {
+         cutoffDate.setDate(now.getDate() - 90);
+       }
+       const reviewDate = new Date(r.createdAt);
+       if (reviewDate < cutoffDate) return false;
+     }
+
+     return matchesSearch;
    })
    .sort((a, b) => {
      const dir = reviewSortDir === 'asc' ? 1 : -1;
@@ -330,6 +378,16 @@ export default function ReviewsPage() {
      day: 'numeric',
    });
  };
+
+ const clearReviewFilters = () => {
+   setReviewFilters({
+     rating: '',
+     dateRange: '',
+     product: '',
+   });
+ };
+
+ const hasActiveReviewFilters = reviewFilters.rating || reviewFilters.dateRange || reviewFilters.product;
 
 
 
@@ -571,15 +629,120 @@ export default function ReviewsPage() {
          <h2 className="text-2xl font-display font-bold text-foreground">All Reviews</h2>
        </div>
       
-       {/* Search Bar for Reviews */}
-       <div className="relative">
-         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-         <Input
-           placeholder="Search reviews by customer, product, or comment..."
-           value={reviewSearchQuery}
-           onChange={(e) => setReviewSearchQuery(e.target.value)}
-           className="pl-10 bg-secondary/50 border-border"
-         />
+       {/* Search and Filter Bar for Reviews */}
+       <div className="space-y-4">
+         <div className="flex gap-4">
+           <div className="relative flex-1">
+             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+             <Input
+               placeholder="Search reviews by customer, product, or comment..."
+               value={reviewSearchQuery}
+               onChange={(e) => setReviewSearchQuery(e.target.value)}
+               className="pl-10 bg-secondary/50 border-border"
+             />
+           </div>
+           <Button
+             onClick={() => setShowReviewFilters(!showReviewFilters)}
+             variant="outline"
+             className="gap-2 border-border"
+           >
+             <Filter className="h-4 w-4" />
+             Filters
+             {hasActiveReviewFilters && (
+               <span className="ml-1 h-2 w-2 bg-flame-orange rounded-full" />
+             )}
+           </Button>
+         </div>
+
+         {/* Filter Panel */}
+         {showReviewFilters && (
+           <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
+             <div className="flex items-center justify-between mb-2">
+               <h3 className="text-sm font-semibold text-foreground">Filter Reviews</h3>
+               <div className="flex items-center gap-2">
+                 {hasActiveReviewFilters && (
+                   <Button
+                     onClick={clearReviewFilters}
+                     variant="ghost"
+                     size="sm"
+                     className="text-xs h-7"
+                   >
+                     Clear All
+                   </Button>
+                 )}
+                 <Button
+                   onClick={() => setShowReviewFilters(false)}
+                   variant="ghost"
+                   size="sm"
+                   className="h-7 w-7 p-0"
+                 >
+                   <X className="h-4 w-4" />
+                 </Button>
+               </div>
+             </div>
+
+             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+               {/* Rating Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Rating</label>
+                 <Select
+                   value={reviewFilters.rating || 'all'}
+                   onValueChange={(value) => setReviewFilters({ ...reviewFilters, rating: value === 'all' ? '' : value })}
+                 >
+                   <SelectTrigger className="bg-secondary/50 border-border">
+                     <SelectValue placeholder="All ratings" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">All ratings</SelectItem>
+                     <SelectItem value="5">5 Stars</SelectItem>
+                     <SelectItem value="4">4 Stars</SelectItem>
+                     <SelectItem value="3">3 Stars</SelectItem>
+                     <SelectItem value="2">2 Stars</SelectItem>
+                     <SelectItem value="1">1 Star</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               {/* Product Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Product</label>
+                 <Select
+                   value={reviewFilters.product || 'all'}
+                   onValueChange={(value) => setReviewFilters({ ...reviewFilters, product: value === 'all' ? '' : value })}
+                 >
+                   <SelectTrigger className="bg-secondary/50 border-border">
+                     <SelectValue placeholder="All products" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">All products</SelectItem>
+                     {uniqueProducts.map(prod => (
+                       <SelectItem key={prod} value={prod}>{prod}</SelectItem>
+                     ))}
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               {/* Date Range Filter */}
+               <div className="space-y-2">
+                 <label className="text-xs font-medium text-foreground">Date Range</label>
+                 <Select
+                   value={reviewFilters.dateRange || 'all'}
+                   onValueChange={(value) => setReviewFilters({ ...reviewFilters, dateRange: value === 'all' ? '' : value })}
+                 >
+                   <SelectTrigger className="bg-secondary/50 border-border">
+                     <SelectValue placeholder="All time" />
+                   </SelectTrigger>
+                   <SelectContent>
+                     <SelectItem value="all">All time</SelectItem>
+                     <SelectItem value="7d">Last 7 days</SelectItem>
+                     <SelectItem value="30d">Last 30 days</SelectItem>
+                     <SelectItem value="90d">Last 90 days</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
+           </div>
+         )}
        </div>
 
 
