@@ -2,6 +2,7 @@ import { apiGet, apiPost, apiPut, apiDelete, ApiResponse } from '@/lib/api';
 import { SeasonalTheme, SeasonalThemeData } from '@/types/seasonal';
 
 export interface SeasonalThemeApiResponse {
+  _id?: string;
   keyname: SeasonalTheme;
   title?: string;
   subtitle?: string;
@@ -16,8 +17,10 @@ export interface SeasonalThemeApiResponse {
   };
   gradient?: string;
   emoji?: string;
+  isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
+  __v?: number;
 }
 
 export const seasonalThemesService = {
@@ -104,6 +107,7 @@ export const seasonalThemesService = {
     return apiDelete<void>(`/seasonal-themes/${keyname}`);
   },
 };
+
 
 
 

@@ -5,8 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Save, Loader2 } from 'lucide-react';
+import { Save, Loader2, Plus } from 'lucide-react';
 import { settingsService } from '@/services/settings.service';
+import { seasonalThemesService, SeasonalThemeApiResponse } from '@/services/seasonal-themes.service';
+import { AddThemeModal } from '@/components/features/admin/settings/AddThemeModal';
 import { toast } from 'sonner';
 
 export default function SettingsPage() {
@@ -28,16 +30,13 @@ export default function SettingsPage() {
     contactEmail: 'admin@flamebeverage.com',
   });
 
-  const themes = [
+  const [themes, setThemes] = useState([
     { label: "Default", value: "default" },
-    { label: "Dashain 🎉", value: "dashain" },
-    { label: "Tihar 🪔", value: "tihar" },
-    { label: "Christmas 🎄", value: "christmas" },
-    { label: "Holi 🌈", value: "holi" },
-    { label: "New Year 🎆", value: "newyear" },
-  ];
+  ]);
   
-    const [theme, setTheme] = useState("default");
+  const [theme, setTheme] = useState("default");
+  const [addThemeModalOpen, setAddThemeModalOpen] = useState(false);
+  const [selectedTheme, setSelectedTheme] = useState<SeasonalThemeApiResponse | null>(null);
   
     useEffect(() => {
       if (theme === "default") {
@@ -47,15 +46,18 @@ export default function SettingsPage() {
       }
     }, [theme]);
 
-  // Fetch settings on mount
+  // Fetch settings and themes on mount
   useEffect(() => {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const response = await settingsService.get();
+        const [settingsResponse, themesResponse] = await Promise.all([
+          settingsService.get(),
+          seasonalThemesService.getAll(),
+        ]);
         
-        if (response.success && response.data) {
-          const settings = response.data;
+        if (settingsResponse.success && settingsResponse.data) {
+          const settings = settingsResponse.data;
           
           // Update notifications
           if (settings.notifications) {
@@ -81,6 +83,23 @@ export default function SettingsPage() {
               contactEmail: settings.storeInfo.contactEmail || 'admin@flamebeverage.com',
             });
           }
+
+          // Update theme
+          if (settings.theme) {
+            setTheme(settings.theme);
+          }
+        }
+
+        // Update themes list
+        if (themesResponse.success && themesResponse.data) {
+          const themesList = [
+            { label: "Default", value: "default" },
+            ...(Array.isArray(themesResponse.data) ? themesResponse.data.map((t: SeasonalThemeApiResponse) => ({
+              label: `${t.emoji || ''} ${t.title || t.keyname}`,
+              value: t.keyname || '',
+            })) : []),
+          ];
+          setThemes(themesList);
         }
       } catch (error: any) {
         console.error('Error fetching settings:', error);
@@ -254,8 +273,23 @@ export default function SettingsPage() {
             />
           </div>
         </div>
-        <div className="mt-8 max-w-xs">
-          <Label className="mb-2 block">Select Theme</Label>
+        <div className="mt-8 space-y-4">
+          <div className="flex items-center justify-between">
+            <Label className="text-base font-medium text-foreground">Select Theme</Label>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => {
+                setSelectedTheme(null);
+                setAddThemeModalOpen(true);
+              }}
+              className="gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Add Theme
+            </Button>
+          </div>
           <select
             value={theme}
             onChange={(e) => setTheme(e.target.value)}
@@ -329,6 +363,31 @@ export default function SettingsPage() {
           )}
         </Button>
       </div>
+
+      {/* Add Theme Modal */}
+      <AddThemeModal
+        open={addThemeModalOpen}
+        onOpenChange={setAddThemeModalOpen}
+        theme={selectedTheme}
+        onSuccess={async () => {
+          // Refresh themes list
+          try {
+            const themesResponse = await seasonalThemesService.getAll();
+            if (themesResponse.success && themesResponse.data) {
+              const themesList = [
+                { label: "Default", value: "default" },
+                ...(Array.isArray(themesResponse.data) ? themesResponse.data.map((t: SeasonalThemeApiResponse) => ({
+                  label: `${t.emoji || ''} ${t.title || t.keyname}`,
+                  value: t.keyname || '',
+                })) : []),
+              ];
+              setThemes(themesList);
+            }
+          } catch (error) {
+            console.error('Error refreshing themes:', error);
+          }
+        }}
+      />
     </div>
   );
 }

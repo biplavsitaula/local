@@ -1,4 +1,4 @@
-export type SeasonalTheme = 'christmas' | 'thanksgiving' | 'newyear' | 'default';
+export type SeasonalTheme = 'christmas' | 'thanksgiving' | 'newyear' | 'default' | 'tihar' | 'dashain' | 'holi' | string;
 
 export interface SeasonalThemeData {
   keyname: SeasonalTheme;
@@ -16,6 +16,7 @@ export interface SeasonalThemeData {
   gradient: string;
   emoji?: string;
 }
+
 
 
 
