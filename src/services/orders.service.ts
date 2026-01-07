@@ -22,7 +22,8 @@ export interface Order {
   location?: string;
   items: OrderItem[];
   totalAmount: number;
-  paymentMethod: 'qr' | 'cod' | 'card';
+  paymentMethod: 'qr' | 'cod' | 'card' | 'online';
+  paymentGateway?: 'esewa' | 'khalti' | 'card';
   status: string;
   createdAt: string;
   updatedAt?: string;
@@ -36,6 +37,20 @@ export interface OrderFilters {
   sortOrder?: 'asc' | 'desc';
   page?: number;
   limit?: number;
+}
+
+export interface CheckoutPayload {
+  fullName: string;
+  phoneNumber: string;
+  deliveryAddress: string;
+  paymentMethod: 'cod' | 'online';
+  paymentGateway?: 'esewa' | 'khalti' | 'card';
+  items: { productId: string; quantity: number }[];
+}
+
+export interface CheckoutResponse {
+  order: Order;
+  message: string;
 }
 
 export const ordersService = {
@@ -102,6 +117,13 @@ export const ordersService = {
    */
   delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiDelete<void>(`/orders/${id}`);
+  },
+
+  /**
+   * Process checkout (Public - for customers)
+   */
+  checkout: async (payload: CheckoutPayload): Promise<ApiResponse<CheckoutResponse>> => {
+    return apiPost<CheckoutResponse>('/checkout', payload, false);
   },
 };
 

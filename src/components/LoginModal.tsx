@@ -1,29 +1,38 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { Flame, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
-import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import RegisterModal from "@/components/RegisterModal";
+import { Flame, Mail, Lock, Eye, EyeOff, Loader2, X } from "lucide-react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 
-function LoginForm() {
+interface LoginModalProps {
+  open: boolean;
+  onClose: () => void;
+  onSwitchToRegister?: () => void;
+  redirectUrl?: string;
+}
+
+const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginModalProps) => {
   const { language, t } = useLanguage();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [registerOpen, setRegisterOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  // Get redirect URL from query params
-  const redirectUrl = searchParams.get('redirect');
+  if (!open) return null;
+
+  const handleClose = () => {
+    setError(null);
+    setFormData({ email: "", password: "" });
+    onClose();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,8 +41,8 @@ function LoginForm() {
     
     try {
       await login(formData.email, formData.password);
+      handleClose();
       // After successful login, redirect based on redirectUrl
-      // AuthContext redirects to /dashboard by default, but we override if there's a redirectUrl
       if (redirectUrl) {
         router.push(redirectUrl);
       }
@@ -46,32 +55,39 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        {/* Logo and Title */}
-        <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full bg-primary-gradient">
-              <Flame className="w-8 h-8 text-white" />
-            </div>
-          </div>
-          <h1 className="text-2xl font-display font-bold text-foreground mb-2">
-            Flame Beverage
-          </h1>
-          <p className="text-muted-foreground">
-            {t('welcomeBack' as any)}
-          </p>
-        </div>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
+      <div className="relative w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl">
+        {/* Close Button */}
+        <button
+          onClick={handleClose}
+          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
+        >
+          <X className="h-4 w-4" />
+        </button>
 
-        {/* Login Card */}
-        <div className="bg-card rounded-2xl border border-border p-8 shadow-xl">
+        <div className="p-8">
+          {/* Logo and Title */}
+          <div className="text-center mb-6">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 rounded-full bg-primary-gradient">
+                <Flame className="w-8 h-8 text-white" />
+              </div>
+            </div>
+            <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+              Flame Beverage
+            </h1>
+            <p className="text-muted-foreground">
+              {t('welcomeBack' as any)}
+            </p>
+          </div>
+
           {/* Tabs */}
           <div className="flex gap-2 mb-6">
             <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
               {t('login')}
             </button>
             <button 
-              onClick={() => setRegisterOpen(true)}
+              onClick={onSwitchToRegister}
               className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors"
             >
               {language === "en" ? "Register" : "दर्ता"}
@@ -79,7 +95,7 @@ function LoginForm() {
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Email */}
             <div>
               <label className="block text-sm font-medium text-foreground mb-2">
@@ -179,38 +195,10 @@ function LoginForm() {
             </button>
           </div>
         </div>
-
-        {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
-            ← {t('backToHome' as any)}
-          </Link>
-        </div>
       </div>
-
-      {/* Register Modal */}
-      <RegisterModal
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        onSwitchToLogin={() => setRegisterOpen(false)}
-      />
     </div>
-  );
-}
-
-// Wrap in Suspense for useSearchParams
-const Login = () => {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-flame-orange" />
-      </div>
-    }>
-      <LoginForm />
-    </Suspense>
   );
 };
 
-export default Login;
-
+export default LoginModal;
 

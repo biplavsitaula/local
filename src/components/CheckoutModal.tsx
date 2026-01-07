@@ -4,12 +4,13 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { IPaymentCheckbox } from "@/interface/IPaymentCheckout";
-import { X, ArrowLeft, User, Phone, MapPin, Package, CreditCard, Check } from "lucide-react";
+import { X, ArrowLeft, User, Phone, MapPin, Package, CreditCard, Check, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
+import { ordersService, CheckoutPayload } from "@/services/orders.service";
 
 const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const { t, language } = useLanguage();
-  const { items, total, totalItems } = useCart();
+  const { items, total, totalItems, clear: clearCart } = useCart();
   const [selectedPayment, setSelectedPayment] = useState<"cod" | "online">("cod");
   const [selectedGateway, setSelectedGateway] = useState<"esewa" | "khalti" | "card" | null>(null);
   const [formData, setFormData] = useState({
@@ -18,6 +19,8 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     deliveryAddress: "",
   });
   const [paid, setPaid] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   if (!open) return null;
 
@@ -26,21 +29,63 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     setSelectedPayment("cod");
     setSelectedGateway(null);
     setFormData({ fullName: "", phoneNumber: "", deliveryAddress: "" });
+    setError(null);
     onClose();
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
     if (selectedPayment === "online" && !selectedGateway) {
       return; // Require gateway selection for online payment
     }
     if (!formData.fullName || !formData.phoneNumber || !formData.deliveryAddress) {
       return; // Require all fields
     }
-    setPaid(true);
-    // Here you would typically process the payment
-    setTimeout(() => {
-      handleClose();
-    }, 2000);
+    if (items.length === 0) {
+      setError(language === "en" ? "Your cart is empty" : "तपाईंको कार्ट खाली छ");
+      return;
+    }
+
+    setIsProcessing(true);
+    setError(null);
+
+    try {
+      // Prepare checkout payload
+      const payload: CheckoutPayload = {
+        fullName: formData.fullName,
+        phoneNumber: formData.phoneNumber,
+        deliveryAddress: formData.deliveryAddress,
+        paymentMethod: selectedPayment,
+        items: items.map(item => ({
+          productId: String(item.product.id),
+          quantity: item.quantity,
+        })),
+      };
+
+      // Add payment gateway if online payment
+      if (selectedPayment === "online" && selectedGateway) {
+        payload.paymentGateway = selectedGateway;
+      }
+
+      // Call checkout API
+      const response = await ordersService.checkout(payload);
+
+      if (response.success) {
+        setPaid(true);
+        // Clear the cart after successful checkout
+        clearCart();
+        // Close modal after showing success message
+        setTimeout(() => {
+          handleClose();
+        }, 2000);
+      } else {
+        setError(response.message || (language === "en" ? "Checkout failed" : "चेकआउट असफल भयो"));
+      }
+    } catch (err: any) {
+      console.error("Checkout error:", err);
+      setError(err.message || (language === "en" ? "Something went wrong. Please try again." : "केही गलत भयो। कृपया पुन: प्रयास गर्नुहोस्।"));
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   const subtotal = total;
@@ -258,6 +303,19 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
               </div>
             )}
 
+            {/* Error Message */}
+            {error && (
+              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
+                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <div>
+                  <p className="text-sm font-semibold text-red-500">
+                    {language === "en" ? "Error" : "त्रुटि"}
+                  </p>
+                  <p className="text-sm text-red-400 mt-1">{error}</p>
+                </div>
+              </div>
+            )}
+
             {/* Success Message */}
             {paid && (
               <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4">
@@ -274,11 +332,20 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             {!paid && (
               <button
                 onClick={handlePayment}
-                disabled={!formData.fullName || !formData.phoneNumber || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway)}
+                disabled={isProcessing || !formData.fullName || !formData.phoneNumber || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway) || items.length === 0}
                 className="w-full rounded-xl bg-primary-gradient px-6 py-4 font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
-                <Check className="w-5 h-5" />
-                {t("placeOrder")}
+                {isProcessing ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    {language === "en" ? "Processing..." : "प्रशोधन गर्दै..."}
+                  </>
+                ) : (
+                  <>
+                    <Check className="w-5 h-5" />
+                    {t("placeOrder")}
+                  </>
+                )}
               </button>
             )}
           </div>

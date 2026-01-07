@@ -109,5 +109,12 @@ export const authService = {
   deleteUser: async (id: string): Promise<ApiResponse<void>> => {
     return apiDelete<void>(`/auth/users/${id}`);
   },
+
+  /**
+   * Logout user (requires authentication)
+   */
+  logout: async (): Promise<ApiResponse<{ message: string }>> => {
+    return apiPost<{ message: string }>('/auth/logout', {}, true);
+  },
 };
 

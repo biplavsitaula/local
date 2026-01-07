@@ -43,10 +43,14 @@ export const tokenManager = {
   setToken: (token: string): void => {
    if (typeof window === 'undefined') return;
    localStorage.setItem(TOKEN_KEY, token);
+   // Set cookie for middleware access (7 days expiry)
+   document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${60 * 60 * 24 * 7}; SameSite=Lax`;
  },
   removeToken: (): void => {
    if (typeof window === 'undefined') return;
    localStorage.removeItem(TOKEN_KEY);
+   // Remove cookie
+   document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; SameSite=Lax`;
  },
   hasToken: (): boolean => {
    return tokenManager.getToken() !== null;

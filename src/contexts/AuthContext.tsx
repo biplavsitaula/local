@@ -18,7 +18,7 @@ interface AuthContextValue {
     role?: 'user' | 'admin' | 'superadmin';
     mobile?: string;
   }) => Promise<void>;
-  logout: () => void;
+  logout: () => Promise<void>;
   updateProfile: (data: {
     fullName?: string;
     email?: string;
@@ -104,11 +104,20 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
-  const logout = () => {
-    tokenManager.removeToken();
-    setToken(null);
-    setUser(null);
-    router.push('/login');
+  const logout = async () => {
+    try {
+      // Call logout API to invalidate token on server
+      await authService.logout();
+    } catch (error) {
+      // Continue with local logout even if API call fails
+      console.error('Logout API error:', error);
+    } finally {
+      // Always clear local state
+      tokenManager.removeToken();
+      setToken(null);
+      setUser(null);
+      router.push('/login');
+    }
   };
 
   const updateProfile = async (data: {

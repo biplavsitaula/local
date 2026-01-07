@@ -5,6 +5,7 @@ import { Input } from '@/components/ui/input';
 import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
 import { NotificationDropdown } from '@/components/features/admin/NotificationDropdown';
 import { ExportButton } from '@/components/features/admin/ExportButton';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminHeaderProps {
   onSearch?: (query: string) => void;
@@ -12,6 +13,13 @@ interface AdminHeaderProps {
 
 export function AdminHeader({ onSearch }: AdminHeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { user } = useAuth();
+
+  // Format role for display
+  const formatRole = (role?: string) => {
+    if (!role) return 'User';
+    return role.charAt(0).toUpperCase() + role.slice(1).replace('admin', ' Admin');
+  };
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchQuery(e.target.value);
@@ -39,11 +47,17 @@ export function AdminHeader({ onSearch }: AdminHeaderProps) {
 
         <div className="flex items-center gap-3 pl-4 border-l border-border">
           <div className="text-right">
-            <p className="text-sm font-medium text-foreground">John Admin</p>
-            <p className="text-xs text-muted-foreground">Super Admin</p>
+            <p className="text-sm font-medium text-foreground">{user?.fullName || 'Admin User'}</p>
+            <p className="text-xs text-muted-foreground">{formatRole(user?.role)}</p>
           </div>
           <div className="w-10 h-10 rounded-full gradient-gold flex items-center justify-center">
-            <User className="h-5 w-5 text-primary-foreground" />
+            {user?.fullName ? (
+              <span className="text-sm font-bold text-primary-foreground">
+                {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
+              </span>
+            ) : (
+              <User className="h-5 w-5 text-primary-foreground" />
+            )}
           </div>
         </div>
       </div>

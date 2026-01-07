@@ -111,9 +111,9 @@ export function AddProductModal({
     if (!formData.stock || parseInt(formData.stock) < 0) {
       newErrors.stock = "Valid stock quantity is required";
     }
-    if (!formData.imageUrl.trim()) {
-      newErrors.imageUrl = "Product image is required";
-    }
+    // if (!formData.imageUrl.trim()) {
+    //   newErrors.imageUrl = "Product image is required";
+    // }
     if (
       formData.rating &&
       (parseFloat(formData.rating) < 0 || parseFloat(formData.rating) > 5)
@@ -352,7 +352,7 @@ export function AddProductModal({
             </div>
           </div>
 
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <Label htmlFor="imageUrl" className="text-foreground">
               Image URL <span className="text-flame-red">*</span>
             </Label>
@@ -381,7 +381,42 @@ export function AddProductModal({
             <p className="text-xs text-muted-foreground">
               Image is mandatory for product listing
             </p>
+          </div> */}
+
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl" className="text-foreground">
+              Image URL
+            </Label>
+
+            <div className="flex gap-2">
+              <Input
+                id="imageUrl"
+                value={formData.imageUrl}
+                onChange={(e) =>
+                  setFormData({ ...formData, imageUrl: e.target.value })
+                }
+                placeholder="https://example.com/image.jpg"
+                className={cn(
+                  "bg-secondary/50 border-border flex-1",
+                  errors.imageUrl && "border-flame-red"
+                )}
+              />
+              <Button type="button" variant="outline" size="icon">
+                <Upload className="h-4 w-4" />
+              </Button>
+            </div>
+
+            {errors.imageUrl && (
+              <p className="text-xs text-flame-red flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> {errors.imageUrl}
+              </p>
+            )}
+
+            <p className="text-xs text-muted-foreground">
+              Image is optional
+            </p>
           </div>
+
 
           <div className="space-y-2">
             <Label htmlFor="itemLink" className="text-foreground">

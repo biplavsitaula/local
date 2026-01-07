@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useCart } from "@/contexts/CartContext";
+import { useAuthModal } from "@/contexts/AuthModalContext";
 import { usePathname } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -38,12 +39,17 @@ const Header: React.FC<IHeaderProps> = ({
  searchQuery,
  onSearchChange,
  onCheckout,
+ onLoginClick,
 }) => {
  const { language, setLanguage, t } = useLanguage();
  const { theme, toggleTheme } = useTheme();
  const { items, totalItems, totalPrice, updateQuantity, removeFromCart } =
    useCart();
+ const { openLoginModal } = useAuthModal();
  const pathname = usePathname();
+ 
+ // Use global auth modal if no onLoginClick provided
+ const handleLoginClick = onLoginClick || openLoginModal;
  const [isMenuOpen, setIsMenuOpen] = useState(false);
  const [isCartOpen, setIsCartOpen] = useState(false);
  const [showPromoBanner, setShowPromoBanner] = useState(true);
@@ -311,20 +317,19 @@ const Header: React.FC<IHeaderProps> = ({
 
          {/* Actions */}
          <div className="flex items-center gap-2">
-           {/* Login Button */}
-           <Link href="/login">
-             <Button
-               variant="outline"
-               className={`hidden sm:flex items-center gap-2 transition-colors ${
-                 theme === 'dark'
-                   ? 'text-foreground border-border hover:bg-secondary/80'
-                   : 'text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400'
-               }`}
-             >
-               <User className="w-4 h-4" />
-               {t("login")}
-             </Button>
-           </Link>
+          {/* Login Button */}
+          <Button
+            variant="outline"
+            onClick={handleLoginClick}
+            className={`hidden sm:flex items-center gap-2 transition-colors ${
+              theme === 'dark'
+                ? 'text-foreground border-border hover:bg-secondary/80'
+                : 'text-gray-700 border-gray-300 hover:bg-gray-100 hover:border-gray-400'
+            }`}
+          >
+            <User className="w-4 h-4" />
+            {t("login")}
+          </Button>
 
 
            {/* Language Toggle */}
@@ -556,18 +561,20 @@ const Header: React.FC<IHeaderProps> = ({
              >
                {t("offers")}
              </Link>
-             <Link
-               href="/login"
-               onClick={() => setIsMenuOpen(false)}
-               className={`text-sm font-medium transition-colors py-2 flex items-center gap-2 ${
-                 theme === 'dark'
-                   ? 'text-foreground hover:text-primary-text'
-                   : 'text-gray-700 hover:text-orange-600'
-               }`}
-             >
-               <User className="w-4 h-4" />
-               {t("login")}
-             </Link>
+            <button
+              onClick={() => {
+                setIsMenuOpen(false);
+                handleLoginClick();
+              }}
+              className={`text-sm font-medium transition-colors py-2 flex items-center gap-2 text-left ${
+                theme === 'dark'
+                  ? 'text-foreground hover:text-primary-text'
+                  : 'text-gray-700 hover:text-orange-600'
+              }`}
+            >
+              <User className="w-4 h-4" />
+              {t("login")}
+            </button>
            </nav>
          </div>
        )}

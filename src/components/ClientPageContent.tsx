@@ -20,6 +20,8 @@ import CartNotification from "@/components/CartNotification";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthModalProvider } from "@/contexts/AuthModalContext";
 import { AgeStatus, Product } from "@/types";
 import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -449,6 +451,7 @@ return (
 
 
 
+
             {/* Product Detail Modal */}
             {selectedProduct && (
               <ProductDetailModal
@@ -514,24 +517,26 @@ export function ClientPageContent() {
  return (
    <ThemeProvider>
      <LanguageProvider>
-       <CartProvider>
-         {ageStatus === "pending" && (
-           <AgeVerificationModal
-             onVerified={handleAgeVerified}
-             onDenied={handleAgeDenied}
-           />
-         )}
+       <AuthProvider>
+         <CartProvider>
+           <AuthModalProvider>
+             {ageStatus === "pending" && (
+               <AgeVerificationModal
+                 onVerified={handleAgeVerified}
+                 onDenied={handleAgeDenied}
+               />
+             )}
 
+             {ageStatus === "denied" && (
+               <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
+             )}
 
-         {ageStatus === "denied" && (
-           <AgeDeniedScreen onBack={() => setAgeStatus("pending")} />
-         )}
-
-
-         {ageStatus === "verified" && (
-           <PageContent />
-         )}
-       </CartProvider>
+             {ageStatus === "verified" && (
+               <PageContent />
+             )}
+           </AuthModalProvider>
+         </CartProvider>
+       </AuthProvider>
      </LanguageProvider>
    </ThemeProvider>
  );

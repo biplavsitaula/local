@@ -28,6 +28,25 @@ export default function SettingsPage() {
     contactEmail: 'admin@flamebeverage.com',
   });
 
+  const themes = [
+    { label: "Default", value: "default" },
+    { label: "Dashain 🎉", value: "dashain" },
+    { label: "Tihar 🪔", value: "tihar" },
+    { label: "Christmas 🎄", value: "christmas" },
+    { label: "Holi 🌈", value: "holi" },
+    { label: "New Year 🎆", value: "newyear" },
+  ];
+  
+    const [theme, setTheme] = useState("default");
+  
+    useEffect(() => {
+      if (theme === "default") {
+        document.documentElement.removeAttribute("data-theme");
+      } else {
+        document.documentElement.setAttribute("data-theme", theme);
+      }
+    }, [theme]);
+
   // Fetch settings on mount
   useEffect(() => {
     const fetchSettings = async () => {
@@ -92,6 +111,7 @@ export default function SettingsPage() {
           storeName: storeInfo.storeName,
           contactEmail: storeInfo.contactEmail,
         },
+        theme: theme,
       };
 
       const response = await settingsService.update(settingsData);
@@ -233,6 +253,20 @@ export default function SettingsPage() {
               min="0"
             />
           </div>
+        </div>
+        <div className="mt-8 max-w-xs">
+          <Label className="mb-2 block">Select Theme</Label>
+          <select
+            value={theme}
+            onChange={(e) => setTheme(e.target.value)}
+            className="w-full rounded-lg border px-3 py-2 bg-background"
+          >
+            {themes.map((t) => (
+              <option key={t.value} value={t.value}>
+                {t.label}
+              </option>
+            ))}
+          </select>
         </div>
       </div>
 

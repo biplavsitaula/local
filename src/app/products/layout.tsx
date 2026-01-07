@@ -3,6 +3,8 @@
 import { ThemeProvider } from "@/contexts/ThemeContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { CartProvider } from "@/contexts/CartContext";
+import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthModalProvider } from "@/contexts/AuthModalContext";
 
 export default function ProductsLayout({
   children,
@@ -12,9 +14,13 @@ export default function ProductsLayout({
   return (
     <ThemeProvider>
       <LanguageProvider>
-        <CartProvider>
-          {children}
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <AuthModalProvider>
+              {children}
+            </AuthModalProvider>
+          </CartProvider>
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   );

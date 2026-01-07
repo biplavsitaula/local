@@ -1,3 +1,5 @@
+"use client";
+
 import { NavLink } from "@/components/NavLink";
 import {
   LayoutDashboard,
@@ -13,8 +15,11 @@ import {
   ShoppingCart,
   CreditCard,
   Bell,
+  Loader2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/contexts/AuthContext";
+import { useState } from "react";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -30,6 +35,20 @@ const menuItems = [
 ];
 
 export function AdminSidebar() {
+  const { logout } = useAuth();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await logout();
+    } catch (error) {
+      console.error('Logout failed:', error);
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
       {/* Logo */}
@@ -75,9 +94,17 @@ export function AdminSidebar() {
           <Settings className="h-5 w-5" />
           <span>Settings</span>
         </NavLink>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-flame-red/10 hover:text-flame-red transition-colors">
-          <LogOut className="h-5 w-5" />
-          <span>Logout</span>
+        <button 
+          onClick={handleLogout}
+          disabled={isLoggingOut}
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-flame-red/10 hover:text-flame-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        >
+          {isLoggingOut ? (
+            <Loader2 className="h-5 w-5 animate-spin" />
+          ) : (
+            <LogOut className="h-5 w-5" />
+          )}
+          <span>{isLoggingOut ? 'Logging out...' : 'Logout'}</span>
         </button>
       </div>
     </aside>
