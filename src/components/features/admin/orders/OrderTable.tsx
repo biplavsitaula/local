@@ -1,26 +1,53 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle } from 'lucide-react';
+import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X } from 'lucide-react';
 import { ordersService, Order as ApiOrder } from '@/services/orders.service';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { useOrderStore, Order } from '@/hooks/useOrderStore';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 export function OrderTable() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    status: '',
+    billNumber: '',
+    location: '',
+    paymentMethod: '',
+  });
 
   const mapApiOrderToOrder = (apiOrder: ApiOrder): Order => {
+    // Handle API response structure - customer can be an object with fullName and location
+    const customerName = (apiOrder.customer as any)?.fullName || 
+                         apiOrder.customer?.name || 
+                         apiOrder.customerName || 
+                         '';
+    const location = (apiOrder.customer as any)?.location || 
+                    apiOrder.customer?.address || 
+                    apiOrder.location || 
+                    '';
+    
+    // Map payment method - API returns "COD", "Online", "QR Payment"
+    let paymentMethod: 'cod' | 'qr' = 'cod';
+    const paymentMethodLower = (apiOrder.paymentMethod || '').toLowerCase();
+    if (paymentMethodLower === 'online' || paymentMethodLower === 'qr' || paymentMethodLower === 'qr payment') {
+      paymentMethod = 'qr';
+    }
+    
     return {
       id: apiOrder._id || apiOrder.id || '',
       billNumber: apiOrder.billNumber,
-      customerName: apiOrder.customer?.name || apiOrder.customerName || '',
-      location: apiOrder.customer?.address || apiOrder.location || '',
+      customerName,
+      location,
       totalAmount: apiOrder.totalAmount,
       status: apiOrder.status,
-      paymentMethod: apiOrder.paymentMethod === 'qr' ? 'qr' : 'cod',
+      paymentMethod,
       createdAt: apiOrder.createdAt,
     };
   };
@@ -32,6 +59,8 @@ export function OrderTable() {
         setError(null);
         const response = await ordersService.getAll({
           search: searchQuery || undefined,
+          status: filters.status || undefined,
+          paymentMethod: filters.paymentMethod || undefined,
           limit: 100,
         });
         const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
@@ -45,9 +74,9 @@ export function OrderTable() {
     };
 
     fetchOrders();
-  }, [searchQuery]);
+  }, [searchQuery, filters.status, filters.paymentMethod]);
 
-  type SortKey = 'billNumber' | 'customerName' | 'totalAmount' | 'status';
+  type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
   type SortDir = 'asc' | 'desc';
 
   const [sortKey, setSortKey] = useState<SortKey>('billNumber');
@@ -64,15 +93,35 @@ export function OrderTable() {
     setSortDir('asc');
   };
 
-  const sortedOrders = useMemo(() => {
-    const dir = sortDir === 'asc' ? 1 : -1;
+  const filteredAndSortedOrders = useMemo(() => {
+    let filtered = [...orders];
 
-    return [...orders].sort((a, b) => {
+    // Apply filters
+    if (filters.billNumber) {
+      filtered = filtered.filter(order => 
+        order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
+      );
+    }
+
+    if (filters.location) {
+      filtered = filtered.filter(order => 
+        order.location.toLowerCase().includes(filters.location.toLowerCase())
+      );
+    }
+
+    // Note: Status and paymentMethod filters are applied via API call
+    // Additional client-side filtering can be added here if needed
+
+    // Sort
+    const dir = sortDir === 'asc' ? 1 : -1;
+    filtered.sort((a, b) => {
       switch (sortKey) {
         case 'billNumber':
           return dir * a.billNumber.localeCompare(b.billNumber);
         case 'customerName':
           return dir * a.customerName.localeCompare(b.customerName);
+        case 'location':
+          return dir * a.location.localeCompare(b.location);
         case 'totalAmount':
           return dir * (a.totalAmount - b.totalAmount);
         case 'status':
@@ -81,7 +130,20 @@ export function OrderTable() {
           return 0;
       }
     });
-  }, [orders, sortDir, sortKey]);
+
+    return filtered;
+  }, [orders, sortDir, sortKey, filters]);
+
+  const clearFilters = () => {
+    setFilters({
+      status: '',
+      billNumber: '',
+      location: '',
+      paymentMethod: '',
+    });
+  };
+
+  const hasActiveFilters = filters.status || filters.billNumber || filters.location || filters.paymentMethod;
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -687,15 +749,123 @@ export function OrderTable() {
 
   return (
     <>
-      {/* Search Bar */}
-      <div className="relative mb-4">
-        <input
-          type="text"
-          placeholder="Search orders by bill number, customer name..."
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full px-4 py-2 bg-secondary/50 border border-border rounded-lg text-foreground placeholder-muted-foreground"
-        />
+      {/* Search and Filter Bar */}
+      <div className="space-y-4 mb-4">
+        <div className="flex gap-4">
+          <div className="relative flex-1">
+            <input
+              type="text"
+              placeholder="Search orders by bill number, customer name..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2 bg-secondary/50 border border-border rounded-lg text-foreground placeholder-muted-foreground"
+            />
+          </div>
+          <Button
+            onClick={() => setShowFilters(!showFilters)}
+            variant="outline"
+            className="gap-2 border-border"
+          >
+            <Filter className="h-4 w-4" />
+            Filters
+            {hasActiveFilters && (
+              <span className="ml-1 h-2 w-2 bg-flame-orange rounded-full" />
+            )}
+          </Button>
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
+            <div className="flex items-center justify-between mb-2">
+              <h3 className="text-sm font-semibold text-foreground">Filter Orders</h3>
+              <div className="flex items-center gap-2">
+                {hasActiveFilters && (
+                  <Button
+                    onClick={clearFilters}
+                    variant="ghost"
+                    size="sm"
+                    className="text-xs h-7"
+                  >
+                    Clear All
+                  </Button>
+                )}
+                <Button
+                  onClick={() => setShowFilters(false)}
+                  variant="ghost"
+                  size="sm"
+                  className="h-7 w-7 p-0"
+                >
+                  <X className="h-4 w-4" />
+                </Button>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+              {/* Status Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Status</label>
+                <Select
+                  value={filters.status || 'all'}
+                  onValueChange={(value) => setFilters({ ...filters, status: value === 'all' ? '' : value })}
+                >
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All statuses" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="placed">Placed</SelectItem>
+                    <SelectItem value="in-progress">In Progress</SelectItem>
+                    <SelectItem value="delivered">Delivered</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
+                    <SelectItem value="cancelled">Cancelled</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Bill Number Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Bill Number</label>
+                <Input
+                  placeholder="Filter by bill number..."
+                  value={filters.billNumber}
+                  onChange={(e) => setFilters({ ...filters, billNumber: e.target.value })}
+                  className="bg-secondary/50 border-border"
+                />
+              </div>
+
+              {/* Location Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Location</label>
+                <Input
+                  placeholder="Filter by location..."
+                  value={filters.location}
+                  onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+                  className="bg-secondary/50 border-border"
+                />
+              </div>
+
+              {/* Payment Method Filter */}
+              <div className="space-y-2">
+                <label className="text-xs font-medium text-foreground">Payment Method</label>
+                <Select
+                  value={filters.paymentMethod || 'all'}
+                  onValueChange={(value) => setFilters({ ...filters, paymentMethod: value === 'all' ? '' : value })}
+                >
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue placeholder="All methods" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All methods</SelectItem>
+                    <SelectItem value="COD">Cash on Delivery (COD)</SelectItem>
+                    <SelectItem value="Online">Online Payment</SelectItem>
+                    <SelectItem value="QR Payment">QR Payment</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
@@ -705,7 +875,7 @@ export function OrderTable() {
               <tr className="border-b border-border/50">
                 {renderSortableTh('Bill Number', 'billNumber')}
                 {renderSortableTh('Customer', 'customerName')}
-                <th className="text-left p-4 text-sm font-semibold text-foreground">Location</th>
+                {renderSortableTh('Location', 'location')}
                 {renderSortableTh('Amount', 'totalAmount')}
                 <th className="text-left p-4 text-sm font-semibold text-foreground">Payment</th>
                 {renderSortableTh('Status', 'status')}
@@ -714,8 +884,8 @@ export function OrderTable() {
               </tr>
             </thead>
             <tbody>
-              {sortedOrders.length > 0 ? (
-                sortedOrders.map((order) => (
+              {filteredAndSortedOrders.length > 0 ? (
+                filteredAndSortedOrders.map((order) => (
                   <tr key={order.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                     <td className="p-4 text-sm text-foreground font-medium">{order.billNumber}</td>
                     <td className="p-4 text-sm text-foreground">{order.customerName}</td>
@@ -725,7 +895,10 @@ export function OrderTable() {
                     </td>
                     <td className="p-4">
                       <span className="text-xs px-2 py-1 rounded-full bg-secondary/50 text-foreground uppercase">
-                        {order.paymentMethod}
+                        {order.paymentMethod === 'qr' ? 'QR Payment' : 
+                         order.paymentMethod === 'cod' ? 'COD' : 
+                         order.paymentMethod === 'online' ? 'Online' : 
+                         order.paymentMethod}
                       </span>
                     </td>
                     <td className="p-4">

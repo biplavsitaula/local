@@ -60,15 +60,31 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
 
-  const mapApiPaymentToPayment = (apiPayment: ApiPayment): Payment => ({
-    id: apiPayment._id || apiPayment.id || "",
-    billNumber: apiPayment.billNumber,
-    customerName: apiPayment.customerName || apiPayment.billNumber, // fallback
-    amount: apiPayment.amount,
-    method: apiPayment.method === "qr" ? "qr" : "cod",
-    status: apiPayment.status,
-    createdAt: apiPayment.createdAt,
-  });
+  const mapApiPaymentToPayment = (apiPayment: any): Payment => {
+    // Handle API response structure - customer can be an object with fullName
+    const customerName = (apiPayment.customer as any)?.fullName || 
+                         apiPayment.customer?.name || 
+                         apiPayment.customerName || 
+                         apiPayment.billNumber || 
+                         'N/A';
+    
+    // Map payment method - API returns "COD", "Online", "QR Payment"
+    let method: "cod" | "qr" = "cod";
+    const paymentMethod = (apiPayment.method || '').toLowerCase();
+    if (paymentMethod === 'online' || paymentMethod === 'qr' || paymentMethod === 'qr payment') {
+      method = 'qr';
+    }
+    
+    return {
+      id: apiPayment._id || apiPayment.id || "",
+      billNumber: apiPayment.billNumber,
+      customerName,
+      amount: apiPayment.amount,
+      method,
+      status: apiPayment.status,
+      createdAt: apiPayment.createdAt,
+    };
+  };
 
   useEffect(() => {
     const fetchPayments = async () => {
