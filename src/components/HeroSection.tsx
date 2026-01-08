@@ -2,8 +2,9 @@ import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
-import { ArrowRight, Sparkles, Flame } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
@@ -37,33 +38,27 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Flame Transition Effect */}
-          <div className="relative flex items-center justify-center py-1 pointer-events-none">
-            {/* Central Glowing Flame Circle */}
+          {/* <div className="relative flex items-center justify-center py-1 pointer-events-none">
             <div className="relative w-24 h-24 flex items-center justify-center">
-              {/* Outer Glow Ring - Yellow Background Glow (different timing) */}
               <div 
                 className="absolute inset-0 rounded-full bg-gradient-to-br from-flame-yellow/30 via-flame-orange/20 to-flame-red/15 blur-2xl animate-glow-pulse-outer"
                 style={{ animationDuration: "2.5s" }}
               />
               
-              {/* Middle Glow Ring */}
               <div 
                 className="absolute inset-0 rounded-full bg-gradient-to-br from-flame-orange/30 via-flame-red/20 to-flame-yellow/20 blur-xl animate-glow-pulse"
                 style={{ animationDelay: "0.2s", animationDuration: "2.8s" }}
               />
               
-              {/* Inner Glow Ring */}
               <div 
                 className="absolute inset-0 rounded-full bg-gradient-to-br from-flame-orange/50 via-flame-red/40 to-flame-yellow/30 blur-lg animate-glow-pulse"
                 style={{ animationDelay: "0.4s", animationDuration: "3s" }}
               />
               
-              {/* Inner Flame Circle (different animation) */}
               <div className="relative w-16 h-16 rounded-full bg-gradient-to-br from-flame-orange via-flame-red to-flame-yellow flex items-center justify-center shadow-2xl animate-flame-pulse transition-all duration-300">
                 <Flame className="w-8 h-8 text-primary-foreground drop-shadow-2xl transition-transform duration-300" />
               </div>
 
-              {/* Floating Ember Particles */}
               {Array.from({ length: 12 }).map((_, i) => (
                 <div
                   key={i}
@@ -83,6 +78,10 @@ const HeroSection: React.FC = () => {
                 </div>
               ))}
             </div>
+          </div> */}
+
+          <div className="flex justify-center items-center">
+            <AnimatedLogo width={180} height={48} />
           </div>
 
           {/* Main Title */}
