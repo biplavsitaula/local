@@ -159,6 +159,22 @@ useEffect(() => {
 }, []);
 
 
+// Filter function for search
+const filterBySearch = (products: Product[]) => {
+  if (!searchQuery.trim()) return products;
+  const query = searchQuery.toLowerCase().trim();
+  return products.filter((product) =>
+    product.name.toLowerCase().includes(query) ||
+    product.category?.toLowerCase().includes(query) ||
+    product.description?.toLowerCase().includes(query)
+  );
+};
+
+// Filtered products based on search query
+const filteredRecentArrivals = filterBySearch(recentArrivals);
+const filteredMostRecommended = filterBySearch(mostRecommended);
+
+
 
 
 const handleBuyNow = (product: Product, quantity: number = 1) => {
@@ -226,9 +242,9 @@ return (
                   <div className="flex items-center justify-center py-16">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ) : recentArrivals.length > 0 ? (
+                ) : filteredRecentArrivals.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {recentArrivals.map((product, index) => (
+                    {filteredRecentArrivals.map((product, index) => (
                       <ProductCard
                         key={product.id || `recent-${index}`}
                         product={product}
@@ -240,7 +256,11 @@ return (
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No recent arrivals found.</p>
+                    <p className="text-muted-foreground">
+                      {searchQuery.trim() 
+                        ? `No recent arrivals found for "${searchQuery}"`
+                        : 'No recent arrivals found.'}
+                    </p>
                   </div>
                 )}
               </section>
@@ -273,9 +293,9 @@ return (
                   <div className="flex items-center justify-center py-16">
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
-                ) : mostRecommended.length > 0 ? (
+                ) : filteredMostRecommended.length > 0 ? (
                   <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-                    {mostRecommended.map((product, index) => (
+                    {filteredMostRecommended.map((product, index) => (
                       <ProductCard
                         key={product.id || `recommended-${index}`}
                         product={product}
@@ -287,7 +307,11 @@ return (
                   </div>
                 ) : (
                   <div className="text-center py-12">
-                    <p className="text-muted-foreground">No recommended products found.</p>
+                    <p className="text-muted-foreground">
+                      {searchQuery.trim() 
+                        ? `No recommended products found for "${searchQuery}"`
+                        : 'No recommended products found.'}
+                    </p>
                   </div>
                 )}
               </section>

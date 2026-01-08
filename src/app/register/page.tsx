@@ -270,8 +270,8 @@ const Register = () => {
         </div>
 
         {/* Back to Home */}
-        <div className="text-center mt-6">
-          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+        <div className="text-center mt-6 p- border border-primary-text hover:border-ternary-text w-50 mx-auto">
+          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors ">
             ← {t('backToHome')}
           </Link>
         </div>

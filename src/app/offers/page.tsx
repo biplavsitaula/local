@@ -14,7 +14,7 @@ import CartNotification from "@/components/CartNotification";
 import { Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle } from "lucide-react";
 
 const Offers = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,6 +106,17 @@ const Offers = () => {
     return false;
   });
 
+  // Filter discounted products based on search query
+  const filteredProducts = discountedProducts.filter((product) => {
+    if (!searchQuery.trim()) return true;
+    const query = searchQuery.toLowerCase().trim();
+    return (
+      product.name.toLowerCase().includes(query) ||
+      product.category?.toLowerCase().includes(query) ||
+      product.description?.toLowerCase().includes(query)
+    );
+  });
+
   const offers = [
     {
       icon: Truck,
@@ -151,6 +162,7 @@ const Offers = () => {
   };
   
   console.log('Discounted products count:', discountedProducts.length);
+  console.log('Filtered products count:', filteredProducts.length);
   console.log('All products:', products);
 
   return (
@@ -217,9 +229,9 @@ const Offers = () => {
           {/* Products Grid */}
           {!loading && !error && (
             <>
-              {discountedProducts.length > 0 ? (
+              {filteredProducts.length > 0 ? (
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {discountedProducts.map((product, index) => (
+                  {filteredProducts.map((product, index) => (
                     <ProductCard
                       key={product.id || `product-${index}`}
                       product={product}
@@ -233,7 +245,9 @@ const Offers = () => {
                 <div className="text-center py-12 bg-card rounded-xl">
                   <Percent className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground text-lg">
-                    {t("noProductsOnSale")}
+                    {searchQuery.trim() 
+                      ? (language === "en" ? `No products found for "${searchQuery}"` : `"${searchQuery}" को लागि कुनै उत्पादन फेला परेन`)
+                      : t("noProductsOnSale")}
                   </p>
                 </div>
               )}
