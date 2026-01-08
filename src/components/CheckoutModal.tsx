@@ -7,6 +7,7 @@ import { IPaymentCheckbox } from "@/interface/IPaymentCheckout";
 import { X, ArrowLeft, User, Phone, MapPin, Package, CreditCard, Check, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { ordersService, CheckoutPayload } from "@/services/orders.service";
+import Image from "next/image";
 
 const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const { t, language } = useLanguage();
@@ -107,13 +108,13 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         <Link
           href="/"
           onClick={handleClose}
-          className="absolute left-6 top-6 flex items-center gap-2 text-sm font-medium text-primary-text hover:text-secondary-text transition-colors cursor-pointer"
+          className="absolute left-6 top-6 flex items-center gap-2 text-sm font-medium text-primary-text hover:text-secondary-text transition-colors cursor-pointer border-2 p-2 border-ternary-text hover:border-primary-text"
         >
           <ArrowLeft className="h-4 w-4" />
           {t("continue")}
         </Link>
 
-        <div className="grid md:grid-cols-2 gap-0">
+        <div className="grid md:grid-cols-2 gap-0 mt-12">
           {/* Left: Order Summary */}
           <div className="p-6 md:p-8 border-r border-border bg-muted/20">
             <h2 className="text-2xl font-display font-bold text-primary-text mb-6">
@@ -300,6 +301,23 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                     {t("card")}
                   </button>
                 </div>
+                
+                {/* QR Code Display based on selected gateway */}
+                {selectedGateway === "esewa" && (
+                  <div className="flex justify-center mt-4">
+                    <Image src="/assets/esewaqr.png" alt="eSewa QR Code" width={150} height={150} className="rounded-lg" />
+                  </div>
+                )}
+                {selectedGateway === "khalti" && (
+                  <div className="flex justify-center mt-4">
+                    <Image src="/assets/khaltiqr.png" alt="Khalti QR Code" width={150} height={150} className="rounded-lg" />
+                  </div>
+                )}
+                {selectedGateway === "card" && (
+                  <div className="flex justify-center mt-4">
+                    <Image src="/assets/cardqr.png" alt="Card QR Code" width={150} height={150} className="rounded-lg" />
+                  </div>
+                )}
               </div>
             )}
 

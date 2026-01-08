@@ -213,7 +213,7 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${
                       theme === 'dark'
                         ? 'text-primary-text hover:text-flame-orange'
                         : 'text-orange-600 hover:text-orange-700'
@@ -260,8 +260,7 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                      theme === 'dark'
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${                      theme === 'dark'
                         ? 'text-primary-text hover:text-flame-orange'
                         : 'text-orange-600 hover:text-orange-700'
                     }`}
@@ -319,8 +318,7 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors ${
-                      theme === 'dark'
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${                      theme === 'dark'
                         ? 'text-primary-text hover:text-flame-orange'
                         : 'text-orange-600 hover:text-orange-700'
                     }`}

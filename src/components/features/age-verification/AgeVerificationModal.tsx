@@ -4,6 +4,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { Flame, Mic } from "lucide-react";
 import { IAgeVerificationModalProps } from "@/interface/IAgeVerificationModalProps";
 import Link from "next/link";
+import Image from "next/image";
 
 const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
   onVerified,
@@ -20,13 +21,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
       <div className="relative z-10 w-full max-w-lg mx-auto">
         <div className="relative rounded-2xl bg-black/90 p-8 md:p-12 text-center border-2 border-flame-orange shadow-[0_0_40px_rgba(255,140,0,0.3)]">
           {/* Logo with flame animation from bottom to top */}
-          <div className="flex justify-center mb-6">
+          <div className="flex justify-center mb-1">
             <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-gradient-to-br from-flame-orange via-flame-orange to-flame-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,140,0,0.5)] relative overflow-hidden">
-                {/* Animated flame from bottom to top */}
+              <Image src="/assets/flame-dark-logo.png" alt="Flame Beverage logo" width={160} height={100} />
+              {/* <div className="w-24 h-24 rounded-full bg-gradient-to-br from-flame-orange via-flame-orange to-flame-yellow flex items-center justify-center shadow-[0_0_30px_rgba(255,140,0,0.5)] relative overflow-hidden">
                 <div className="absolute inset-0 bg-gradient-to-t from-flame-orange via-flame-yellow to-transparent animate-flame-rise opacity-80" />
                 <Flame className="w-12 h-12 text-black relative z-10" />
-              </div>
+              </div> */}
             </div>
           </div>
 
