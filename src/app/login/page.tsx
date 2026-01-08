@@ -1,29 +1,23 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { Flame, Mail, Lock, Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
-import RegisterModal from "@/components/RegisterModal";
 
-function LoginForm() {
+const Login = () => {
   const { language, t } = useLanguage();
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [registerOpen, setRegisterOpen] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
-
-  // Get redirect URL from query params
-  const redirectUrl = searchParams.get('redirect');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,12 +26,7 @@ function LoginForm() {
     
     try {
       await login(formData.email, formData.password);
-      // After successful login, redirect based on redirectUrl
-      // AuthContext redirects to /dashboard by default, but we override if there's a redirectUrl
-      if (redirectUrl) {
-        router.push(redirectUrl);
-      }
-      // If no redirectUrl, AuthContext handles the redirect
+      // Navigation is handled by the auth context
     } catch (err: any) {
       setError(err.message || "Login failed. Please check your credentials.");
     } finally {
@@ -70,12 +59,9 @@ function LoginForm() {
             <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
               {t('login')}
             </button>
-            <button 
-              onClick={() => setRegisterOpen(true)}
-              className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors"
-            >
+            <Link href="/register" className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors">
               {language === "en" ? "Register" : "दर्ता"}
-            </button>
+            </Link>
           </div>
 
           {/* Form */}
@@ -187,27 +173,7 @@ function LoginForm() {
           </Link>
         </div>
       </div>
-
-      {/* Register Modal */}
-      <RegisterModal
-        open={registerOpen}
-        onClose={() => setRegisterOpen(false)}
-        onSwitchToLogin={() => setRegisterOpen(false)}
-      />
     </div>
-  );
-}
-
-// Wrap in Suspense for useSearchParams
-const Login = () => {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader2 className="w-8 h-8 animate-spin text-flame-orange" />
-      </div>
-    }>
-      <LoginForm />
-    </Suspense>
   );
 };
 

@@ -20,6 +20,7 @@ import {
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
 import { useState } from "react";
+import Image from "next/image";
 
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
@@ -53,7 +54,7 @@ export function AdminSidebar() {
     <aside className="fixed left-0 top-0 h-screen w-64 bg-sidebar border-r border-sidebar-border flex flex-col">
       {/* Logo */}
       <div className="p-6 border-b border-sidebar-border">
-        <div className="flex items-center gap-3">
+        {/* <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-lg gradient-gold flex items-center justify-center">
             <Flame className="h-6 w-6 text-primary-foreground" />
           </div>
@@ -63,7 +64,22 @@ export function AdminSidebar() {
             </h1>
             <p className="text-xs text-muted-foreground">Admin Panel</p>
           </div>
-        </div>
+        </div> */}
+        <div >
+              <Image
+                src="/assets/newlogo.png"
+                alt="Flame Beverage logo"
+                width={180}
+                height={48}
+                className="object-contain h-12 w-auto"
+                priority
+              />
+              <div className="text-left mt-2 text-bold">
+              <p>Admin Panel</p>
+
+
+             </div>
+          </div>
       </div>
 
       {/* Navigation */}

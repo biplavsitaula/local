@@ -6,6 +6,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Flame, Mail, Lock, Eye, EyeOff, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 
 interface LoginModalProps {
   open: boolean;
@@ -69,9 +70,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           {/* Logo and Title */}
           <div className="text-center mb-6">
             <div className="flex justify-center mb-4">
-              <div className="p-3 rounded-full bg-primary-gradient">
+              {/* <div className="p-3 rounded-full bg-primary-gradient">
                 <Flame className="w-8 h-8 text-white" />
-              </div>
+              </div> */}
+              <Image src="/assets/flame-dark-logo.png" alt="Flame Beverage logo" width={100} height={80} />
             </div>
             <h1 className="text-2xl font-display font-bold text-foreground mb-2">
               Flame Beverage

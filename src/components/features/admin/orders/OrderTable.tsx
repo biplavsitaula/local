@@ -388,7 +388,9 @@ export function OrderTable() {
         <body>
           <div class="invoice-container">
             <div class="header">
-              <div class="logo">🔥</div>
+              <div class="logo">
+                <img src="/assets/flame-light-logo.png" alt="Flame Beverage logo" width="50" height="50" style="object-fit: contain;" />
+              </div>
               <div class="company-name">FLAME BEVERAGE</div>
               <div class="company-subtitle">Premium Liquor Store</div>
               <div class="bill-info">
