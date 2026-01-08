@@ -46,11 +46,6 @@ const Products: React.FC = () => {
 
  // Map API product to internal Product type
  const mapApiProductToProduct = (apiProduct: any): Product => {
-   const originalPrice = apiProduct.discountPercent
-     ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
-     : undefined;
-
-
    // Handle API response structure: type instead of category
    const categoryValue = apiProduct.type || apiProduct.category || '';
    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
@@ -58,23 +53,34 @@ const Products: React.FC = () => {
      category = 'whisky';
    }
 
+   // Get discount info from API
+   const discountPercent = apiProduct.discountPercent || 0;
+   const discountAmount = apiProduct.discountAmount || 0;
+   const hasDiscount = discountPercent > 0 || discountAmount > 0;
+
+   // Use finalPrice as current price, original price is the base price when there's a discount
+   const currentPrice = apiProduct.finalPrice || apiProduct.price || 0;
+   const originalPrice = hasDiscount ? apiProduct.price : undefined;
+
+   // Use API tag directly (discount is shown separately via originalPrice)
+   const tag = apiProduct.tag || undefined;
 
    return {
      id: apiProduct._id || apiProduct.id || '',
      name: apiProduct.name || '',
      category,
-     price: apiProduct.finalPrice || apiProduct.price || 0,
-     originalPrice: apiProduct.discountPercent ? apiProduct.price : undefined,
+     price: currentPrice,
+     originalPrice,
      image: apiProduct.image || apiProduct.imageUrl || '',
      description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
      volume: apiProduct.volume || '750ml',
      alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
      alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
      inStock: (apiProduct.stock || 0) > 0,
-     isNew: false,
+     isNew: apiProduct.isNew || false,
      stock: apiProduct.stock,
      rating: apiProduct.rating,
-     tag: apiProduct.discountPercent ? `${apiProduct.discountPercent}% OFF` : apiProduct.tag,
+     tag,
    } as Product;
  };
 

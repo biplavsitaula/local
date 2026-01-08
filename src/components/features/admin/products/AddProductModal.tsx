@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Link, Star, AlertCircle } from "lucide-react";
+import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag } from "lucide-react";
 import { toast } from "sonner";
 import { useProductMutation } from "@/hooks/useProductMutation";
 import { Product } from "@/types";
@@ -65,6 +65,8 @@ export function AddProductModal({
     imageUrl: "",
     itemLink: "",
     rating: "",
+    discountPercent: "",
+    tag: "",
     isRecommended: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -80,6 +82,8 @@ export function AddProductModal({
         imageUrl: product.image || "",
         itemLink: (product as any).itemLink || "",
         rating: product.rating?.toString() || "",
+        discountPercent: (product as any).discountPercent?.toString() || "",
+        tag: product.tag || "",
         isRecommended: (product as any).isRecommended || false,
       });
     } else if (!product && open) {
@@ -91,6 +95,8 @@ export function AddProductModal({
         imageUrl: "",
         itemLink: "",
         rating: "",
+        discountPercent: "",
+        tag: "",
         isRecommended: false,
       });
     }
@@ -120,6 +126,12 @@ export function AddProductModal({
     ) {
       newErrors.rating = "Rating must be between 0 and 5";
     }
+    if (
+      formData.discountPercent &&
+      (parseFloat(formData.discountPercent) < 0 || parseFloat(formData.discountPercent) > 100)
+    ) {
+      newErrors.discountPercent = "Discount must be between 0 and 100";
+    }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -148,6 +160,8 @@ export function AddProductModal({
         type: categoryToType,
         price: parseFloat(formData.price),
         image: formData.imageUrl,
+        discountPercent: formData.discountPercent ? parseFloat(formData.discountPercent) : 0,
+        tag: formData.tag ? formData.tag.toUpperCase() : "",
         ...(formData.rating && { rating: parseFloat(formData.rating) }),
         ...(formData.stock && { stock: parseInt(formData.stock) }),
         ...(formData.itemLink && { itemLink: formData.itemLink }),
@@ -186,6 +200,8 @@ export function AddProductModal({
           imageUrl: "",
           itemLink: "",
           rating: "",
+          discountPercent: "",
+          tag: "",
           isRecommended: false,
         });
       }
@@ -196,6 +212,7 @@ export function AddProductModal({
       console.error('Error saving product:', err);
     }
   };
+  console.log(formData.tag,'formData.tagformData.tag')
 
   const handleClose = () => {
     setOpen(false);
@@ -349,6 +366,65 @@ export function AddProductModal({
                   <AlertCircle className="h-3 w-3" /> {errors.rating}
                 </p>
               )}
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="discountPercent" className="text-foreground">
+                Discount Percent{" "}
+                <span className="text-muted-foreground text-xs">
+                  (Optional)
+                </span>
+              </Label>
+              <div className="relative">
+                <Percent className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-flame-orange" />
+                <Input
+                  id="discountPercent"
+                  type="number"
+                  step="1"
+                  min="0"
+                  max="100"
+                  value={formData.discountPercent}
+                  onChange={(e) =>
+                    setFormData({ ...formData, discountPercent: e.target.value })
+                  }
+                  placeholder="0"
+                  className={cn(
+                    "bg-secondary/50 border-border pl-10",
+                    errors.discountPercent && "border-flame-red"
+                  )}
+                />
+              </div>
+              {errors.discountPercent && (
+                <p className="text-xs text-flame-red flex items-center gap-1">
+                  <AlertCircle className="h-3 w-3" /> {errors.discountPercent}
+                </p>
+              )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="tag" className="text-foreground">
+                Product Tag{" "}
+                <span className="text-muted-foreground text-xs">
+                  (Optional)
+                </span>
+              </Label>
+              <div className="relative">
+                <Tag className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-flame-yellow" />
+                <Input
+                  id="tag"
+                  type="text"
+                  value={formData.tag}
+                  onChange={(e) =>
+                    setFormData({ ...formData, tag: e.target.value })
+                  }
+                  placeholder="e.g., NEW, BEST, TOP"
+                  className="bg-secondary/50 border-border pl-10"
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                e.g., NEW, BEST, TOP, HOT
+              </p>
             </div>
           </div>
 

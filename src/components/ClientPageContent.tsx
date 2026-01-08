@@ -58,24 +58,35 @@ const [notificationQuantity, setNotificationQuantity] = useState(1);
    // Keep original category name from API (capitalized)
    const category = categoryValue || 'Other';
 
+   // Get discount info from API
+   const discountPercent = product.discountPercent || 0;
+   const discountAmount = product.discountAmount || 0;
+   const hasDiscount = discountPercent > 0 || discountAmount > 0;
+
+   // Use finalPrice as current price, original price is the base price when there's a discount
+   const currentPrice = product.finalPrice || product.price || 0;
+   const originalPrice = hasDiscount ? product.price : undefined;
+
+   // Use API tag directly (discount is shown separately via originalPrice)
+   const tag = product.tag || undefined;
 
    return {
      id: product._id || product.id || '',
      name: product.name || '',
      nameNe: product.nameNe || product.name || '',
      category,
-     price: product.finalPrice || product.price || 0,
-     originalPrice: product.discountPercent ? product.price : undefined,
+     price: currentPrice,
+     originalPrice,
      image: product.image || product.imageUrl || '',
      description: product.description || `Premium ${categoryValue || 'Beverage'} - ${product.name || 'Product'}`,
      volume: product.volume || '750ml',
      alcoholContent: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
      alcohol: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
      inStock: (product.stock || 0) > 0,
-     isNew: true, // Mark as new for recent arrivals
+     isNew: product.isNew || false, // Only show NEW badge if API says it's new
      stock: product.stock,
      rating: product.rating,
-     tag: product.discountPercent ? `${product.discountPercent}% OFF` : (product.tag || 'NEW'),
+     tag,
    } as Product;
  };
 

@@ -27,23 +27,14 @@ const Offers = () => {
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
-    // Handle multiple possible discount field names from API
-    const discountPercent = apiProduct.discountPercent || apiProduct.discountPercentage || apiProduct.discount || 0;
+    // Get discount info from API
+    const discountPercent = apiProduct.discountPercent || 0;
     const discountAmount = apiProduct.discountAmount || 0;
-    const finalPrice = apiProduct.finalPrice;
-    
-    // Calculate original price if there's a discount
-    let originalPrice: number | undefined = undefined;
-    if (discountPercent > 0) {
-      // If discountPercent exists, calculate original price
-      originalPrice = Math.round((apiProduct.price / (1 - discountPercent / 100)) * 100) / 100;
-    } else if (discountAmount > 0 && finalPrice) {
-      // If discountAmount exists, original price = finalPrice + discountAmount
-      originalPrice = finalPrice + discountAmount;
-    } else if (discountAmount > 0) {
-      // If only discountAmount exists, original price = price + discountAmount
-      originalPrice = (apiProduct.price || 0) + discountAmount;
-    }
+    const hasDiscount = discountPercent > 0 || discountAmount > 0;
+
+    // Use finalPrice as current price, original price is the base price when there's a discount
+    const currentPrice = apiProduct.finalPrice || apiProduct.price || 0;
+    const originalPrice = hasDiscount ? apiProduct.price : undefined;
 
     // Handle API response structure: type instead of category
     const categoryValue = apiProduct.type || apiProduct.category || '';
@@ -52,25 +43,25 @@ const Offers = () => {
       category = 'whisky';
     }
 
-    // Use finalPrice if available, otherwise use price
-    const productPrice = finalPrice || apiProduct.price || 0;
+    // Use API tag directly (discount is shown separately via originalPrice)
+    const tag = apiProduct.tag || undefined;
 
     return {
       id: apiProduct._id || apiProduct.id || '',
       name: apiProduct.name || '',
       category,
-      price: productPrice,
+      price: currentPrice,
       originalPrice,
       image: apiProduct.image || apiProduct.imageUrl || '',
       description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
       volume: apiProduct.volume || '750ml',
-      alcoholContent: apiProduct.alcoholContent || apiProduct.alcohol || '40%',
-      alcohol: apiProduct.alcohol || apiProduct.alcoholContent || '40%',
+      alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+      alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
       inStock: (apiProduct.stock || 0) > 0,
-      isNew: false,
+      isNew: apiProduct.isNew || false,
       stock: apiProduct.stock || 0,
       rating: apiProduct.rating || 0,
-      tag: apiProduct.tag,
+      tag,
     } as Product;
   };
 

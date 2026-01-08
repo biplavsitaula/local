@@ -7,6 +7,8 @@ export interface CreateProductRequest {
   price: number;
   image: string;
   discountPercentage?: number;
+  discountPercent?: number;
+  tag?: string;
   // Additional fields that might be supported by the API
   stock?: number;
   rating?: number;
@@ -23,6 +25,8 @@ export interface UpdateProductRequest {
   price?: number;
   image?: string;
   discountPercentage?: number;
+  discountPercent?: number;
+  tag?: string;
   // Additional fields that might be supported by the API
   stock?: number;
   rating?: number;
@@ -42,6 +46,8 @@ export interface CreateProductResponse {
     price: number;
     type: string;
     discountPercentage?: number;
+    discountPercent?: number;
+    tag?: string;
     __v?: number;
     createdAt?: string;
     updatedAt?: string;
@@ -60,6 +66,8 @@ export interface UpdateProductResponse {
     price: number;
     type: string;
     discountPercentage?: number;
+    discountPercent?: number;
+    tag?: string;
     __v?: number;
     createdAt?: string;
     updatedAt?: string;

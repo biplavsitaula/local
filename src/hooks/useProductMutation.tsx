@@ -38,31 +38,42 @@ export const useProductMutation = (): UseProductMutationReturn => {
       try {
         setLoading(true);
         setError(null);
-        // Map CreateProductRequest to service format
-        const serviceData = {
+        
+        // Get discount and tag values
+        const discountPercent = (productData as any).discountPercent ?? productData.discountPercentage ?? 0;
+        const tag = (productData as any).tag || '';
+        
+        // Map CreateProductRequest to service format - API expects 'type' not 'category'
+        const serviceData: Record<string, any> = {
           name: productData.name,
-          category: productData.type, // Map type to category
+          type: productData.type, // API uses 'type'
           price: productData.price,
-          imageUrl: productData.image,
-          image: productData.image,
-          discountPercent: productData.discountPercentage,
+          image: productData.image || '',
           stock: productData.stock || 0,
-          rating: productData.rating,
-          recommended: productData.isRecommended,
         };
+        
+        // Only include optional fields if they have values
+        if (discountPercent > 0) serviceData.discountPercent = discountPercent;
+        if (tag) serviceData.tag = tag;
+        if (productData.rating !== undefined) serviceData.rating = productData.rating;
+        if (productData.isRecommended) serviceData.isRecommended = productData.isRecommended;
+        
         const response = await productsService.create(serviceData);
+        const resData = response.data as any;
+        
         // Transform response to match CreateProductResponse
         return {
           message: response.message || 'Product created successfully',
           data: {
-            _id: response.data?._id || response.data?.id || '',
-            name: response.data?.name || '',
-            image: response.data?.image || response.data?.imageUrl || '',
-            price: response.data?.price || 0,
-            type: response.data?.category || response.data?.type || '',
-            discountPercentage: response.data?.discountPercent || response.data?.discountPercentage,
-            createdAt: response.data?.createdAt,
-            updatedAt: response.data?.updatedAt,
+            _id: resData?._id || resData?.id || '',
+            name: resData?.name || '',
+            image: resData?.image || resData?.imageUrl || '',
+            price: resData?.price || 0,
+            type: resData?.type || resData?.category || '',
+            discountPercentage: resData?.discountPercent || resData?.discountPercentage || 0,
+            tag: resData?.tag || '',
+            createdAt: resData?.createdAt,
+            updatedAt: resData?.updatedAt,
           },
         };
       } catch (err) {
@@ -85,33 +96,42 @@ export const useProductMutation = (): UseProductMutationReturn => {
       try {
         setLoading(true);
         setError(null);
-        // Map UpdateProductRequest to service format
-        const serviceData: any = {};
+        
+        // Map UpdateProductRequest to service format - API expects 'type' not 'category'
+        const serviceData: Record<string, any> = {};
+        
         if (productData.name !== undefined) serviceData.name = productData.name;
-        if (productData.type !== undefined) serviceData.category = productData.type; // Map type to category
+        if (productData.type !== undefined) serviceData.type = productData.type; // API uses 'type'
         if (productData.price !== undefined) serviceData.price = productData.price;
-        if (productData.image !== undefined) {
-          serviceData.imageUrl = productData.image;
-          serviceData.image = productData.image;
-        }
-        if (productData.discountPercentage !== undefined) serviceData.discountPercent = productData.discountPercentage;
+        if (productData.image !== undefined) serviceData.image = productData.image;
         if (productData.stock !== undefined) serviceData.stock = productData.stock;
         if (productData.rating !== undefined) serviceData.rating = productData.rating;
-        if (productData.isRecommended !== undefined) serviceData.recommended = productData.isRecommended;
+        if (productData.isRecommended !== undefined) serviceData.isRecommended = productData.isRecommended;
+        
+        // Handle both discountPercent and discountPercentage
+        const discountValue = (productData as any).discountPercent ?? productData.discountPercentage;
+        if (discountValue !== undefined) serviceData.discountPercent = discountValue;
+        
+        // Handle tag
+        const tagValue = (productData as any).tag;
+        if (tagValue !== undefined) serviceData.tag = tagValue;
         
         const response = await productsService.update(productId, serviceData);
+        const resData = response.data as any;
+        
         // Transform response to match UpdateProductResponse
         return {
           message: response.message || 'Product updated successfully',
           data: {
-            _id: response.data?._id || response.data?.id || productId,
-            name: response.data?.name || '',
-            image: response.data?.image || response.data?.imageUrl || '',
-            price: response.data?.price || 0,
-            type: response.data?.category || response.data?.type || '',
-            discountPercentage: response.data?.discountPercent || response.data?.discountPercentage,
-            createdAt: response.data?.createdAt,
-            updatedAt: response.data?.updatedAt,
+            _id: resData?._id || resData?.id || productId,
+            name: resData?.name || '',
+            image: resData?.image || resData?.imageUrl || '',
+            price: resData?.price || 0,
+            type: resData?.type || resData?.category || '',
+            discountPercentage: resData?.discountPercent || resData?.discountPercentage || 0,
+            tag: resData?.tag || '',
+            createdAt: resData?.createdAt,
+            updatedAt: resData?.updatedAt,
           },
         };
       } catch (err) {

@@ -46,9 +46,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
     <div className="group relative overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10">
       {/* Badges */}
       <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
-        {product.isNew && (
+        {product.tag && (
           <span className="rounded-full bg-primary-gradient px-3 py-1 text-xs font-bold text-text-inverse">
-            NEW
+            {product.tag}
           </span>
         )}
         {product.originalPrice && (

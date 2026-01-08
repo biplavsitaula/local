@@ -31,11 +31,6 @@ const Categories = () => {
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
-    // Calculate original price if there's a discount
-    const originalPrice = apiProduct.discountPercent && apiProduct.discountPercent > 0
-      ? apiProduct.price / (1 - apiProduct.discountPercent / 100)
-      : undefined;
-
     // Normalize category - handle API response structure: type instead of category
     const categoryValue = apiProduct.type || apiProduct.category || '';
     let category = categoryValue ? categoryValue.toLowerCase() : 'other';
@@ -43,31 +38,32 @@ const Categories = () => {
       category = 'whisky';
     }
 
-    // Use finalPrice if available, otherwise use price
-    const finalPrice = apiProduct.finalPrice || apiProduct.price;
+    // Get discount info from API
+    const discountPercent = apiProduct.discountPercent || 0;
+    const discountAmount = apiProduct.discountAmount || 0;
+    const hasDiscount = discountPercent > 0 || discountAmount > 0;
+
+    // Use finalPrice as current price, original price is the base price when there's a discount
+    const currentPrice = apiProduct.finalPrice || apiProduct.price || 0;
+    const originalPrice = hasDiscount ? apiProduct.price : undefined;
 
     // Format alcohol percentage
     const alcoholPercentage = apiProduct.alcoholPercentage 
       ? `${apiProduct.alcoholPercentage}%`
       : undefined;
 
-    // Determine tag based on isRecommended or status
-    let tag = apiProduct.tag;
-    if (!tag && apiProduct.isRecommended) {
-      tag = 'RECOMMENDED';
-    }
+    // Use API tag directly (discount is shown separately via originalPrice)
+    const tag = apiProduct.tag || undefined;
 
-    // Check if product is new (created within last 30 days)
-    const isNew = apiProduct.createdAt 
-      ? (Date.now() - new Date(apiProduct.createdAt).getTime()) < (30 * 24 * 60 * 60 * 1000)
-      : false;
+    // Only use isNew from API response
+    const isNew = apiProduct.isNew || false;
 
     return {
       id: apiProduct._id || apiProduct.id || '',
       name: apiProduct.name || '',
       category,
-      price: finalPrice,
-      originalPrice: originalPrice ? Math.round(originalPrice * 100) / 100 : undefined,
+      price: currentPrice,
+      originalPrice,
       image: apiProduct.image || apiProduct.imageUrl || '',
       description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
       volume: apiProduct.volume || '750ml',
