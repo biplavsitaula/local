@@ -1,7 +1,7 @@
 "use client";
 
 import { Dialog, DialogContent } from '@/components/ui/dialog';
-import { Printer, X } from 'lucide-react';
+import { Printer } from 'lucide-react';
 import { Order } from '@/hooks/useOrderStore';
 
 interface OrderItem {
@@ -82,12 +82,6 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
             <h2 className="text-2xl font-bold text-[#f97316]">
               Order Details - {order.billNumber}
             </h2>
-            <button
-              onClick={onClose}
-              className="text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <X className="h-5 w-5" />
-            </button>
           </div>
 
           {/* Customer Info and Order Info */}
