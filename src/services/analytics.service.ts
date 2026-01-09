@@ -1,15 +1,17 @@
 import { apiGet, ApiResponse } from '@/lib/api';
 
 
+export interface AnalyticsMetric {
+  value: number;
+  growth: number;
+  previousValue: number;
+}
+
 export interface AnalyticsSummary {
- totalRevenue: number;
- totalSales: number;
- avgOrderValue: number;
- productsSold: number;
- totalRevenueGrowth?: number;
- totalSalesGrowth?: number;
- avgOrderValueGrowth?: number;
- productsSoldGrowth?: number;
+  totalRevenue: AnalyticsMetric;
+  totalSales: AnalyticsMetric;
+  avgOrderValue: AnalyticsMetric;
+  productsSold: AnalyticsMetric;
 }
 
 
@@ -43,10 +45,10 @@ export const analyticsService = {
          success: true,
          message: 'Analytics summary not available',
          data: {
-           totalRevenue: 0,
-           totalSales: 0,
-           avgOrderValue: 0,
-           productsSold: 0,
+           totalRevenue: { value: 0, growth: 0, previousValue: 0 },
+           totalSales: { value: 0, growth: 0, previousValue: 0 },
+           avgOrderValue: { value: 0, growth: 0, previousValue: 0 },
+           productsSold: { value: 0, growth: 0, previousValue: 0 },
          },
        };
      }

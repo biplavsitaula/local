@@ -23,6 +23,56 @@ import { productsService } from '@/services/products.service';
 import { stockAlertsService } from '@/services/stock-alerts.service';
 import { reviewsService } from '@/services/reviews.service';
 
+// Helper to normalize category name (capitalize first letter)
+const normalizeCategory = (category: string): string => {
+  if (!category) return 'Unknown';
+  return category.charAt(0).toUpperCase() + category.slice(1).toLowerCase();
+};
+
+// Helper to merge duplicate stock categories (case-insensitive)
+const mergeStockCategories = (data: any[]): any[] => {
+  const merged: Record<string, { category: string; inStock: number; lowStock: number; outOfStock: number }> = {};
+  
+  data.forEach(item => {
+    const normalizedName = normalizeCategory(item.category);
+    if (merged[normalizedName]) {
+      merged[normalizedName].inStock += item.inStock || 0;
+      merged[normalizedName].lowStock += item.lowStock || 0;
+      merged[normalizedName].outOfStock += item.outOfStock || 0;
+    } else {
+      merged[normalizedName] = {
+        category: normalizedName,
+        inStock: item.inStock || 0,
+        lowStock: item.lowStock || 0,
+        outOfStock: item.outOfStock || 0,
+      };
+    }
+  });
+  
+  return Object.values(merged).sort((a, b) => 
+    (b.inStock + b.lowStock + b.outOfStock) - (a.inStock + a.lowStock + a.outOfStock)
+  );
+};
+
+// Helper to merge duplicate product categories
+const mergeProductCategories = (data: any[]): { name: string; value: number }[] => {
+  const merged: Record<string, { name: string; value: number }> = {};
+  
+  data.forEach(item => {
+    const normalizedName = normalizeCategory(item.category || item.name);
+    if (merged[normalizedName]) {
+      merged[normalizedName].value += item.count || item.value || 0;
+    } else {
+      merged[normalizedName] = {
+        name: normalizedName,
+        value: item.count || item.value || 0,
+      };
+    }
+  });
+  
+  return Object.values(merged).sort((a, b) => b.value - a.value);
+};
+
 const Index = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -62,34 +112,54 @@ const Index = () => {
         const lowStock = lowStockRes.data?.length || 0;
 
         // Fetch stock by category
+        // Merge duplicate categories (e.g., "Gin" and "gin")
         const stockByCategoryRes = await analyticsService.getStockByCategory();
-        setStockData(stockByCategoryRes.data || []);
+        setStockData(mergeStockCategories(stockByCategoryRes.data || []));
 
         // Fetch sales trend
+        // API returns: { month, revenue, count } - map to { month, sales }
         const salesTrendRes = await analyticsService.getSalesTrend();
-        setSalesData((salesTrendRes.data || []).map(item => ({
-          month: item.month,
-          sales: item.sales,
+        const salesTrendData = salesTrendRes.data || [];
+        setSalesData(salesTrendData.map(item => ({
+          month: item.month || '',
+          sales: item.revenue || item.sales || 0,
         })));
 
+        // Calculate totals from sales trend data as fallback
+        const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item.revenue || 0), 0);
+        const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item.count || 0), 0);
+
         // Fetch products by category
+        // Merge duplicate categories
         const productsByCategoryRes = await analyticsService.getProductsByCategory();
-        setCategoryData(productsByCategoryRes.data || []);
+        setCategoryData(mergeProductCategories(productsByCategoryRes.data || []));
 
         // Fetch reviews summary
         const reviewsRes = await reviewsService.getSummary();
-        const totalReviews = reviewsRes.data.totalReviews || 0;
+        const totalReviews = reviewsRes.data?.totalReviews || 0;
 
-        // Fetch recent products
+        // Fetch recent products and map to expected format
         const productsListRes = await productsService.getAll({ limit: 10 });
-        setProducts(productsListRes.data || []);
+        const mappedProducts = (productsListRes.data || []).map((p: any) => ({
+          id: p._id || p.id,
+          name: p.name,
+          category: p.type || p.category,
+          price: p.price || 0,
+          stock: p.stock ?? 0,
+          rating: p.rating,
+          image: p.image || p.imageUrl || '',
+          description: p.description || '',
+          sales: p.sales || p.totalSold || 0,
+        }));
+        setProducts(mappedProducts);
 
         setStats({
           totalProducts,
           outOfStock,
           lowStock,
-          totalSales: analyticsData?.totalSales || 0,
-          totalRevenue: analyticsData?.totalRevenue || 0,
+          // Use analytics data if available (nested object with .value), otherwise use calculated values
+          totalSales: analyticsData?.totalSales?.value || calculatedTotalSales,
+          totalRevenue: analyticsData?.totalRevenue?.value || calculatedTotalRevenue,
           totalReviews,
         });
       } catch (err: any) {
@@ -146,7 +216,7 @@ const Index = () => {
           title="Total Products"
           value={stats.totalProducts}
           icon={Package}
-          trend={{ value: analytics?.totalRevenueGrowth || 12, isPositive: true }}
+          trend={{ value: Math.abs(analytics?.totalRevenue?.growth || 0), isPositive: (analytics?.totalRevenue?.growth || 0) >= 0 }}
           delay={50}
         />
         <StatCard
@@ -167,14 +237,14 @@ const Index = () => {
           title="Total Sales"
           value={stats.totalSales.toLocaleString()}
           icon={ShoppingCart}
-          trend={{ value: analytics?.totalSalesGrowth || 8, isPositive: true }}
+          trend={{ value: Math.abs(analytics?.totalSales?.growth || 0), isPositive: (analytics?.totalSales?.growth || 0) >= 0 }}
           delay={200}
         />
         <StatCard
           title="Revenue"
-          value={`$${(stats.totalRevenue / 1000).toFixed(0)}K`}
+          value={stats.totalRevenue >= 1000 ? `Rs. ${(stats.totalRevenue / 1000).toFixed(1)}K` : `Rs. ${stats.totalRevenue.toFixed(2)}`}
           icon={DollarSign}
-          trend={{ value: analytics?.totalRevenueGrowth || 15, isPositive: true }}
+          trend={{ value: Math.abs(analytics?.totalRevenue?.growth || 0), isPositive: (analytics?.totalRevenue?.growth || 0) >= 0 }}
           variant="success"
           delay={250}
         />
