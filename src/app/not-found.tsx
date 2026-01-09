@@ -5,11 +5,15 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
-import { useLanguage } from "@/contexts/LanguageContext";
+import { getCurrentLanguageTranslations } from "@/helpers/languageHelper";
 
 export default function NotFound() {
   const router = useRouter();
-  const { t } = useLanguage();
+  // Use translations helper directly to avoid LanguageProvider dependency during SSR
+  const translations = typeof window !== 'undefined' 
+    ? getCurrentLanguageTranslations() 
+    : getCurrentLanguageTranslations(); // getCurrentLanguageTranslations handles SSR internally
+  const t = (key: string) => translations[key as keyof typeof translations] || key;
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
