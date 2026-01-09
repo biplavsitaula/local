@@ -20,7 +20,7 @@ const months = [
 const currentYear = new Date().getFullYear();
 const years = [currentYear - 1, currentYear, currentYear + 1];
 
-type DataType = 'products' | 'orders' | 'payments';
+type DataType = 'products' | 'orders' | 'payments' | 'inventory';
 
 interface ExportButtonProps {
   defaultDataType?: DataType;

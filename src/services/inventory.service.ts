@@ -9,6 +9,7 @@ export interface InventoryTransaction {
     price?: number;
     image?: string;
     stock?: number;
+    currentStock?: number;
   };
   productName: string;
   type: 'add' | 'remove';
@@ -24,6 +25,7 @@ export interface InventoryTransaction {
   };
   createdAt: string;
   updatedAt?: string;
+  currentStock?: number;
 }
 
 export interface AddStockRequest {

@@ -328,6 +328,10 @@ export function InventoryTable({ productId }: InventoryTableProps) {
                 </button>
               </th>
               <th className="text-left p-4 font-medium text-muted-foreground">
+                Current Stock
+                <ArrowUpDown className="h-4 w-4" />
+              </th>
+              <th className="text-left p-4 font-medium text-muted-foreground">
                 Reason
               </th>
               <th className="text-left p-4 font-medium text-muted-foreground">
@@ -407,6 +411,9 @@ export function InventoryTable({ productId }: InventoryTableProps) {
                     <span className="font-semibold text-foreground">
                       {transaction.newStock}
                     </span>
+                  </td>
+                  <td className="p-4 text-muted-foreground">
+                    {transaction.currentStock}
                   </td>
                   <td className="p-4">
                     <div className="max-w-[200px]">
