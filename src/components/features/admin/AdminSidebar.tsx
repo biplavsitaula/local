@@ -16,6 +16,7 @@ import {
   CreditCard,
   Bell,
   Loader2,
+  Warehouse,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -25,6 +26,7 @@ import Image from "next/image";
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { title: "Products", icon: Package, path: "/admin/products" },
+  { title: "Inventory", icon: Warehouse, path: "/admin/inventory" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },
   { title: "Notifications", icon: Bell, path: "/admin/notifications" },
