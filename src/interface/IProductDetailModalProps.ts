@@ -6,3 +6,4 @@ export interface IProductDetailModalProps {
   onClose: () => void;
 }
 
+

@@ -71,3 +71,4 @@ const AnimatedLogo: React.FC<AnimatedLogoProps> = ({
 
 export default AnimatedLogo;
 
+
