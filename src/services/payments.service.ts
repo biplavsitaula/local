@@ -1,13 +1,39 @@
 import { apiGet, apiPost, apiPut, apiDelete, ApiResponse } from '@/lib/api';
 
+export interface PaymentCustomer {
+  fullName: string;
+  mobile: string;
+  location?: string;
+}
+
+export interface PaymentOrderItem {
+  productId: string;
+  name: string;
+  quantity: number;
+  price: number;
+  total: number;
+  _id: string;
+}
+
+export interface PaymentOrder {
+  _id: string;
+  billNumber: string;
+  customer: PaymentCustomer;
+  items: PaymentOrderItem[];
+  totalAmount: number;
+}
+
 export interface Payment {
   _id?: string;
   id?: string;
-  orderId: string;
+  orderId: PaymentOrder | string;
   billNumber: string;
+  customer: PaymentCustomer;
   amount: number;
-  method: 'qr' | 'cod' | 'card';
+  method: 'COD' | 'Online' | 'qr' | 'cod' | 'card';
+  gateway: 'esewa' | 'khalti' | null;
   status: string;
+  notes?: string;
   transactionId?: string;
   createdAt: string;
   updatedAt?: string;

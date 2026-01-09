@@ -8,7 +8,7 @@ import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 type MethodFilter = "all" | "qr" | "cod";
-type SortKey = "billNumber" | "customerName" | "amount" | "method" | "status" | "createdAt";
+type SortKey = "billNumber" | "customerName" | "amount" | "method" | "gateway" | "status" | "createdAt";
 type SortDir = "asc" | "desc";
 
 interface PaymentTableProps {
@@ -19,10 +19,19 @@ interface Payment {
   id: string;
   billNumber: string;
   customerName: string;
+  customerMobile: string;
   amount: number;
   method: "cod" | "qr";
+  gateway: string | null;
   status: string;
+  notes: string;
   createdAt: string;
+  orderItems: Array<{
+    name: string;
+    quantity: number;
+    price: number;
+    total: number;
+  }>;
 }
 
 const getStatusColor = (status: string) => {
@@ -39,11 +48,17 @@ const getStatusColor = (status: string) => {
   return "bg-muted/20 text-muted-foreground";
 };
 
-const getMethodPill = (method: "cod" | "qr") => {
+const getMethodPill = (method: "cod" | "qr", gateway: string | null) => {
   if (method === "qr") {
+    // Show gateway name for online payments
+    const gatewayLabel = gateway ? gateway.charAt(0).toUpperCase() + gateway.slice(1) : "Online";
     return {
-      label: "QR Payment",
-      className: "bg-success/15 text-success border border-success/30",
+      label: gatewayLabel,
+      className: gateway === "esewa" 
+        ? "bg-green-500/15 text-green-500 border border-green-500/30"
+        : gateway === "khalti"
+        ? "bg-purple-500/15 text-purple-500 border border-purple-500/30"
+        : "bg-success/15 text-success border border-success/30",
     };
   }
   return {
@@ -72,11 +87,12 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
 
   const mapApiPaymentToPayment = (apiPayment: any): Payment => {
     // Handle API response structure - customer can be an object with fullName
-    const customerName = (apiPayment.customer as any)?.fullName || 
+    const customerName = apiPayment.customer?.fullName || 
                          apiPayment.customer?.name || 
                          apiPayment.customerName || 
-                         apiPayment.billNumber || 
                          'N/A';
+    
+    const customerMobile = apiPayment.customer?.mobile || '';
     
     // Map payment method - API returns "COD", "Online", "QR Payment"
     let method: "cod" | "qr" = "cod";
@@ -84,15 +100,30 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
     if (paymentMethod === 'online' || paymentMethod === 'qr' || paymentMethod === 'qr payment') {
       method = 'qr';
     }
+
+    // Get gateway (esewa, khalti, etc.)
+    const gateway = apiPayment.gateway || null;
+
+    // Get order items from orderId object
+    const orderItems = (apiPayment.orderId?.items || []).map((item: any) => ({
+      name: item.name || '',
+      quantity: item.quantity || 0,
+      price: item.price || 0,
+      total: item.total || 0,
+    }));
     
     return {
       id: apiPayment._id || apiPayment.id || "",
       billNumber: apiPayment.billNumber,
       customerName,
+      customerMobile,
       amount: apiPayment.amount,
       method,
+      gateway,
       status: apiPayment.status,
+      notes: apiPayment.notes || '',
       createdAt: apiPayment.createdAt,
+      orderItems,
     };
   };
 
@@ -102,13 +133,20 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
         setLoading(true);
         setError(null);
 
+        // Fetch all payments and filter on client side
         const response = await paymentsService.getAll({
-          method: methodFilter !== "all" ? methodFilter : undefined,
-          search: query || undefined,
           limit: 100,
         });
 
-        const mappedPayments = (response.data || []).map(mapApiPaymentToPayment);
+        let mappedPayments = (response.data || []).map(mapApiPaymentToPayment);
+        
+        // Filter by method on client side
+        if (methodFilter === "qr") {
+          mappedPayments = mappedPayments.filter(p => p.method === "qr");
+        } else if (methodFilter === "cod") {
+          mappedPayments = mappedPayments.filter(p => p.method === "cod");
+        }
+        
         setPayments(mappedPayments);
       } catch (err: any) {
         setError(err.message || "Failed to load payments");
@@ -119,7 +157,7 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
     };
 
     fetchPayments();
-  }, [methodFilter, query]);
+  }, [methodFilter]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -195,6 +233,8 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
           return dir * (a.amount - b.amount);
         case "method":
           return dir * a.method.localeCompare(b.method);
+        case "gateway":
+          return dir * (a.gateway || '').localeCompare(b.gateway || '');
         case "status":
           return dir * a.status.localeCompare(b.status);
         case "createdAt":
@@ -396,6 +436,7 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
               {renderSortableTh("Customer", "customerName")}
               {renderSortableTh("Amount", "amount")}
               {renderSortableTh("Method", "method")}
+              {renderSortableTh("Gateway", "gateway")}
               {renderSortableTh("Status", "status")}
               {renderSortableTh("Date", "createdAt")}
             </tr>
@@ -403,36 +444,66 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
           <tbody>
             {rows.length > 0 ? (
               rows.map((p) => {
-                const methodPill = getMethodPill(p.method);
+                const methodPill = getMethodPill(p.method, p.gateway);
                 return (
                   <tr
                     key={p.id}
                     className="border-b border-border/30 hover:bg-muted/30 transition-colors"
                   >
                     <td className="p-4 text-sm font-medium text-flame-orange">{p.billNumber}</td>
-                    <td className="p-4 text-sm text-foreground">{p.customerName}</td>
+                    <td className="p-4">
+                      <div className="text-sm text-foreground font-medium">{p.customerName}</div>
+                      {p.customerMobile && (
+                        <div className="text-xs text-muted-foreground">{p.customerMobile}</div>
+                      )}
+                    </td>
                     <td className="p-4 text-sm text-foreground font-medium">
-                      ${p.amount.toFixed(2)}
+                      Rs. {p.amount.toFixed(2)}
                     </td>
                     <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full ${methodPill.className}`}>
-                        {methodPill.label}
+                      <span className={`text-xs px-2 py-1 rounded-full ${
+                        p.method === "qr" 
+                          ? "bg-success/15 text-success border border-success/30" 
+                          : "bg-warning/15 text-warning border border-warning/30"
+                      }`}>
+                        {p.method === "qr" ? "Online" : "COD"}
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(p.status)}`}>
+                      {p.gateway ? (
+                        <span className={`text-xs px-2 py-1 rounded-full ${
+                          p.gateway === "esewa" 
+                            ? "bg-green-500/15 text-green-500 border border-green-500/30"
+                            : p.gateway === "khalti"
+                            ? "bg-purple-500/15 text-purple-500 border border-purple-500/30"
+                            : "bg-blue-500/15 text-blue-500 border border-blue-500/30"
+                        }`}>
+                          {p.gateway.charAt(0).toUpperCase() + p.gateway.slice(1)}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">-</span>
+                      )}
+                    </td>
+                    <td className="p-4">
+                      <span className={`text-xs px-2 py-1 rounded-full capitalize ${getStatusColor(p.status)}`}>
                         {p.status}
                       </span>
                     </td>
                     <td className="p-4 text-sm text-muted-foreground">
-                      {new Date(p.createdAt).toLocaleDateString("en-US")}
+                      {new Date(p.createdAt).toLocaleDateString("en-US", {
+                        year: 'numeric',
+                        month: 'short',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
                     </td>
                   </tr>
                 );
               })
             ) : (
               <tr>
-                <td colSpan={6} className="p-10 text-center text-muted-foreground">
+                <td colSpan={7} className="p-10 text-center text-muted-foreground">
                   No payments found
                 </td>
               </tr>

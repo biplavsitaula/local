@@ -4,10 +4,16 @@ import { useMemo, useEffect, useState } from "react";
 import { CreditCard, QrCode, Wallet, Loader2, AlertCircle } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/features/admin/ExportButton";
-import { paymentsService } from "@/services/payments.service";
+import { paymentsService, Payment as ApiPayment } from "@/services/payments.service";
 import { PaymentTable } from "@/components/features/admin/payments/PaymentTable";
 
 type MethodFilter = "all" | "qr" | "cod";
+
+interface PaymentSummary {
+  totalPayments: number;
+  completed: number;
+  pending: number;
+}
 
 function SummaryCard({
   label,
@@ -28,13 +34,10 @@ function SummaryCard({
 
 export default function Payments() {
   const [mounted, setMounted] = useState(false);
-  const [summary, setSummary] = useState({
-    totalPayments: 0,
-    completed: 0,
-    pending: 0,
-  });
+  const [payments, setPayments] = useState<ApiPayment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<MethodFilter>("all");
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -42,53 +45,67 @@ export default function Payments() {
   }, []);
 
   useEffect(() => {
-    const fetchSummary = async () => {
+    const fetchPayments = async () => {
       try {
         setLoading(true);
         setError(null);
 
-        const response = await paymentsService.getSummary();
-
-        setSummary({
-          totalPayments: response.data?.totalPayments ?? 0,
-          completed: response.data?.completed ?? 0,
-          pending: response.data?.pending ?? 0,
-        });
+        const response = await paymentsService.getAll({ limit: 1000 });
+        setPayments(response.data || []);
       } catch (err: any) {
-        setError(err.message || "Failed to load payment summary");
+        setError(err.message || "Failed to load payments");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchSummary();
+    fetchPayments();
   }, []);
 
-  const calcTotals = (method: MethodFilter) => {
-    // Currently only "all" is supported
-    if (method === "all") {
-      return {
-        totalPayments: summary.totalPayments,
-        completed: summary.completed,
-        pending: summary.pending,
-      };
+  // Helper to check if payment is QR/Online
+  const isQrPayment = (p: ApiPayment) => {
+    const method = (p.method || '').toLowerCase();
+    return method === 'online' || method === 'qr' || method === 'qr payment';
+  };
+
+  // Helper to check if payment is COD
+  const isCodPayment = (p: ApiPayment) => {
+    const method = (p.method || '').toLowerCase();
+    return method === 'cod' || method === 'cash on delivery';
+  };
+
+  // Calculate summaries from actual payment data
+  const calcTotals = (method: MethodFilter): PaymentSummary => {
+    let filtered = payments;
+    
+    if (method === "qr") {
+      filtered = payments.filter(isQrPayment);
+    } else if (method === "cod") {
+      filtered = payments.filter(isCodPayment);
     }
 
-    // Placeholder until API supports filters
+    const total = filtered.reduce((sum, p) => sum + (p.amount || 0), 0);
+    const completed = filtered
+      .filter(p => (p.status || '').toLowerCase() === 'completed')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+    const pending = filtered
+      .filter(p => (p.status || '').toLowerCase() === 'pending')
+      .reduce((sum, p) => sum + (p.amount || 0), 0);
+
     return {
-      totalPayments: 0,
-      completed: 0,
-      pending: 0,
+      totalPayments: total,
+      completed,
+      pending,
     };
   };
 
-  const totalsAll = useMemo(() => calcTotals("all"), [summary]);
-  const totalsQr = useMemo(() => calcTotals("qr"), [summary]);
-  const totalsCod = useMemo(() => calcTotals("cod"), [summary]);
+  const totalsAll = useMemo(() => calcTotals("all"), [payments]);
+  const totalsQr = useMemo(() => calcTotals("qr"), [payments]);
+  const totalsCod = useMemo(() => calcTotals("cod"), [payments]);
 
   if (!mounted) return null;
 
-  if (loading && !summary.totalPayments) {
+  if (loading && payments.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
@@ -99,7 +116,7 @@ export default function Payments() {
     );
   }
 
-  if (error && !summary.totalPayments) {
+  if (error && payments.length === 0) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4 text-center">
@@ -131,7 +148,8 @@ export default function Payments() {
       </div>
 
       <Tabs
-        defaultValue="all"
+        value={activeTab}
+        onValueChange={(value) => setActiveTab(value as MethodFilter)}
         className="opacity-0 animate-fade-in"
         style={{ animationDelay: "100ms" }}
       >
@@ -139,14 +157,23 @@ export default function Payments() {
           <TabsTrigger value="all" className="gap-2">
             <CreditCard className="h-4 w-4" />
             All Payments
+            <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded-full">
+              {payments.length}
+            </span>
           </TabsTrigger>
           <TabsTrigger value="qr" className="gap-2">
             <QrCode className="h-4 w-4" />
             QR Payments
+            <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded-full">
+              {payments.filter(isQrPayment).length}
+            </span>
           </TabsTrigger>
           <TabsTrigger value="cod" className="gap-2">
             <Wallet className="h-4 w-4" />
             Cash on Delivery
+            <span className="ml-1 text-xs bg-muted px-1.5 py-0.5 rounded-full">
+              {payments.filter(isCodPayment).length}
+            </span>
           </TabsTrigger>
         </TabsList>
 
