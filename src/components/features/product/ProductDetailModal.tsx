@@ -27,8 +27,8 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
     }
     toast.success(
       language === 'en'
-        ? `${quantity} × ${product.name} added to cart!`
-        : `${quantity} × ${product.nameNe} कार्टमा थपियो!`
+        ? `${quantity} × ${product?.name} added to cart!`
+        : `${quantity} × ${product?.nameNe} कार्टमा थपियो!`
     );
     setQuantity(1);
     onClose();
@@ -54,8 +54,8 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
             <div className="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-flame-orange/50 rounded-br" />
 
             <img
-              src={product.image}
-              alt={product.name}
+              src={product?.image}
+              alt={product?.name}
               className="max-w-full max-h-[320px] object-contain drop-shadow-2xl"
               style={{
                 filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))',
@@ -68,38 +68,38 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
             <DialogHeader className="mb-4">
               <span className="inline-flex items-center px-3 py-1 text-xs font-medium bg-secondary rounded-full text-muted-foreground capitalize w-fit mb-2">
                 <Tag className="w-3 h-3 mr-1" />
-                {product.category}
+                {product?.category}
               </span>
               <DialogTitle className="text-2xl font-display text-foreground">
-                {language === 'en' ? product.name : product.nameNe}
+                {language === 'en' ? product?.name : product?.nameNe}
               </DialogTitle>
             </DialogHeader>
 
             {/* Product Info */}
             <div className="space-y-4 flex-1">
               <p className="text-muted-foreground text-sm leading-relaxed">
-                {product.description}
+                {product?.description}
               </p>
 
               <div className="flex flex-wrap gap-3">
                 <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
                   <Wine className="w-4 h-4 text-flame-orange" />
-                  <span className="text-sm text-foreground">{product.volume}</span>
+                  <span className="text-sm text-foreground">{product?.volume}</span>
                 </div>
                 <div className="flex items-center gap-2 px-3 py-2 bg-secondary/50 rounded-lg">
                   <Droplets className="w-4 h-4 text-flame-orange" />
-                  <span className="text-sm text-foreground">{product.alcohol}</span>
+                  <span className="text-sm text-foreground">{product?.alcohol}</span>
                 </div>
               </div>
 
               {/* Price */}
               <div className="pt-2">
                 <p className="text-3xl font-bold flame-text">
-                  Rs. {(product.price * quantity).toLocaleString()}
+                  Rs. {((product?.price || 0) * quantity).toLocaleString()}
                 </p>
                 {quantity > 1 && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    Rs. {product.price.toLocaleString()} × {quantity}
+                    Rs. {(product?.price || 0).toLocaleString()} × {quantity}
                   </p>
                 )}
               </div>
@@ -138,7 +138,7 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
               <div className="flex items-center justify-between py-3 border-t border-border/50">
                 <span className="text-muted-foreground">Total:</span>
                 <span className="text-xl font-bold text-foreground">
-                  Rs. {(product.price * quantity).toLocaleString()}
+                  Rs. {((product?.price || 0) * quantity).toLocaleString()}
                 </span>
               </div>
 
