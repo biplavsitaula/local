@@ -32,7 +32,7 @@ export const seasonalThemesService = {
       return await apiGet<SeasonalThemeApiResponse>('/seasonal-themes/current', undefined, false);
     } catch (error: any) {
       // Handle 404 or other errors gracefully
-      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+      if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
         console.warn('Current seasonal theme endpoint not available, returning default');
         return {
           success: true,
@@ -53,7 +53,7 @@ export const seasonalThemesService = {
     try {
       return await apiGet<SeasonalThemeApiResponse[]>('/seasonal-themes', undefined, false);
     } catch (error: any) {
-      if (error.status === 404 || error.message?.includes('404')) {
+      if (error?.status === 404 || error?.message?.includes('404')) {
         console.warn('Seasonal themes endpoint not available');
         return {
           success: true,
@@ -72,7 +72,7 @@ export const seasonalThemesService = {
     try {
       return await apiGet<SeasonalThemeApiResponse>(`/seasonal-themes/${keyname}`, undefined, false);
     } catch (error: any) {
-      if (error.status === 404 || error.message?.includes('404')) {
+      if (error?.status === 404 || error?.message?.includes('404')) {
         console.warn(`Seasonal theme ${keyname} not found`);
         return {
           success: true,

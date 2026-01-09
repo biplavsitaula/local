@@ -189,28 +189,28 @@ const ProductGrid: React.FC<ProductGridProps> = ({
  // Map API product to internal Product type
  const mapApiProductToProduct = (apiProduct: any): Product => {
    // Handle API response structure: type instead of category, image instead of imageUrl
-   const categoryValue = apiProduct.type || apiProduct.category || '';
+   const categoryValue = apiProduct?.type || apiProduct?.category || '';
    // Keep original category name from API (capitalized)
    const category = categoryValue || 'Other';
 
 
    return {
-     id: apiProduct._id || apiProduct.id || '',
-     name: apiProduct.name || '',
-     nameNe: apiProduct.nameNe || apiProduct.name || '', // Use name as fallback if nameNe not available
+     id: apiProduct?._id || apiProduct?.id || '',
+     name: apiProduct?.name || '',
+     nameNe: apiProduct?.nameNe || apiProduct?.name || '', // Use name as fallback if nameNe not available
      category,
-     price: apiProduct.finalPrice || apiProduct.price || 0,
-     originalPrice: apiProduct.discountPercent ? apiProduct.price : undefined,
-     image: apiProduct.image || apiProduct.imageUrl || '',
-     description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
-     volume: apiProduct.volume || '750ml',
-     alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
-     alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
-     inStock: (apiProduct.stock || 0) > 0,
+     price: apiProduct?.finalPrice || apiProduct?.price || 0,
+     originalPrice: apiProduct?.discountPercent ? apiProduct?.price : undefined,
+     image: apiProduct?.image || apiProduct?.imageUrl || '',
+     description: apiProduct?.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct?.name || 'Product'}`,
+     volume: apiProduct?.volume || '750ml',
+     alcoholContent: apiProduct?.alcoholPercentage ? `${apiProduct?.alcoholPercentage}%` : '40%',
+     alcohol: apiProduct?.alcoholPercentage ? `${apiProduct?.alcoholPercentage}%` : '40%',
+     inStock: (apiProduct?.stock || 0) > 0,
      isNew: false,
-     stock: apiProduct.stock || 0,
-     rating: apiProduct.rating || 0,
-     tag: apiProduct.discountPercent ? `${apiProduct.discountPercent}% OFF` : apiProduct.tag,
+     stock: apiProduct?.stock || 0,
+     rating: apiProduct?.rating || 0,
+     tag: apiProduct?.discountPercent ? `${apiProduct?.discountPercent}% OFF` : apiProduct?.tag,
    } as Product;
  };
 
@@ -248,7 +248,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
      }
    } catch (err: any) {
-     setError(err.message || 'Failed to fetch products');
+     setError(err?.message || 'Failed to fetch products');
      if (!append) {
        setProducts([]);
      }
@@ -278,17 +278,17 @@ const ProductGrid: React.FC<ProductGridProps> = ({
  const filteredProducts = useMemo(() => {
    const filtered = products.filter((product) => {
      const matchesSearch =
-       product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       (product.nameNe && product.nameNe.toLowerCase().includes(searchQuery.toLowerCase())) ||
-       (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()));
-    
+       product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+       (product?.nameNe && product?.nameNe?.toLowerCase().includes(searchQuery.toLowerCase())) ||
+       (product?.description && product?.description?.toLowerCase().includes(searchQuery.toLowerCase()));
+     
      // Match category case-insensitively
      const matchesCategory =
        !selectedCategory ||
        selectedCategory === "All" ||
        selectedCategory === "" ||
-       product.category.toLowerCase() === selectedCategory.toLowerCase();
-    
+       product?.category?.toLowerCase() === selectedCategory.toLowerCase();
+     
      return matchesSearch && matchesCategory;
    });
   

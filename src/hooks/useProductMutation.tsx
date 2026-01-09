@@ -63,7 +63,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         
         // Transform response to match CreateProductResponse
         return {
-          message: response.message || 'Product created successfully',
+          message: response?.message || 'Product created successfully',
           data: {
             _id: resData?._id || resData?.id || '',
             name: resData?.name || '',
@@ -78,7 +78,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         };
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to create product';
+          err instanceof Error ? err?.message : 'Failed to create product';
         setError(errorMessage);
         throw err;
       } finally {
@@ -121,7 +121,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         
         // Transform response to match UpdateProductResponse
         return {
-          message: response.message || 'Product updated successfully',
+          message: response?.message || 'Product updated successfully',
           data: {
             _id: resData?._id || resData?.id || productId,
             name: resData?.name || '',
@@ -136,7 +136,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         };
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to update product';
+          err instanceof Error ? err?.message : 'Failed to update product';
         setError(errorMessage);
         throw err;
       } finally {
@@ -154,14 +154,14 @@ export const useProductMutation = (): UseProductMutationReturn => {
         const response = await productsService.delete(productId);
         // Transform response to match DeleteProductResponse
         return {
-          message: response.message || 'Product deleted successfully',
+          message: response?.message || 'Product deleted successfully',
           data: {
             _id: productId,
           },
         };
       } catch (err) {
         const errorMessage =
-          err instanceof Error ? err.message : 'Failed to delete product';
+          err instanceof Error ? err?.message : 'Failed to delete product';
         setError(errorMessage);
         throw err;
       } finally {

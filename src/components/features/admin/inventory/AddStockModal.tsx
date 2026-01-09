@@ -160,7 +160,7 @@ export function AddStockModal({
       }
     } catch (error: any) {
       const errorMessage =
-        error.message || "Failed to add stock. Please try again.";
+        error?.message || "Failed to add stock. Please try again.";
       toast.error(errorMessage);
       console.error("Add stock error:", error);
     } finally {

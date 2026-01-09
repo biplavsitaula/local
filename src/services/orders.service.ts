@@ -62,7 +62,7 @@ export const ordersService = {
       return await apiGet<Order[]>('/orders', filters, false);
     } catch (error: any) {
       // Handle 404 or other errors gracefully
-      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+      if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
         console.warn('Orders endpoint not available, returning empty array');
         return {
           success: true,

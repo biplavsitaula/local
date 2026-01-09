@@ -102,13 +102,13 @@ async function apiFetch<T>(
  if (response.status === 401) {
    handleUnauthorized();
    const errorData = await response.json().catch(() => ({ message: 'Unauthorized' }));
-   throw new Error(errorData.message || 'Unauthorized. Please login again.');
+   throw new Error(errorData?.message || 'Unauthorized. Please login again.');
  }
 
 
  if (!response.ok) {
    const errorData = await response.json().catch(() => ({ message: 'An error occurred' }));
-   const errorMessage = errorData.message || `HTTP error! status: ${response.status}`;
+   const errorMessage = errorData?.message || `HTTP error! status: ${response.status}`;
    // Include status code in error message for better error handling
    const error = new Error(errorMessage);
    (error as any).status = response.status;
@@ -122,9 +122,9 @@ async function apiFetch<T>(
  if (data && 'data' in data && !('success' in data)) {
    return {
      success: true,
-     message: data.message || 'Success',
-     data: data.data,
-     pagination: data.pagination,
+     message: data?.message || 'Success',
+     data: data?.data,
+     pagination: data?.pagination,
    } as ApiResponse<T>;
  }
   return data;

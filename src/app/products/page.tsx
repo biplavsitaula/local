@@ -47,39 +47,39 @@ const Products: React.FC = () => {
  // Map API product to internal Product type
  const mapApiProductToProduct = (apiProduct: any): Product => {
    // Handle API response structure: type instead of category
-   const categoryValue = apiProduct.type || apiProduct.category || '';
+   const categoryValue = apiProduct?.type || apiProduct?.category || '';
    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
    if (category === 'whiskey' || category === 'whisky') {
      category = 'whisky';
    }
 
    // Get discount info from API
-   const discountPercent = apiProduct.discountPercent || 0;
-   const discountAmount = apiProduct.discountAmount || 0;
+   const discountPercent = apiProduct?.discountPercent || 0;
+   const discountAmount = apiProduct?.discountAmount || 0;
    const hasDiscount = discountPercent > 0 || discountAmount > 0;
 
    // Use finalPrice as current price, original price is the base price when there's a discount
-   const currentPrice = apiProduct.finalPrice || apiProduct.price || 0;
-   const originalPrice = hasDiscount ? apiProduct.price : undefined;
+   const currentPrice = apiProduct?.finalPrice || apiProduct?.price || 0;
+   const originalPrice = hasDiscount ? apiProduct?.price : undefined;
 
    // Use API tag directly (discount is shown separately via originalPrice)
-   const tag = apiProduct.tag || undefined;
+   const tag = apiProduct?.tag || undefined;
 
    return {
-     id: apiProduct._id || apiProduct.id || '',
-     name: apiProduct.name || '',
+     id: apiProduct?._id || apiProduct?.id || '',
+     name: apiProduct?.name || '',
      category,
      price: currentPrice,
      originalPrice,
-     image: apiProduct.image || apiProduct.imageUrl || '',
-     description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
-     volume: apiProduct.volume || '750ml',
-     alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
-     alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
-     inStock: (apiProduct.stock || 0) > 0,
-     isNew: apiProduct.isNew || false,
-     stock: apiProduct.stock,
-     rating: apiProduct.rating,
+     image: apiProduct?.image || apiProduct?.imageUrl || '',
+     description: apiProduct?.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct?.name || 'Product'}`,
+     volume: apiProduct?.volume || '750ml',
+     alcoholContent: apiProduct?.alcoholPercentage ? `${apiProduct?.alcoholPercentage}%` : '40%',
+     alcohol: apiProduct?.alcoholPercentage ? `${apiProduct?.alcoholPercentage}%` : '40%',
+     inStock: (apiProduct?.stock || 0) > 0,
+     isNew: apiProduct?.isNew || false,
+     stock: apiProduct?.stock,
+     rating: apiProduct?.rating,
      tag,
    } as Product;
  };
@@ -117,7 +117,7 @@ const Products: React.FC = () => {
        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
      }
    } catch (err: any) {
-     setError(err.message || 'Failed to fetch products');
+     setError(err?.message || 'Failed to fetch products');
      if (!append) {
        setProducts([]);
      }
@@ -158,40 +158,40 @@ const Products: React.FC = () => {
    let filtered = [...products];
 
 
-   // Search filter
-   if (searchQuery) {
-     const query = searchQuery.toLowerCase();
-     filtered = filtered.filter(
-       (p) =>
-         p.name.toLowerCase().includes(query) ||
-         (p.nameNe && p.nameNe.toLowerCase().includes(query)) ||
-         p.category.toLowerCase().includes(query)
-     );
-   }
+  // Search filter
+  if (searchQuery) {
+    const query = searchQuery.toLowerCase();
+    filtered = filtered.filter(
+      (p) =>
+        p?.name?.toLowerCase().includes(query) ||
+        (p?.nameNe && p?.nameNe?.toLowerCase().includes(query)) ||
+        p?.category?.toLowerCase().includes(query)
+    );
+  }
 
 
-   // Category filter
-   if (selectedCategory) {
-     filtered = filtered.filter((p) => p.category === selectedCategory);
-   }
+  // Category filter
+  if (selectedCategory) {
+    filtered = filtered.filter((p) => p?.category === selectedCategory);
+  }
 
 
-   // Price filter
-   filtered = filtered.filter((p) => p.price >= priceRange[0] && p.price <= priceRange[1]);
+  // Price filter
+  filtered = filtered.filter((p) => p?.price >= priceRange[0] && p?.price <= priceRange[1]);
 
 
-   // Sort
-   switch (sortBy) {
-     case 'lowToHigh':
-       filtered.sort((a, b) => a.price - b.price);
-       break;
-     case 'highToLow':
-       filtered.sort((a, b) => b.price - a.price);
-       break;
-     case 'newest':
-     default:
-       filtered.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
-   }
+  // Sort
+  switch (sortBy) {
+    case 'lowToHigh':
+      filtered.sort((a, b) => (a?.price || 0) - (b?.price || 0));
+      break;
+    case 'highToLow':
+      filtered.sort((a, b) => (b?.price || 0) - (a?.price || 0));
+      break;
+    case 'newest':
+    default:
+      filtered.sort((a, b) => (b?.isNew ? 1 : 0) - (a?.isNew ? 1 : 0));
+  }
 
 
    return filtered;

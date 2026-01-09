@@ -53,41 +53,41 @@ const [notificationQuantity, setNotificationQuantity] = useState(1);
    // Cast to any to access fields that may not be in the TypeScript interface
    const product = apiProduct as any;
   
-   // Handle API response structure: type instead of category
-   const categoryValue = product.type || product.category || '';
-   // Keep original category name from API (capitalized)
-   const category = categoryValue || 'Other';
+  // Handle API response structure: type instead of category
+  const categoryValue = product?.type || product?.category || '';
+  // Keep original category name from API (capitalized)
+  const category = categoryValue || 'Other';
 
-   // Get discount info from API
-   const discountPercent = product.discountPercent || 0;
-   const discountAmount = product.discountAmount || 0;
-   const hasDiscount = discountPercent > 0 || discountAmount > 0;
+  // Get discount info from API
+  const discountPercent = product?.discountPercent || 0;
+  const discountAmount = product?.discountAmount || 0;
+  const hasDiscount = discountPercent > 0 || discountAmount > 0;
 
-   // Use finalPrice as current price, original price is the base price when there's a discount
-   const currentPrice = product.finalPrice || product.price || 0;
-   const originalPrice = hasDiscount ? product.price : undefined;
+  // Use finalPrice as current price, original price is the base price when there's a discount
+  const currentPrice = product?.finalPrice || product?.price || 0;
+  const originalPrice = hasDiscount ? product?.price : undefined;
 
-   // Use API tag directly (discount is shown separately via originalPrice)
-   const tag = product.tag || undefined;
+  // Use API tag directly (discount is shown separately via originalPrice)
+  const tag = product?.tag || undefined;
 
-   return {
-     id: product._id || product.id || '',
-     name: product.name || '',
-     nameNe: product.nameNe || product.name || '',
-     category,
-     price: currentPrice,
-     originalPrice,
-     image: product.image || product.imageUrl || '',
-     description: product.description || `Premium ${categoryValue || 'Beverage'} - ${product.name || 'Product'}`,
-     volume: product.volume || '750ml',
-     alcoholContent: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
-     alcohol: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
-     inStock: (product.stock || 0) > 0,
-     isNew: product.isNew || false, // Only show NEW badge if API says it's new
-     stock: product.stock,
-     rating: product.rating,
-     tag,
-   } as Product;
+  return {
+    id: product?._id || product?.id || '',
+    name: product?.name || '',
+    nameNe: product?.nameNe || product?.name || '',
+    category,
+    price: currentPrice,
+    originalPrice,
+    image: product?.image || product?.imageUrl || '',
+    description: product?.description || `Premium ${categoryValue || 'Beverage'} - ${product?.name || 'Product'}`,
+    volume: product?.volume || '750ml',
+    alcoholContent: product?.alcoholPercentage ? `${product?.alcoholPercentage}%` : '40%',
+    alcohol: product?.alcoholPercentage ? `${product?.alcoholPercentage}%` : '40%',
+    inStock: (product?.stock || 0) > 0,
+    isNew: product?.isNew || false, // Only show NEW badge if API says it's new
+    stock: product?.stock,
+    rating: product?.rating,
+    tag,
+  } as Product;
  };
 
 
@@ -119,10 +119,10 @@ useEffect(() => {
     
       // Sort by createdAt or updatedAt if available, otherwise use the order from API
       const sortedProducts = [...products].sort((a, b) => {
-        const dateA = a.createdAt ? new Date(a.createdAt).getTime() :
-                      (a.updatedAt ? new Date(a.updatedAt).getTime() : 0);
-        const dateB = b.createdAt ? new Date(b.createdAt).getTime() :
-                      (b.updatedAt ? new Date(b.updatedAt).getTime() : 0);
+        const dateA = a?.createdAt ? new Date(a.createdAt).getTime() :
+                      (a?.updatedAt ? new Date(a.updatedAt).getTime() : 0);
+        const dateB = b?.createdAt ? new Date(b.createdAt).getTime() :
+                      (b?.updatedAt ? new Date(b.updatedAt).getTime() : 0);
         return dateB - dateA; // Descending order (newest first)
       });
     
@@ -177,9 +177,9 @@ const filterBySearch = (products: Product[]) => {
   if (!searchQuery.trim()) return products;
   const query = searchQuery.toLowerCase().trim();
   return products.filter((product) =>
-    product.name.toLowerCase().includes(query) ||
-    product.category?.toLowerCase().includes(query) ||
-    product.description?.toLowerCase().includes(query)
+    product?.name?.toLowerCase().includes(query) ||
+    product?.category?.toLowerCase().includes(query) ||
+    product?.description?.toLowerCase().includes(query)
   );
 };
 
@@ -436,7 +436,7 @@ return (
                         {seasonalTheme.description}
                       </p>
                       <div className="flex flex-wrap gap-2 text-sm">
-                        {seasonalTheme.tags.map((tag, index) => (
+                        {seasonalTheme?.tags?.map((tag, index) => (
                           <span key={index} className={`rounded-full px-3 py-1 ${
                             theme === 'dark'
                               ? 'bg-secondary/50 text-foreground'

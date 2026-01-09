@@ -27,7 +27,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
       toast.success(
         language === 'en' ? 'Added to Cart!' : 'कार्टमा थपियो!',
         {
-          description: `${quantity}x ${language === 'en' ? product.name : product.nameNe}`,
+          description: `${quantity}x ${language === 'en' ? product?.name : product?.nameNe}`,
         }
       );
     }
@@ -55,8 +55,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
           {/* Image */}
           <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
             <img
-              src={product.image}
-              alt={product.name}
+              src={product?.image}
+              alt={product?.name}
               className="h-full w-full object-cover"
             />
             {product.isNew && (
@@ -73,19 +73,19 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
 
           {/* Details */}
           <div className="flex flex-col">
-            <p className="text-sm uppercase tracking-wide text-muted-foreground">{product.category}</p>
+            <p className="text-sm uppercase tracking-wide text-muted-foreground">{product?.category}</p>
             <h2 className="mt-2 font-display text-3xl font-bold text-tertiary-text">
-              {language === 'en' ? product.name : product.nameNe}
+              {language === 'en' ? product?.name : product?.nameNe}
             </h2>
 
             {/* Price */}
             <div className="mt-4 flex items-center gap-3">
               <span className="text-3xl font-bold text-primary">
-                Rs. {product.price.toLocaleString()}
+                Rs. {(product?.price || 0).toLocaleString()}
               </span>
-              {product.originalPrice && (
+              {product?.originalPrice && (
                 <span className="text-lg text-muted-foreground line-through">
-                  Rs. {product.originalPrice.toLocaleString()}
+                  Rs. {(product?.originalPrice || 0).toLocaleString()}
                 </span>
               )}
             </div>
@@ -110,17 +110,17 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               <div className="rounded-lg bg-muted/50 p-3 text-center">
                 <Wine className="mx-auto h-5 w-5 text-primary" />
                 <p className="mt-1 text-xs text-muted-foreground">{t('volume')}</p>
-                <p className="font-medium text-foreground">{product.volume}</p>
+                <p className="font-medium text-foreground">{product?.volume}</p>
               </div>
               <div className="rounded-lg bg-muted/50 p-3 text-center">
                 <Percent className="mx-auto h-5 w-5 text-primary" />
                 <p className="mt-1 text-xs text-muted-foreground">{t('alcoholContent')}</p>
-                <p className="font-medium text-foreground">{product.alcoholContent || product.alcohol}</p>
+                <p className="font-medium text-foreground">{product?.alcoholContent || product?.alcohol}</p>
               </div>
               <div className="rounded-lg bg-muted/50 p-3 text-center">
                 <MapPin className="mx-auto h-5 w-5 text-primary" />
                 <p className="mt-1 text-xs text-muted-foreground">{t('origin')}</p>
-                <p className="font-medium text-foreground">{product.origin || 'N/A'}</p>
+                <p className="font-medium text-foreground">{product?.origin || 'N/A'}</p>
               </div>
             </div>
 
@@ -128,7 +128,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
             <div className="mt-6">
               <h3 className="font-semibold text-foreground">{t('description')}</h3>
               <p className="mt-2 text-muted-foreground">
-                {language === 'en' ? product.description : product.descriptionNe || product.description}
+                {language === 'en' ? product?.description : product?.descriptionNe || product?.description}
               </p>
             </div>
 

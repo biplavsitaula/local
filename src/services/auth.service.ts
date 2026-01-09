@@ -53,8 +53,8 @@ export const authService = {
       return await apiPost<LoginResponse>('/auth/register', data, false);
     } catch (error: any) {
       // Handle 404 or other errors gracefully
-      if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot POST')) {
-        console.error('Registration endpoint not available:', error.message);
+      if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot POST')) {
+        console.error('Registration endpoint not available:', error?.message);
         throw new Error('Registration service is currently unavailable. Please try again later.');
       }
       throw error;

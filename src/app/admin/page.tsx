@@ -127,13 +127,13 @@ const Index = () => {
         const salesTrendRes = await analyticsService.getSalesTrend();
         const salesTrendData = salesTrendRes.data || [];
         setSalesData(salesTrendData.map(item => ({
-          month: item.month || '',
-          sales: item.revenue || item.sales || 0,
+          month: item?.month || '',
+          sales: item?.revenue || item?.sales || 0,
         })));
 
         // Calculate totals from sales trend data as fallback
-        const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item.revenue || 0), 0);
-        const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item.count || 0), 0);
+        const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item?.revenue || 0), 0);
+        const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item?.count || 0), 0);
 
         // Fetch products by category
         // Merge duplicate categories
@@ -146,17 +146,17 @@ const Index = () => {
 
         // Fetch recent products and map to expected format
         const productsListRes = await productsService.getAll({ limit: 50 });
-        const mappedProducts = (productsListRes.data || []).map((p: any) => ({
-          id: p._id || p.id,
-          name: p.name,
-          category: p.type || p.category,
-          price: p.price || 0,
-          stock: p.stock ?? 0,
-          rating: p.rating,
-          image: p.image || p.imageUrl || '',
-          description: p.description || '',
-          sales: p.sales || p.totalSold || 0,
-        }));
+      const mappedProducts = (productsListRes.data || []).map((p: any) => ({
+        id: p?._id || p?.id,
+        name: p?.name,
+        category: p?.type || p?.category,
+        price: p?.price || 0,
+        stock: p?.stock ?? 0,
+        rating: p?.rating,
+        image: p?.image || p?.imageUrl || '',
+        description: p?.description || '',
+        sales: p?.sales || p?.totalSold || 0,
+      }));
         setAllProducts(mappedProducts);
         setProducts(mappedProducts);
 
@@ -170,7 +170,7 @@ const Index = () => {
           totalReviews,
         });
       } catch (err: any) {
-        setError(err.message || 'Failed to load dashboard data');
+        setError(err?.message || 'Failed to load dashboard data');
         console.error('Dashboard error:', err);
       } finally {
         setLoading(false);

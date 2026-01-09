@@ -57,8 +57,8 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         deliveryAddress: formData.deliveryAddress,
         paymentMethod: selectedPayment,
         items: items.map(item => ({
-          productId: String(item.product.id),
-          quantity: item.quantity,
+          productId: String(item?.product?.id),
+          quantity: item?.quantity || 0,
         })),
       };
 
@@ -79,11 +79,11 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           handleClose();
         }, 2000);
       } else {
-        setError(response.message || (language === "en" ? "Checkout failed" : "चेकआउट असफल भयो"));
+        setError(response?.message || (language === "en" ? "Checkout failed" : "चेकआउट असफल भयो"));
       }
     } catch (err: any) {
       console.error("Checkout error:", err);
-      setError(err.message || (language === "en" ? "Something went wrong. Please try again." : "केही गलत भयो। कृपया पुन: प्रयास गर्नुहोस्।"));
+      setError(err?.message || (language === "en" ? "Something went wrong. Please try again." : "केही गलत भयो। कृपया पुन: प्रयास गर्नुहोस्।"));
     } finally {
       setIsProcessing(false);
     }
@@ -124,21 +124,21 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             {/* Cart Items */}
             <div className="space-y-4 mb-6">
               {items.map((item) => (
-                <div key={item.product.id} className="flex gap-4">
+                <div key={item?.product?.id} className="flex gap-4">
                   <img
-                    src={item.product.image}
-                    alt={item.product.name}
+                    src={item?.product?.image}
+                    alt={item?.product?.name}
                     className="w-20 h-24 object-cover rounded-lg"
                   />
                   <div className="flex-1">
                     <h4 className="font-medium text-foreground mb-1">
-                      {language === "en" ? item.product.name : item.product.nameNe || item.product.name}
+                      {language === "en" ? item?.product?.name : item?.product?.nameNe || item?.product?.name}
                     </h4>
                     <p className="text-sm text-muted-foreground mb-2">
-                      Rs. {item.product.price.toLocaleString()} x {item.quantity}
+                      Rs. {(item?.product?.price || 0).toLocaleString()} x {item?.quantity || 0}
                     </p>
                     <p className="text-lg font-bold text-primary-text">
-                      Rs. {(item.product.price * item.quantity).toLocaleString()}
+                      Rs. {((item?.product?.price || 0) * (item?.quantity || 0)).toLocaleString()}
                     </p>
                   </div>
                 </div>

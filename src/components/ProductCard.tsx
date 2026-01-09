@@ -27,7 +27,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       toast.success(
         language === 'en' ? 'Added to Cart!' : 'कार्टमा थपियो!',
         {
-          description: `${quantity}x ${language === 'en' ? product.name : product.nameNe}`,
+          description: `${quantity}x ${language === 'en' ? product?.name : product?.nameNe}`,
         }
       );
     }
@@ -69,8 +69,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Image - Square */}
       <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
         <img
-          src={product.image}
-          alt={product.name}
+          src={product?.image}
+          alt={product?.name}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
         />
@@ -85,27 +85,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
       {/* Content */}
       <div className="p-4">
-        <p className="text-xs text-muted-foreground capitalize">{product.category}</p>
+        <p className="text-xs text-muted-foreground capitalize">{product?.category}</p>
         <h3 className="mt-1 line-clamp-1 font-display text-lg font-bold text-tertiary-text">
-          {language === 'en' ? product.name : product.nameNe}
+          {language === 'en' ? product?.name : product?.nameNe}
         </h3>
         <p className="mt-1 text-sm text-muted-foreground">
-          {product.volume} • {product.alcoholContent || product.alcohol}
+          {product?.volume} • {product?.alcoholContent || product?.alcohol}
         </p>
 
         {/* Price */}
         <div className="mt-3 flex items-center gap-2">
           <span className="text-xl font-bold text-primary">
-            Rs. {(product.price * quantity).toLocaleString()}
+            Rs. {((product?.price || 0) * quantity).toLocaleString()}
           </span>
-          {product.originalPrice && (
+          {product?.originalPrice && (
             <span className="text-sm text-muted-foreground line-through">
-              Rs. {(product.originalPrice * quantity).toLocaleString()}
+              Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
             </span>
           )}
           {quantity > 1 && (
             <span className="text-xs text-muted-foreground">
-              (Rs. {product.price.toLocaleString()} × {quantity})
+              (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
             </span>
           )}
         </div>

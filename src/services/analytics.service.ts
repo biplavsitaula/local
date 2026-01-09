@@ -39,7 +39,7 @@ export const analyticsService = {
      return await apiGet<AnalyticsSummary>('/analytics/summary');
    } catch (error: any) {
      // Handle 404 or other errors gracefully
-     if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+     if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
        console.warn('Analytics summary endpoint not available, returning default values');
        return {
          success: true,
@@ -64,7 +64,7 @@ export const analyticsService = {
    try {
      return await apiGet<SalesTrendData[]>('/analytics/sales-trend');
    } catch (error: any) {
-     if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+     if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
        console.warn('Sales trend endpoint not available, returning empty array');
        return {
          success: true,
@@ -84,7 +84,7 @@ export const analyticsService = {
    try {
      return await apiGet<ChartDataPoint[]>('/analytics/stock-by-category');
    } catch (error: any) {
-     if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+     if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
        console.warn('Stock by category endpoint not available, returning empty array');
        return {
          success: true,
@@ -104,7 +104,7 @@ export const analyticsService = {
    try {
      return await apiGet<ChartDataPoint[]>('/analytics/products-by-category');
    } catch (error: any) {
-     if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+     if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
        console.warn('Products by category endpoint not available, returning empty array');
        return {
          success: true,
@@ -124,7 +124,7 @@ export const analyticsService = {
    try {
      return await apiGet<ChartDataPoint[]>('/analytics/revenue-by-category');
    } catch (error: any) {
-     if (error.status === 404 || error.message?.includes('404') || error.message?.includes('Cannot GET')) {
+     if (error?.status === 404 || error?.message?.includes('404') || error?.message?.includes('Cannot GET')) {
        console.warn('Revenue by category endpoint not available, returning empty array');
        return {
          success: true,

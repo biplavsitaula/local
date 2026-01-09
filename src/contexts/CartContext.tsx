@@ -26,23 +26,23 @@ const saveCartToStorage = (items: CartItem[]) => {
     // Only save essential product data to avoid circular references
     const cartData = items.map(item => ({
       product: {
-        id: item.product.id,
-        name: item.product.name,
-        price: item.product.price,
-        image: item.product.image,
-        category: item.product.category,
+        id: item?.product?.id,
+        name: item?.product?.name,
+        price: item?.product?.price,
+        image: item?.product?.image,
+        category: item?.product?.category,
         // Include other essential fields
-        originalPrice: item.product.originalPrice,
-        description: item.product.description,
-        volume: item.product.volume,
-        alcoholContent: item.product.alcoholContent,
-        alcohol: item.product.alcohol,
-        inStock: item.product.inStock,
-        stock: item.product.stock,
-        rating: item.product.rating,
-        tag: item.product.tag,
+        originalPrice: item?.product?.originalPrice,
+        description: item?.product?.description,
+        volume: item?.product?.volume,
+        alcoholContent: item?.product?.alcoholContent,
+        alcohol: item?.product?.alcohol,
+        inStock: item?.product?.inStock,
+        stock: item?.product?.stock,
+        rating: item?.product?.rating,
+        tag: item?.product?.tag,
       },
-      quantity: item.quantity,
+      quantity: item?.quantity,
     }));
     localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartData));
   } catch (error) {
@@ -60,8 +60,8 @@ const loadCartFromStorage = (): CartItem[] => {
     // Validate and return cart items
     if (Array.isArray(parsed)) {
       return parsed.map(item => ({
-        product: item.product as Product,
-        quantity: item.quantity || 1,
+        product: item?.product as Product,
+        quantity: item?.quantity || 1,
       }));
     }
     return [];
@@ -93,8 +93,8 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
           const parsed = JSON.parse(e.newValue);
           if (Array.isArray(parsed)) {
             setItems(parsed.map(item => ({
-              product: item.product as Product,
-              quantity: item.quantity || 1,
+              product: item?.product as Product,
+              quantity: item?.quantity || 1,
             })));
           }
         } catch (error) {
@@ -109,10 +109,10 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
 
   const addToCart = (product: Product, quantity = 1) => {
     setItems((prev) => {
-      const existing = prev.find((i) => i.product.id === product.id);
+      const existing = prev.find((i) => i?.product?.id === product?.id);
       const updated = existing
         ? prev.map((i) =>
-            i.product.id === product.id ? { ...i, quantity: i.quantity + quantity } : i,
+            i?.product?.id === product?.id ? { ...i, quantity: (i?.quantity || 0) + quantity } : i,
           )
         : [...prev, { product, quantity }];
       return updated;
@@ -122,14 +122,14 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   const updateQuantity = (productId: number | string, quantity: number) => {
     setItems((prev) => {
       const updated = prev
-        .map((i) => (i.product.id === productId ? { ...i, quantity } : i))
-        .filter((i) => i.quantity > 0);
+        .map((i) => (i?.product?.id === productId ? { ...i, quantity } : i))
+        .filter((i) => (i?.quantity || 0) > 0);
       return updated;
     });
   };
 
   const removeFromCart = (productId: number | string) => {
-    setItems((prev) => prev.filter((i) => i.product.id !== productId));
+    setItems((prev) => prev.filter((i) => i?.product?.id !== productId));
   };
 
   const clear = () => {
@@ -140,11 +140,11 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const total = useMemo(
-    () => items.reduce((sum, item) => sum + item.product.price * item.quantity, 0),
+    () => items.reduce((sum, item) => sum + (item?.product?.price || 0) * (item?.quantity || 0), 0),
     [items],
   );
 
-  const count = useMemo(() => items.reduce((sum, i) => sum + i.quantity, 0), [items]);
+  const count = useMemo(() => items.reduce((sum, i) => sum + (i?.quantity || 0), 0), [items]);
 
   return (
     <CartContext.Provider

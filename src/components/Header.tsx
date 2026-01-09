@@ -91,7 +91,7 @@ const Header: React.FC<IHeaderProps> = ({
      }
 
 
-     const scrollY = window.scrollY || window.pageYOffset;
+     const scrollY = window?.scrollY || window?.pageYOffset;
      const isCurrentlyShown = bannerStateRef.current;
     
      let shouldShow = isCurrentlyShown;
@@ -409,14 +409,14 @@ const Header: React.FC<IHeaderProps> = ({
                            <div className="flex-1 min-w-0">
                              <h4 className="font-medium text-foreground text-sm truncate">
                                {language === "en"
-                                 ? item.product.name
-                                 : item.product.nameNe}
+                                 ? item?.product?.name
+                                 : item?.product?.nameNe}
                              </h4>
                              <p className="text-xs text-muted-foreground">
-                               {item.product.volume}
+                               {item?.product?.volume}
                              </p>
                              <p className="text-primary-text font-semibold mt-1">
-                               Rs. {item.product.price.toLocaleString()}
+                               Rs. {item?.product?.price?.toLocaleString()}
                              </p>
                              <div className="flex items-center gap-2 mt-2">
                                <Button
@@ -425,15 +425,15 @@ const Header: React.FC<IHeaderProps> = ({
                                  className="h-7 w-7 border-border"
                                  onClick={() =>
                                    updateQuantity(
-                                     item.product.id,
-                                     item.quantity - 1
+                                     item?.product?.id,
+                                     (item?.quantity || 0) - 1
                                    )
                                  }
                                >
                                  <Minus className="w-3 h-3" />
                                </Button>
                                <span className="text-sm font-medium w-6 text-center text-foreground">
-                                 {item.quantity}
+                                 {item?.quantity}
                                </span>
                                <Button
                                  variant="outline"
@@ -441,8 +441,8 @@ const Header: React.FC<IHeaderProps> = ({
                                  className="h-7 w-7 border-border"
                                  onClick={() =>
                                    updateQuantity(
-                                     item.product.id,
-                                     item.quantity + 1
+                                     item?.product?.id,
+                                     (item?.quantity || 0) + 1
                                    )
                                  }
                                >
@@ -453,7 +453,7 @@ const Header: React.FC<IHeaderProps> = ({
                                  size="icon"
                                  className="h-7 w-7 text-destructive hover:text-destructive ml-auto"
                                  onClick={() =>
-                                   removeFromCart(item.product.id)
+                                   removeFromCart(item?.product?.id)
                                  }
                                >
                                  <Trash2 className="w-4 h-4" />

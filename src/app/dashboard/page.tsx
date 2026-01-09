@@ -36,17 +36,17 @@ const mergeStockCategories = (data: any[]): any[] => {
   const merged: Record<string, { category: string; inStock: number; lowStock: number; outOfStock: number }> = {};
   
   data.forEach(item => {
-    const normalizedName = normalizeCategory(item.category);
+    const normalizedName = normalizeCategory(item?.category);
     if (merged[normalizedName]) {
-      merged[normalizedName].inStock += item.inStock || 0;
-      merged[normalizedName].lowStock += item.lowStock || 0;
-      merged[normalizedName].outOfStock += item.outOfStock || 0;
+      merged[normalizedName].inStock += item?.inStock || 0;
+      merged[normalizedName].lowStock += item?.lowStock || 0;
+      merged[normalizedName].outOfStock += item?.outOfStock || 0;
     } else {
       merged[normalizedName] = {
         category: normalizedName,
-        inStock: item.inStock || 0,
-        lowStock: item.lowStock || 0,
-        outOfStock: item.outOfStock || 0,
+        inStock: item?.inStock || 0,
+        lowStock: item?.lowStock || 0,
+        outOfStock: item?.outOfStock || 0,
       };
     }
   });
@@ -61,13 +61,13 @@ const mergeProductCategories = (data: any[]): { name: string; value: number }[] 
   const merged: Record<string, { name: string; value: number }> = {};
   
   data.forEach(item => {
-    const normalizedName = normalizeCategory(item.category || item.name);
+    const normalizedName = normalizeCategory(item?.category || item?.name);
     if (merged[normalizedName]) {
-      merged[normalizedName].value += item.count || item.value || 0;
+      merged[normalizedName].value += item?.count || item?.value || 0;
     } else {
       merged[normalizedName] = {
         name: normalizedName,
-        value: item.count || item.value || 0,
+        value: item?.count || item?.value || 0,
       };
     }
   });
@@ -130,16 +130,16 @@ const Dashboard = () => {
        // API returns: { month, revenue, count } - map to { month, sales }
        const salesTrendRes = await analyticsService.getSalesTrend();
        const salesTrendData = salesTrendRes.data || [];
-       const mappedSalesData = salesTrendData.map(item => ({
-         month: item.month || '',
-         sales: item.revenue || item.sales || 0,
-       }));
+      const mappedSalesData = salesTrendData.map(item => ({
+        month: item?.month || '',
+        sales: item?.revenue || item?.sales || 0,
+      }));
        setSalesData(mappedSalesData);
 
 
-       // Calculate totals from sales trend data as fallback
-       const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item.revenue || 0), 0);
-       const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item.count || 0), 0);
+      // Calculate totals from sales trend data as fallback
+      const calculatedTotalRevenue = salesTrendData.reduce((sum, item) => sum + (item?.revenue || 0), 0);
+      const calculatedTotalSales = salesTrendData.reduce((sum, item) => sum + (item?.count || 0), 0);
 
 
        // Fetch products by category
@@ -156,17 +156,17 @@ const Dashboard = () => {
 
        // Fetch recent products and map to expected format
        const productsListRes = await productsService.getAll({ limit: 10 });
-       const mappedProducts = (productsListRes.data || []).map((p: any) => ({
-         id: p._id || p.id,
-         name: p.name,
-         category: p.type || p.category,
-         price: p.price || 0,
-         stock: p.stock ?? 0,
-         rating: p.rating,
-         image: p.image || p.imageUrl || '',
-         description: p.description || '',
-         sales: p.sales || p.totalSold || 0,
-       }));
+      const mappedProducts = (productsListRes.data || []).map((p: any) => ({
+        id: p?._id || p?.id,
+        name: p?.name,
+        category: p?.type || p?.category,
+        price: p?.price || 0,
+        stock: p?.stock ?? 0,
+        rating: p?.rating,
+        image: p?.image || p?.imageUrl || '',
+        description: p?.description || '',
+        sales: p?.sales || p?.totalSold || 0,
+      }));
        setProducts(mappedProducts);
 
 
@@ -179,9 +179,9 @@ const Dashboard = () => {
          totalRevenue: analyticsData?.totalRevenue?.value || calculatedTotalRevenue,
          totalReviews,
        });
-     } catch (err: any) {
-       setError(err.message || 'Failed to load dashboard data');
-       console.error('Dashboard error:', err);
+    } catch (err: any) {
+      setError(err?.message || 'Failed to load dashboard data');
+      console.error('Dashboard error:', err);
      } finally {
        setLoading(false);
      }
