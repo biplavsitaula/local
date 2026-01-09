@@ -13,12 +13,18 @@ import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
 import { Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle } from "lucide-react";
 
+const ITEMS_PER_PAGE = 10;
+
 const Offers = () => {
   const { t, language } = useLanguage();
   const { addToCart } = useCart();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -65,27 +71,61 @@ const Offers = () => {
     } as Product;
   };
 
-  // Fetch products from API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
+  // Fetch products from API with pagination
+  const fetchProducts = async (pageNum: number, append: boolean = false) => {
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
         setLoading(true);
-        setError(null);
-        const response = await productsService.getAll({ limit: 1000 });
-        const mappedProducts = (response.data || []).map(mapApiProductToProduct);
-        console.log('Fetched products:', mappedProducts);
-        console.log('Products with discounts:', mappedProducts.filter(p => p.originalPrice && p.originalPrice > p.price));
-        setProducts(mappedProducts);
-      } catch (err: any) {
-        setError(err.message || 'Failed to fetch products');
-        setProducts([]);
-      } finally {
-        setLoading(false);
       }
-    };
+      setError(null);
+      
+      const response = await productsService.getAll({
+        page: pageNum,
+        limit: ITEMS_PER_PAGE
+      });
+      
+      const mappedProducts = (response.data || []).map(mapApiProductToProduct);
+      
+      if (append) {
+        setProducts(prev => [...prev, ...mappedProducts]);
+      } else {
+        setProducts(mappedProducts);
+      }
+      
+      // Check if there are more products to load
+      const pagination = (response as any).pagination;
+      if (pagination) {
+        setTotalProducts(pagination.total || 0);
+        setHasMore(pageNum < (pagination.pages || 1));
+      } else {
+        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to fetch products');
+      if (!append) {
+        setProducts([]);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
 
-    fetchProducts();
+  // Initial fetch
+  useEffect(() => {
+    setPage(1);
+    setProducts([]);
+    fetchProducts(1, false);
   }, []);
+
+  // Handle load more
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage, true);
+  };
 
   // Filter products that have discounts (originalPrice > price)
   // Also include products that have discountPercent, discountAmount, or finalPrice fields
@@ -152,10 +192,6 @@ const Offers = () => {
     setCheckoutOpen(true);
   };
   
-  console.log('Discounted products count:', discountedProducts.length);
-  console.log('Filtered products count:', filteredProducts.length);
-  console.log('All products:', products);
-
   return (
     <div className="min-h-screen bg-background">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
@@ -221,17 +257,55 @@ const Offers = () => {
           {!loading && !error && (
             <>
               {filteredProducts.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                  {filteredProducts.map((product, index) => (
-                    <ProductCard
-                      key={product.id || `product-${index}`}
-                      product={product}
-                      onViewDetails={setSelectedProduct}
-                      onBuyNow={handleBuyNow}
-                      onAddToCart={handleAddToCart}
-                    />
-                  ))}
-                </div>
+                <>
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                    {filteredProducts.map((product, index) => (
+                      <ProductCard
+                        key={product.id || `product-${index}`}
+                        product={product}
+                        onViewDetails={setSelectedProduct}
+                        onBuyNow={handleBuyNow}
+                        onAddToCart={handleAddToCart}
+                      />
+                    ))}
+                  </div>
+
+                  {/* Load More Button */}
+                  {hasMore && !searchQuery && (
+                    <div className="flex justify-center mt-10">
+                      <button
+                        onClick={handleLoadMore}
+                        disabled={loadingMore}
+                        className="flex items-center gap-2 px-8 py-3 bg-flame-gradient text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-flame-orange/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        {loadingMore ? (
+                          <>
+                            <Loader2 className="h-5 w-5 animate-spin" />
+                            Loading...
+                          </>
+                        ) : (
+                          <>
+                            Load More Products
+                            {totalProducts > 0 && (
+                              <span className="text-sm opacity-80">
+                                ({products.length} of {totalProducts})
+                              </span>
+                            )}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Show total count when all loaded */}
+                  {!hasMore && discountedProducts.length > 0 && !searchQuery && (
+                    <div className="text-center mt-10">
+                      <p className="text-muted-foreground">
+                        Showing all {discountedProducts.length} discounted products
+                      </p>
+                    </div>
+                  )}
+                </>
               ) : (
                 <div className="text-center py-12 bg-card rounded-xl">
                   <Percent className="w-16 h-16 text-muted-foreground mx-auto mb-4" />

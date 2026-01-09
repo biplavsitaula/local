@@ -14,6 +14,8 @@ import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
 
+const ITEMS_PER_PAGE = 10;
+
 const Categories = () => {
   const { t, language } = useLanguage();
   const { addToCart } = useCart();
@@ -21,7 +23,11 @@ const Categories = () => {
   const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [totalProducts, setTotalProducts] = useState(0);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -78,42 +84,71 @@ const Categories = () => {
     } as Product;
   };
 
-  // Fetch products from API
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
+  // Fetch products from API with pagination
+  const fetchProducts = async (pageNum: number, append: boolean = false) => {
+    try {
+      if (append) {
+        setLoadingMore(true);
+      } else {
         setLoading(true);
-        setError(null);
-        const response = await productsService.getAll({ limit: 1000 });
-        
-        // Debug logging
-        console.log('API Response:', response);
-        console.log('Products data:', response.data);
-        console.log('Products count:', response.data?.length || 0);
-        
-        if (!response.data || !Array.isArray(response.data)) {
-          console.error('Invalid response data:', response);
-          setError('Invalid response format from server');
-          setProducts([]);
-          return;
-        }
-
-        const mappedProducts = response.data.map(mapApiProductToProduct);
-        console.log('Mapped products:', mappedProducts);
-        console.log('Mapped products count:', mappedProducts.length);
-        
-        setProducts(mappedProducts);
-      } catch (err: any) {
-        console.error('Error fetching products:', err);
-        setError(err.message || 'Failed to fetch products');
-        setProducts([]);
-      } finally {
-        setLoading(false);
       }
-    };
+      setError(null);
+      
+      const response = await productsService.getAll({
+        page: pageNum,
+        limit: ITEMS_PER_PAGE
+      });
+      
+      if (!response.data || !Array.isArray(response.data)) {
+        console.error('Invalid response data:', response);
+        setError('Invalid response format from server');
+        if (!append) {
+          setProducts([]);
+        }
+        return;
+      }
 
-    fetchProducts();
+      const mappedProducts = response.data.map(mapApiProductToProduct);
+      
+      if (append) {
+        setProducts(prev => [...prev, ...mappedProducts]);
+      } else {
+        setProducts(mappedProducts);
+      }
+      
+      // Check if there are more products to load
+      const pagination = (response as any).pagination;
+      if (pagination) {
+        setTotalProducts(pagination.total || 0);
+        setHasMore(pageNum < (pagination.pages || 1));
+      } else {
+        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
+      }
+    } catch (err: any) {
+      console.error('Error fetching products:', err);
+      setError(err.message || 'Failed to fetch products');
+      if (!append) {
+        setProducts([]);
+      }
+    } finally {
+      setLoading(false);
+      setLoadingMore(false);
+    }
+  };
+
+  // Initial fetch
+  useEffect(() => {
+    setPage(1);
+    setProducts([]);
+    fetchProducts(1, false);
   }, []);
+
+  // Handle load more
+  const handleLoadMore = () => {
+    const nextPage = page + 1;
+    setPage(nextPage);
+    fetchProducts(nextPage, true);
+  };
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -311,17 +346,55 @@ const Categories = () => {
 
             {/* Products Grid */}
             {filteredProducts.length > 0 ? (
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
-                {filteredProducts.map((product, index) => (
-                  <ProductCard
-                    key={product.id || `product-${index}`}
-                    product={product}
-                    onViewDetails={setSelectedProduct}
-                    onBuyNow={handleBuyNow}
-                    onAddToCart={handleAddToCart}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 gap-4">
+                  {filteredProducts.map((product, index) => (
+                    <ProductCard
+                      key={product.id || `product-${index}`}
+                      product={product}
+                      onViewDetails={setSelectedProduct}
+                      onBuyNow={handleBuyNow}
+                      onAddToCart={handleAddToCart}
+                    />
+                  ))}
+                </div>
+
+                {/* Load More Button */}
+                {hasMore && !selectedCategory && !searchQuery && (
+                  <div className="flex justify-center mt-10">
+                    <button
+                      onClick={handleLoadMore}
+                      disabled={loadingMore}
+                      className="flex items-center gap-2 px-8 py-3 bg-flame-gradient text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-flame-orange/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      {loadingMore ? (
+                        <>
+                          <Loader2 className="h-5 w-5 animate-spin" />
+                          Loading...
+                        </>
+                      ) : (
+                        <>
+                          Load More Products
+                          {totalProducts > 0 && (
+                            <span className="text-sm opacity-80">
+                              ({products.length} of {totalProducts})
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </button>
+                  </div>
+                )}
+
+                {/* Show total count when all loaded */}
+                {!hasMore && products.length > 0 && !selectedCategory && !searchQuery && (
+                  <div className="text-center mt-10">
+                    <p className="text-muted-foreground">
+                      Showing all {products.length} products
+                    </p>
+                  </div>
+                )}
+              </>
             ) : !loading && !error ? (
               <div className="text-center py-12">
                 <p
