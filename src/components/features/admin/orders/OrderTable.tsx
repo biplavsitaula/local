@@ -1,19 +1,21 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X } from 'lucide-react';
+import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X, Search } from 'lucide-react';
 import { ordersService, Order as ApiOrder } from '@/services/orders.service';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { useOrderStore, Order } from '@/hooks/useOrderStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useDebounce } from '@/hooks/useDebounce';
 
 export function OrderTable() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     status: '',
@@ -58,7 +60,7 @@ export function OrderTable() {
         setLoading(true);
         setError(null);
         const response = await ordersService.getAll({
-          search: searchQuery || undefined,
+          search: debouncedSearch || undefined,
           status: filters.status || undefined,
           paymentMethod: filters.paymentMethod || undefined,
           limit: 100,
@@ -74,7 +76,7 @@ export function OrderTable() {
     };
 
     fetchOrders();
-  }, [searchQuery, filters.status, filters.paymentMethod]);
+  }, [debouncedSearch, filters.status, filters.paymentMethod]);
 
   type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
   type SortDir = 'asc' | 'desc';
@@ -755,12 +757,13 @@ export function OrderTable() {
       <div className="space-y-4 mb-4">
         <div className="flex gap-4">
           <div className="relative flex-1">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
               placeholder="Search orders by bill number, customer name..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full px-4 py-2 bg-secondary/50 border border-border rounded-lg text-foreground placeholder-muted-foreground"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="w-full pl-10 pr-4 py-2 bg-secondary/50 border border-border rounded-lg text-foreground placeholder-muted-foreground"
             />
           </div>
           <Button

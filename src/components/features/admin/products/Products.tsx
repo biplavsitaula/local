@@ -5,15 +5,18 @@ import { ProductTable } from '@/components/features/admin/products/ProductTable'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExportButton } from '@/components/features/admin/ExportButton';
 import { productsService, Product } from '@/services/products.service';
-import { Loader2, AlertCircle } from 'lucide-react';
+import { Loader2, AlertCircle, Search } from 'lucide-react';
 import { Product as ProductType } from '@/types';
+import { Input } from '@/components/ui/input';
+import { useDebounce } from '@/hooks/useDebounce';
 
 const Products = () => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentFilter, setCurrentFilter] = useState<string>('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
 
@@ -70,13 +73,13 @@ const Products = () => {
   }, [page]);
 
   useEffect(() => {
-    fetchProducts(currentFilter, searchQuery);
-  }, [currentFilter, searchQuery, fetchProducts]);
+    fetchProducts(currentFilter, debouncedSearch);
+  }, [currentFilter, debouncedSearch, fetchProducts]);
 
   // Listen for product changed event (added or updated) to refresh the list
   useEffect(() => {
     const handleProductChanged = () => {
-      fetchProducts(currentFilter, searchQuery);
+      fetchProducts(currentFilter, debouncedSearch);
     };
 
     window.addEventListener('productChanged', handleProductChanged);
@@ -84,11 +87,11 @@ const Products = () => {
     return () => {
       window.removeEventListener('productChanged', handleProductChanged);
     };
-  }, [currentFilter, searchQuery, fetchProducts]);
+  }, [currentFilter, debouncedSearch, fetchProducts]);
 
   const refetch = useCallback(() => {
-    fetchProducts(currentFilter, searchQuery);
-  }, [currentFilter, searchQuery, fetchProducts]);
+    fetchProducts(currentFilter, debouncedSearch);
+  }, [currentFilter, debouncedSearch, fetchProducts]);
 
   if (loading) {
     return (
@@ -128,7 +131,18 @@ const Products = () => {
             <h1 className="text-3xl font-display font-bold text-foreground">Products</h1>
             <p className="text-muted-foreground mt-1">Manage your product inventory</p>
           </div>
-          <ExportButton defaultDataType="products" />
+          <div className="flex items-center gap-4">
+            <div className="relative w-64">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                placeholder="Search products..."
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
+                className="pl-10 bg-secondary/50 border-border"
+              />
+            </div>
+            <ExportButton defaultDataType="products" />
+          </div>
         </div>
 
         <Tabs 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { ArrowDown, ArrowUp, ArrowUpDown, Search, Loader2, AlertCircle, Filter, X } from "lucide-react";
+import { ArrowDown, ArrowUp, ArrowUpDown, Loader2, AlertCircle, Filter, X } from "lucide-react";
 import { paymentsService, Payment as ApiPayment } from "@/services/payments.service";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,6 +13,7 @@ type SortDir = "asc" | "desc";
 
 interface PaymentTableProps {
   methodFilter: MethodFilter;
+  searchQuery?: string;
 }
 
 interface Payment {
@@ -67,14 +68,13 @@ const getMethodPill = (method: "cod" | "qr", gateway: string | null) => {
   };
 };
 
-export function PaymentTable({ methodFilter }: PaymentTableProps) {
+export function PaymentTable({ methodFilter, searchQuery = "" }: PaymentTableProps) {
   // --------------------
   // Hooks must always run first
   // --------------------
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [query, setQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
   const [showFilters, setShowFilters] = useState(false);
@@ -84,6 +84,9 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
     minAmount: '',
     maxAmount: '',
   });
+  
+  // Use the searchQuery prop from parent (already debounced)
+  const query = searchQuery;
 
   const mapApiPaymentToPayment = (apiPayment: any): Payment => {
     // Handle API response structure - customer can be an object with fullName
@@ -308,18 +311,9 @@ export function PaymentTable({ methodFilter }: PaymentTableProps) {
   // --------------------
   return (
     <div className="glass-card rounded-xl border border-border/50 overflow-hidden">
-      {/* Search and Filter Bar */}
+      {/* Filter Bar */}
       <div className="p-4 border-b border-border/50 space-y-4">
-        <div className="flex gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search payments..."
-              className="h-10 w-full rounded-md border border-border bg-secondary/30 px-10 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring"
-            />
-          </div>
+        <div className="flex gap-4 justify-end">
           <Button
             onClick={() => setShowFilters(!showFilters)}
             variant="outline"

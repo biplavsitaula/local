@@ -17,11 +17,14 @@ import {
   ShoppingCart,
   Loader2,
   AlertCircle,
+  Search,
 } from "lucide-react";
 import { analyticsService } from '@/services/analytics.service';
 import { productsService } from '@/services/products.service';
 import { stockAlertsService } from '@/services/stock-alerts.service';
 import { reviewsService } from '@/services/reviews.service';
+import { Input } from '@/components/ui/input';
+import { useDebounce } from '@/hooks/useDebounce';
 
 // Helper to normalize category name (capitalize first letter)
 const normalizeCategory = (category: string): string => {
@@ -88,7 +91,10 @@ const Index = () => {
   const [salesData, setSalesData] = useState<any[]>([]);
   const [categoryData, setCategoryData] = useState<any[]>([]);
   const [products, setProducts] = useState<any[]>([]);
+  const [allProducts, setAllProducts] = useState<any[]>([]);
   const [analytics, setAnalytics] = useState<any>(null);
+  const [searchInput, setSearchInput] = useState('');
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   useEffect(() => {
     const fetchDashboardData = async () => {
@@ -139,7 +145,7 @@ const Index = () => {
         const totalReviews = reviewsRes.data?.totalReviews || 0;
 
         // Fetch recent products and map to expected format
-        const productsListRes = await productsService.getAll({ limit: 10 });
+        const productsListRes = await productsService.getAll({ limit: 50 });
         const mappedProducts = (productsListRes.data || []).map((p: any) => ({
           id: p._id || p.id,
           name: p.name,
@@ -151,6 +157,7 @@ const Index = () => {
           description: p.description || '',
           sales: p.sales || p.totalSold || 0,
         }));
+        setAllProducts(mappedProducts);
         setProducts(mappedProducts);
 
         setStats({
@@ -172,6 +179,21 @@ const Index = () => {
 
     fetchDashboardData();
   }, []);
+
+  // Filter products based on search
+  useEffect(() => {
+    if (!debouncedSearch) {
+      setProducts(allProducts);
+    } else {
+      const query = debouncedSearch.toLowerCase();
+      const filtered = allProducts.filter(
+        (p) =>
+          p.name?.toLowerCase().includes(query) ||
+          p.category?.toLowerCase().includes(query)
+      );
+      setProducts(filtered);
+    }
+  }, [debouncedSearch, allProducts]);
 
   if (loading) {
     return (
@@ -273,9 +295,20 @@ const Index = () => {
 
       {/* Product Table */}
       <div>
-        <h2 className="text-xl font-semibold text-foreground mb-4">
-          All Products
-        </h2>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-xl font-semibold text-foreground">
+            All Products
+          </h2>
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search products..."
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              className="pl-10 bg-secondary/50 border-border"
+            />
+          </div>
+        </div>
         <ProductTable filter="all" products={products} />
       </div>
     </div>

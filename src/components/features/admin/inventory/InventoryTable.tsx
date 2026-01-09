@@ -49,6 +49,7 @@ export function InventoryTable({ productId }: InventoryTableProps) {
     | "quantity"
     | "previousStock"
     | "newStock"
+    | "currentStock"
     | "createdAt";
   type SortDir = "asc" | "desc";
 
@@ -139,11 +140,14 @@ export function InventoryTable({ productId }: InventoryTableProps) {
           return dir * (a.previousStock - b.previousStock);
         case "newStock":
           return dir * (a.newStock - b.newStock);
+        case "currentStock":
+          return dir * ((a.currentStock ?? 0) - (b.currentStock ?? 0));
         case "createdAt":
           return (
             dir *
             (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
           );
+
         default:
           return 0;
       }
@@ -328,8 +332,13 @@ export function InventoryTable({ productId }: InventoryTableProps) {
                 </button>
               </th>
               <th className="text-left p-4 font-medium text-muted-foreground">
-                Current Stock
-                <ArrowUpDown className="h-4 w-4" />
+                <button
+                  className="flex items-center gap-1 hover:text-foreground transition-colors"
+                  onClick={() => handleSort("currentStock")}
+                >
+                  Current Stock
+                  <ArrowUpDown className="h-4 w-4" />
+                </button>
               </th>
               <th className="text-left p-4 font-medium text-muted-foreground">
                 Reason
@@ -413,7 +422,7 @@ export function InventoryTable({ productId }: InventoryTableProps) {
                     </span>
                   </td>
                   <td className="p-4 text-muted-foreground">
-                    {transaction.currentStock}
+                    {transaction.currentStock ?? 0}
                   </td>
                   <td className="p-4">
                     <div className="max-w-[200px]">

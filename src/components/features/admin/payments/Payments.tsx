@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useEffect, useState } from "react";
-import { CreditCard, QrCode, Wallet, Loader2, AlertCircle } from "lucide-react";
+import { CreditCard, QrCode, Wallet, Loader2, AlertCircle, Search } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ExportButton } from "@/components/features/admin/ExportButton";
 import { paymentsService, Payment as ApiPayment } from "@/services/payments.service";
 import { PaymentTable } from "@/components/features/admin/payments/PaymentTable";
+import { Input } from "@/components/ui/input";
+import { useDebounce } from "@/hooks/useDebounce";
 
 type MethodFilter = "all" | "qr" | "cod";
 
@@ -38,6 +40,8 @@ export default function Payments() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<MethodFilter>("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const debouncedSearch = useDebounce(searchQuery, 300);
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -144,7 +148,18 @@ export default function Payments() {
             Track all payment records and transactions
           </p>
         </div>
-        <ExportButton defaultDataType="payments" />
+        <div className="flex items-center gap-4">
+          <div className="relative w-64">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search payments..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-secondary/50 border-border"
+            />
+          </div>
+          <ExportButton defaultDataType="payments" />
+        </div>
       </div>
 
       <Tabs
@@ -196,7 +211,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="all" />
+          <PaymentTable methodFilter="all" searchQuery={debouncedSearch} />
         </TabsContent>
 
         {/* QR */}
@@ -218,7 +233,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="qr" />
+          <PaymentTable methodFilter="qr" searchQuery={debouncedSearch} />
         </TabsContent>
 
         {/* COD */}
@@ -240,7 +255,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="cod" />
+          <PaymentTable methodFilter="cod" searchQuery={debouncedSearch} />
         </TabsContent>
       </Tabs>
     </div>
