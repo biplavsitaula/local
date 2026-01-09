@@ -75,7 +75,7 @@ export default function RecommendedPage() {
  // Handle edit product
  const handleEditProduct = (product: any) => {
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,
@@ -92,7 +92,7 @@ export default function RecommendedPage() {
  // Handle delete product
  const handleDeleteProduct = (product: any) => {
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,
@@ -438,7 +438,7 @@ export default function RecommendedPage() {
                    const reviews = Math.floor(Math.random() * 200) + 50; // Mock reviews count
                   
                    return (
-                     <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                     <tr key={product.id || (product as any)?._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                        <td className="p-4">
                          <div className="flex items-center gap-3">
                            <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
@@ -546,7 +546,7 @@ export default function RecommendedPage() {
              const rank = index + 1;
              return (
                <div
-                 key={product.id || product._id || `recommended-${index}`}
+                 key={product.id || (product as any)?._id || `recommended-${index}`}
                  className="flex items-center gap-3 p-3 rounded-lg hover:bg-secondary/30 transition-colors"
                >
                  <div className="text-lg font-bold text-flame-orange w-6">#{rank}</div>

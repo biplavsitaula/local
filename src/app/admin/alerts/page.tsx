@@ -141,7 +141,7 @@ function StockProductTable({ products, title, searchPlaceholder = "Search produc
                  const reviews = Math.floor(Math.random() * 300) + 50; // Mock reviews count
                 
                  return (
-                   <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                   <tr key={product.id || (product as any)?._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                      <td className="p-4">
                        <div className="flex items-center gap-3">
                          <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
@@ -209,7 +209,7 @@ function StockProductTable({ products, title, searchPlaceholder = "Search produc
                              onClick={() => {
                                const quantity = prompt('Enter reorder quantity:', '50');
                                if (quantity && !isNaN(Number(quantity))) {
-                                 onReorder(product.id || product._id || '', Number(quantity));
+                                 onReorder(product.id || (product as any)?._id || '', Number(quantity));
                                }
                              }}
                              className="p-2 hover:bg-success/10 rounded-lg transition-colors"
@@ -311,7 +311,7 @@ export default function AlertsPage() {
  // Handle edit product
  const handleEditProduct = (product: any) => {
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,
@@ -328,7 +328,7 @@ export default function AlertsPage() {
  // Handle delete product
  const handleDeleteProduct = (product: any) => {
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,

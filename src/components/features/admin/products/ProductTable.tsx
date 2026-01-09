@@ -360,7 +360,7 @@ export function ProductTable({ filter, products = [], onRefresh }: ProductTableP
             <tbody>
               {sortedProducts.length > 0 ? (
                 sortedProducts.map((product, index) => (
-                  <tr key={product.id || product._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
+                  <tr key={product.id || (product as any)?._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                     <td className="p-4 text-sm text-foreground">{product.name}</td>
                     <td className="p-4 text-sm text-muted-foreground capitalize">{product.category}</td>
                     <td className="p-4 text-sm text-foreground">Rs. {product.price.toLocaleString()}</td>

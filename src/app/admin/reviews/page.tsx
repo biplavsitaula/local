@@ -149,7 +149,7 @@ export default function ReviewsPage() {
  const handleEditProduct = (product: any) => {
    // Convert to Product type format
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,
@@ -166,7 +166,7 @@ export default function ReviewsPage() {
  // Handle delete product (for Most Reviewed Products table)
  const handleDeleteProduct = (product: any) => {
    const productData: Product = {
-     id: product.id || product._id,
+     id: product.id || (product as any)?._id,
      name: product.name,
      category: product.category,
      price: product.price || 0,
