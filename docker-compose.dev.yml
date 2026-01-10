@@ -1,0 +1,31 @@
+version: '3.8'
+
+services:
+  # Frontend (Next.js)
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: frontend-dev
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    volumes:
+      # Mount source code for hot reload
+      - .:/app
+      # Prevent node_modules and .next from being overwritten
+      - /app/node_modules
+      - /app/.next
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=${NEXT_PUBLIC_API_URL:-http://localhost:5000/api}
+      - API_URL=${API_URL:-http://backend:5000/api}
+    networks:
+      - bb-network
+
+networks:
+  bb-network:
+    driver: bridge
+
