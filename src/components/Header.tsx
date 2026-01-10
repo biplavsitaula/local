@@ -14,25 +14,22 @@ import {
  SheetTrigger,
 } from "@/components/ui/sheet";
 import {
- Flame,
- Search,
- ShoppingCart,
- Sun,
- Moon,
- Globe,
- Menu,
- X,
- Minus,
- Plus,
- Trash2,
- User,
- Clock,
- Package,
- Truck,
- Gift,
+  Flame,
+  Search,
+  ShoppingCart,
+  Sun,
+  Moon,
+  Globe,
+  Menu,
+  X,
+  Minus,
+  Plus,
+  Trash2,
+  User,
 } from "lucide-react";
 import Link from "next/link";
 import { IHeaderProps } from "@/interface/IHeaderProps";
+import OfferBanner from "@/components/OfferBanner";
 
 
 const Header: React.FC<IHeaderProps> = ({
@@ -178,63 +175,17 @@ const Header: React.FC<IHeaderProps> = ({
        ? 'border-border/40 bg-background/80'
        : 'border-border/60 bg-white/95 shadow-sm'
    }`}>
-     {/* Promo Banner - uses CSS grid for smooth height animation */}
-     <div
-       className="grid transition-[grid-template-rows] duration-300 ease-out"
-       style={{
-         gridTemplateRows: showPromoBanner ? '1fr' : '0fr',
-       }}
-     >
-       <div className={`overflow-hidden ${
-         theme === 'dark' ? 'bg-secondary/30' : 'bg-gradient-to-r from-orange-50/80 via-yellow-50/80 to-orange-50/80'
-       }`}>
-         <div className="container mx-auto px-4 py-2 sm:py-3">
-           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-             {[
-               {
-                 icon: Clock,
-                 title: t('hourDelivery'),
-                 color: 'from-flame-red to-flame-orange',
-               },
-               {
-                 icon: Package,
-                 title: t('bulkDiscount'),
-                 color: 'from-flame-orange to-flame-yellow',
-               },
-               {
-                 icon: Truck,
-                 title: t('freeDelivery'),
-                 color: 'from-flame-yellow to-flame-gold',
-               },
-               {
-                 icon: Gift,
-                 title: t('eventOffer'),
-                 color: 'from-flame-gold to-flame-orange',
-               },
-             ].map((promo, index) => {
-               const IconComponent = promo.icon;
-               return (
-                 <div
-                   key={index}
-                   className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-lg border transition-colors ${
-                     theme === 'dark'
-                       ? 'bg-card border-border/50 card-glow'
-                       : 'bg-white/90 border-orange-200/50 shadow-sm hover:shadow-md hover:border-orange-300/60'
-                   }`}
-                 >
-                   <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br ${promo.color} flex items-center justify-center shrink-0 shadow-md`}>
-                     <IconComponent className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-primary-foreground" />
-                   </div>
-                   <p className={`text-[10px] sm:text-xs font-medium leading-tight ${
-                     theme === 'dark' ? 'text-foreground' : 'text-gray-800'
-                   }`}>{promo.title}</p>
-                 </div>
-               );
-             })}
-           </div>
-         </div>
-       </div>
-     </div>
+    {/* Offer Banner */}
+    <div
+      className="grid transition-[grid-template-rows] duration-300 ease-out"
+      style={{
+        gridTemplateRows: showPromoBanner ? '1fr' : '0fr',
+      }}
+    >
+      <div className="overflow-hidden">
+        <OfferBanner show={showPromoBanner} />
+      </div>
+    </div>
 
 
      <div className="container mx-auto px-4">
