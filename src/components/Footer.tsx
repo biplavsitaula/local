@@ -17,11 +17,11 @@ const Footer: React.FC = () => {
         ? 'bg-card border-border'
         : 'bg-white border-gray-200'
     }`}>
-      <div className="container mx-auto px-4 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+      <div className="container mx-auto px-4 py-8 sm:py-12">
+        <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
-          <div className="space-y-4">
-        <div className={`flex items-center gap-3 p-2 rounded-lg ${
+          <div className="space-y-3 sm:space-y-4 col-span-2 md:col-span-1">
+        <div className={`flex items-center gap-2 sm:gap-3 p-2 rounded-lg ${
             theme === 'dark' ? 'bg-black' : 'bg-gray-100'
           }`}>
               <Image
@@ -29,7 +29,7 @@ const Footer: React.FC = () => {
                 alt="Flame Beverage logo"
                 width={180}
                 height={48}
-                className="object-contain h-12 w-auto"
+                className="object-contain h-10 sm:h-12 w-auto"
                 priority
               />
           </div>
@@ -53,12 +53,12 @@ const Footer: React.FC = () => {
                 Flame Beverage
               </span>
             </div> */}
-            <p className={`text-sm ${
+            <p className={`text-xs sm:text-sm ${
               theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
             }`}>
               Your premium destination for the finest spirits and beverages. Quality guaranteed.
             </p>
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               <a href="#" className={`transition-colors ${
                 theme === 'dark'
                   ? 'text-muted-foreground hover:text-primary-text'
@@ -85,12 +85,12 @@ const Footer: React.FC = () => {
 
           {/* Quick Links */}
           <div>
-            <h4 className={`font-display font-semibold mb-4 ${
+            <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
               {t('quickLinks')}
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
                   href="/"
@@ -144,12 +144,12 @@ const Footer: React.FC = () => {
 
           {/* Legal */}
           <div>
-            <h4 className={`font-display font-semibold mb-4 ${
+            <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
               {language === 'en' ? 'Legal' : 'कानूनी'}
             </h4>
-            <ul className="space-y-2">
+            <ul className="space-y-1.5 sm:space-y-2">
               <li>
                 <Link
                   href="/about"
@@ -191,32 +191,32 @@ const Footer: React.FC = () => {
 
           {/* Contact */}
           <div>
-            <h4 className={`font-display font-semibold mb-4 ${
+            <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-foreground' : 'text-gray-900'
             }`}>
               {t('customerService')}
             </h4>
-            <ul className="space-y-3">
-              <li className={`flex items-center gap-2 text-sm ${
+            <ul className="space-y-2 sm:space-y-3">
+              <li className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
               }`}>
-                <Phone className={`w-4 h-4 ${
+                <Phone className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${
                   theme === 'dark' ? 'text-primary-text' : 'text-orange-600'
                 }`} />
-                <span>+977 9800000000</span>
+                <span className="break-all">+977 9800000000</span>
               </li>
-              <li className={`flex items-center gap-2 text-sm ${
+              <li className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
               }`}>
-                <Mail className={`w-4 h-4 ${
+                <Mail className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${
                   theme === 'dark' ? 'text-primary-text' : 'text-orange-600'
                 }`} />
-                <span>info@flamebeverage.com</span>
+                <span className="break-all">info@flamebeverage.com</span>
               </li>
-              <li className={`flex items-start gap-2 text-sm ${
+              <li className={`flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
               }`}>
-                <MapPin className={`w-4 h-4 shrink-0 mt-0.5 ${
+                <MapPin className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 mt-0.5 ${
                   theme === 'dark' ? 'text-primary-text' : 'text-orange-600'
                 }`} />
                 <span>Kathmandu, Nepal</span>
@@ -225,13 +225,13 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Newsletter */}
-          <div>
-            <h4 className={`font-display font-semibold mb-4 ${
+          <div className="col-span-2 md:col-span-1">
+            <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-foreground' : 'text-gray-900'
             }`}>
               {t('newsletter')}
             </h4>
-            <p className={`text-sm mb-4 ${
+            <p className={`text-xs sm:text-sm mb-3 sm:mb-4 ${
               theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
             }`}>
               Subscribe for exclusive offers and updates.
@@ -253,15 +253,15 @@ const Footer: React.FC = () => {
         </div>
 
         {/* Bottom */}
-        <div className={`mt-12 pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-4 transition-colors ${
+        <div className={`mt-8 sm:mt-12 pt-6 sm:pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 transition-colors ${
           theme === 'dark' ? 'border-border' : 'border-gray-200'
         }`}>
-          <p className={`text-sm ${
+          <p className={`text-xs sm:text-sm text-center md:text-left ${
             theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
           }`}>
             {t('copyright')}
           </p>
-          <div className={`flex items-center gap-2 text-sm ${
+          <div className={`flex items-center gap-2 text-xs sm:text-sm ${
             theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
           }`}>
             <span className={theme === 'dark' ? 'text-primary-text' : 'text-orange-600'}>🔞</span>
