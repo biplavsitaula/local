@@ -69,16 +69,30 @@ export function ExportButton({
   const [selectedYear, setSelectedYear] = useState(String(currentYear));
   const [dataType, setDataType] = useState<DataType>(defaultDataType);
   const [loading, setLoading] = useState(false);
+  const [useDateRange, setUseDateRange] = useState(false);
+  const [startDate, setStartDate] = useState(() => {
+    const date = new Date();
+    date.setDate(1); // First day of current month
+    return date.toISOString().split('T')[0];
+  });
+  const [endDate, setEndDate] = useState(() => {
+    const date = new Date();
+    return date.toISOString().split('T')[0];
+  });
   
   const { products: storeProducts } = useProductStore();
   
   // Use products from data file (which has the actual products) or merge with store products
   const products = productsData.length > 0 ? productsData : storeProducts;
 
-  // Reset dataType to default when dialog opens
+  // Reset dataType and date selection mode when dialog opens
   useEffect(() => {
     if (open) {
       setDataType(defaultDataType);
+      // Reset to month/year mode for orders and payments, keep date range for products (not applicable)
+      if (defaultDataType !== 'products') {
+        setUseDateRange(false);
+      }
     }
   }, [open, defaultDataType]);
 
@@ -132,10 +146,23 @@ export function ExportButton({
       doc.setFontSize(14);
       doc.setTextColor(102, 102, 102); // Gray color
       
-      // For products, don't show month/year (they don't have dates)
-      const subtitle = dataType === 'products' 
-        ? title 
-        : `${title} - ${months[parseInt(selectedMonth)]} ${selectedYear}`;
+      // Generate subtitle based on data type and date selection
+      let subtitle: string;
+      if (dataType === 'products') {
+        subtitle = title;
+      } else if (useDateRange) {
+        const startFormatted = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        const endFormatted = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        subtitle = `${title} - ${startFormatted} to ${endFormatted}`;
+      } else if (dataType === 'payments' && paymentFilters?.dateRange) {
+        // Show table filter date range
+        const rangeLabel = paymentFilters.dateRange === '7d' ? 'Last 7 days' : 
+                          paymentFilters.dateRange === '30d' ? 'Last 30 days' : 
+                          paymentFilters.dateRange === '90d' ? 'Last 90 days' : '';
+        subtitle = `${title} - ${rangeLabel}`;
+      } else {
+        subtitle = `${title} - ${months[parseInt(selectedMonth)]} ${selectedYear}`;
+      }
       
       doc.text(
         subtitle,
@@ -256,6 +283,13 @@ export function ExportButton({
   const getFilteredData = async () => {
     const month = parseInt(selectedMonth);
     const year = parseInt(selectedYear);
+    const start = useDateRange ? new Date(startDate) : null;
+    const end = useDateRange ? new Date(endDate) : null;
+    
+    // If using date range, set end date to end of day
+    if (end) {
+      end.setHours(23, 59, 59, 999);
+    }
 
     try {
       switch (dataType) {
@@ -406,12 +440,17 @@ export function ExportButton({
             });
           }
           
-          // Filter by month and year
+          // Filter by date range or month/year
           const filteredOrders = apiOrders.filter((apiOrder: any) => {
             try {
               if (!apiOrder.createdAt) return false;
               const date = new Date(apiOrder.createdAt);
-              return date.getMonth() === month && date.getFullYear() === year;
+              
+              if (useDateRange && start && end) {
+                return date >= start && date <= end;
+              } else {
+                return date.getMonth() === month && date.getFullYear() === year;
+              }
             } catch {
               return false;
             }
@@ -474,8 +513,20 @@ export function ExportButton({
             }
           }
           
-          // Apply date range filter (if specified, it overrides month/year selection)
-          if (paymentFilters?.dateRange) {
+          // Apply date range filter - priority: custom date range > table filter date range > month/year
+          if (useDateRange && start && end) {
+            // Filter by custom date range from export dialog
+            apiPayments = apiPayments.filter((p: any) => {
+              try {
+                if (!p.createdAt) return false;
+                const paymentDate = new Date(p.createdAt);
+                return paymentDate >= start && paymentDate <= end;
+              } catch {
+                return false;
+              }
+            });
+          } else if (paymentFilters?.dateRange) {
+            // Apply preset date range from table filters (7d, 30d, 90d)
             const now = new Date();
             let cutoffDate = new Date();
             if (paymentFilters.dateRange === '7d') {
@@ -495,7 +546,7 @@ export function ExportButton({
               }
             });
           } else {
-            // Filter by month and year only if dateRange is not specified
+            // Filter by month and year only if no date range is specified
             apiPayments = apiPayments.filter((apiPayment: any) => {
               try {
                 if (!apiPayment.createdAt) return false;
@@ -523,22 +574,49 @@ export function ExportButton({
   const handleExport = async (format: 'excel' | 'pdf') => {
     try {
       setLoading(true);
+      
+      // Validate date range if using it
+      if (dataType !== 'products' && useDateRange) {
+        if (!startDate || !endDate) {
+          toast.error('Please select both start and end dates');
+          setLoading(false);
+          return;
+        }
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        if (start > end) {
+          toast.error('Start date must be before or equal to end date');
+          setLoading(false);
+          return;
+        }
+      }
+      
       const data = await getFilteredData();
       
       if (data.length === 0) {
         const errorMsg = dataType === 'products'
           ? `No ${dataType} found matching the current filters.`
+          : useDateRange
+          ? `No ${dataType} data found for the selected date range. Please select a different date range.`
           : `No ${dataType} data found for ${months[parseInt(selectedMonth)]} ${selectedYear}. Please select a different month/year.`;
         toast.error(errorMsg);
         setLoading(false);
         return;
       }
       
-      // For products, don't include month/year in filename
-      const monthName = months[parseInt(selectedMonth)];
-      const filename = dataType === 'products'
-        ? `flame-beverage-${dataType}-export-${new Date().toISOString().split('T')[0]}`
-        : `flame-beverage-${dataType}-${monthName}-${selectedYear}`;
+      // Generate filename based on data type and date selection
+      let filename: string;
+      if (dataType === 'products') {
+        filename = `flame-beverage-${dataType}-export-${new Date().toISOString().split('T')[0]}`;
+      } else if (useDateRange) {
+        const startStr = startDate.replace(/-/g, '');
+        const endStr = endDate.replace(/-/g, '');
+        filename = `flame-beverage-${dataType}-${startStr}-to-${endStr}`;
+      } else {
+        const monthName = months[parseInt(selectedMonth)];
+        filename = `flame-beverage-${dataType}-${monthName}-${selectedYear}`;
+      }
+      
       const title = `${dataType.charAt(0).toUpperCase() + dataType.slice(1)} Report`;
 
       if (format === 'excel') {
@@ -563,14 +641,23 @@ export function ExportButton({
           Export Data
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[400px] bg-card border-border">
+      <DialogContent className="sm:max-w-[450px] bg-card border-border max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="text-xl font-display text-flame-orange">Export Monthly Data</DialogTitle>
+          <DialogTitle className="text-xl font-display text-flame-orange">Export Data</DialogTitle>
         </DialogHeader>
         <div className="space-y-4 mt-4">
           <div className="space-y-2">
             <label className="text-sm font-medium text-foreground">Data Type</label>
-            <Select value={dataType} onValueChange={(v) => setDataType(v as DataType)}>
+            <Select 
+              value={dataType} 
+              onValueChange={(v) => {
+                setDataType(v as DataType);
+                // Reset date range mode when switching to products
+                if (v === 'products') {
+                  setUseDateRange(false);
+                }
+              }}
+            >
               <SelectTrigger className="bg-secondary/50 border-border">
                 <SelectValue />
               </SelectTrigger>
@@ -582,34 +669,97 @@ export function ExportButton({
             </Select>
           </div>
           
-          <div className="grid grid-cols-2 gap-4">
+          {/* Date Selection Mode - Only show for orders and payments */}
+          {dataType !== 'products' && (
             <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Month</label>
-              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+              <label className="text-sm font-medium text-foreground">Date Selection</label>
+              <Select 
+                value={useDateRange ? 'range' : 'month'} 
+                onValueChange={(v) => {
+                  setUseDateRange(v === 'range');
+                  // If switching to month/year, reset custom date range
+                  if (v === 'month') {
+                    const date = new Date();
+                    date.setDate(1);
+                    setStartDate(date.toISOString().split('T')[0]);
+                    setEndDate(new Date().toISOString().split('T')[0]);
+                  }
+                }}
+              >
                 <SelectTrigger className="bg-secondary/50 border-border">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {months.map((month, idx) => (
-                    <SelectItem key={idx} value={String(idx)}>{month}</SelectItem>
-                  ))}
+                  <SelectItem value="month">Month & Year</SelectItem>
+                  <SelectItem value="range">Custom Date Range</SelectItem>
                 </SelectContent>
               </Select>
+              {dataType === 'payments' && paymentFilters?.dateRange && !useDateRange && (
+                <p className="text-xs text-muted-foreground mt-1">
+                  Table filter active: {paymentFilters.dateRange === '7d' ? 'Last 7 days' : 
+                                       paymentFilters.dateRange === '30d' ? 'Last 30 days' : 
+                                       paymentFilters.dateRange === '90d' ? 'Last 90 days' : ''}
+                </p>
+              )}
             </div>
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Year</label>
-              <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="bg-secondary/50 border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {years.map((year) => (
-                    <SelectItem key={year} value={String(year)}>{year}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+          )}
+
+          {/* Month/Year Selection */}
+          {dataType !== 'products' && !useDateRange && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Month</label>
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {months.map((month, idx) => (
+                      <SelectItem key={idx} value={String(idx)}>{month}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Year</label>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger className="bg-secondary/50 border-border">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {years.map((year) => (
+                      <SelectItem key={year} value={String(year)}>{year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
-          </div>
+          )}
+
+          {/* Date Range Selection */}
+          {dataType !== 'products' && useDateRange && (
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">Start Date</label>
+                <input
+                  type="date"
+                  value={startDate}
+                  onChange={(e) => setStartDate(e.target.value)}
+                  className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-md text-foreground"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-sm font-medium text-foreground">End Date</label>
+                <input
+                  type="date"
+                  value={endDate}
+                  onChange={(e) => setEndDate(e.target.value)}
+                  min={startDate}
+                  className="w-full px-3 py-2 bg-secondary/50 border border-border rounded-md text-foreground"
+                />
+              </div>
+            </div>
+          )}
 
           <div className="flex gap-3 pt-4">
             <Button 
