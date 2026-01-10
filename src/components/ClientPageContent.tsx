@@ -240,11 +240,10 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${
-                      theme === 'dark'
-                        ? 'text-primary-text hover:text-flame-orange'
-                        : 'text-orange-600 hover:text-orange-700'
-                    }`}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-primary-text hover:border-ternary-text rounded-xl ${                      theme === 'dark'
+                      ? 'text-white-text hover:text-flame-orange'
+                      : 'text-orange-600 hover:text-orange-700'
+                  }`}
                   >
                     View All
                     <ArrowRight className="w-4 h-4" />
@@ -291,8 +290,8 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${                      theme === 'dark'
-                        ? 'text-primary-text hover:text-flame-orange'
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-primary-text hover:border-ternary-text rounded-xl ${                      theme === 'dark'
+                        ? 'text-white-text hover:text-flame-orange'
                         : 'text-orange-600 hover:text-orange-700'
                     }`}
                   >
@@ -353,10 +352,10 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-ternary-text hover:border-primary-text ${                      theme === 'dark'
-                        ? 'text-primary-text hover:text-flame-orange'
-                        : 'text-orange-600 hover:text-orange-700'
-                    }`}
+                    className={`flex items-center gap-2 text-sm font-medium transition-colors border-2 p-2 border-primary-text hover:border-ternary-text rounded-xl ${                      theme === 'dark'
+                      ? 'text-white-text hover:text-flame-orange'
+                      : 'text-orange-600 hover:text-orange-700'
+                  }`}
                   >
                     View All
                     <ArrowRight className="w-4 h-4" />
