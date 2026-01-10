@@ -56,61 +56,65 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4">
-      <div className="relative w-full max-w-md bg-card rounded-2xl border border-border shadow-2xl">
+    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
+          className="absolute right-2 top-2 sm:right-4 sm:top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted/90 backdrop-blur-sm text-foreground transition-colors hover:bg-muted cursor-pointer shadow-lg"
+          aria-label="Close modal"
         >
           <X className="h-4 w-4" />
         </button>
 
-        <div className="p-8">
+        <div className="p-4 sm:p-6 md:p-8">
           {/* Logo and Title */}
-          <div className="text-center mb-6">
-            <div className="flex justify-center mb-4">
-              {/* <div className="p-3 rounded-full bg-primary-gradient">
-                <Flame className="w-8 h-8 text-white" />
-              </div> */}
-              <Image src="/assets/flame-dark-logo.png" alt="Flame Beverage logo" width={100} height={80} />
+          <div className="text-center mb-4 sm:mb-6">
+            <div className="flex justify-center mb-3 sm:mb-4">
+              <Image 
+                src="/assets/flame-dark-logo.png" 
+                alt="Flame Beverage logo" 
+                width={80} 
+                height={64}
+                className="sm:w-[100px] sm:h-[80px]"
+              />
             </div>
-            <h1 className="text-2xl font-display font-bold text-foreground mb-2">
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
               Flame Beverage
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-sm sm:text-base text-muted-foreground">
               {t('welcomeBack' as any)}
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="flex gap-2 mb-6">
-            <button className="flex-1 py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium">
+          <div className="flex gap-2 mb-4 sm:mb-6">
+            <button className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base">
               {t('login')}
             </button>
             <button 
               onClick={onSwitchToRegister}
-              className="flex-1 py-3 px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center hover:bg-muted transition-colors"
+              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center text-sm sm:text-base hover:bg-muted transition-colors cursor-pointer"
             >
               {language === "en" ? "Register" : "दर्ता"}
             </button>
           </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-5">
+          <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
             {/* Email */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
                 {t('emailAddress' as any)}
               </label>
               <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Mail className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                   placeholder={t('enterEmail' as any)}
-                  className="w-full pl-10 pr-4 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
               </div>
@@ -118,39 +122,39 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
 
             {/* Password */}
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
                 {t('password' as any)}
               </label>
               <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
+                <Lock className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
                 <input
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                   placeholder={t('enterPassword' as any)}
-                  className="w-full pl-10 pr-12 py-3 bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-2.5 sm:right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground cursor-pointer"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                  {showPassword ? <EyeOff className="w-4 h-4 sm:w-5 sm:h-5" /> : <Eye className="w-4 h-4 sm:w-5 sm:h-5" />}
                 </button>
               </div>
             </div>
 
             {/* Forgot Password */}
             <div className="flex justify-end">
-              <Link href="#" className="text-sm text-primary-text hover:text-secondary-text">
+              <Link href="#" className="text-xs sm:text-sm text-primary-text hover:text-secondary-text">
                 {t('forgotPassword' as any)}
               </Link>
             </div>
 
             {/* Error Message */}
             {error && (
-              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-sm">
+              <div className="p-2.5 sm:p-3 rounded-lg bg-red-500/10 border border-red-500/20 text-red-500 text-xs sm:text-sm">
                 {error}
               </div>
             )}
@@ -159,12 +163,12 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
+                <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
               ) : (
-                <Flame className="w-5 h-5" />
+                <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
               {isLoading 
                 ? t('loggingIn' as any)
@@ -174,7 +178,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           </form>
 
           {/* Divider */}
-          <div className="relative my-6">
+          <div className="relative my-4 sm:my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border"></div>
             </div>
@@ -186,13 +190,13 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           </div>
 
           {/* Social Login */}
-          <div className="grid grid-cols-2 gap-4">
-            <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
-              <span className="text-xl">G</span>
+          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
+              <span className="text-lg sm:text-xl">G</span>
               <span className="font-medium">{t('google' as any)}</span>
             </button>
-            <button className="flex items-center justify-center gap-2 py-3 px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors">
-              <span className="text-xl">f</span>
+            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
+              <span className="text-lg sm:text-xl">f</span>
               <span className="font-medium">{t('facebook' as any)}</span>
             </button>
           </div>

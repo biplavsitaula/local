@@ -94,12 +94,12 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const finalTotal = subtotal + deliveryFee;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-4 overflow-auto">
-      <div className="relative w-full max-w-6xl rounded-2xl border border-border bg-card shadow-2xl my-8">
+    <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-auto">
+      <div className="relative w-full max-w-6xl rounded-xl md:rounded-2xl border border-border bg-card shadow-2xl my-2 md:my-8 max-h-[98vh] overflow-y-auto">
         {/* Close Button */}
         <button
           onClick={handleClose}
-          className="absolute right-4 top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
+          className="absolute right-2 top-2 sm:right-4 sm:top-4 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-muted text-foreground transition-colors hover:bg-muted/80 cursor-pointer"
         >
           <X className="h-4 w-4" />
         </button>
@@ -108,36 +108,36 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         <Link
           href="/"
           onClick={handleClose}
-          className="absolute left-6 top-6 flex items-center gap-2 text-sm font-medium text-primary-text hover:text-secondary-text transition-colors cursor-pointer border-2 p-2 border-ternary-text hover:border-primary-text"
+          className="absolute left-2 top-2 sm:left-4 sm:top-4 z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium text-primary-text hover:text-secondary-text transition-colors cursor-pointer border border-ternary-text hover:border-primary-text px-2 py-1 sm:px-2 sm:p-2 rounded-lg"
         >
-          <ArrowLeft className="h-4 w-4" />
-          {t("continue")}
+          <ArrowLeft className="h-3 w-3 sm:h-4 sm:w-4" />
+          <span className="hidden sm:inline">{t("continue")}</span>
         </Link>
 
-        <div className="grid md:grid-cols-2 gap-0 mt-12">
+        <div className="grid md:grid-cols-2 gap-0 mt-10 sm:mt-12">
           {/* Left: Order Summary */}
-          <div className="p-6 md:p-8 border-r border-border bg-muted/20">
-            <h2 className="text-2xl font-display font-bold text-primary-text mb-6">
+          <div className="p-4 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-border bg-muted/20">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-primary-text mb-4 sm:mb-6">
               {t("orderSummary")}
             </h2>
 
             {/* Cart Items */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
               {items.map((item) => (
-                <div key={item?.product?.id} className="flex gap-4">
+                <div key={item?.product?.id} className="flex gap-2 sm:gap-4">
                   <img
                     src={item?.product?.image}
                     alt={item?.product?.name}
-                    className="w-20 h-24 object-cover rounded-lg"
+                    className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-lg shrink-0"
                   />
-                  <div className="flex-1">
-                    <h4 className="font-medium text-foreground mb-1">
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-medium text-foreground mb-1 text-sm sm:text-base line-clamp-2">
                       {language === "en" ? item?.product?.name : item?.product?.nameNe || item?.product?.name}
                     </h4>
-                    <p className="text-sm text-muted-foreground mb-2">
+                    <p className="text-xs sm:text-sm text-muted-foreground mb-1 sm:mb-2">
                       Rs. {(item?.product?.price || 0).toLocaleString()} x {item?.quantity || 0}
                     </p>
-                    <p className="text-lg font-bold text-primary-text">
+                    <p className="text-base sm:text-lg font-bold text-primary-text">
                       Rs. {((item?.product?.price || 0) * (item?.quantity || 0)).toLocaleString()}
                     </p>
                   </div>
@@ -146,20 +146,20 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             </div>
 
             {/* Price Breakdown */}
-            <div className="border-t border-border pt-4 space-y-2">
-              <div className="flex justify-between text-foreground">
+            <div className="border-t border-border pt-3 sm:pt-4 space-y-2">
+              <div className="flex justify-between text-sm sm:text-base text-foreground">
                 <span>{t("subtotal")}</span>
                 <span>Rs. {subtotal.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between text-foreground">
+              <div className="flex justify-between text-sm sm:text-base text-foreground">
                 <span>{t("delivery")}</span>
                 <span className={deliveryFee === 0 ? "text-green-500 font-semibold" : ""}>
                   {deliveryFee === 0 ? t("free") : `Rs. ${deliveryFee.toLocaleString()}`}
                 </span>
               </div>
               <div className="flex justify-between items-center pt-2 border-t border-border">
-                <span className="text-lg font-semibold text-primary-text">{t("total")}</span>
-                <span className="text-2xl font-bold text-primary-text">
+                <span className="text-base sm:text-lg font-semibold text-primary-text">{t("total")}</span>
+                <span className="text-xl sm:text-2xl font-bold text-primary-text">
                   Rs. {finalTotal.toLocaleString()}
                 </span>
               </div>
@@ -167,17 +167,17 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           </div>
 
           {/* Right: Delivery & Payment */}
-          <div className="p-6 md:p-8">
-            <h2 className="text-2xl font-display font-bold text-primary-text mb-6">
+          <div className="p-4 sm:p-6 md:p-8">
+            <h2 className="text-xl sm:text-2xl font-display font-bold text-primary-text mb-4 sm:mb-6">
               {t("deliveryPayment")}
             </h2>
 
             {/* Form Fields */}
-            <div className="space-y-4 mb-6">
+            <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
               {/* Full Name */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-                  <User className="w-4 h-4 text-flame-orange" />
+                <label className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                  <User className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-flame-orange" />
                   {t("fullName")}
                 </label>
                 <input
@@ -185,14 +185,14 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   value={formData.fullName}
                   onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                   placeholder={t("enterName")}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                 />
               </div>
 
               {/* Phone Number */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-                  <Phone className="w-4 h-4 text-flame-orange" />
+                <label className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                  <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-flame-orange" />
                   {t("phoneNumber")}
                 </label>
                 <input
@@ -200,14 +200,14 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   value={formData.phoneNumber}
                   onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
                   placeholder={t("enterPhone")}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                 />
               </div>
 
               {/* Delivery Address */}
               <div>
-                <label className="flex items-center gap-2 text-sm font-medium text-foreground mb-2">
-                  <MapPin className="w-4 h-4 text-flame-orange" />
+                <label className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                  <MapPin className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-flame-orange" />
                   {t("deliveryAddress")}
                 </label>
                 <textarea
@@ -215,31 +215,31 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   onChange={(e) => setFormData({ ...formData, deliveryAddress: e.target.value })}
                   placeholder={t("enterAddress")}
                   rows={3}
-                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20 resize-none"
+                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20 resize-none"
                 />
               </div>
             </div>
 
             {/* Payment Method Selection */}
-            <div className="mb-6">
-              <h3 className="text-lg font-display font-semibold text-foreground mb-4">
+            <div className="mb-4 sm:mb-6">
+              <h3 className="text-base sm:text-lg font-display font-semibold text-foreground mb-3 sm:mb-4">
                 {t("paymentTitle")}
               </h3>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-2 sm:gap-3">
                 {/* Cash on Delivery */}
                 <button
                   onClick={() => {
                     setSelectedPayment("cod");
                     setSelectedGateway(null);
                   }}
-                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${
+                  className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-left ${
                     selectedPayment === "cod"
                       ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
                       : "border-border bg-card hover:border-flame-orange/50"
                   }`}
                 >
-                  <Package className={`w-6 h-6 mb-2 ${selectedPayment === "cod" ? "text-text-inverse" : "text-flame-orange"}`} />
-                  <div className="font-semibold mb-1">{t("cod")}</div>
+                  <Package className={`w-5 h-5 sm:w-6 sm:h-6 mb-1.5 sm:mb-2 ${selectedPayment === "cod" ? "text-text-inverse" : "text-flame-orange"}`} />
+                  <div className="font-semibold mb-0.5 sm:mb-1 text-xs sm:text-sm">{t("cod")}</div>
                   <div className={`text-xs ${selectedPayment === "cod" ? "text-text-inverse/80" : "text-muted-foreground"}`}>
                     {t("payWhenReceive")}
                   </div>
@@ -248,14 +248,14 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 {/* Pay Online */}
                 <button
                   onClick={() => setSelectedPayment("online")}
-                  className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-left ${
+                  className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-left ${
                     selectedPayment === "online"
                       ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
                       : "border-border bg-card hover:border-flame-orange/50"
                   }`}
                 >
-                  <CreditCard className={`w-6 h-6 mb-2 ${selectedPayment === "online" ? "text-text-inverse" : "text-flame-orange"}`} />
-                  <div className="font-semibold mb-1">{t("online")}</div>
+                  <CreditCard className={`w-5 h-5 sm:w-6 sm:h-6 mb-1.5 sm:mb-2 ${selectedPayment === "online" ? "text-text-inverse" : "text-flame-orange"}`} />
+                  <div className="font-semibold mb-0.5 sm:mb-1 text-xs sm:text-sm">{t("online")}</div>
                   <div className={`text-xs ${selectedPayment === "online" ? "text-text-inverse/80" : "text-muted-foreground"}`}>
                     {t("esewaKhaltiCard")}
                   </div>
@@ -265,14 +265,14 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
             {/* Payment Gateway Selection (if online selected) */}
             {selectedPayment === "online" && (
-              <div className="mb-6">
-                <h3 className="text-lg font-display font-semibold text-foreground mb-4">
+              <div className="mb-4 sm:mb-6">
+                <h3 className="text-base sm:text-lg font-display font-semibold text-foreground mb-3 sm:mb-4">
                   {t("selectPaymentGateway")}
                 </h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-3 gap-2 sm:gap-3">
                   <button
                     onClick={() => setSelectedGateway("esewa")}
-                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-center ${
+                    className={`p-2.5 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-center text-xs sm:text-sm ${
                       selectedGateway === "esewa"
                         ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
                         : "border-border bg-card hover:border-flame-orange/50"
@@ -282,7 +282,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   </button>
                   <button
                     onClick={() => setSelectedGateway("khalti")}
-                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-center ${
+                    className={`p-2.5 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-center text-xs sm:text-sm ${
                       selectedGateway === "khalti"
                         ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
                         : "border-border bg-card hover:border-flame-orange/50"
@@ -292,7 +292,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   </button>
                   <button
                     onClick={() => setSelectedGateway("card")}
-                    className={`p-4 rounded-xl border-2 transition-all cursor-pointer text-center ${
+                    className={`p-2.5 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-center text-xs sm:text-sm ${
                       selectedGateway === "card"
                         ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
                         : "border-border bg-card hover:border-flame-orange/50"
@@ -304,18 +304,18 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 
                 {/* QR Code Display based on selected gateway */}
                 {selectedGateway === "esewa" && (
-                  <div className="flex justify-center mt-4">
-                    <Image src="/assets/esewaqr.png" alt="eSewa QR Code" width={150} height={150} className="rounded-lg" />
+                  <div className="flex justify-center mt-3 sm:mt-4">
+                    <Image src="/assets/esewaqr.png" alt="eSewa QR Code" width={120} height={120} className="sm:w-[150px] sm:h-[150px] rounded-lg" />
                   </div>
                 )}
                 {selectedGateway === "khalti" && (
-                  <div className="flex justify-center mt-4">
-                    <Image src="/assets/khaltiqr.png" alt="Khalti QR Code" width={150} height={150} className="rounded-lg" />
+                  <div className="flex justify-center mt-3 sm:mt-4">
+                    <Image src="/assets/khaltiqr.png" alt="Khalti QR Code" width={120} height={120} className="sm:w-[150px] sm:h-[150px] rounded-lg" />
                   </div>
                 )}
                 {selectedGateway === "card" && (
-                  <div className="flex justify-center mt-4">
-                    <Image src="/assets/cardqr.png" alt="Card QR Code" width={150} height={150} className="rounded-lg" />
+                  <div className="flex justify-center mt-3 sm:mt-4">
+                    <Image src="/assets/cardqr.png" alt="Card QR Code" width={120} height={120} className="sm:w-[150px] sm:h-[150px] rounded-lg" />
                   </div>
                 )}
               </div>
@@ -323,22 +323,22 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-6 rounded-xl border border-red-500/30 bg-red-500/10 p-4 flex items-start gap-3">
-                <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+              <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-red-500/30 bg-red-500/10 p-3 sm:p-4 flex items-start gap-2 sm:gap-3">
+                <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
-                  <p className="text-sm font-semibold text-red-500">
+                  <p className="text-xs sm:text-sm font-semibold text-red-500">
                     {language === "en" ? "Error" : "त्रुटि"}
                   </p>
-                  <p className="text-sm text-red-400 mt-1">{error}</p>
+                  <p className="text-xs sm:text-sm text-red-400 mt-1">{error}</p>
                 </div>
               </div>
             )}
 
             {/* Success Message */}
             {paid && (
-              <div className="mb-6 rounded-xl border border-green-500/30 bg-green-500/10 p-4">
-                <p className="text-lg font-semibold text-green-500">{t("success")}</p>
-                <p className="text-sm text-muted-foreground mt-1">
+              <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-green-500/30 bg-green-500/10 p-3 sm:p-4">
+                <p className="text-base sm:text-lg font-semibold text-green-500">{t("success")}</p>
+                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
                   {language === "en"
                     ? "You'll get updates for delivery windows. Thank you!"
                     : "तपाईंले डेलिभरी समयको लागि अपडेटहरू प्राप्त गर्नुहुनेछ। धन्यवाद!"}
@@ -351,16 +351,16 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
               <button
                 onClick={handlePayment}
                 disabled={isProcessing || !formData.fullName || !formData.phoneNumber || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway) || items.length === 0}
-                className="w-full rounded-xl bg-primary-gradient px-6 py-4 font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                className="w-full rounded-lg sm:rounded-xl bg-primary-gradient px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
                   <>
-                    <Loader2 className="w-5 h-5 animate-spin" />
-                    {language === "en" ? "Processing..." : "प्रशोधन गर्दै..."}
+                    <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
+                    <span className="text-xs sm:text-sm">{language === "en" ? "Processing..." : "प्रशोधन गर्दै..."}</span>
                   </>
                 ) : (
                   <>
-                    <Check className="w-5 h-5" />
+                    <Check className="w-4 h-4 sm:w-5 sm:h-5" />
                     {t("placeOrder")}
                   </>
                 )}
