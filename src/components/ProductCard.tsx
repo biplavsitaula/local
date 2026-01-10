@@ -119,11 +119,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           )}
         </div>
 
-        {/* Quantity Selector */}
+        {/* Quantity Selector and Actions - All in one line on mobile */}
         {product.inStock !== false && (
-          <div className="mt-3 flex flex-wrap items-center gap-2">
-            <span className="text-xs sm:text-sm text-muted-foreground">{t('quantity')}:</span>
-            <div className="flex items-center rounded-lg border border-border">
+          <div className="mt-3 flex items-center gap-2">
+            {/* Quantity Selector */}
+            <div className="flex items-center rounded-lg border border-border shrink-0">
               <button
                 onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 className="flex h-7 w-7 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
@@ -140,28 +140,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
                 <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
               </button>
             </div>
+            
+            {/* Actions */}
+            <button
+              onClick={handleAddToCart}
+              disabled={product.inStock === false}
+              className="flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg border border-primary-border bg-btn-outline py-2 sm:py-2.5 px-2 sm:px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline text-xs sm:text-sm">{t('addToCart')}</span>
+            </button>
+            <button
+              onClick={handleBuyNow}
+              disabled={product.inStock === false}
+              className="flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg bg-primary-gradient py-2 sm:py-2.5 px-2 sm:px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+              <span className="hidden sm:inline text-xs sm:text-sm">{t('buyNow')}</span>
+            </button>
           </div>
         )}
-
-        {/* Actions */}
-        <div className="mt-4 flex gap-2">
-          <button
-            onClick={handleAddToCart}
-            disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg border border-primary-border bg-btn-outline py-2.5 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <ShoppingCart className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('addToCart')}</span>
-          </button>
-          <button
-            onClick={handleBuyNow}
-            disabled={product.inStock === false}
-            className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-2.5 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <Zap className="h-4 w-4" />
-            <span className="hidden sm:inline">{t('buyNow')}</span>
-          </button>
-        </div>
       </div>
     </div>
   );
