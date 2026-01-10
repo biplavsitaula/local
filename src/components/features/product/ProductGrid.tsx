@@ -2,7 +2,7 @@ import React, { useState, useMemo, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { Product } from "@/types";
-import { ShoppingCart, Zap, Plus, Minus, Eye, Loader2, AlertCircle } from "lucide-react";
+import { ShoppingCart, Zap, Plus, Minus, Eye, Loader2, AlertCircle, Package } from "lucide-react";
 import { toast } from "sonner";
 import ProductDetailModal from "@/components/features/product/ProductDetailModal";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
@@ -81,13 +81,22 @@ return (
       className="relative w-full overflow-hidden bg-muted cursor-pointer"
       style={{ paddingBottom: "100%" }}
     >
-      <img
-        onClick={() => onViewDetails(product)}
-        src={product.image}
-        alt={product.name}
-        className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-        loading="lazy"
-      />
+      {product.image ? (
+        <img
+          onClick={() => onViewDetails(product)}
+          src={product.image}
+          alt={product.name}
+          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          loading="lazy"
+        />
+      ) : (
+        <div
+          onClick={() => onViewDetails(product)}
+          className="absolute inset-0 h-full w-full flex items-center justify-center bg-muted/50"
+        >
+          <Package className="h-12 w-12 text-muted-foreground/50" />
+        </div>
+      )}
     </div>
 
 
