@@ -168,15 +168,18 @@ export function AddProductModal({
         ...(formData.isRecommended && { isRecommended: formData.isRecommended }),
       };
 
+      let response;
       if (isEditMode && product) {
         // For update, use product.id (which should be the _id from API)
         const productId = typeof product.id === 'string' ? product.id : String(product.id);
         
-        await updateProductMutation(productId, productData);
-        toast.success("Product updated successfully!");
+        response = await updateProductMutation(productId, productData);
+        // Show API response message if available, otherwise use default
+        toast.success(response?.message || "Product updated successfully!");
       } else {
-        await createProductMutation(productData);
-        toast.success("Product added successfully!");
+        response = await createProductMutation(productData);
+        // Show API response message if available, otherwise use default
+        toast.success(response?.message || "Product added successfully!");
       }
       
       // Call onSuccess callback to refresh the product list
@@ -206,8 +209,15 @@ export function AddProductModal({
         });
       }
       setErrors({});
-    } catch (err) {
-      const errorMessage = err instanceof Error ? err.message : 'Failed to save product';
+    } catch (err: any) {
+      // Extract API response message if available
+      // Try multiple possible error structures
+      const errorMessage = err?.response?.data?.message || 
+                          err?.response?.data?.error ||
+                          err?.response?.message || 
+                          err?.message || 
+                          err?.toString() ||
+                          'Failed to save product';
       toast.error(errorMessage);
       console.error('Error saving product:', err);
     }

@@ -37,8 +37,9 @@ export function DeleteProductModal({
       // Get product ID (should be _id from API)
       const productId = typeof product.id === 'string' ? product.id : String(product.id);
       
-      await deleteProductMutation(productId);
-      toast.success("Product deleted successfully!");
+      const response = await deleteProductMutation(productId);
+      // Show API response message if available, otherwise use default
+      toast.success(response?.message || "Product deleted successfully!");
       
       // Call onConfirm callback if provided
       if (onConfirm) {
@@ -51,8 +52,15 @@ export function DeleteProductModal({
       }
       
       onOpenChange(false);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to delete product';
+    } catch (error: any) {
+      // Extract API response message if available
+      // Try multiple possible error structures
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.error ||
+                          error?.response?.message || 
+                          error?.message || 
+                          error?.toString() ||
+                          'Failed to delete product';
       toast.error(errorMessage);
       console.error('Error deleting product:', error);
     } finally {

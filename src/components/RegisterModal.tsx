@@ -73,7 +73,15 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
       handleClose();
       // Navigation is handled by the auth context
     } catch (err: any) {
-      setError(err.message || (language === "en" ? "Registration failed. Please try again." : "दर्ता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।"));
+      // Extract API response message if available
+      // Try multiple possible error structures
+      const apiMessage = err?.response?.data?.message || 
+                        err?.response?.data?.error ||
+                        err?.response?.message || 
+                        err?.message || 
+                        err?.toString() ||
+                        (language === "en" ? "Registration failed. Please try again." : "दर्ता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।");
+      setError(apiMessage);
     } finally {
       setIsLoading(false);
     }

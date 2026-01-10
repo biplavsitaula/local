@@ -92,12 +92,19 @@ export default function SettingsPage() {
 
         // Update themes list
         if (themesResponse.success && themesResponse.data) {
+          // Filter out any API themes with "default" keyname to avoid duplicates
+          const apiThemes = Array.isArray(themesResponse.data) 
+            ? themesResponse.data
+                .filter((t: SeasonalThemeApiResponse) => (t.keyname || '').toLowerCase() !== 'default')
+                .map((t: SeasonalThemeApiResponse) => ({
+                  label: `${t.emoji || ''} ${t.title || t.keyname}`,
+                  value: t.keyname || '',
+                }))
+            : [];
+          
           const themesList = [
             { label: "Default", value: "default" },
-            ...(Array.isArray(themesResponse.data) ? themesResponse.data.map((t: SeasonalThemeApiResponse) => ({
-              label: `${t.emoji || ''} ${t.title || t.keyname}`,
-              value: t.keyname || '',
-            })) : []),
+            ...apiThemes,
           ];
           setThemes(themesList);
         }
@@ -136,13 +143,30 @@ export default function SettingsPage() {
       const response = await settingsService.update(settingsData);
       
       if (response.success) {
-        toast.success('Settings saved successfully!');
+        // Use API response message directly - it exists based on console log
+        const message = response.message?.trim() || 'Settings saved successfully!';
+        // Ensure we're passing a valid string to toast
+        if (message) {
+          toast.success(String(message));
+        } else {
+          toast.success('Settings saved successfully!');
+        }
       } else {
-        toast.error(response.message || 'Failed to save settings');
+        // Show API error message
+        const errorMessage = response.message?.trim() || 'Failed to save settings';
+        toast.error(String(errorMessage));
       }
     } catch (error: any) {
       console.error('Error saving settings:', error);
-      toast.error(error.message || 'Failed to save settings. Please try again.');
+      // Extract API response message if available
+      // Try multiple possible error structures
+      const apiMessage = error?.response?.data?.message || 
+                        error?.response?.data?.error ||
+                        error?.response?.message || 
+                        error?.message || 
+                        error?.toString() ||
+                        'Failed to save settings. Please try again.';
+      toast.error(apiMessage);
     } finally {
       setSaving(false);
     }
@@ -374,12 +398,19 @@ export default function SettingsPage() {
           try {
             const themesResponse = await seasonalThemesService.getAll();
             if (themesResponse.success && themesResponse.data) {
+              // Filter out any API themes with "default" keyname to avoid duplicates
+              const apiThemes = Array.isArray(themesResponse.data) 
+                ? themesResponse.data
+                    .filter((t: SeasonalThemeApiResponse) => (t.keyname || '').toLowerCase() !== 'default')
+                    .map((t: SeasonalThemeApiResponse) => ({
+                      label: `${t.emoji || ''} ${t.title || t.keyname}`,
+                      value: t.keyname || '',
+                    }))
+                : [];
+              
               const themesList = [
                 { label: "Default", value: "default" },
-                ...(Array.isArray(themesResponse.data) ? themesResponse.data.map((t: SeasonalThemeApiResponse) => ({
-                  label: `${t.emoji || ''} ${t.title || t.keyname}`,
-                  value: t.keyname || '',
-                })) : []),
+                ...apiThemes,
               ];
               setThemes(themesList);
             }
