@@ -51,7 +51,7 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
             return (
               <div
                 key={index}
-                className={`group relative flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden ${
+                className={`group relative flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden border-1 border-text-primary ${
                   theme === 'dark'
                     ? 'bg-card/80 border-border/50 hover:border-primary/60 hover:bg-card/90 card-glow hover:shadow-xl hover:shadow-primary/20'
                     : 'bg-white/95 border-orange-200/60 hover:border-orange-400/80 hover:bg-white shadow-sm hover:shadow-lg hover:shadow-orange-200/50'
