@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { Product } from '@/types';
 import { ArrowUpDown, Edit, Trash2, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -28,9 +28,16 @@ interface ProductTableProps {
   filter: FilterType;
   products?: Product[];
   onRefresh?: () => void;
+  onFiltersChange?: (filters: {
+    category?: string;
+    stockStatus?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    minRating?: string;
+  }) => void;
 }
 
-export function ProductTable({ filter, products = [], onRefresh }: ProductTableProps) {
+export function ProductTable({ filter, products = [], onRefresh, onFiltersChange }: ProductTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [editProduct, setEditProduct] = useState<Product | null>(null);
@@ -44,6 +51,19 @@ export function ProductTable({ filter, products = [], onRefresh }: ProductTableP
     maxPrice: '',
     minRating: '',
   });
+  
+  // Expose filters to parent component
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        category: filters.category,
+        stockStatus: filters.stockStatus,
+        minPrice: filters.minPrice,
+        maxPrice: filters.maxPrice,
+        minRating: filters.minRating,
+      });
+    }
+  }, [filters, onFiltersChange]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {

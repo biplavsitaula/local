@@ -10,7 +10,17 @@ import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/useDebounce';
 
-export function OrderTable() {
+interface OrderTableProps {
+  onFiltersChange?: (filters: {
+    search?: string;
+    status?: string;
+    billNumber?: string;
+    location?: string;
+    paymentMethod?: string;
+  }) => void;
+}
+
+export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -23,6 +33,19 @@ export function OrderTable() {
     location: '',
     paymentMethod: '',
   });
+  
+  // Expose filters to parent component
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        search: debouncedSearch,
+        status: filters.status,
+        billNumber: filters.billNumber,
+        location: filters.location,
+        paymentMethod: filters.paymentMethod,
+      });
+    }
+  }, [debouncedSearch, filters, onFiltersChange]);
 
   const mapApiOrderToOrder = (apiOrder: ApiOrder): Order => {
     // Handle API response structure - customer can be an object with fullName and location

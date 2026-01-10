@@ -21,6 +21,13 @@ const Products = () => {
   const debouncedSearch = useDebounce(searchInput, 300);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [tableFilters, setTableFilters] = useState<{
+    category?: string;
+    stockStatus?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    minRating?: string;
+  }>({});
 
   const mapApiProductToProduct = (apiProduct: any): ProductType => {
     // Handle API response structure: type instead of category, image instead of imageUrl
@@ -128,7 +135,7 @@ const Products = () => {
       );
     }
 
-    return <ProductTable filter={currentFilter} products={products} onRefresh={refetch} />;
+    return <ProductTable filter={currentFilter} products={products} onRefresh={refetch} onFiltersChange={setTableFilters} />;
   };
 
   return (
@@ -148,7 +155,18 @@ const Products = () => {
               className="pl-10 bg-secondary/50 border-border"
             />
           </div>
-          <ExportButton defaultDataType="products" />
+          <ExportButton 
+            defaultDataType="products" 
+            productFilters={{
+              filterType: currentFilter,
+              searchQuery: debouncedSearch,
+              category: tableFilters.category,
+              stockStatus: tableFilters.stockStatus,
+              minPrice: tableFilters.minPrice,
+              maxPrice: tableFilters.maxPrice,
+              minRating: tableFilters.minRating,
+            }}
+          />
         </div>
       </div>
 

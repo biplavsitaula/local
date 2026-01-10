@@ -42,6 +42,12 @@ export default function Payments() {
   const [activeTab, setActiveTab] = useState<MethodFilter>("all");
   const [searchQuery, setSearchQuery] = useState("");
   const debouncedSearch = useDebounce(searchQuery, 300);
+  const [tableFilters, setTableFilters] = useState<{
+    status?: string;
+    dateRange?: string;
+    minAmount?: string;
+    maxAmount?: string;
+  }>({});
 
   // Prevent hydration mismatch
   useEffect(() => {
@@ -158,7 +164,17 @@ export default function Payments() {
               className="pl-10 bg-secondary/50 border-border"
             />
           </div>
-          <ExportButton defaultDataType="payments" />
+          <ExportButton 
+            defaultDataType="payments" 
+            paymentFilters={{
+              methodFilter: activeTab,
+              searchQuery: debouncedSearch,
+              status: tableFilters.status,
+              dateRange: tableFilters.dateRange,
+              minAmount: tableFilters.minAmount,
+              maxAmount: tableFilters.maxAmount,
+            }}
+          />
         </div>
       </div>
 
@@ -211,7 +227,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="all" searchQuery={debouncedSearch} />
+          <PaymentTable methodFilter="all" searchQuery={debouncedSearch} onFiltersChange={setTableFilters} />
         </TabsContent>
 
         {/* QR */}
@@ -233,7 +249,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="qr" searchQuery={debouncedSearch} />
+          <PaymentTable methodFilter="qr" searchQuery={debouncedSearch} onFiltersChange={setTableFilters} />
         </TabsContent>
 
         {/* COD */}
@@ -255,7 +271,7 @@ export default function Payments() {
               valueClassName="text-warning"
             />
           </div>
-          <PaymentTable methodFilter="cod" searchQuery={debouncedSearch} />
+          <PaymentTable methodFilter="cod" searchQuery={debouncedSearch} onFiltersChange={setTableFilters} />
         </TabsContent>
       </Tabs>
     </div>

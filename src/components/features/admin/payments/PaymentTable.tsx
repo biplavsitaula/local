@@ -14,6 +14,12 @@ type SortDir = "asc" | "desc";
 interface PaymentTableProps {
   methodFilter: MethodFilter;
   searchQuery?: string;
+  onFiltersChange?: (filters: {
+    status?: string;
+    dateRange?: string;
+    minAmount?: string;
+    maxAmount?: string;
+  }) => void;
 }
 
 interface Payment {
@@ -68,7 +74,7 @@ const getMethodPill = (method: "cod" | "qr", gateway: string | null) => {
   };
 };
 
-export function PaymentTable({ methodFilter, searchQuery = "" }: PaymentTableProps) {
+export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }: PaymentTableProps) {
   // --------------------
   // Hooks must always run first
   // --------------------
@@ -87,6 +93,18 @@ export function PaymentTable({ methodFilter, searchQuery = "" }: PaymentTablePro
   
   // Use the searchQuery prop from parent (already debounced)
   const query = searchQuery;
+  
+  // Expose filters to parent component
+  useEffect(() => {
+    if (onFiltersChange) {
+      onFiltersChange({
+        status: filters.status,
+        dateRange: filters.dateRange,
+        minAmount: filters.minAmount,
+        maxAmount: filters.maxAmount,
+      });
+    }
+  }, [filters, onFiltersChange]);
 
   const mapApiPaymentToPayment = (apiPayment: any): Payment => {
     // Handle API response structure - customer can be an object with fullName
