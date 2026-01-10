@@ -67,7 +67,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           <X className="h-4 w-4" />
         </button>
 
-        <div className="p-4 sm:p-6 md:p-8">
+        <div className="p-4 sm:p-6 md:p-8 pb-6 sm:pb-8 md:pb-10">
           {/* Logo and Title */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">

@@ -83,7 +83,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             <Package className="h-12 w-12 text-muted-foreground/50" />
           </div>
         )}
-        {product.inStock === false && (
+        {!product.inStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
             <span className="rounded-full bg-destructive px-4 py-2 font-bold text-destructive-foreground">
               {t('outOfStock')}
@@ -120,7 +120,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
         </div>
 
         {/* Quantity Selector and Actions - All in one line on mobile */}
-        {product.inStock !== false && (
+        {product.inStock === true && (
           <div className="mt-3 flex items-center gap-2">
             {/* Quantity Selector */}
             <div className="flex items-center rounded-lg border border-border shrink-0">
@@ -144,7 +144,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             {/* Actions */}
             <button
               onClick={handleAddToCart}
-              disabled={product.inStock === false}
+              disabled={!product.inStock}
               className="flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg border border-primary-border bg-btn-outline py-2 sm:py-2.5 px-2 sm:px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               <ShoppingCart className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
@@ -152,7 +152,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             </button>
             <button
               onClick={handleBuyNow}
-              disabled={product.inStock === false}
+              disabled={!product.inStock}
               className="flex flex-1 items-center justify-center gap-1 sm:gap-2 rounded-lg bg-primary-gradient py-2 sm:py-2.5 px-2 sm:px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
             >
               <Zap className="h-3.5 w-3.5 sm:h-4 sm:w-4" />

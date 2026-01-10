@@ -116,7 +116,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
         <div className="grid md:grid-cols-2 gap-0 mt-10 sm:mt-12">
           {/* Left: Order Summary */}
-          <div className="p-4 sm:p-6 md:p-8 border-b md:border-b-0 md:border-r border-border bg-muted/20">
+          <div className="p-4 sm:p-6 md:p-8 pb-6 sm:pb-8 md:pb-10 border-b md:border-b-0 md:border-r border-border bg-muted/20">
             <h2 className="text-xl sm:text-2xl font-display font-bold text-primary-text mb-4 sm:mb-6">
               {t("orderSummary")}
             </h2>
@@ -167,7 +167,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           </div>
 
           {/* Right: Delivery & Payment */}
-          <div className="p-4 sm:p-6 md:p-8">
+          <div className="p-4 sm:p-6 md:p-8 pb-6 sm:pb-8 md:pb-10">
             <h2 className="text-xl sm:text-2xl font-display font-bold text-primary-text mb-4 sm:mb-6">
               {t("deliveryPayment")}
             </h2>
