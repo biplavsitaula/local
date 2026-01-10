@@ -115,7 +115,7 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Status: </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium {getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
                 </div>
@@ -140,7 +140,7 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                   <tr className="border-b border-border/50">
                     <th className="text-left p-3 text-sm font-semibold text-foreground">Product</th>
                     <th className="text-center p-3 text-sm font-semibold text-foreground">Qty</th>
-                    <th className="text-right p-3 text-sm font-semibold text-foreground">Price</th>
+                    <th className="text-right p-3 text-sm font-semibold text-foreground">Price (Rs)</th>
                     <th className="text-right p-3 text-sm font-semibold text-foreground">Total</th>
                   </tr>
                 </thead>
@@ -149,8 +149,8 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                     <tr key={index} className="border-b border-border/30">
                       <td className="p-3 text-sm text-foreground">{item.name}</td>
                       <td className="p-3 text-sm text-center text-foreground">{item.quantity}</td>
-                      <td className="p-3 text-sm text-right text-foreground">${item.price.toFixed(2)}</td>
-                      <td className="p-3 text-sm text-right text-foreground">${(item.price * item.quantity).toFixed(2)}</td>
+                      <td className="p-3 text-sm text-right text-foreground">{item.price.toFixed(2)}</td>
+                      <td className="p-3 text-sm text-right text-foreground">{(item.price * item.quantity).toFixed(2)}</td>
                     </tr>
                   ))}
                   <tr>
@@ -158,7 +158,7 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                       Total:
                     </td>
                     <td className="p-3 text-right text-lg font-bold text-[#f97316]">
-                      ${total.toFixed(2)}
+                      Rs {total.toFixed(2)}
                     </td>
                   </tr>
                 </tbody>

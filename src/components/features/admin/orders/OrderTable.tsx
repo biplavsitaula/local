@@ -453,15 +453,15 @@ export function OrderTable() {
                   <tr>
                     <td>${item.name}</td>
                     <td>${item.quantity}</td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                    <td>Rs ${item.price.toFixed(2)}</td>
+                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
             
             <div class="total-section">
-              <div class="total-amount">Total Amount: $${total.toFixed(2)}</div>
+              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
             </div>
             
             <div class="footer">
@@ -697,15 +697,15 @@ export function OrderTable() {
                   <tr>
                     <td>${item.name}</td>
                     <td>${item.quantity}</td>
-                    <td>$${item.price.toFixed(2)}</td>
-                    <td>$${(item.price * item.quantity).toFixed(2)}</td>
+                    <td>Rs ${item.price.toFixed(2)}</td>
+                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
                   </tr>
                 `).join('')}
               </tbody>
             </table>
             
             <div class="total-section">
-              <div class="total-amount">Total Amount: $${total.toFixed(2)}</div>
+              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
             </div>
             
             <div class="footer">

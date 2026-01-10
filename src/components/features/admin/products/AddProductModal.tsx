@@ -285,7 +285,7 @@ export function AddProductModal({
             </div>
             <div className="space-y-2">
               <Label htmlFor="price" className="text-foreground">
-                Price ($) <span className="text-flame-red">*</span>
+                Price (Rs) <span className="text-flame-red">*</span>
               </Label>
               <Input
                 id="price"
