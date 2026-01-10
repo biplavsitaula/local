@@ -401,7 +401,7 @@ return (
                 </div>
               </section> */}
               {showSeasonalSection && (
-                <section className={`mx-auto max-w-6xl relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors ${
+                <section className={`mx-auto w-full max-w-6xl min-w-0 relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors mb-4 ${
                   theme === 'dark'
                     ? 'gradient-card shadow-glow'
                     : 'bg-white/90 border-orange-200/60 shadow-lg'
@@ -418,7 +418,7 @@ return (
                     <X className={`h-4 w-4 ${theme === 'dark' ? 'text-foreground' : 'text-gray-700'}`} />
                   </button>
                   <div className={`absolute inset-0 ${seasonalTheme.gradient}`} />
-                  <div className="relative grid gap-6 md:grid-cols-2 md:items-center">
+                  <div className="relative grid gap-6 md:grid-cols-2 md:items-center w-full">
                     <div className="space-y-3">
                       <p className={`text-sm uppercase tracking-[0.3em] ${
                         theme === 'dark' ? 'text-flame-orange/80' : 'text-orange-600'

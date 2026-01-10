@@ -4,8 +4,9 @@ import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Product } from '@/types';
-import { ShoppingCart, Zap, Plus, Minus, Eye } from 'lucide-react';
+import { ShoppingCart, Zap, Plus, Minus, Eye, Package } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ProductCardProps {
   product: Product;
@@ -68,12 +69,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
       {/* Image - Square */}
       <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
-        <img
-          src={product?.image}
-          alt={product?.name}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-          loading="lazy"
-        />
+        {product?.image ? (
+          <Image
+            src={product.image}
+            alt={product?.name || 'Product image'}
+            className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            loading="lazy"
+            width={400}
+            height={400}
+          />
+        ) : (
+          <div className="absolute inset-0 h-full w-full flex items-center justify-center bg-muted/50">
+            <Package className="h-12 w-12 text-muted-foreground/50" />
+          </div>
+        )}
         {product.inStock === false && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
             <span className="rounded-full bg-destructive px-4 py-2 font-bold text-destructive-foreground">

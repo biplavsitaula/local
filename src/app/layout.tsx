@@ -17,6 +17,15 @@ const playfairDisplay = Playfair_Display({
 export const metadata: Metadata = {
   title: "Flame Beverage",
   description: "Flame Beverage is a premium beverage store that offers a wide range of spirits and beverages.",
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: [
+      { url: '/apple-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
+  },
 };
 
 export default function RootLayout({
