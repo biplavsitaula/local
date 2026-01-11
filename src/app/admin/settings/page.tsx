@@ -435,38 +435,49 @@ export default function SettingsPage() {
         <h2 className="text-xl font-semibold text-foreground mb-6">Product Categories</h2>
         
         <div className="space-y-6">
-          {/* Add Category (Super Admin only) */}
-          {canEdit && (
-            <div className="space-y-2">
+          {/* Add Category Input - Always visible, disabled if not super admin */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
               <Label htmlFor="newCategory" className="text-base font-medium text-foreground">
                 Add New Category
               </Label>
-              <div className="flex gap-2">
-                <Input
-                  id="newCategory"
-                  type="text"
-                  value={newCategory}
-                  onChange={(e) => setNewCategory(e.target.value)}
-                  placeholder="e.g., Cold Drinks, Juices"
-                  className="flex-1"
-                  onKeyPress={(e) => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddCategory();
-                    }
-                  }}
-                />
-                <Button
-                  onClick={handleAddCategory}
-                  disabled={!newCategory.trim() || loadingCategories}
-                  className="gap-2"
-                >
-                  <Plus className="h-4 w-4" />
-                  Add
-                </Button>
-              </div>
             </div>
-          )}
+            <div className="flex gap-2">
+              <Input
+                id="newCategory"
+                type="text"
+                value={newCategory}
+                onChange={(e) => setNewCategory(e.target.value)}
+                placeholder="e.g., Cold Drinks, Juices"
+                className="flex-1 bg-background border-border"
+                // disabled={!canEdit || loadingCategories}
+                disabled={loadingCategories}
+                onKeyPress={(e) => {
+                  if (e.key === 'Enter'  && newCategory.trim()) {
+                    e.preventDefault();
+                    handleAddCategory();
+                  }
+                }}
+              />
+              <Button
+                onClick={handleAddCategory}
+                disabled={!newCategory.trim() || loadingCategories}
+                className="gap-2"
+              >
+                {loadingCategories ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Plus className="h-4 w-4" />
+                )}
+                Add
+              </Button>
+            </div>
+            {!canEdit && (
+              <p className="text-xs text-muted-foreground">
+                Only super admin can add new categories
+              </p>
+            )}
+          </div>
 
           {/* Categories List */}
           <div className="space-y-2">
@@ -488,7 +499,8 @@ export default function SettingsPage() {
                     {canEdit && (
                       <button
                         onClick={() => handleDeleteCategory(category)}
-                        className="p-1 hover:bg-destructive/10 rounded transition-colors"
+                        disabled={loadingCategories}
+                        className="p-1 hover:bg-destructive/10 rounded transition-colors disabled:opacity-50"
                         title="Delete category"
                       >
                         <Trash2 className="h-4 w-4 text-destructive" />

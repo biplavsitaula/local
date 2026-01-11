@@ -270,10 +270,10 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
   const handleAcceptOrder = async (order: Order) => {
     console.log('handleAcceptOrder called', { orderId: order.id, canEdit, order });
     
-    if (!canEdit) {
-      toast.error('Only super admin can accept orders');
-      return;
-    }
+    // if (!canEdit) {
+    //   toast.error('Only super admin can accept orders');
+    //   return;
+    // }
     
     if (!confirm(`Are you sure you want to accept order ${order.billNumber}?`)) {
       return;
@@ -321,10 +321,10 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
   const handleRejectOrder = async (order: Order) => {
     console.log('handleRejectOrder called', { orderId: order.id, canEdit, order });
     
-    if (!canEdit) {
-      toast.error('Only super admin can reject orders');
-      return;
-    }
+    // if (!canEdit) {
+    //   toast.error('Only super admin can reject orders');
+    //   return;
+    // }
     
     if (!confirm(`Are you sure you want to reject order ${order.billNumber}?`)) {
       return;
