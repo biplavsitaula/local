@@ -12,6 +12,8 @@ import { useDebounce } from '@/hooks/useDebounce';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { toast } from 'sonner';
 import { Pagination } from '@/components/ui/pagination';
+import { ConfirmModal } from '@/components/ConfirmModal';
+import { SuccessMsgModal } from '@/components/SuccessMsgModal';
 
 interface OrderTableProps {
   onFiltersChange?: (filters: {
@@ -41,6 +43,15 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
   const { canEdit } = useRoleAccess();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
+  
+  // Modal states
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
+  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
+  const [confirmTitle, setConfirmTitle] = useState("");
+  const [confirmMessage, setConfirmMessage] = useState("");
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
+  const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
   
   // Expose filters to parent component
   useEffect(() => {
@@ -270,15 +281,18 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
   const handleAcceptOrder = async (order: Order) => {
     console.log('handleAcceptOrder called', { orderId: order.id, canEdit, order });
     
-    // if (!canEdit) {
-    //   toast.error('Only super admin can accept orders');
-    //   return;
-    // }
-    
-    if (!confirm(`Are you sure you want to accept order ${order.billNumber}?`)) {
-      return;
-    }
-    
+    // Show confirmation modal
+    setPendingOrder(order);
+    setConfirmTitle("Accept Order");
+    setConfirmMessage(`Are you sure you want to accept order ${order.billNumber}?`);
+    setConfirmAction(() => {
+      setConfirmModalOpen(false);
+      performAcceptOrder(order);
+    });
+    setConfirmModalOpen(true);
+  };
+
+  const performAcceptOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
       // Use _id if available, otherwise use id
@@ -288,7 +302,10 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
       console.log('Accept order response:', response);
       
       if (response.success) {
-        toast.success(response.message || `Order ${order.billNumber} accepted successfully`);
+        // Show success modal instead of toast
+        setSuccessMessage(response.message || `Order ${order.billNumber} accepted successfully`);
+        setSuccessModalOpen(true);
+        
         // Refresh orders
         const refreshResponse = await ordersService.getAll({
           search: debouncedSearch || undefined,
@@ -315,21 +332,25 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setPendingOrder(null);
     }
   };
 
   const handleRejectOrder = async (order: Order) => {
     console.log('handleRejectOrder called', { orderId: order.id, canEdit, order });
     
-    // if (!canEdit) {
-    //   toast.error('Only super admin can reject orders');
-    //   return;
-    // }
-    
-    if (!confirm(`Are you sure you want to reject order ${order.billNumber}?`)) {
-      return;
-    }
-    
+    // Show confirmation modal
+    setPendingOrder(order);
+    setConfirmTitle("Reject Order");
+    setConfirmMessage(`Are you sure you want to reject order ${order.billNumber}?`);
+    setConfirmAction(() => {
+      setConfirmModalOpen(false);
+      performRejectOrder(order);
+    });
+    setConfirmModalOpen(true);
+  };
+
+  const performRejectOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
       // Use _id if available, otherwise use id
@@ -339,7 +360,10 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
       console.log('Reject order response:', response);
       
       if (response.success) {
-        toast.success(response.message || `Order ${order.billNumber} rejected successfully`);
+        // Show success modal instead of toast
+        setSuccessMessage(response.message || `Order ${order.billNumber} rejected successfully`);
+        setSuccessModalOpen(true);
+        
         // Refresh orders
         const refreshResponse = await ordersService.getAll({
           search: debouncedSearch || undefined,
@@ -366,6 +390,7 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setPendingOrder(null);
     }
   };
 
@@ -1213,6 +1238,28 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onPrint={handlePrint}
+      />
+      
+      <ConfirmModal
+        open={confirmModalOpen}
+        onOpenChange={setConfirmModalOpen}
+        onConfirm={() => {
+          if (confirmAction) {
+            confirmAction();
+          }
+        }}
+        title={confirmTitle}
+        message={confirmMessage}
+        confirmText={confirmTitle.includes("Accept") ? "Accept" : "Reject"}
+        variant={confirmTitle.includes("Reject") ? "destructive" : "default"}
+        isLoading={pendingOrder !== null && processingOrderId === (pendingOrder?.id || null)}
+      />
+      
+      <SuccessMsgModal
+        open={successModalOpen}
+        onOpenChange={setSuccessModalOpen}
+        message={successMessage}
+        title="Success"
       />
     </>
   );

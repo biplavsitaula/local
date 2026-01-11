@@ -14,10 +14,13 @@ const Orders = () => {
     paymentMethod?: string;
   }>({});
   const [refreshKey, setRefreshKey] = useState(0);
+  const [statusRefreshKey, setStatusRefreshKey] = useState(0);
 
   const handleOrderUpdate = useCallback(() => {
     // Trigger refresh of OrderTable by updating key
     setRefreshKey(prev => prev + 1);
+    // Trigger refresh of OrderStatusSection by updating key
+    setStatusRefreshKey(prev => prev + 1);
   }, []);
 
   return (
@@ -31,7 +34,7 @@ const Orders = () => {
       </div>
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
-        <OrderStatusSection onOrderUpdate={handleOrderUpdate} />
+        <OrderStatusSection key={statusRefreshKey} onOrderUpdate={handleOrderUpdate} />
       </div>
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '200ms' }}>

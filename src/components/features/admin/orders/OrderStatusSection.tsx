@@ -46,23 +46,25 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
     };
   };
 
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        const response = await ordersService.getAll({
-          limit: 1000, // Fetch all for statistics
-        });
-        const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-      } catch (err: any) {
-        console.error('Failed to load orders:', err);
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch orders function
+  const fetchOrders = async () => {
+    try {
+      setLoading(true);
+      const response = await ordersService.getAll({
+        limit: 1000, // Fetch all for statistics
+      });
+      const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
+      setOrders(mappedOrders);
+    } catch (err: any) {
+      console.error('Failed to load orders:', err);
+      setOrders([]);
+    } finally {
+      setLoading(false);
+    }
+  };
 
+  // Initial fetch
+  useEffect(() => {
     fetchOrders();
   }, []);
 
