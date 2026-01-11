@@ -25,6 +25,7 @@ import { Product } from "@/types";
 import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
+import { SuccessMsgModal } from "@/components/SuccessMsgModal";
 
 const categories = [
   "Whiskey",
@@ -70,6 +71,8 @@ export function AddProductModal({
     isRecommended: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
 
   useEffect(() => {
     if (product && open) {
@@ -174,12 +177,14 @@ export function AddProductModal({
         const productId = typeof product.id === 'string' ? product.id : String(product.id);
         
         response = await updateProductMutation(productId, productData);
-        // Show API response message if available, otherwise use default
-        toast.success(response?.message || "Product updated successfully!");
+        // Show API response message in modal instead of toast
+        setSuccessMessage(response?.message || "Product updated successfully!");
+        setSuccessModalOpen(true);
       } else {
         response = await createProductMutation(productData);
-        // Show API response message if available, otherwise use default
-        toast.success(response?.message || "Product added successfully!");
+        // Show API response message in modal instead of toast
+        setSuccessMessage(response?.message || "Product added successfully!");
+        setSuccessModalOpen(true);
       }
       
       // Call onSuccess callback to refresh the product list
@@ -571,24 +576,40 @@ export function AddProductModal({
 
   if (isEditMode) {
     return (
-      <Dialog open={open} onOpenChange={setOpen}>
-        {dialogContent}
-      </Dialog>
+      <>
+        <Dialog open={open} onOpenChange={setOpen}>
+          {dialogContent}
+        </Dialog>
+        <SuccessMsgModal
+          open={successModalOpen}
+          onOpenChange={setSuccessModalOpen}
+          message={successMessage}
+          title="Success"
+        />
+      </>
     );
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(isOpen) => (isOpen ? setOpen(true) : handleClose())}
-    >
-      <DialogTrigger asChild>
-        <Button variant="outline" size="lg" className="gap-2">
-          <Plus className="h-5 w-5" />
-          Add Product
-        </Button>
-      </DialogTrigger>
-      {dialogContent}
-    </Dialog>
+    <>
+      <Dialog
+        open={open}
+        onOpenChange={(isOpen) => (isOpen ? setOpen(true) : handleClose())}
+      >
+        <DialogTrigger asChild>
+          <Button variant="outline" size="lg" className="gap-2">
+            <Plus className="h-5 w-5" />
+            Add Product
+          </Button>
+        </DialogTrigger>
+        {dialogContent}
+      </Dialog>
+      <SuccessMsgModal
+        open={successModalOpen}
+        onOpenChange={setSuccessModalOpen}
+        message={successMessage}
+        title="Success"
+      />
+    </>
   );
 }
