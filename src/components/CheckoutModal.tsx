@@ -22,6 +22,18 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const [paid, setPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [orderResponse, setOrderResponse] = useState<{
+    message?: string;
+    status?: string;
+    billNumber?: string;
+    statusInfo?: {
+      status: string;
+      message: string;
+      buttonText: string;
+      showSuccess: boolean;
+      showReject: boolean;
+    };
+  } | null>(null);
 
   if (!open) return null;
 
@@ -31,6 +43,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     setSelectedGateway(null);
     setFormData({ fullName: "", phoneNumber: "", deliveryAddress: "" });
     setError(null);
+    setOrderResponse(null);
     onClose();
   };
 
@@ -72,12 +85,22 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
       if (response.success) {
         setPaid(true);
+        // Store response data for display
+        const responseData = response.data;
+        // Check for status at top level (from API response) or in data
+        const apiResponse = response as any;
+        setOrderResponse({
+          message: responseData?.statusInfo?.message || response.message,
+          status: responseData?.orderStatus || responseData?.order?.status || responseData?.statusInfo?.status || apiResponse?.status,
+          billNumber: responseData?.billNumber || responseData?.order?.billNumber,
+          statusInfo: responseData?.statusInfo,
+        });
         // Clear the cart after successful checkout
         clearCart();
-        // Close modal after showing success message
+        // Close modal after showing success message (increased timeout to show message)
         setTimeout(() => {
           handleClose();
-        }, 2000);
+        }, 5000);
       } else {
         setError(response?.message || (language === "en" ? "Checkout failed" : "चेकआउट असफल भयो"));
       }
@@ -335,10 +358,36 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             )}
 
             {/* Success Message */}
-            {paid && (
-              <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-green-500/30 bg-green-500/10 p-3 sm:p-4">
-                <p className="text-base sm:text-lg font-semibold text-green-500">{t("success")}</p>
-                <p className="text-xs sm:text-sm text-muted-foreground mt-1">
+            {paid && orderResponse && (
+              <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-green-500/30 bg-green-500/10 p-3 sm:p-4 space-y-2">
+                <div className="flex items-center gap-2">
+                  <Check className="w-5 h-5 text-green-500" />
+                  <p className="text-base sm:text-lg font-semibold text-green-500">{t("success")}</p>
+                </div>
+                {orderResponse.message && (
+                  <p className="text-sm sm:text-base text-foreground font-medium">
+                    {orderResponse.message}
+                  </p>
+                )}
+                {orderResponse.billNumber && (
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {language === "en" ? "Order Number" : "अर्डर नम्बर"}: <span className="font-semibold text-foreground">{orderResponse.billNumber}</span>
+                  </p>
+                )}
+                {orderResponse.statusInfo?.buttonText && (
+                  <div className="mt-3">
+                    <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium ${
+                      orderResponse.status === "pending" 
+                        ? "bg-yellow-500/20 text-yellow-600 border border-yellow-500/30"
+                        : orderResponse.status === "accepted"
+                        ? "bg-green-500/20 text-green-600 border border-green-500/30"
+                        : "bg-red-500/20 text-red-600 border border-red-500/30"
+                    }`}>
+                      {orderResponse.statusInfo.buttonText}
+                    </span>
+                  </div>
+                )}
+                <p className="text-xs sm:text-sm text-muted-foreground mt-2">
                   {language === "en"
                     ? "You'll get updates for delivery windows. Thank you!"
                     : "तपाईंले डेलिभरी समयको लागि अपडेटहरू प्राप्त गर्नुहुनेछ। धन्यवाद!"}

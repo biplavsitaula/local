@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
-import { Flame, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, X } from "lucide-react";
+import { Flame, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, X, Shield } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface RegisterModalProps {
   open: boolean;
@@ -26,6 +27,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
     phone: "",
     password: "",
     confirmPassword: "",
+    role: "user" as "user" | "admin" | "superadmin",
     agreeToTerms: false,
   });
 
@@ -39,6 +41,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
       phone: "",
       password: "",
       confirmPassword: "",
+      role: "user",
       agreeToTerms: false,
     });
     onClose();
@@ -68,7 +71,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
         email: formData.email,
         password: formData.password,
         mobile: formData.phone,
-        role: 'user',
+        role: formData.role as "user" | "admin" | "superadmin",
       });
       handleClose();
       // Navigation is handled by the auth context
@@ -188,6 +191,37 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                     required
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Role */}
+            <div>
+              <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                {language === "en" ? "Role" : "भूमिका"}
+              </label>
+              <div className="relative">
+                <Shield className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10" />
+                <Select
+                  value={formData.role}
+                  onValueChange={(value: "user" | "admin" | "superadmin") => 
+                    setFormData({ ...formData, role: value })
+                  }
+                >
+                  <SelectTrigger className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20">
+                    <SelectValue placeholder={language === "en" ? "Select role" : "भूमिका छान्नुहोस्"} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="user">
+                      {language === "en" ? "User" : "प्रयोगकर्ता"}
+                    </SelectItem>
+                    <SelectItem value="admin">
+                      {language === "en" ? "Admin" : "प्रशासक"}
+                    </SelectItem>
+                    <SelectItem value="superadmin">
+                      {language === "en" ? "Super Admin" : "सुपर प्रशासक"}
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
             </div>
 

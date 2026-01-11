@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { OrderTable } from '@/components/features/admin/orders/OrderTable';
+import { OrderStatusSection } from '@/components/features/admin/orders/OrderStatusSection';
 import { ExportButton } from '@/components/features/admin/ExportButton';
 
 const Orders = () => {
@@ -12,6 +13,12 @@ const Orders = () => {
     location?: string;
     paymentMethod?: string;
   }>({});
+  const [refreshKey, setRefreshKey] = useState(0);
+
+  const handleOrderUpdate = useCallback(() => {
+    // Trigger refresh of OrderTable by updating key
+    setRefreshKey(prev => prev + 1);
+  }, []);
 
   return (
     <div className="space-y-6">
@@ -24,7 +31,11 @@ const Orders = () => {
       </div>
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
-        <OrderTable onFiltersChange={setOrderFilters} />
+        <OrderStatusSection onOrderUpdate={handleOrderUpdate} />
+      </div>
+
+      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '200ms' }}>
+        <OrderTable key={refreshKey} onFiltersChange={setOrderFilters} onOrderUpdate={handleOrderUpdate} />
       </div>
     </div>
   );

@@ -12,6 +12,7 @@ import Image from 'next/image';
 import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
 import { DeleteProductModal } from '@/components/features/admin/products/DeleteProductModal';
 import { Product } from '@/types';
+import { Pagination } from '@/components/ui/pagination';
 
 
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
@@ -30,13 +31,15 @@ export default function RecommendedPage() {
  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
  const [showFilters, setShowFilters] = useState(false);
- const [filters, setFilters] = useState({
-   category: '',
-   stockStatus: '',
-   minPrice: '',
-   maxPrice: '',
-   minRating: '',
- });
+  const [filters, setFilters] = useState({
+    category: '',
+    stockStatus: '',
+    minPrice: '',
+    maxPrice: '',
+    minRating: '',
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
 
 
  const fetchRecommended = useCallback(async () => {
@@ -136,65 +139,118 @@ export default function RecommendedPage() {
  }, [recommendedProducts]);
 
  // Filter and sort for table
- const filteredAndSorted = recommendedProducts
-   .filter((p) => {
-     const query = searchQuery.toLowerCase();
-     const matchesSearch = (
-       (p.name || '').toLowerCase().includes(query) ||
-       (p.category || '').toLowerCase().includes(query)
-     );
+ const filteredAndSorted = useMemo(() => {
+   const filtered = recommendedProducts
+     .filter((p) => {
+       const query = searchQuery.toLowerCase();
+       const matchesSearch = (
+         (p.name || '').toLowerCase().includes(query) ||
+         (p.category || '').toLowerCase().includes(query)
+       );
 
-     // Apply additional filters
-     if (filters.category && p.category?.toLowerCase() !== filters.category.toLowerCase()) {
-       return false;
-     }
+       // Apply additional filters
+       if (filters.category && p.category?.toLowerCase() !== filters.category.toLowerCase()) {
+         return false;
+       }
 
-     if (filters.stockStatus) {
-       const stock = p.stock || 0;
-       if (filters.stockStatus === 'in-stock' && stock <= 20) return false;
-       if (filters.stockStatus === 'low-stock' && (stock === 0 || stock > 20)) return false;
-       if (filters.stockStatus === 'out-of-stock' && stock > 0) return false;
-     }
+       if (filters.stockStatus) {
+         const stock = p.stock || 0;
+         if (filters.stockStatus === 'in-stock' && stock <= 20) return false;
+         if (filters.stockStatus === 'low-stock' && (stock === 0 || stock > 20)) return false;
+         if (filters.stockStatus === 'out-of-stock' && stock > 0) return false;
+       }
 
-     if (filters.minPrice) {
-       const min = parseFloat(filters.minPrice);
-       if (!isNaN(min) && (p.price || 0) < min) return false;
-     }
+       if (filters.minPrice) {
+         const min = parseFloat(filters.minPrice);
+         if (!isNaN(min) && (p.price || 0) < min) return false;
+       }
 
-     if (filters.maxPrice) {
-       const max = parseFloat(filters.maxPrice);
-       if (!isNaN(max) && (p.price || 0) > max) return false;
-     }
+       if (filters.maxPrice) {
+         const max = parseFloat(filters.maxPrice);
+         if (!isNaN(max) && (p.price || 0) > max) return false;
+       }
 
-     if (filters.minRating) {
-       const min = parseFloat(filters.minRating);
-       if (!isNaN(min) && (p.rating || 0) < min) return false;
-     }
+       if (filters.minRating) {
+         const min = parseFloat(filters.minRating);
+         if (!isNaN(min) && (p.rating || 0) < min) return false;
+       }
 
-     return matchesSearch;
-   })
-   .sort((a, b) => {
-     const dir = sortDir === 'asc' ? 1 : -1;
-     switch (sortKey) {
-       case 'name':
-         return dir * (a.name || '').localeCompare(b.name || '');
-       case 'category':
-         return dir * (a.category || '').localeCompare(b.category || '');
-       case 'price':
-         return dir * ((a.price || 0) - (b.price || 0));
-       case 'stock':
-         return dir * ((a.stock || 0) - (b.stock || 0));
-       case 'rating':
-         return dir * ((a.rating || 0) - (b.rating || 0));
-       case 'sales':
-         return dir * (((a as any).sales || 0) - ((b as any).sales || 0));
-       case 'status':
-         // Sort by stock level (status is derived from stock)
-         return dir * ((a.stock || 0) - (b.stock || 0));
-       default:
-         return 0;
-     }
-   });
+       return matchesSearch;
+     })
+     .sort((a, b) => {
+       const dir = sortDir === 'asc' ? 1 : -1;
+       switch (sortKey) {
+         case 'name':
+           return dir * (a.name || '').localeCompare(b.name || '');
+         case 'category':
+           return dir * (a.category || '').localeCompare(b.category || '');
+         case 'price':
+           return dir * ((a.price || 0) - (b.price || 0));
+         case 'stock':
+           return dir * ((a.stock || 0) - (b.stock || 0));
+         case 'rating':
+           return dir * ((a.rating || 0) - (b.rating || 0));
+         case 'sales':
+           return dir * (((a as any).sales || 0) - ((b as any).sales || 0));
+         case 'status':
+           // Sort by stock level (status is derived from stock)
+           return dir * ((a.stock || 0) - (b.stock || 0));
+         default:
+           return 0;
+       }
+     });
+
+   // Apply pagination
+   const startIndex = (currentPage - 1) * itemsPerPage;
+   const endIndex = startIndex + itemsPerPage;
+   return filtered.slice(startIndex, endIndex);
+ }, [recommendedProducts, searchQuery, filters, sortKey, sortDir, currentPage, itemsPerPage]);
+
+ const totalFiltered = useMemo(() => {
+   return recommendedProducts
+     .filter((p) => {
+       const query = searchQuery.toLowerCase();
+       const matchesSearch = (
+         (p.name || '').toLowerCase().includes(query) ||
+         (p.category || '').toLowerCase().includes(query)
+       );
+
+       if (filters.category && p.category?.toLowerCase() !== filters.category.toLowerCase()) {
+         return false;
+       }
+
+       if (filters.stockStatus) {
+         const stock = p.stock || 0;
+         if (filters.stockStatus === 'in-stock' && stock <= 20) return false;
+         if (filters.stockStatus === 'low-stock' && (stock === 0 || stock > 20)) return false;
+         if (filters.stockStatus === 'out-of-stock' && stock > 0) return false;
+       }
+
+       if (filters.minPrice) {
+         const min = parseFloat(filters.minPrice);
+         if (!isNaN(min) && (p.price || 0) < min) return false;
+       }
+
+       if (filters.maxPrice) {
+         const max = parseFloat(filters.maxPrice);
+         if (!isNaN(max) && (p.price || 0) > max) return false;
+       }
+
+       if (filters.minRating) {
+         const min = parseFloat(filters.minRating);
+         if (!isNaN(min) && (p.rating || 0) < min) return false;
+       }
+
+       return matchesSearch;
+     });
+ }, [recommendedProducts, searchQuery, filters]);
+
+ const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
+
+ // Reset to page 1 when filters or search change
+ useEffect(() => {
+   setCurrentPage(1);
+ }, [searchQuery, filters, sortKey, sortDir]);
 
 
  const getStock = (p: any) => p.stock ?? 0;
@@ -527,11 +583,25 @@ export default function RecommendedPage() {
                    </td>
                  </tr>
                )}
-             </tbody>
-           </table>
-         </div>
-       </div>
-     </div>
+            </tbody>
+          </table>
+        </div>
+        {totalFiltered.length > itemsPerPage && (
+          <div className="border-t border-border/50 p-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalFiltered.length}
+            />
+          </div>
+        )}
+      </div>
+    </div>
 
 
      {/* Most Recommended Sidebar */}

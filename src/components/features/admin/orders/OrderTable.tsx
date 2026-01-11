@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from 'react';
-import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X, Search } from 'lucide-react';
+import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X, Search, CheckCircle, XCircle } from 'lucide-react';
 import { ordersService, Order as ApiOrder } from '@/services/orders.service';
 import { OrderDetailsModal } from './OrderDetailsModal';
 import { useOrderStore, Order } from '@/hooks/useOrderStore';
@@ -9,6 +9,9 @@ import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/useDebounce';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
+import { toast } from 'sonner';
+import { Pagination } from '@/components/ui/pagination';
 
 interface OrderTableProps {
   onFiltersChange?: (filters: {
@@ -18,9 +21,10 @@ interface OrderTableProps {
     location?: string;
     paymentMethod?: string;
   }) => void;
+  onOrderUpdate?: () => void;
 }
 
-export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
+export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps = {}) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +37,10 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
     location: '',
     paymentMethod: '',
   });
+  const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
+  const { canEdit } = useRoleAccess();
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
   
   // Expose filters to parent component
   useEffect(() => {
@@ -86,7 +94,7 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
           search: debouncedSearch || undefined,
           status: filters.status || undefined,
           paymentMethod: filters.paymentMethod || undefined,
-          limit: 100,
+          limit: 1000, // Fetch all, paginate client-side
         });
         const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
         setOrders(mappedOrders);
@@ -99,6 +107,7 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
     };
 
     fetchOrders();
+    setCurrentPage(1); // Reset to first page when filters change
   }, [debouncedSearch, filters.status, filters.paymentMethod]);
 
   type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
@@ -156,8 +165,11 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
       }
     });
 
-    return filtered;
-  }, [orders, sortDir, sortKey, filters]);
+    // Apply pagination
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filtered.slice(startIndex, endIndex);
+  }, [orders, sortDir, sortKey, filters, currentPage, itemsPerPage]);
 
   const clearFilters = () => {
     setFilters({
@@ -253,6 +265,108 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
       { name: 'Premium Whiskey', quantity: 1, price: order.totalAmount * 0.6 },
       { name: 'Premium Brandy', quantity: 1, price: order.totalAmount * 0.4 },
     ];
+  };
+
+  const handleAcceptOrder = async (order: Order) => {
+    console.log('handleAcceptOrder called', { orderId: order.id, canEdit, order });
+    
+    if (!canEdit) {
+      toast.error('Only super admin can accept orders');
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to accept order ${order.billNumber}?`)) {
+      return;
+    }
+    
+    try {
+      setProcessingOrderId(order.id);
+      // Use _id if available, otherwise use id
+      const orderId = (order as any)._id || order.id;
+      console.log('Calling acceptOrder API with id:', orderId);
+      const response = await ordersService.acceptOrder(orderId);
+      console.log('Accept order response:', response);
+      
+      if (response.success) {
+        toast.success(response.message || `Order ${order.billNumber} accepted successfully`);
+        // Refresh orders
+        const refreshResponse = await ordersService.getAll({
+          search: debouncedSearch || undefined,
+          status: filters.status || undefined,
+          paymentMethod: filters.paymentMethod || undefined,
+          limit: 1000, // Match the initial fetch limit
+        });
+        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
+        setOrders(mappedOrders);
+        // Notify parent component to refresh OrderStatusSection
+        if (onOrderUpdate) {
+          onOrderUpdate();
+        }
+      } else {
+        toast.error(response.message || 'Failed to accept order');
+      }
+    } catch (err: any) {
+      console.error('Error accepting order:', err);
+      const errorMessage = err?.response?.data?.message || 
+                          err?.response?.data?.error ||
+                          err?.response?.message || 
+                          err?.message || 
+                          'Failed to accept order. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setProcessingOrderId(null);
+    }
+  };
+
+  const handleRejectOrder = async (order: Order) => {
+    console.log('handleRejectOrder called', { orderId: order.id, canEdit, order });
+    
+    if (!canEdit) {
+      toast.error('Only super admin can reject orders');
+      return;
+    }
+    
+    if (!confirm(`Are you sure you want to reject order ${order.billNumber}?`)) {
+      return;
+    }
+    
+    try {
+      setProcessingOrderId(order.id);
+      // Use _id if available, otherwise use id
+      const orderId = (order as any)._id || order.id;
+      console.log('Calling rejectOrder API with id:', orderId);
+      const response = await ordersService.rejectOrder(orderId);
+      console.log('Reject order response:', response);
+      
+      if (response.success) {
+        toast.success(response.message || `Order ${order.billNumber} rejected successfully`);
+        // Refresh orders
+        const refreshResponse = await ordersService.getAll({
+          search: debouncedSearch || undefined,
+          status: filters.status || undefined,
+          paymentMethod: filters.paymentMethod || undefined,
+          limit: 1000, // Match the initial fetch limit
+        });
+        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
+        setOrders(mappedOrders);
+        // Notify parent component to refresh OrderStatusSection
+        if (onOrderUpdate) {
+          onOrderUpdate();
+        }
+      } else {
+        toast.error(response.message || 'Failed to reject order');
+      }
+    } catch (err: any) {
+      console.error('Error rejecting order:', err);
+      const errorMessage = err?.response?.data?.message || 
+                          err?.response?.data?.error ||
+                          err?.response?.message || 
+                          err?.message || 
+                          'Failed to reject order. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setProcessingOrderId(null);
+    }
   };
 
   const handlePrint = async (order: Order) => {
@@ -937,10 +1051,106 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
                     <td className="p-4 text-sm text-muted-foreground">{formatDate(order.createdAt)}</td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
+                        {(() => {
+                          const statusLower = order.status?.toLowerCase() || '';
+                          const isAccepted = statusLower.includes('accepted') || statusLower === 'accepted';
+                          const isRejected = statusLower.includes('rejected') || statusLower === 'rejected' || statusLower.includes('reject');
+                          const isPending = statusLower.includes('pending') || statusLower === 'pending' || statusLower.includes('placed');
+                          
+                          // Accept/Reject icon buttons (visible for pending/placed orders, but only superadmin can use them)
+                          if (isPending) {
+                            return (
+                              <>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Accept button clicked', { orderId: order.id, canEdit, processingOrderId });
+                                    if (processingOrderId === order.id) {
+                                      console.log('Order is already being processed');
+                                      return;
+                                    }
+                                    handleAcceptOrder(order);
+                                  }}
+                                  disabled={processingOrderId === order.id}
+                                  className={`p-2 rounded-lg transition-colors relative z-10 ${
+                                    canEdit 
+                                      ? 'hover:bg-green-500/10 text-green-500 cursor-pointer active:scale-95' 
+                                      : 'opacity-50 text-green-500/50 cursor-pointer hover:opacity-70'
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                  aria-label="Accept order"
+                                  title={canEdit ? "Accept order" : "Only super admin can accept orders"}
+                                  type="button"
+                                >
+                                  {processingOrderId === order.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <CheckCircle className="h-4 w-4" />
+                                  )}
+                                </button>
+                                <button
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    console.log('Reject button clicked', { orderId: order.id, canEdit, processingOrderId });
+                                    if (processingOrderId === order.id) {
+                                      console.log('Order is already being processed');
+                                      return;
+                                    }
+                                    handleRejectOrder(order);
+                                  }}
+                                  disabled={processingOrderId === order.id}
+                                  className={`p-2 rounded-lg transition-colors relative z-10 ${
+                                    canEdit 
+                                      ? 'hover:bg-red-500/10 text-red-500 cursor-pointer active:scale-95' 
+                                      : 'opacity-50 text-red-500/50 cursor-pointer hover:opacity-70'
+                                  } disabled:opacity-50 disabled:cursor-not-allowed`}
+                                  aria-label="Reject order"
+                                  title={canEdit ? "Reject order" : "Only super admin can reject orders"}
+                                  type="button"
+                                >
+                                  {processingOrderId === order.id ? (
+                                    <Loader2 className="h-4 w-4 animate-spin" />
+                                  ) : (
+                                    <XCircle className="h-4 w-4" />
+                                  )}
+                                </button>
+                              </>
+                            );
+                          }
+                          
+                          // Status indicators for accepted/rejected orders
+                          if (isAccepted) {
+                            return (
+                              <button
+                                disabled
+                                className="p-2 bg-green-500/20 rounded-lg cursor-not-allowed"
+                                title="Order Accepted"
+                              >
+                                <CheckCircle className="h-4 w-4 text-green-500" />
+                              </button>
+                            );
+                          }
+                          
+                          if (isRejected) {
+                            return (
+                              <button
+                                disabled
+                                className="p-2 bg-red-500/20 rounded-lg cursor-not-allowed"
+                                title="Order Rejected"
+                              >
+                                <XCircle className="h-4 w-4 text-red-500" />
+                              </button>
+                            );
+                          }
+                          
+                          return null;
+                        })()}
                         <button
                           onClick={() => handleView(order)}
                           className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
                           aria-label="View order"
+                          title="View order details"
                         >
                           <Eye className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -948,6 +1158,7 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
                           onClick={() => handlePrint(order)}
                           className="p-2 hover:bg-secondary/50 rounded-lg transition-colors"
                           aria-label="Print order"
+                          title="Print order"
                         >
                           <Printer className="h-4 w-4 text-muted-foreground" />
                         </button>
@@ -965,6 +1176,36 @@ export function OrderTable({ onFiltersChange }: OrderTableProps = {}) {
             </tbody>
           </table>
         </div>
+        
+        {/* Pagination */}
+        {(() => {
+          // Calculate total filtered items (before pagination)
+          let totalFiltered = [...orders];
+          if (filters.billNumber) {
+            totalFiltered = totalFiltered.filter(order => 
+              order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
+            );
+          }
+          if (filters.location) {
+            totalFiltered = totalFiltered.filter(order => 
+              order.location.toLowerCase().includes(filters.location.toLowerCase())
+            );
+          }
+          const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
+          
+          return totalFiltered.length > itemsPerPage ? (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalFiltered.length}
+            />
+          ) : null;
+        })()}
       </div>
       
       <OrderDetailsModal

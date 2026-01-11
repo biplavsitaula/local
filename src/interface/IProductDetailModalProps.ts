@@ -22,3 +22,18 @@ export interface IProductDetailModalProps {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

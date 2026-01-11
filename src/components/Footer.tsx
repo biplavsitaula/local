@@ -1,7 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Flame, Mail, Phone, MapPin, Facebook, Instagram, Twitter } from 'lucide-react';
+import { Flame, Mail, Phone, MapPin, Facebook, Instagram, Twitter, Loader2, CheckCircle } from 'lucide-react';
+import emailjs from '@emailjs/browser';
+import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
@@ -10,6 +12,63 @@ import Image from 'next/image';
 const Footer: React.FC = () => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail) return;
+
+    try {
+      setIsSubmitting(true);
+      
+      // Initialize EmailJS (you'll need to set these in your .env.local)
+      // NEXT_PUBLIC_EMAILJS_SERVICE_ID=your_service_id
+      // NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
+      // NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
+      
+      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
+      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
+      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
+
+      if (!serviceId || !templateId || !publicKey) {
+        console.warn('EmailJS credentials not configured. Please set NEXT_PUBLIC_EMAILJS_* environment variables.');
+        toast.error('Newsletter subscription is not configured. Please contact support.');
+        return;
+      }
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          to_email: newsletterEmail,
+          from_name: 'Flame Beverage',
+          message: `New newsletter subscription from: ${newsletterEmail}`,
+          reply_to: newsletterEmail,
+        },
+        publicKey
+      );
+
+      setIsSubmitted(true);
+      toast.success(language === 'en' 
+        ? 'Successfully subscribed to newsletter!' 
+        : 'न्युजलेटरको लागि सदस्यता लिइयो!');
+      
+      // Reset after 3 seconds
+      setTimeout(() => {
+        setNewsletterEmail("");
+        setIsSubmitted(false);
+      }, 3000);
+    } catch (error: any) {
+      console.error('Newsletter subscription error:', error);
+      toast.error(language === 'en' 
+        ? 'Failed to subscribe. Please try again.' 
+        : 'सदस्यता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <footer className={`border-t transition-colors ${
@@ -236,19 +295,36 @@ const Footer: React.FC = () => {
             }`}>
               Subscribe for exclusive offers and updates.
             </p>
-            <div className="flex gap-2">
+            <form 
+              onSubmit={handleNewsletterSubmit}
+              className="flex gap-2"
+            >
               <Input
                 type="email"
                 placeholder="Your email"
+                value={newsletterEmail}
+                onChange={(e) => setNewsletterEmail(e.target.value)}
+                required
+                disabled={isSubmitting || isSubmitted}
                 className={`flex-1 ${theme === 'dark'
                   ? 'bg-secondary/50 border-border/50'
                   : 'bg-gray-50 border-gray-200 focus:border-orange-400'
                 }`}
               />
-              <Button className="bg-primary-btn hover:bg-primary-hover text-primary-foreground shrink-0">
-                <Mail className="w-4 h-4" />
+              <Button 
+                type="submit"
+                disabled={isSubmitting || isSubmitted || !newsletterEmail}
+                className="bg-primary-btn hover:bg-primary-hover text-primary-foreground shrink-0 disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : isSubmitted ? (
+                  <CheckCircle className="w-4 h-4" />
+                ) : (
+                  <Mail className="w-4 h-4" />
+                )}
               </Button>
-            </div>
+            </form>
           </div>
         </div>
 

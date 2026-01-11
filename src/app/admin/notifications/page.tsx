@@ -1,7 +1,7 @@
 "use client";
 
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Bell, CreditCard, ShoppingCart, AlertTriangle, Shield, Info, Check, Loader2, AlertCircle, Trash2, Settings, Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { notificationsService, Notification } from '@/services/notifications.service';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
-
+import { Pagination } from '@/components/ui/pagination';
 
 // API notification types
 type ApiNotificationType = 'New Payment' | 'New Order' | 'Low Stock Alert' | 'Super Admin Update' | 'System Update';
@@ -52,12 +52,14 @@ export default function NotificationsPage() {
  const [selectedType, setSelectedType] = useState<FilterType>('all');
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
- const [showFilters, setShowFilters] = useState(false);
- const [filters, setFilters] = useState({
-   readStatus: '',
-   dateRange: '',
-   search: '',
- });
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState({
+    readStatus: '',
+    dateRange: '',
+    search: '',
+  });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
 
 
  const fetchNotifications = useCallback(async () => {
@@ -242,7 +244,21 @@ export default function NotificationsPage() {
  };
 
 
- const filteredNotifications = applyFilters(filterByType(selectedType));
+  const filteredNotifications = applyFilters(filterByType(selectedType));
+
+  // Pagination logic
+  const paginatedNotifications = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredNotifications.slice(startIndex, endIndex);
+  }, [filteredNotifications, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [selectedType, filters]);
 
 
  if (loading) {
@@ -436,21 +452,21 @@ export default function NotificationsPage() {
          </div>
 
 
-         <TabsContent value={selectedType} className="m-0">
-           <ScrollArea className="h-[calc(100vh-300px)]">
-             {filteredNotifications.length === 0 ? (
-               <div className="p-12 text-center text-muted-foreground">
-                 <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                 <p className="text-lg font-medium">No notifications</p>
-                 <p className="text-sm mt-2">
-                   {selectedType === 'all'
-                     ? "You're all caught up!"
-                     : `No ${typeConfig[selectedType]?.label || selectedType} notifications`}
-                 </p>
-               </div>
-             ) : (
-               <div className="divide-y divide-border/50">
-                 {filteredNotifications.map((notification) => {
+        <TabsContent value={selectedType} className="m-0">
+          <ScrollArea className="h-[calc(100vh-300px)]">
+            {filteredNotifications.length === 0 ? (
+              <div className="p-12 text-center text-muted-foreground">
+                <Bell className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                <p className="text-lg font-medium">No notifications</p>
+                <p className="text-sm mt-2">
+                  {selectedType === 'all'
+                    ? "You're all caught up!"
+                    : `No ${typeConfig[selectedType]?.label || selectedType} notifications`}
+                </p>
+              </div>
+            ) : (
+              <div className="divide-y divide-border/50">
+                {paginatedNotifications.map((notification) => {
                    const config = getNotificationConfig(notification.type);
                    const Icon = config.icon;
                    const notificationId = notification._id || notification.id || '';
@@ -522,14 +538,28 @@ export default function NotificationsPage() {
                      </div>
                    );
                  })}
-               </div>
-             )}
-           </ScrollArea>
-         </TabsContent>
-       </Tabs>
-     </div>
-   </div>
- );
+              </div>
+            )}
+          </ScrollArea>
+          {filteredNotifications.length > itemsPerPage && (
+            <div className="border-t border-border/50 p-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                itemsPerPage={itemsPerPage}
+                totalItems={filteredNotifications.length}
+              />
+            </div>
+          )}
+        </TabsContent>
+      </Tabs>
+    </div>
+  </div>
+);
 }
 
 

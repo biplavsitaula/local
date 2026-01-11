@@ -4,8 +4,9 @@
 import React, { useState, useEffect } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Wine, Beer, GlassWater, Martini, Grape, Cherry, LayoutGrid, Sparkles, Coffee, FlameKindling } from 'lucide-react';
+import { Wine, Beer, GlassWater, Martini, Grape, Cherry, LayoutGrid, Sparkles, Coffee, FlameKindling, ChevronDown } from 'lucide-react';
 import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }) => {
@@ -42,44 +43,75 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
      currentTheme === 'dark' ? 'bg-secondary/20' : 'bg-gray-50/50'
    }`}>
      <div className="container mx-auto px-4">
-       <h2 className={`mb-8 text-center font-display text-3xl font-bold ${
-         currentTheme === 'dark' ? 'text-foreground' : 'text-gray-900'
-       }`}>
-         {t('categories')}
-       </h2>
-       <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:grid-cols-8">
-         {categories.map((category) => {
-           const isSelected = selected === category.name || (category.id === 'all' && (selected === 'All' || selected === ''));
-           const Icon = category.icon;
+      <h2 className={`mb-8 text-center font-display text-3xl font-bold ${
+        currentTheme === 'dark' ? 'text-foreground' : 'text-gray-900'
+      }`}>
+        {t('categories')}
+      </h2>
+      
+      {/* Mobile: Dropdown */}
+      <div className="block sm:hidden mb-4">
+        <Select
+          value={selected === 'All' || selected === '' ? 'all' : selected.toLowerCase()}
+          onValueChange={(value) => onSelect(value === 'all' ? 'All' : categories.find(c => c.id === value)?.name || 'All')}
+        >
+          <SelectTrigger className={`w-full ${
+            currentTheme === 'dark'
+              ? 'bg-card border-border'
+              : 'bg-white border-gray-200'
+          }`}>
+            <SelectValue placeholder={t('categories')} />
+          </SelectTrigger>
+          <SelectContent>
+            {categories.map((category) => {
+              const Icon = category.icon;
+              return (
+                <SelectItem key={category.id} value={category.id}>
+                  <div className="flex items-center gap-2">
+                    <Icon className="h-4 w-4" />
+                    <span>{language === 'en' ? category.name : category.nameNe}</span>
+                  </div>
+                </SelectItem>
+              );
+            })}
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Desktop: Grid with compact boxes (2 rows on mobile) */}
+      <div className="hidden sm:grid grid-cols-4 gap-2 lg:grid-cols-8">
+        {categories.map((category) => {
+          const isSelected = selected === category.name || (category.id === 'all' && (selected === 'All' || selected === ''));
+          const Icon = category.icon;
           
-           return (
-             <button
-               key={category.id}
-               onClick={() => onSelect(category.id === 'all' ? 'All' : category.name)}
-               className={`group flex flex-col items-center gap-2 rounded-xl border p-3 transition-all duration-300 cursor-pointer ${
-                 isSelected
-                   ? `border-flame-orange bg-gradient-to-br ${category.color} shadow-lg shadow-flame-orange/20`
-                   : currentTheme === 'dark'
-                   ? 'border-border bg-card hover:border-flame-orange/50 hover:shadow-md'
-                   : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
-               }`}
-             >
-               <Icon className={`text-2xl transition-transform group-hover:scale-110 ${
-                 isSelected ? 'text-white' : currentTheme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
-               }`} />
-               <span className={`text-xs font-medium text-center ${
-                 isSelected
-                   ? 'text-white'
-                   : currentTheme === 'dark'
-                   ? 'text-foreground'
-                   : 'text-gray-900'
-               }`}>
-                 {language === 'en' ? category.name : category.nameNe}
-               </span>
-             </button>
-           );
-         })}
-       </div>
+          return (
+            <button
+              key={category.id}
+              onClick={() => onSelect(category.id === 'all' ? 'All' : category.name)}
+              className={`group flex flex-col items-center gap-1 rounded-lg border p-2 transition-all duration-300 cursor-pointer ${
+                isSelected
+                  ? `border-flame-orange bg-gradient-to-br ${category.color} shadow-lg shadow-flame-orange/20`
+                  : currentTheme === 'dark'
+                  ? 'border-border bg-card hover:border-flame-orange/50 hover:shadow-md'
+                  : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
+              }`}
+            >
+              <Icon className={`text-xl transition-transform group-hover:scale-110 ${
+                isSelected ? 'text-white' : currentTheme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
+              }`} />
+              <span className={`text-[10px] font-medium text-center leading-tight ${
+                isSelected
+                  ? 'text-white'
+                  : currentTheme === 'dark'
+                  ? 'text-foreground'
+                  : 'text-gray-900'
+              }`}>
+                {language === 'en' ? category.name : category.nameNe}
+              </span>
+            </button>
+          );
+        })}
+      </div>
      </div>
    </section>
  );

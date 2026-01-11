@@ -7,6 +7,7 @@ import { Flame, Mail, Lock, Eye, EyeOff, Loader2, X } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import ForgotPasswordModal from "./ForgotPasswordModal";
 
 interface LoginModalProps {
   open: boolean;
@@ -22,6 +23,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
@@ -147,9 +149,13 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
 
             {/* Forgot Password */}
             <div className="flex justify-end">
-              <Link href="#" className="text-xs sm:text-sm text-primary-text hover:text-secondary-text">
+              <button
+                type="button"
+                onClick={() => setShowForgotPassword(true)}
+                className="text-xs sm:text-sm text-primary-text hover:text-secondary-text"
+              >
                 {t('forgotPassword' as any)}
-              </Link>
+              </button>
             </div>
 
             {/* Error Message */}
@@ -202,6 +208,16 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           </div>
         </div>
       </div>
+
+      {/* Forgot Password Modal */}
+      <ForgotPasswordModal
+        open={showForgotPassword}
+        onClose={() => setShowForgotPassword(false)}
+        onSwitchToLogin={() => {
+          setShowForgotPassword(false);
+          // Optionally focus back on login form
+        }}
+      />
     </div>
   );
 };

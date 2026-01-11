@@ -50,7 +50,27 @@ export interface CheckoutPayload {
 
 export interface CheckoutResponse {
   order: Order;
-  message: string;
+  payment?: {
+    _id?: string;
+    billNumber: string;
+    amount: number;
+    method: string;
+    gateway?: string | null;
+    status: string;
+  };
+  orderStatus?: string;
+  billNumber?: string;
+  canCheckStatus?: boolean;
+  statusInfo?: {
+    status: string;
+    message: string;
+    buttonText: string;
+    showSuccess: boolean;
+    showReject: boolean;
+    rejectionReason?: string | null;
+    acceptedAt?: string | null;
+    rejectedAt?: string | null;
+  };
 }
 
 export const ordersService = {
@@ -124,6 +144,20 @@ export const ordersService = {
    */
   checkout: async (payload: CheckoutPayload): Promise<ApiResponse<CheckoutResponse>> => {
     return apiPost<CheckoutResponse>('/checkout', payload, false);
+  },
+
+  /**
+   * Accept a pending order (Super Admin only)
+   */
+  acceptOrder: async (id: string): Promise<ApiResponse<Order>> => {
+    return apiPost<Order>(`/orders/${id}/accept`, {});
+  },
+
+  /**
+   * Reject a pending order (Super Admin only)
+   */
+  rejectOrder: async (id: string): Promise<ApiResponse<Order>> => {
+    return apiPost<Order>(`/orders/${id}/reject`, {});
   },
 };
 

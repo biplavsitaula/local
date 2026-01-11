@@ -116,5 +116,19 @@ export const authService = {
   logout: async (): Promise<ApiResponse<{ message: string }>> => {
     return apiPost<{ message: string }>('/auth/logout', {}, true);
   },
+
+  /**
+   * Request password reset (Public endpoint)
+   */
+  forgotPassword: async (email: string): Promise<ApiResponse<{ message: string }>> => {
+    return apiPost<{ message: string }>('/auth/forgot-password', { email }, false);
+  },
+
+  /**
+   * Reset password with token (Public endpoint)
+   */
+  resetPassword: async (token: string, password: string): Promise<ApiResponse<{ message: string }>> => {
+    return apiPost<{ message: string }>('/auth/reset-password', { token, password }, false);
+  },
 };
 

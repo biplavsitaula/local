@@ -1,4 +1,4 @@
-import { apiGet, apiPost, apiPut, ApiResponse } from '@/lib/api';
+import { apiGet, apiPost, apiPut, apiDelete, ApiResponse } from '@/lib/api';
 
 export interface Settings {
   notifications?: {
@@ -71,6 +71,27 @@ export const settingsService = {
    */
   reset: async (): Promise<ApiResponse<Settings>> => {
     return apiPost<Settings>('/settings/reset', {});
+  },
+
+  /**
+   * Get all categories (Admin only)
+   */
+  getCategories: async (): Promise<ApiResponse<string[]>> => {
+    return apiGet<string[]>('/settings/categories');
+  },
+
+  /**
+   * Add a new category (Super Admin only)
+   */
+  addCategory: async (category: string): Promise<ApiResponse<string[]>> => {
+    return apiPost<string[]>('/settings/categories', { category });
+  },
+
+  /**
+   * Delete a category (Super Admin only)
+   */
+  deleteCategory: async (category: string): Promise<ApiResponse<{ message: string }>> => {
+    return apiDelete<{ message: string }>(`/settings/categories/${encodeURIComponent(category)}`);
   },
 };
 

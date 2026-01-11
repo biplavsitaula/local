@@ -10,6 +10,8 @@ import { settingsService } from '@/services/settings.service';
 import { seasonalThemesService, SeasonalThemeApiResponse } from '@/services/seasonal-themes.service';
 import { AddThemeModal } from '@/components/features/admin/settings/AddThemeModal';
 import { toast } from 'sonner';
+import { useRoleAccess } from '@/hooks/useRoleAccess';
+import { Trash2 } from 'lucide-react';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -37,6 +39,10 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState("default");
   const [addThemeModalOpen, setAddThemeModalOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<SeasonalThemeApiResponse | null>(null);
+  const [categories, setCategories] = useState<string[]>([]);
+  const [newCategory, setNewCategory] = useState("");
+  const [loadingCategories, setLoadingCategories] = useState(false);
+  const { canEdit } = useRoleAccess();
   
     useEffect(() => {
       if (theme === "default") {
@@ -51,9 +57,10 @@ export default function SettingsPage() {
     const fetchSettings = async () => {
       try {
         setLoading(true);
-        const [settingsResponse, themesResponse] = await Promise.all([
+        const [settingsResponse, themesResponse, categoriesResponse] = await Promise.all([
           settingsService.get(),
           seasonalThemesService.getAll(),
+          settingsService.getCategories().catch(() => ({ success: true, data: [] })),
         ]);
         
         if (settingsResponse.success && settingsResponse.data) {
@@ -108,6 +115,11 @@ export default function SettingsPage() {
           ];
           setThemes(themesList);
         }
+
+        // Update categories list
+        if (categoriesResponse.success && categoriesResponse.data) {
+          setCategories(categoriesResponse.data || []);
+        }
       } catch (error: any) {
         console.error('Error fetching settings:', error);
         toast.error('Failed to load settings. Using default values.');
@@ -118,6 +130,57 @@ export default function SettingsPage() {
 
     fetchSettings();
   }, []);
+
+  const handleAddCategory = async () => {
+    if (!newCategory.trim()) return;
+    
+    try {
+      setLoadingCategories(true);
+      const response = await settingsService.addCategory(newCategory.trim());
+      if (response.success) {
+        setCategories(response.data || []);
+        setNewCategory("");
+        toast.success('Category added successfully');
+      } else {
+        toast.error(response.message || 'Failed to add category');
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.error ||
+                          error?.response?.message || 
+                          error?.message || 
+                          'Failed to add category. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
+
+  const handleDeleteCategory = async (category: string) => {
+    if (!confirm(`Are you sure you want to delete the category "${category}"?`)) {
+      return;
+    }
+    
+    try {
+      setLoadingCategories(true);
+      const response = await settingsService.deleteCategory(category);
+      if (response.success) {
+        setCategories(prev => prev.filter(c => c !== category));
+        toast.success('Category deleted successfully');
+      } else {
+        toast.error(response.message || 'Failed to delete category');
+      }
+    } catch (error: any) {
+      const errorMessage = error?.response?.data?.message || 
+                          error?.response?.data?.error ||
+                          error?.response?.message || 
+                          error?.message || 
+                          'Failed to delete category. Please try again.';
+      toast.error(errorMessage);
+    } finally {
+      setLoadingCategories(false);
+    }
+  };
 
   const handleSave = async () => {
     try {
@@ -363,6 +426,80 @@ export default function SettingsPage() {
               }
               className="max-w-md"
             />
+          </div>
+        </div>
+      </div>
+
+      {/* Category Management Section */}
+      <div className="glass-card rounded-xl p-6 border border-border/50">
+        <h2 className="text-xl font-semibold text-foreground mb-6">Product Categories</h2>
+        
+        <div className="space-y-6">
+          {/* Add Category (Super Admin only) */}
+          {canEdit && (
+            <div className="space-y-2">
+              <Label htmlFor="newCategory" className="text-base font-medium text-foreground">
+                Add New Category
+              </Label>
+              <div className="flex gap-2">
+                <Input
+                  id="newCategory"
+                  type="text"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  placeholder="e.g., Cold Drinks, Juices"
+                  className="flex-1"
+                  onKeyPress={(e) => {
+                    if (e.key === 'Enter') {
+                      e.preventDefault();
+                      handleAddCategory();
+                    }
+                  }}
+                />
+                <Button
+                  onClick={handleAddCategory}
+                  disabled={!newCategory.trim() || loadingCategories}
+                  className="gap-2"
+                >
+                  <Plus className="h-4 w-4" />
+                  Add
+                </Button>
+              </div>
+            </div>
+          )}
+
+          {/* Categories List */}
+          <div className="space-y-2">
+            <Label className="text-base font-medium text-foreground">
+              Existing Categories ({categories.length})
+            </Label>
+            {loadingCategories ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="h-6 w-6 animate-spin text-flame-orange" />
+              </div>
+            ) : categories.length > 0 ? (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+                {categories.map((category, index) => (
+                  <div
+                    key={index}
+                    className="flex items-center justify-between p-3 rounded-lg border border-border bg-secondary/30"
+                  >
+                    <span className="text-sm font-medium text-foreground capitalize">{category}</span>
+                    {canEdit && (
+                      <button
+                        onClick={() => handleDeleteCategory(category)}
+                        className="p-1 hover:bg-destructive/10 rounded transition-colors"
+                        title="Delete category"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </button>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-sm text-muted-foreground py-4">No categories found. Add your first category above.</p>
+            )}
           </div>
         </div>
       </div>

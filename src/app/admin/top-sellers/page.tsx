@@ -17,7 +17,7 @@
 "use client";
 
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import {
  Search,
  Edit,
@@ -34,6 +34,7 @@ import { topSellersService } from "@/services/top-sellers.service";
 import { AddProductModal } from "@/components/features/admin/products/AddProductModal";
 import { DeleteProductModal } from "@/components/features/admin/products/DeleteProductModal";
 import { Product as ProductType } from "@/types";
+import { Pagination } from "@/components/ui/pagination";
 
 
 type SortKey = "name" | "category" | "price" | "stock" | "rating" | "sales";
@@ -64,9 +65,11 @@ export default function TopSellersPage() {
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
   // Modal states
- const [editModalOpen, setEditModalOpen] = useState(false);
- const [deleteModalOpen, setDeleteModalOpen] = useState(false);
- const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
 
 
  const fetchData = useCallback(async () => {
@@ -154,33 +157,57 @@ export default function TopSellersPage() {
  const top3Products = topSellingProducts.slice(0, 3);
 
 
- const filteredAndSorted = topSellingProducts
-   .filter((p) => {
+ const filteredAndSorted = useMemo(() => {
+   const filtered = topSellingProducts
+     .filter((p) => {
+       const q = searchQuery.toLowerCase();
+       return (
+         p.name.toLowerCase().includes(q) ||
+         p.category.toLowerCase().includes(q)
+       );
+     })
+     .sort((a, b) => {
+       const dir = sortDir === "asc" ? 1 : -1;
+       switch (sortKey) {
+         case "name":
+           return dir * a.name.localeCompare(b.name);
+         case "category":
+           return dir * a.category.localeCompare(b.category);
+         case "price":
+           return dir * (a.price - b.price);
+         case "stock":
+           return dir * (a.stock - b.stock);
+         case "rating":
+           return dir * ((a.rating || 0) - (b.rating || 0));
+         case "sales":
+           return dir * ((a.totalSold || 0) - (b.totalSold || 0));
+         default:
+           return 0;
+       }
+     });
+
+   // Apply pagination
+   const startIndex = (currentPage - 1) * itemsPerPage;
+   const endIndex = startIndex + itemsPerPage;
+   return filtered.slice(startIndex, endIndex);
+ }, [topSellingProducts, searchQuery, sortKey, sortDir, currentPage, itemsPerPage]);
+
+ const totalFiltered = useMemo(() => {
+   return topSellingProducts.filter((p) => {
      const q = searchQuery.toLowerCase();
      return (
        p.name.toLowerCase().includes(q) ||
        p.category.toLowerCase().includes(q)
      );
-   })
-   .sort((a, b) => {
-     const dir = sortDir === "asc" ? 1 : -1;
-     switch (sortKey) {
-       case "name":
-         return dir * a.name.localeCompare(b.name);
-       case "category":
-         return dir * a.category.localeCompare(b.category);
-       case "price":
-         return dir * (a.price - b.price);
-       case "stock":
-         return dir * (a.stock - b.stock);
-       case "rating":
-         return dir * ((a.rating || 0) - (b.rating || 0));
-       case "sales":
-         return dir * ((a.totalSold || 0) - (b.totalSold || 0));
-       default:
-         return 0;
-     }
    });
+ }, [topSellingProducts, searchQuery]);
+
+ const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
+
+ // Reset to page 1 when filters or search change
+ useEffect(() => {
+   setCurrentPage(1);
+ }, [searchQuery, sortKey, sortDir]);
 
 
  const getStatus = (p: Product) => {
@@ -346,10 +373,24 @@ export default function TopSellersPage() {
                  </td>
                </tr>
              );
-           })}
-         </tbody>
-       </table>
-     </div>
+          })}
+        </tbody>
+      </table>
+      {totalFiltered.length > itemsPerPage && (
+        <div className="border-t border-border/50 p-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalFiltered.length}
+          />
+        </div>
+      )}
+    </div>
 
 
      {/* Edit Product Modal */}

@@ -9,6 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { AddProductModal } from './AddProductModal';
 import { DeleteProductModal } from './DeleteProductModal';
+import { Pagination } from '@/components/ui/pagination';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
@@ -51,6 +52,8 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
     maxPrice: '',
     minRating: '',
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
   
   // Expose filters to parent component
   useEffect(() => {
@@ -195,6 +198,20 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
 
     return sorted;
   }, [filter, sortDir, sortKey, products, filters]);
+
+  // Pagination logic
+  const paginatedProducts = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return sortedProducts.slice(startIndex, endIndex);
+  }, [sortedProducts, currentPage, itemsPerPage]);
+
+  const totalPages = Math.ceil(sortedProducts.length / itemsPerPage);
+
+  // Reset to page 1 when filters or sort change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filter, filters, sortKey, sortDir]);
 
   // Get unique categories from products
   const categories = useMemo(() => {
@@ -378,8 +395,8 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
               </tr>
             </thead>
             <tbody>
-              {sortedProducts.length > 0 ? (
-                sortedProducts.map((product, index) => (
+              {paginatedProducts.length > 0 ? (
+                paginatedProducts.map((product, index) => (
                   <tr key={product.id || (product as any)?._id || `product-${index}`} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
                     <td className="p-4 text-sm text-foreground">{product.name}</td>
                     <td className="p-4 text-sm text-muted-foreground capitalize">{product.category}</td>
@@ -432,6 +449,20 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
             </tbody>
           </table>
         </div>
+        {sortedProducts.length > itemsPerPage && (
+          <div className="border-t border-border/50 p-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={itemsPerPage}
+              totalItems={sortedProducts.length}
+            />
+          </div>
+        )}
       </div>
       {editProduct && (
         <AddProductModal
