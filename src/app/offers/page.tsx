@@ -270,8 +270,8 @@ const Offers = () => {
                     ))}
                   </div>
 
-                  {/* Load More Button */}
-                  {hasMore && !searchQuery && (
+                  {/* Load More Button - only show if we have enough discounted products and more to load */}
+                  {hasMore && !searchQuery && discountedProducts.length >= ITEMS_PER_PAGE && (
                     <div className="flex justify-center mt-10">
                       <button
                         onClick={handleLoadMore}

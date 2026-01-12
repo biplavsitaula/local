@@ -62,6 +62,7 @@ export function AddProductModal({
     name: "",
     category: "",
     price: "",
+    originalPrice: "",
     stock: "",
     imageUrl: "",
     itemLink: "",
@@ -81,6 +82,7 @@ export function AddProductModal({
         // category: product.category || "",
         category: product.category?.toLowerCase() || "",
         price: product.price?.toString() || "",
+        originalPrice: product.originalPrice?.toString() || "",
         stock: (product.stock ?? 0).toString(),
         imageUrl: product.image || "",
         itemLink: (product as any).itemLink || "",
@@ -94,6 +96,7 @@ export function AddProductModal({
         name: "",
         category: "",
         price: "",
+        originalPrice: "",
         stock: "",
         imageUrl: "",
         itemLink: "",
@@ -165,6 +168,7 @@ export function AddProductModal({
         image: formData.imageUrl,
         discountPercent: formData.discountPercent ? parseFloat(formData.discountPercent) : 0,
         tag: formData.tag ? formData.tag.toUpperCase() : "",
+        ...(formData.originalPrice && { originalPrice: parseFloat(formData.originalPrice) }),
         ...(formData.rating && { rating: parseFloat(formData.rating) }),
         ...(formData.stock && { stock: parseInt(formData.stock) }),
         ...(formData.itemLink && { itemLink: formData.itemLink }),
@@ -204,6 +208,7 @@ export function AddProductModal({
           name: "",
           category: "",
           price: "",
+          originalPrice: "",
           stock: "",
           imageUrl: "",
           itemLink: "",
@@ -323,6 +328,30 @@ export function AddProductModal({
                 </p>
               )}
             </div>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="originalPrice" className="text-foreground">
+              Original Price (Rs){" "}
+              <span className="text-muted-foreground text-xs">
+                (Optional - for showing strikethrough price)
+              </span>
+            </Label>
+            <Input
+              id="originalPrice"
+              type="number"
+              step="0.01"
+              min="0"
+              value={formData.originalPrice}
+              onChange={(e) =>
+                setFormData({ ...formData, originalPrice: e.target.value })
+              }
+              placeholder="0.00"
+              className="bg-secondary/50 border-border"
+            />
+            <p className="text-xs text-muted-foreground">
+              Set higher than price to show discount (e.g., Original: Rs. 1000, Price: Rs. 800 = 20% off)
+            </p>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
