@@ -269,7 +269,9 @@ const Footer: React.FC = () => {
                 <Phone className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${
                   theme === 'dark' ? 'text-primary-text' : 'text-orange-600'
                 }`} />
-                <span className="break-all">+977 9800000000</span>
+                <a href="tel:+9779800000000" className="break-all hover:text-flame-orange transition-colors">
+                  +977 9800000000
+                </a>
               </li>
               <li className={`flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
@@ -277,7 +279,9 @@ const Footer: React.FC = () => {
                 <Mail className={`w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0 ${
                   theme === 'dark' ? 'text-primary-text' : 'text-orange-600'
                 }`} />
-                <span className="break-all">info@flamebeverage.com</span>
+                <a href="mailto:info@flamebeverage.com" className="break-all hover:text-flame-orange transition-colors">
+                  info@flamebeverage.com
+                </a>
               </li>
               <li className={`flex items-start gap-1.5 sm:gap-2 text-xs sm:text-sm ${
                 theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
