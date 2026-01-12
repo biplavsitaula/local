@@ -30,6 +30,7 @@ import {
 import Link from "next/link";
 import { IHeaderProps } from "@/interface/IHeaderProps";
 import OfferBanner from "@/components/OfferBanner";
+import Image from "next/image";
 
 
 const Header: React.FC<IHeaderProps> = ({
@@ -352,10 +353,12 @@ const Header: React.FC<IHeaderProps> = ({
                            key={item.product.id}
                            className="flex gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50"
                          >
-                           <img
-                             src={item.product.image}
+                           <Image
+                             src={item.product.image || "/assets/liquor1.jpeg"}
                              alt={item.product.name}
                              className="w-16 h-20 object-cover rounded-md"
+                             width={64}
+                             height={80}
                            />
                            <div className="flex-1 min-w-0">
                              <h4 className="font-medium text-foreground text-sm truncate">

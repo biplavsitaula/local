@@ -553,7 +553,12 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
           <div class="invoice-container">
             <div class="header">
               <div class="logo">
-                <img src="/assets/flame-light-logo.png" alt="Flame Beverage logo" width="50" height="50" style="object-fit: contain;" />
+                <Image 
+                src="/assets/flame-light-logo.png" 
+                alt="Flame Beverage logo" 
+                width="50" height="50" 
+                style="object-fit: contain;" 
+                />
               </div>
               <div class="company-name">FLAME BEVERAGE</div>
               <div class="company-subtitle">Premium Liquor Store</div>

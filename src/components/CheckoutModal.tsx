@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { IPaymentCheckbox } from "@/interface/IPaymentCheckout";
-import { X, ArrowLeft, User, Phone, MapPin, Package, CreditCard, Check, Loader2, AlertCircle } from "lucide-react";
+import { X, ArrowLeft, User, Phone, MapPin, Package, CreditCard, Check, Loader2, AlertCircle, Mail } from "lucide-react";
 import Link from "next/link";
 import { ordersService, CheckoutPayload } from "@/services/orders.service";
 import Image from "next/image";
@@ -18,6 +18,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     fullName: "",
     phoneNumber: "",
     deliveryAddress: "",
+    email: "",
   });
   const [paid, setPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
@@ -42,7 +43,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     setPaid(false);
     setSelectedPayment("cod");
     setSelectedGateway(null);
-    setFormData({ fullName: "", phoneNumber: "", deliveryAddress: "" });
+    setFormData({ fullName: "", phoneNumber: "", deliveryAddress: "", email: "" });
     setError(null);
     setPhoneError(null);
     setOrderResponse(null);
@@ -53,7 +54,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     if (selectedPayment === "online" && !selectedGateway) {
       return; // Require gateway selection for online payment
     }
-    if (!formData.fullName || !formData.phoneNumber || !formData.deliveryAddress) {
+    if (!formData.fullName || !formData.phoneNumber || !formData.deliveryAddress || !formData.email) {
       return; // Require all fields
     }
     // Validate phone number (10 digits)
@@ -76,6 +77,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
         fullName: formData.fullName,
         phoneNumber: formData.phoneNumber,
         deliveryAddress: formData.deliveryAddress,
+        email: formData.email,
         paymentMethod: selectedPayment,
         items: items.map(item => ({
           productId: String(item?.product?.id),
@@ -156,10 +158,12 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
               {items.map((item) => (
                 <div key={item?.product?.id} className="flex gap-2 sm:gap-4">
-                  <img
-                    src={item?.product?.image}
+                  <Image
+                    src={item?.product?.image || "/assets/liquor1.jpeg"}
                     alt={item?.product?.name}
                     className="w-16 h-20 sm:w-20 sm:h-24 object-cover rounded-lg shrink-0"
+                    width={84}
+                    height={80}
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-foreground mb-1 text-sm sm:text-base line-clamp-2">
@@ -244,6 +248,20 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 {phoneError && (
                   <p className="mt-1.5 text-xs sm:text-sm text-red-500">{phoneError}</p>
                 )}
+              </div>
+              {/* Email Address */}
+              <div>
+                <label className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                  <Mail className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-flame-orange" />
+                  {t("emailAddress")}
+                </label>
+                <input
+                  type="email"
+                  value={formData.email}
+                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  placeholder={t("enterEmail")}
+                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                />
               </div>
 
               {/* Delivery Address */}

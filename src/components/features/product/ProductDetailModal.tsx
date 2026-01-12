@@ -11,6 +11,7 @@ import {
 import { ShoppingCart, Plus, Minus, Wine, Droplets, Tag } from 'lucide-react';
 import { toast } from 'sonner';
 import { IProductDetailModalProps } from '@/interface/IProductDetailModalProps';
+import Image from 'next/image';
 
 const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
   product,
@@ -53,8 +54,8 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
             <div className="absolute bottom-3 left-3 w-6 h-6 border-l-2 border-b-2 border-flame-orange/50 rounded-bl" />
             <div className="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-flame-orange/50 rounded-br" />
 
-            <img
-              src={product?.image}
+            <Image
+              src={product?.image || "/assets/liquor1.jpeg"}
               alt={product?.name}
               className="max-w-full max-h-[320px] object-contain drop-shadow-2xl"
               style={{

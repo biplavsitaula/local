@@ -6,6 +6,7 @@ import { useCart } from '@/contexts/CartContext';
 import { Product } from '@/types';
 import { X, ShoppingCart, Zap, Plus, Minus, MapPin, Wine, Percent } from 'lucide-react';
 import { toast } from 'sonner';
+import Image from 'next/image';
 
 interface ProductDetailModalProps {
   product: Product;
@@ -54,10 +55,12 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
         <div className="grid gap-6 p-6 md:grid-cols-2">
           {/* Image */}
           <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
-            <img
-              src={product?.image}
+            <Image
+              src={product?.image || "/assets/liquor1.jpeg"}
               alt={product?.name}
               className="h-full w-full object-cover"
+              width={500}
+              height={500}
             />
             {product.isNew && (
               <span className="absolute left-4 top-4 rounded-full bg-primary-gradient px-4 py-1.5 text-sm font-bold text-text-inverse">

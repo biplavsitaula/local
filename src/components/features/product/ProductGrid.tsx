@@ -6,6 +6,7 @@ import { ShoppingCart, Zap, Plus, Minus, Eye, Loader2, AlertCircle, Package } fr
 import { toast } from "sonner";
 import ProductDetailModal from "@/components/features/product/ProductDetailModal";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
+import Image from "next/image";
 
 
 
@@ -82,9 +83,9 @@ return (
       style={{ paddingBottom: "100%" }}
     >
       {product.image ? (
-        <img
+        <Image
           onClick={() => onViewDetails(product)}
-          src={product.image}
+          src={product.image || "/assets/liquor1.jpeg"}
           alt={product.name}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"

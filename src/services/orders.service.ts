@@ -46,6 +46,7 @@ export interface CheckoutPayload {
   paymentMethod: 'cod' | 'online';
   paymentGateway?: 'esewa' | 'khalti' | 'card';
   items: { productId: string; quantity: number }[];
+  email: string;
 }
 
 export interface CheckoutResponse {
