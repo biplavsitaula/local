@@ -27,21 +27,21 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
 
           {/* Brand Name */}
           <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 bg-gradient-to-r from-yellow-400 via-orange-500 via-orange-600 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_15px_rgba(255,140,0,0.5)]">
-            Flame Beverage
+            {t("flameBeverage")}
           </h1>
 
           {/* Tagline with microphone icons */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Mic className="w-4 h-4 text-orange-500" />
             <span className="text-sm text-gray-300 font-light">
-              Premium Liquor Store
+              {t("premiumLiquorStore")}
             </span>
             <Mic className="w-4 h-4 text-orange-500" />
           </div>
 
           {/* Age Verification Heading */}
           <h2 className="text-2xl md:text-3xl font-display font-bold mb-4 bg-gradient-to-r from-yellow-400 via-orange-500 via-orange-600 to-red-600 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(255,140,0,0.4)]">
-            Age Verification Required
+            {t("ageVerificationRequired")}
           </h2>
 
           {/* Message */}
@@ -72,13 +72,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
 
           {/* Legal Disclaimer */}
           <p className="text-xs text-gray-500 leading-relaxed">
-            By entering this site, you agree to our{" "}
+            {t("siteAgreement")}{" "}
             <Link href="/terms" className="text-flame-orange hover:underline">
-              Terms & Conditions
+              {t("termsConditions")}
             </Link>{" "}
-            and{" "}
+            {t("and")}{" "}
             <Link href="/privacy" className="text-flame-orange hover:underline">
-              Privacy Policy
+              {t("privacyPolicy")}
             </Link>
             .
           </p>

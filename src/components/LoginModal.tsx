@@ -82,7 +82,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
               />
             </div>
             <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
-              Flame Beverage
+              {t("flameBeverage")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               {t('welcomeBack' as any)}
@@ -98,7 +98,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
               onClick={onSwitchToRegister}
               className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center text-sm sm:text-base hover:bg-muted transition-colors cursor-pointer"
             >
-              {language === "en" ? "Register" : "दर्ता"}
+              {t("register")}
             </button>
           </div>
 

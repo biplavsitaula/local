@@ -57,19 +57,19 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
     // Validate phone number (10 digits)
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(formData.phone)) {
-      setPhoneError(language === "en" ? "Phone number must be exactly 10 digits" : "फोन नम्बर ठ्याक्कै १० अंकको हुनुपर्छ");
+      setPhoneError(t("phoneValidation"));
       return;
     }
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
-      setError(language === "en" ? "Passwords do not match" : "पासवर्डहरू मेल खाँदैनन्");
+      setError(t("passwordsDoNotMatch"));
       return;
     }
 
     // Validate password length
     if (formData.password.length < 6) {
-      setError(language === "en" ? "Password must be at least 6 characters" : "पासवर्ड कम्तिमा ६ वर्णको हुनुपर्छ");
+      setError(t("passwordMinLength"));
       return;
     }
 
@@ -93,7 +93,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                         err?.response?.message || 
                         err?.message || 
                         err?.toString() ||
-                        (language === "en" ? "Registration failed. Please try again." : "दर्ता असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।");
+                        t("registrationFailed");
       setError(apiMessage);
     } finally {
       setIsLoading(false);
@@ -125,7 +125,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
               />
             </div>
             <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
-              Flame Beverage
+              {t("flameBeverage")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
               {t('createAccount')}
@@ -141,7 +141,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
               {t('login')}
             </button>
             <button className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base">
-              {language === "en" ? "Register" : "दर्ता"}
+              {t("register")}
             </button>
           </div>
 
@@ -218,7 +218,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
             {/* Role */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
-                {language === "en" ? "Role" : "भूमिका"}
+                {t("role")}
               </label>
               <div className="relative">
                 <Shield className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10" />
@@ -229,17 +229,17 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                   }
                 >
                   <SelectTrigger className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20">
-                    <SelectValue placeholder={language === "en" ? "Select role" : "भूमिका छान्नुहोस्"} />
+                    <SelectValue placeholder={t("selectRole")} />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="user">
-                      {language === "en" ? "User" : "प्रयोगकर्ता"}
+                      {t("roleUser")}
                     </SelectItem>
                     <SelectItem value="admin">
-                      {language === "en" ? "Admin" : "प्रशासक"}
+                      {t("roleAdmin")}
                     </SelectItem>
                     <SelectItem value="superadmin">
-                      {language === "en" ? "Super Admin" : "सुपर प्रशासक"}
+                      {t("roleSuperAdmin")}
                     </SelectItem>
                   </SelectContent>
                 </Select>

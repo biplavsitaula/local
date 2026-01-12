@@ -25,12 +25,14 @@ import { AuthModalProvider } from "@/contexts/AuthModalContext";
 import { AgeStatus, Product } from "@/types";
 import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
 import { useTheme } from "@/contexts/ThemeContext";
+import { useLanguage } from "@/contexts/LanguageContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
 
 
 
 
 function PageContent() {
+const { t } = useLanguage();
 const [searchQuery, setSearchQuery] = useState("");
 const [selectedCategory, setSelectedCategory] = useState<string>("All");
 const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -236,7 +238,7 @@ return (
                   <h2 className={`text-2xl font-display font-bold sm: text-xl ${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
-                    Recent Arrivals
+                    {t("recentArrivals")}
                   </h2>
                   <Link
                     href="/products"
@@ -245,7 +247,7 @@ return (
                       : 'text-orange-600 hover:text-orange-700'
                   }`}
                   >
-                    View All
+                    {t("viewAll")}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -270,8 +272,8 @@ return (
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
                       {searchQuery.trim() 
-                        ? `No recent arrivals found for "${searchQuery}"`
-                        : 'No recent arrivals found.'}
+                        ? `${t("noRecentArrivalsSearch")} "${searchQuery}"`
+                        : t("noRecentArrivals")}
                     </p>
                   </div>
                 )}
@@ -286,7 +288,7 @@ return (
                   <h2 className={`text-2xl font-display font-bold sm: text-xl${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
-                    Most Recommended
+                    {t("mostRecommended")}
                   </h2>
                   <Link
                     href="/products"
@@ -295,7 +297,7 @@ return (
                         : 'text-orange-600 hover:text-orange-700'
                     }`}
                   >
-                    View All
+                    {t("viewAll")}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -320,8 +322,8 @@ return (
                   <div className="text-center py-12">
                     <p className="text-muted-foreground">
                       {searchQuery.trim() 
-                        ? `No recommended products found for "${searchQuery}"`
-                        : 'No recommended products found.'}
+                        ? `${t("noRecommendedProductsSearch")} "${searchQuery}"`
+                        : t("noRecommendedProducts")}
                     </p>
                   </div>
                 )}
@@ -348,7 +350,7 @@ return (
                   <h2 className={`text-2xl font-display font-bold ${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
-                    All Products
+                    {t("allProducts")}
                   </h2>
                   <Link
                     href="/products"
@@ -357,7 +359,7 @@ return (
                       : 'text-orange-600 hover:text-orange-700'
                   }`}
                   >
-                    View All
+                    {t("viewAll")}
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -454,7 +456,7 @@ return (
                           : 'bg-white/80 shadow-md'
                       }`}>
                         <div className={`text-center ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}>
-                          <p className="text-lg font-semibold">Festival Ad</p>
+                          <p className="text-lg font-semibold">{t("festivalAd")}</p>
                           <p className="text-sm text-muted-foreground">
                             {seasonalTheme.keyname === 'christmas' && 'Red theme, santa art, event-specific CTA.'}
                             {seasonalTheme.keyname === 'thanksgiving' && 'Amber theme, harvest art, thanksgiving CTA.'}

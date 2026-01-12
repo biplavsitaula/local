@@ -77,12 +77,10 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               />
             </div>
             <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
-              {language === "en" ? "Forgot Password" : "पासवर्ड बिर्सनुहोस्"}
+              {t("forgotPasswordTitle")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              {language === "en" 
-                ? "Enter your email to receive a password reset link" 
-                : "पासवर्ड रिसेट लिङ्क प्राप्त गर्न आफ्नो इमेल प्रविष्ट गर्नुहोस्"}
+              {t("forgotPasswordDesc")}
             </p>
           </div>
 
@@ -92,12 +90,10 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 <CheckCircle className="h-12 w-12 text-green-500" />
                 <div className="text-center">
                   <p className="text-sm sm:text-base font-medium text-foreground mb-2">
-                    {language === "en" ? "Reset link sent!" : "रिसेट लिङ्क पठाइयो!"}
+                    {t("resetLinkSent")}
                   </p>
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {language === "en" 
-                      ? `We've sent a password reset link to ${email}. Please check your email.`
-                      : `हामीले ${email} मा पासवर्ड रिसेट लिङ्क पठाएका छौं। कृपया आफ्नो इमेल जाँच गर्नुहोस्।`}
+                    {t("resetLinkSentDesc").replace("{email}", email)}
                   </p>
                 </div>
               </div>
@@ -105,7 +101,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 onClick={onSwitchToLogin}
                 className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold"
               >
-                {language === "en" ? "Back to Login" : "लगइनमा फर्कनुहोस्"}
+                {t("backToLogin")}
               </button>
             </div>
           ) : (
@@ -148,10 +144,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                   ) : (
                     <Mail className="w-4 h-4 sm:w-5 sm:h-5" />
                   )}
-                  {isLoading 
-                    ? (language === "en" ? "Sending..." : "पठाउँदै...")
-                    : (language === "en" ? "Send Reset Link" : "रिसेट लिङ्क पठाउनुहोस्")
-                  }
+                  {isLoading ? t("sending") : t("sendResetLink")}
                 </button>
               </form>
 
@@ -161,7 +154,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                   onClick={onSwitchToLogin}
                   className="text-xs sm:text-sm text-primary-text hover:text-secondary-text"
                 >
-                  {language === "en" ? "Back to Login" : "लगइनमा फर्कनुहोस्"}
+                  {t("backToLogin")}
                 </button>
               </div>
             </>

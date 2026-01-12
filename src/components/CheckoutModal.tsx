@@ -60,11 +60,11 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     // Validate phone number (10 digits)
     const phoneRegex = /^\d{10}$/;
     if (!phoneRegex.test(formData.phoneNumber)) {
-      setPhoneError(language === "en" ? "Phone number must be exactly 10 digits" : "फोन नम्बर ठ्याक्कै १० अंकको हुनुपर्छ");
+      setPhoneError(t("phoneValidation"));
       return;
     }
     if (items.length === 0) {
-      setError(language === "en" ? "Your cart is empty" : "तपाईंको कार्ट खाली छ");
+      setError(t("cartIsEmpty"));
       return;
     }
 
@@ -112,11 +112,11 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           handleClose();
         }, 5000);
       } else {
-        setError(response?.message || (language === "en" ? "Checkout failed" : "चेकआउट असफल भयो"));
+        setError(response?.message || t("checkoutFailed"));
       }
     } catch (err: any) {
       console.error("Checkout error:", err);
-      setError(err?.message || (language === "en" ? "Something went wrong. Please try again." : "केही गलत भयो। कृपया पुन: प्रयास गर्नुहोस्।"));
+      setError(err?.message || t("somethingWentWrong"));
     } finally {
       setIsProcessing(false);
     }
@@ -377,11 +377,11 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
             {/* Error Message */}
             {error && (
-              <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-red-500/30 bg-red-500/10 p-3 sm:p-4 flex items-start gap-2 sm:gap-3">
+                <div className="mb-4 sm:mb-6 rounded-lg sm:rounded-xl border border-red-500/30 bg-red-500/10 p-3 sm:p-4 flex items-start gap-2 sm:gap-3">
                 <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-red-500 flex-shrink-0 mt-0.5" />
                 <div>
                   <p className="text-xs sm:text-sm font-semibold text-red-500">
-                    {language === "en" ? "Error" : "त्रुटि"}
+                    {t("error")}
                   </p>
                   <p className="text-xs sm:text-sm text-red-400 mt-1">{error}</p>
                 </div>
@@ -402,7 +402,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 )}
                 {orderResponse.billNumber && (
                   <p className="text-xs sm:text-sm text-muted-foreground">
-                    {language === "en" ? "Order Number" : "अर्डर नम्बर"}: <span className="font-semibold text-foreground">{orderResponse.billNumber}</span>
+                    {t("orderNumber")}: <span className="font-semibold text-foreground">{orderResponse.billNumber}</span>
                   </p>
                 )}
                 {orderResponse.statusInfo?.buttonText && (
@@ -419,9 +419,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                   </div>
                 )}
                 <p className="text-xs sm:text-sm text-muted-foreground mt-2">
-                  {language === "en"
-                    ? "You'll get updates for delivery windows. Thank you!"
-                    : "तपाईंले डेलिभरी समयको लागि अपडेटहरू प्राप्त गर्नुहुनेछ। धन्यवाद!"}
+                  {t("orderUpdateMessage")}
                 </p>
               </div>
             )}
@@ -436,7 +434,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 {isProcessing ? (
                   <>
                     <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
-                    <span className="text-xs sm:text-sm">{language === "en" ? "Processing..." : "प्रशोधन गर्दै..."}</span>
+                    <span className="text-xs sm:text-sm">{t("processing")}</span>
                   </>
                 ) : (
                   <>
