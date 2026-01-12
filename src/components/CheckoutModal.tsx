@@ -22,6 +22,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
   const [paid, setPaid] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [phoneError, setPhoneError] = useState<string | null>(null);
   const [orderResponse, setOrderResponse] = useState<{
     message?: string;
     status?: string;
@@ -43,6 +44,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     setSelectedGateway(null);
     setFormData({ fullName: "", phoneNumber: "", deliveryAddress: "" });
     setError(null);
+    setPhoneError(null);
     setOrderResponse(null);
     onClose();
   };
@@ -53,6 +55,12 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
     }
     if (!formData.fullName || !formData.phoneNumber || !formData.deliveryAddress) {
       return; // Require all fields
+    }
+    // Validate phone number (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phoneNumber)) {
+      setPhoneError(language === "en" ? "Phone number must be exactly 10 digits" : "फोन नम्बर ठ्याक्कै १० अंकको हुनुपर्छ");
+      return;
     }
     if (items.length === 0) {
       setError(language === "en" ? "Your cart is empty" : "तपाईंको कार्ट खाली छ");
@@ -221,10 +229,21 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                 <input
                   type="tel"
                   value={formData.phoneNumber}
-                  onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    setFormData({ ...formData, phoneNumber: value });
+                    setPhoneError(null);
+                  }}
                   placeholder={t("enterPhone")}
-                  className="w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className={`w-full px-3 py-2.5 sm:px-4 sm:py-3 text-sm sm:text-base bg-background border rounded-lg sm:rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                    phoneError 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" 
+                      : "border-border focus:border-primary-border focus:ring-primary-border/20"
+                  }`}
                 />
+                {phoneError && (
+                  <p className="mt-1.5 text-xs sm:text-sm text-red-500">{phoneError}</p>
+                )}
               </div>
 
               {/* Delivery Address */}
@@ -399,7 +418,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
             {!paid && (
               <button
                 onClick={handlePayment}
-                disabled={isProcessing || !formData.fullName || !formData.phoneNumber || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway) || items.length === 0}
+                disabled={isProcessing || !formData.fullName || !formData.phoneNumber || formData.phoneNumber.length !== 10 || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway) || items.length === 0}
                 className="w-full rounded-lg sm:rounded-xl bg-primary-gradient px-4 py-3 sm:px-6 sm:py-4 text-sm sm:text-base font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isProcessing ? (

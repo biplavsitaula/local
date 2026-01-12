@@ -6,6 +6,7 @@ import { paymentsService, Payment as ApiPayment } from "@/services/payments.serv
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Pagination } from "@/components/ui/pagination";
 
 type MethodFilter = "all" | "qr" | "cod";
 type SortKey = "billNumber" | "customerName" | "amount" | "method" | "gateway" | "status" | "createdAt";
@@ -90,6 +91,8 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
     minAmount: '',
     maxAmount: '',
   });
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 25;
   
   // Use the searchQuery prop from parent (already debounced)
   const query = searchQuery;
@@ -192,7 +195,7 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
   // --------------------
   // Memoized rows (hook)
   // --------------------
-  const rows = useMemo(() => {
+  const filteredAndSortedRows = useMemo(() => {
     const q = query.trim().toLowerCase();
 
     let list = payments;
@@ -265,6 +268,18 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
       }
     });
   }, [payments, query, sortDir, sortKey, filters]);
+
+  // Apply pagination
+  const rows = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return filteredAndSortedRows.slice(startIndex, endIndex);
+  }, [filteredAndSortedRows, currentPage, itemsPerPage]);
+
+  // Reset to page 1 when filters or search change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [query, filters.status, filters.dateRange, filters.minAmount, filters.maxAmount, sortKey, sortDir]);
 
   const clearFilters = () => {
     setFilters({
@@ -523,6 +538,26 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
           </tbody>
         </table>
       </div>
+      
+      {/* Pagination */}
+      {(() => {
+        const totalPages = Math.ceil(filteredAndSortedRows.length / itemsPerPage);
+        
+        return filteredAndSortedRows.length > itemsPerPage ? (
+          <div className="border-t border-border/50 p-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={itemsPerPage}
+              totalItems={filteredAndSortedRows.length}
+            />
+          </div>
+        ) : null;
+      })()}
     </div>
   );
 }

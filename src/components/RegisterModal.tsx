@@ -30,11 +30,13 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
     role: "user" as "user" | "admin" | "superadmin",
     agreeToTerms: false,
   });
+  const [phoneError, setPhoneError] = useState<string | null>(null);
 
   if (!open) return null;
 
   const handleClose = () => {
     setError(null);
+    setPhoneError(null);
     setFormData({
       fullName: "",
       email: "",
@@ -50,6 +52,14 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setPhoneError(null);
+
+    // Validate phone number (10 digits)
+    const phoneRegex = /^\d{10}$/;
+    if (!phoneRegex.test(formData.phone)) {
+      setPhoneError(language === "en" ? "Phone number must be exactly 10 digits" : "फोन नम्बर ठ्याक्कै १० अंकको हुनुपर्छ");
+      return;
+    }
 
     // Validate passwords match
     if (formData.password !== formData.confirmPassword) {
@@ -185,13 +195,24 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                   <input
                     type="tel"
                     value={formData.phone}
-                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                      setFormData({ ...formData, phone: value });
+                      setPhoneError(null);
+                    }}
                     placeholder={t('phonePlaceholder')}
-                    className="flex-1 pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                    className={`flex-1 pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                      phoneError 
+                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" 
+                        : "border-border focus:border-primary-border focus:ring-primary-border/20"
+                    }`}
                     required
                   />
                 </div>
               </div>
+              {phoneError && (
+                <p className="mt-1.5 text-xs sm:text-sm text-red-500">{phoneError}</p>
+              )}
             </div>
 
             {/* Role */}
