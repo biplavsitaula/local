@@ -1,21 +1,20 @@
 "use client";
 
-import { useMemo, useState, useEffect } from 'react';
 import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X, Search, CheckCircle, XCircle } from 'lucide-react';
-import { ordersService, Order as ApiOrder } from '@/services/orders.service';
 import { OrderDetailsModal } from './OrderDetailsModal';
-import { useOrderStore, Order } from '@/hooks/useOrderStore';
+import { Order } from '@/hooks/useOrderStore';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useDebounce } from '@/hooks/useDebounce';
-import { useRoleAccess } from '@/hooks/useRoleAccess';
-import { toast } from 'sonner';
 import { Pagination } from '@/components/ui/pagination';
 import { ConfirmModal } from '@/components/ConfirmModal';
 import { SuccessMsgModal } from '@/components/SuccessMsgModal';
+import { useOrderTable } from './hooks/useOrderTable';
 
 interface OrderTableProps {
+  orders: Order[];
+  allOrders?: Order[];
   onFiltersChange?: (filters: {
     search?: string;
     status?: string;
@@ -26,209 +25,55 @@ interface OrderTableProps {
   onOrderUpdate?: () => void;
 }
 
-export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps = {}) {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [searchInput, setSearchInput] = useState('');
-  const debouncedSearch = useDebounce(searchInput, 300);
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState({
-    status: '',
-    billNumber: '',
-    location: '',
-    paymentMethod: '',
+export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onOrderUpdate }: OrderTableProps) {
+  const {
+    searchInput,
+    setSearchInput,
+    showFilters,
+    setShowFilters,
+    filters,
+    setFilters,
+    currentPage,
+    setCurrentPage,
+    itemsPerPage,
+    filteredAndSortedOrders,
+    totalFiltered,
+    totalPages,
+    canEdit,
+    processingOrderId,
+    confirmModalOpen,
+    setConfirmModalOpen,
+    confirmAction,
+    confirmTitle,
+    confirmMessage,
+    successModalOpen,
+    setSuccessModalOpen,
+    successMessage,
+    pendingOrder,
+    selectedOrder,
+    isModalOpen,
+    sortKey,
+    sortDir,
+    handleSort,
+    clearFilters,
+    hasActiveFilters,
+    handleStatusUpdate,
+    handleAcceptOrder,
+    handleRejectOrder,
+    handleView,
+    handleCloseModal,
+    handlePrint,
+    formatDate,
+    getStatusColor,
+  } = useOrderTable({
+    orders: propOrders,
+    onFiltersChange,
+    onOrderUpdate,
   });
-  const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
-  const { canEdit } = useRoleAccess();
-  const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
-  
-  // Modal states
-  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
-  const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
-  const [confirmTitle, setConfirmTitle] = useState("");
-  const [confirmMessage, setConfirmMessage] = useState("");
-  const [successModalOpen, setSuccessModalOpen] = useState(false);
-  const [successMessage, setSuccessMessage] = useState("");
-  const [pendingOrder, setPendingOrder] = useState<Order | null>(null);
-  
-  // Expose filters to parent component
-  useEffect(() => {
-    if (onFiltersChange) {
-      onFiltersChange({
-        search: debouncedSearch,
-        status: filters.status,
-        billNumber: filters.billNumber,
-        location: filters.location,
-        paymentMethod: filters.paymentMethod,
-      });
-    }
-  }, [debouncedSearch, filters, onFiltersChange]);
 
-  const mapApiOrderToOrder = (apiOrder: ApiOrder): Order => {
-    // Handle API response structure - customer can be an object with fullName and location
-    const customerName = (apiOrder.customer as any)?.fullName || 
-                         apiOrder.customer?.name || 
-                         apiOrder.customerName || 
-                         '';
-    const location = (apiOrder.customer as any)?.location || 
-                    apiOrder.customer?.address || 
-                    apiOrder.location || 
-                    '';
-    
-    // Map payment method - API returns "COD", "Online", "QR Payment"
-    let paymentMethod: 'cod' | 'qr' = 'cod';
-    const paymentMethodLower = (apiOrder.paymentMethod || '').toLowerCase();
-    if (paymentMethodLower === 'online' || paymentMethodLower === 'qr' || paymentMethodLower === 'qr payment') {
-      paymentMethod = 'qr';
-    }
-    
-    return {
-      id: apiOrder._id || apiOrder.id || '',
-      billNumber: apiOrder.billNumber,
-      customerName,
-      location,
-      totalAmount: apiOrder.totalAmount,
-      status: apiOrder.status,
-      paymentMethod,
-      createdAt: apiOrder.createdAt,
-    };
-  };
-
-  useEffect(() => {
-    const fetchOrders = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const response = await ordersService.getAll({
-          search: debouncedSearch || undefined,
-          status: filters.status || undefined,
-          paymentMethod: filters.paymentMethod || undefined,
-          limit: 1000, // Fetch all, paginate client-side
-        });
-        const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-      } catch (err: any) {
-        setError(err.message || 'Failed to load orders');
-        setOrders([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchOrders();
-    setCurrentPage(1); // Reset to first page when filters change
-  }, [debouncedSearch, filters.status, filters.paymentMethod]);
+  const debouncedSearch = useDebounce(searchInput, 300);
 
   type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
-  type SortDir = 'asc' | 'desc';
-
-  const [sortKey, setSortKey] = useState<SortKey>('billNumber');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
-
-  const handleSort = (key: SortKey) => {
-    if (key === sortKey) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
-      return;
-    }
-    setSortKey(key);
-    setSortDir('asc');
-  };
-
-  const filteredAndSortedOrders = useMemo(() => {
-    let filtered = [...orders];
-
-    // Apply filters
-    if (filters.billNumber) {
-      filtered = filtered.filter(order => 
-        order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
-      );
-    }
-
-    if (filters.location) {
-      filtered = filtered.filter(order => 
-        order.location.toLowerCase().includes(filters.location.toLowerCase())
-      );
-    }
-
-    // Note: Status and paymentMethod filters are applied via API call
-    // Additional client-side filtering can be added here if needed
-
-    // Sort
-    const dir = sortDir === 'asc' ? 1 : -1;
-    filtered.sort((a, b) => {
-      switch (sortKey) {
-        case 'billNumber':
-          return dir * a.billNumber.localeCompare(b.billNumber);
-        case 'customerName':
-          return dir * a.customerName.localeCompare(b.customerName);
-        case 'location':
-          return dir * a.location.localeCompare(b.location);
-        case 'totalAmount':
-          return dir * (a.totalAmount - b.totalAmount);
-        case 'status':
-          return dir * a.status.localeCompare(b.status);
-        default:
-          return 0;
-      }
-    });
-
-    // Apply pagination
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filtered.slice(startIndex, endIndex);
-  }, [orders, sortDir, sortKey, filters, currentPage, itemsPerPage]);
-
-  const clearFilters = () => {
-    setFilters({
-      status: '',
-      billNumber: '',
-      location: '',
-      paymentMethod: '',
-    });
-  };
-
-  const hasActiveFilters = filters.status || filters.billNumber || filters.location || filters.paymentMethod;
-
-  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
-    try {
-      await ordersService.updateStatus(orderId, newStatus);
-      // Refresh orders
-      const response = await ordersService.getAll({ limit: 100 });
-      const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
-      setOrders(mappedOrders);
-    } catch (err: any) {
-      console.error('Failed to update order status:', err);
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4">
-          <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
-          <p className="text-muted-foreground">Loading orders...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <div className="flex flex-col items-center gap-4 text-center">
-          <AlertCircle className="h-8 w-8 text-destructive" />
-          <div>
-            <p className="text-lg font-semibold text-foreground mb-2">Error loading orders</p>
-            <p className="text-muted-foreground">{error}</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   const renderSortableTh = (label: string, columnKey: SortKey) => (
     <th
@@ -250,19 +95,6 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
     </th>
   );
 
-  const formatDate = (dateString: string) => {
-    try {
-      const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
-      });
-    } catch {
-      return dateString;
-    }
-  };
-
   // Mock order items - in a real app, this would come from the order data
   const getOrderItems = (order: Order) => {
     if (order.billNumber === 'FB-2024-003') {
@@ -278,645 +110,6 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
     ];
   };
 
-  const handleAcceptOrder = async (order: Order) => {
-    console.log('handleAcceptOrder called', { orderId: order.id, canEdit, order });
-    
-    // Show confirmation modal
-    setPendingOrder(order);
-    setConfirmTitle("Accept Order");
-    setConfirmMessage(`Are you sure you want to accept order ${order.billNumber}?`);
-    setConfirmAction(() => {
-      setConfirmModalOpen(false);
-      performAcceptOrder(order);
-    });
-    setConfirmModalOpen(true);
-  };
-
-  const performAcceptOrder = async (order: Order) => {
-    try {
-      setProcessingOrderId(order.id);
-      // Use _id if available, otherwise use id
-      const orderId = (order as any)._id || order.id;
-      console.log('Calling acceptOrder API with id:', orderId);
-      const response = await ordersService.acceptOrder(orderId);
-      console.log('Accept order response:', response);
-      
-      if (response.success) {
-        // Show success modal instead of toast
-        setSuccessMessage(response.message || `Order ${order.billNumber} accepted successfully`);
-        setSuccessModalOpen(true);
-        
-        // Refresh orders
-        const refreshResponse = await ordersService.getAll({
-          search: debouncedSearch || undefined,
-          status: filters.status || undefined,
-          paymentMethod: filters.paymentMethod || undefined,
-          limit: 1000, // Match the initial fetch limit
-        });
-        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-        // Notify parent component to refresh OrderStatusSection
-        if (onOrderUpdate) {
-          onOrderUpdate();
-        }
-      } else {
-        toast.error(response.message || 'Failed to accept order');
-      }
-    } catch (err: any) {
-      console.error('Error accepting order:', err);
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          'Failed to accept order. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setProcessingOrderId(null);
-      setPendingOrder(null);
-    }
-  };
-
-  const handleRejectOrder = async (order: Order) => {
-    console.log('handleRejectOrder called', { orderId: order.id, canEdit, order });
-    
-    // Show confirmation modal
-    setPendingOrder(order);
-    setConfirmTitle("Reject Order");
-    setConfirmMessage(`Are you sure you want to reject order ${order.billNumber}?`);
-    setConfirmAction(() => {
-      setConfirmModalOpen(false);
-      performRejectOrder(order);
-    });
-    setConfirmModalOpen(true);
-  };
-
-  const performRejectOrder = async (order: Order) => {
-    try {
-      setProcessingOrderId(order.id);
-      // Use _id if available, otherwise use id
-      const orderId = (order as any)._id || order.id;
-      console.log('Calling rejectOrder API with id:', orderId);
-      const response = await ordersService.rejectOrder(orderId);
-      console.log('Reject order response:', response);
-      
-      if (response.success) {
-        // Show success modal instead of toast
-        setSuccessMessage(response.message || `Order ${order.billNumber} rejected successfully`);
-        setSuccessModalOpen(true);
-        
-        // Refresh orders
-        const refreshResponse = await ordersService.getAll({
-          search: debouncedSearch || undefined,
-          status: filters.status || undefined,
-          paymentMethod: filters.paymentMethod || undefined,
-          limit: 1000, // Match the initial fetch limit
-        });
-        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-        // Notify parent component to refresh OrderStatusSection
-        if (onOrderUpdate) {
-          onOrderUpdate();
-        }
-      } else {
-        toast.error(response.message || 'Failed to reject order');
-      }
-    } catch (err: any) {
-      console.error('Error rejecting order:', err);
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          'Failed to reject order. Please try again.';
-      toast.error(errorMessage);
-    } finally {
-      setProcessingOrderId(null);
-      setPendingOrder(null);
-    }
-  };
-
-  const handlePrint = async (order: Order) => {
-    try {
-      // Fetch full order details from API
-      const orderResponse = await ordersService.getByBillNumber(order.billNumber);
-      const fullOrder = orderResponse.data;
-      
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert('Please allow popups to print order');
-        return;
-      }
-
-      const orderItems = fullOrder.items || getOrderItems(order);
-      const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const printDate = new Date(order.createdAt);
-      const formattedDate = printDate.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
-      });
-
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Bill - ${order.billNumber}</title>
-          <style>
-            @media print {
-              body { margin: 0; padding: 20px; }
-              @page { margin: 0; }
-            }
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              padding: 40px;
-              color: #333;
-              background: #fff;
-              line-height: 1.6;
-            }
-            .invoice-container {
-              max-width: 800px;
-              margin: 0 auto;
-              background: #fff;
-            }
-            .header {
-              text-align: center;
-              margin-bottom: 40px;
-            }
-            .logo {
-              font-size: 48px;
-              margin-bottom: 10px;
-            }
-            .company-name {
-              font-size: 32px;
-              font-weight: bold;
-              color: #f97316;
-              margin-bottom: 5px;
-              letter-spacing: 2px;
-            }
-            .company-subtitle {
-              font-size: 14px;
-              color: #666;
-              margin-bottom: 20px;
-            }
-            .bill-info {
-              display: flex;
-              justify-content: center;
-              gap: 30px;
-              margin-top: 15px;
-              font-size: 14px;
-            }
-            .details-section {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 40px;
-              margin-bottom: 40px;
-            }
-            .detail-box h3 {
-              font-size: 16px;
-              font-weight: 600;
-              color: #333;
-              margin-bottom: 15px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #e5e5e5;
-            }
-            .detail-item {
-              margin-bottom: 10px;
-              font-size: 14px;
-            }
-            .detail-label {
-              font-weight: 600;
-              color: #666;
-              display: inline-block;
-              min-width: 80px;
-            }
-            .detail-value {
-              color: #333;
-            }
-            .products-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 30px;
-            }
-            .products-table thead {
-              background: #f97316;
-              color: #fff;
-            }
-            .products-table th {
-              padding: 12px;
-              text-align: left;
-              font-weight: 600;
-              font-size: 14px;
-            }
-            .products-table th:last-child,
-            .products-table td:last-child {
-              text-align: right;
-            }
-            .products-table td {
-              padding: 12px;
-              border-bottom: 1px solid #e5e5e5;
-              font-size: 14px;
-            }
-            .products-table tbody tr:last-child td {
-              border-bottom: none;
-            }
-            .total-section {
-              text-align: right;
-              margin-bottom: 40px;
-            }
-            .total-amount {
-              font-size: 20px;
-              font-weight: bold;
-              color: #f97316;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 50px;
-              padding-top: 30px;
-              border-top: 1px solid #e5e5e5;
-            }
-            .footer p {
-              margin-bottom: 8px;
-              color: #666;
-              font-size: 14px;
-            }
-            .footer a {
-              color: #f97316;
-              text-decoration: none;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-container">
-            <div class="header">
-              <div class="logo">
-                <Image 
-                src="/assets/flame-light-logo.png" 
-                alt="Flame Beverage logo" 
-                width="50" height="50" 
-                style="object-fit: contain;" 
-                />
-              </div>
-              <div class="company-name">FLAME BEVERAGE</div>
-              <div class="company-subtitle">Premium Liquor Store</div>
-              <div class="bill-info">
-                <span><strong>Bill No:</strong> ${order.billNumber}</span>
-                <span><strong>Date:</strong> ${formattedDate}</span>
-              </div>
-            </div>
-            
-            <div class="details-section">
-              <div class="detail-box">
-                <h3>Customer Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Name:</span>
-                  <span class="detail-value">${order.customerName}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">PAN:</span>
-                  <span class="detail-value">KLMNO9012P</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Mobile:</span>
-                  <span class="detail-value">+977-9861234567</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Location:</span>
-                  <span class="detail-value">${order.location}</span>
-                </div>
-              </div>
-              
-              <div class="detail-box">
-                <h3>Order Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Order ID:</span>
-                  <span class="detail-value">${order.id.split('-')[1] || '3'}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Status:</span>
-                  <span class="detail-value">${order.status}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Payment:</span>
-                  <span class="detail-value">${order.paymentMethod === 'qr' ? 'QR Payment' : 'Cash on Delivery'}</span>
-                </div>
-              </div>
-            </div>
-            
-            <table class="products-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${orderItems.map(item => `
-                  <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>Rs ${item.price.toFixed(2)}</td>
-                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            
-            <div class="total-section">
-              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
-            </div>
-            
-            <div class="footer">
-              <p>Thank you for shopping with Flame Beverage!</p>
-              <p>For queries, contact us at <a href="mailto:support@flamebeverage.com">support@flamebeverage.com</a></p>
-            </div>
-          </div>
-        </body>
-      </html>
-      `;
-
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.focus();
-      
-      // Wait for content to load, then print
-      setTimeout(() => {
-        printWindow.print();
-      }, 250);
-    } catch (err: any) {
-      console.error('Failed to fetch order details:', err);
-      // Fallback to using mock data if API call fails
-      const orderItems = getOrderItems(order);
-      const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
-      const printDate = new Date(order.createdAt);
-      const formattedDate = printDate.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
-      });
-
-      const printWindow = window.open('', '_blank');
-      if (!printWindow) {
-        alert('Please allow popups to print order');
-        return;
-      }
-
-      const htmlContent = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <title>Bill - ${order.billNumber}</title>
-          <style>
-            @media print {
-              body { margin: 0; padding: 20px; }
-              @page { margin: 0; }
-            }
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
-            body {
-              font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              padding: 40px;
-              color: #333;
-              background: #fff;
-              line-height: 1.6;
-            }
-            .invoice-container {
-              max-width: 800px;
-              margin: 0 auto;
-              background: #fff;
-            }
-            .header {
-              text-align: center;
-              margin-bottom: 40px;
-            }
-            .logo {
-              font-size: 48px;
-              margin-bottom: 10px;
-            }
-            .company-name {
-              font-size: 32px;
-              font-weight: bold;
-              color: #f97316;
-              margin-bottom: 5px;
-              letter-spacing: 2px;
-            }
-            .company-subtitle {
-              font-size: 14px;
-              color: #666;
-              margin-bottom: 20px;
-            }
-            .bill-info {
-              display: flex;
-              justify-content: center;
-              gap: 30px;
-              margin-top: 15px;
-              font-size: 14px;
-            }
-            .details-section {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 40px;
-              margin-bottom: 40px;
-            }
-            .detail-box h3 {
-              font-size: 16px;
-              font-weight: 600;
-              color: #333;
-              margin-bottom: 15px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #e5e5e5;
-            }
-            .detail-item {
-              margin-bottom: 10px;
-              font-size: 14px;
-            }
-            .detail-label {
-              font-weight: 600;
-              color: #666;
-              display: inline-block;
-              min-width: 80px;
-            }
-            .detail-value {
-              color: #333;
-            }
-            .products-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 30px;
-            }
-            .products-table thead {
-              background: #f97316;
-              color: #fff;
-            }
-            .products-table th {
-              padding: 12px;
-              text-align: left;
-              font-weight: 600;
-              font-size: 14px;
-            }
-            .products-table th:last-child,
-            .products-table td:last-child {
-              text-align: right;
-            }
-            .products-table td {
-              padding: 12px;
-              border-bottom: 1px solid #e5e5e5;
-              font-size: 14px;
-            }
-            .products-table tbody tr:last-child td {
-              border-bottom: none;
-            }
-            .total-section {
-              text-align: right;
-              margin-bottom: 40px;
-            }
-            .total-amount {
-              font-size: 20px;
-              font-weight: bold;
-              color: #f97316;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 50px;
-              padding-top: 30px;
-              border-top: 1px solid #e5e5e5;
-            }
-            .footer p {
-              margin-bottom: 8px;
-              color: #666;
-              font-size: 14px;
-            }
-            .footer a {
-              color: #f97316;
-              text-decoration: none;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-container">
-            <div class="header">
-              <div class="logo">🔥</div>
-              <div class="company-name">FLAME BEVERAGE</div>
-              <div class="company-subtitle">Premium Liquor Store</div>
-              <div class="bill-info">
-                <span><strong>Bill No:</strong> ${order.billNumber}</span>
-                <span><strong>Date:</strong> ${formattedDate}</span>
-              </div>
-            </div>
-            
-            <div class="details-section">
-              <div class="detail-box">
-                <h3>Customer Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Name:</span>
-                  <span class="detail-value">${order.customerName}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">PAN:</span>
-                  <span class="detail-value">KLMNO9012P</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Mobile:</span>
-                  <span class="detail-value">+977-9861234567</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Location:</span>
-                  <span class="detail-value">${order.location}</span>
-                </div>
-              </div>
-              
-              <div class="detail-box">
-                <h3>Order Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Order ID:</span>
-                  <span class="detail-value">${order.id.split('-')[1] || '3'}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Status:</span>
-                  <span class="detail-value">${order.status}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Payment:</span>
-                  <span class="detail-value">${order.paymentMethod === 'qr' ? 'QR Payment' : 'Cash on Delivery'}</span>
-                </div>
-              </div>
-            </div>
-            
-            <table class="products-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                ${orderItems.map(item => `
-                  <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>Rs ${item.price.toFixed(2)}</td>
-                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
-                  </tr>
-                `).join('')}
-              </tbody>
-            </table>
-            
-            <div class="total-section">
-              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
-            </div>
-            
-            <div class="footer">
-              <p>Thank you for shopping with Flame Beverage!</p>
-              <p>For queries, contact us at <a href="mailto:support@flamebeverage.com">support@flamebeverage.com</a></p>
-            </div>
-          </div>
-        </body>
-      </html>
-      `;
-
-      printWindow.document.write(htmlContent);
-      printWindow.document.close();
-      printWindow.focus();
-      
-      setTimeout(() => {
-        printWindow.print();
-      }, 250);
-    }
-  };
-
-  const handleView = (order: Order) => {
-    setSelectedOrder(order);
-    setIsModalOpen(true);
-  };
-
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
-    setSelectedOrder(null);
-  };
-
-  const getStatusColor = (status: string) => {
-    const statusLower = status.toLowerCase();
-    if (statusLower.includes('pending') || statusLower.includes('processing')) {
-      return 'bg-warning/20 text-warning';
-    }
-    if (statusLower.includes('completed') || statusLower.includes('delivered')) {
-      return 'bg-success/20 text-success';
-    }
-    if (statusLower.includes('cancelled') || statusLower.includes('failed')) {
-      return 'bg-destructive/20 text-destructive';
-    }
-    return 'bg-muted/20 text-muted-foreground';
-  };
 
   return (
     <>
@@ -1208,34 +401,18 @@ export function OrderTable({ onFiltersChange, onOrderUpdate }: OrderTableProps =
         </div>
         
         {/* Pagination */}
-        {(() => {
-          // Calculate total filtered items (before pagination)
-          let totalFiltered = [...orders];
-          if (filters.billNumber) {
-            totalFiltered = totalFiltered.filter(order => 
-              order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
-            );
-          }
-          if (filters.location) {
-            totalFiltered = totalFiltered.filter(order => 
-              order.location.toLowerCase().includes(filters.location.toLowerCase())
-            );
-          }
-          const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
-          
-          return totalFiltered.length > itemsPerPage ? (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => {
-                setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              itemsPerPage={itemsPerPage}
-              totalItems={totalFiltered.length}
-            />
-          ) : null;
-        })()}
+        {totalFiltered.length > itemsPerPage ? (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            itemsPerPage={itemsPerPage}
+            totalItems={totalFiltered.length}
+          />
+        ) : null}
       </div>
       
       <OrderDetailsModal

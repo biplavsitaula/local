@@ -12,6 +12,7 @@ import { AddThemeModal } from '@/components/features/admin/settings/AddThemeModa
 import { toast } from 'sonner';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { Trash2 } from 'lucide-react';
+import { SuccessMsgModal } from '@/components/SuccessMsgModal';
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -43,6 +44,8 @@ export default function SettingsPage() {
   const [newCategory, setNewCategory] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(false);
   const { canEdit } = useRoleAccess();
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [successMessage, setSuccessMessage] = useState("");
   
     useEffect(() => {
       if (theme === "default") {
@@ -208,12 +211,9 @@ export default function SettingsPage() {
       if (response.success) {
         // Use API response message directly - it exists based on console log
         const message = response.message?.trim() || 'Settings saved successfully!';
-        // Ensure we're passing a valid string to toast
-        if (message) {
-          toast.success(String(message));
-        } else {
-          toast.success('Settings saved successfully!');
-        }
+        // Show success modal instead of toast
+        setSuccessMessage(message || 'Settings saved successfully!');
+        setSuccessModalOpen(true);
       } else {
         // Show API error message
         const errorMessage = response.message?.trim() || 'Failed to save settings';
@@ -567,6 +567,14 @@ export default function SettingsPage() {
             console.error('Error refreshing themes:', error);
           }
         }}
+      />
+
+      {/* Success Modal */}
+      <SuccessMsgModal
+        open={successModalOpen}
+        onOpenChange={setSuccessModalOpen}
+        message={successMessage}
+        title="Success"
       />
     </div>
   );

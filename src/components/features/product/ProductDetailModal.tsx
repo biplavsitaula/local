@@ -1,6 +1,4 @@
-import React, { useState } from 'react';
-import { useLanguage } from '@/contexts/LanguageContext';
-import { useCart } from '@/contexts/CartContext';
+import React from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -9,34 +7,23 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { ShoppingCart, Plus, Minus, Wine, Droplets, Tag } from 'lucide-react';
-import { toast } from 'sonner';
 import { IProductDetailModalProps } from '@/interface/IProductDetailModalProps';
 import Image from 'next/image';
+import { useProductDetail } from './hooks/useProductDetail';
 
 const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
   product,
   isOpen,
   onClose,
 }) => {
-  const { language, t } = useLanguage();
-  const { addToCart } = useCart();
-  const [quantity, setQuantity] = useState(1);
-
-  const handleAddToCart = () => {
-    for (let i = 0; i < quantity; i++) {
-      addToCart(product);
-    }
-    toast.success(
-      language === 'en'
-        ? `${quantity} × ${product?.name} added to cart!`
-        : `${quantity} × ${product?.nameNe} कार्टमा थपियो!`
-    );
-    setQuantity(1);
-    onClose();
-  };
-
-  const incrementQuantity = () => setQuantity((prev) => prev + 1);
-  const decrementQuantity = () => setQuantity((prev) => Math.max(1, prev - 1));
+  const {
+    quantity,
+    incrementQuantity,
+    decrementQuantity,
+    handleAddToCart,
+    t,
+    language,
+  } = useProductDetail({ product, onClose });
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>

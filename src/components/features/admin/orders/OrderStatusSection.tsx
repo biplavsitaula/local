@@ -9,10 +9,11 @@ import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 
 interface OrderStatusSectionProps {
+  orders?: Order[];
   onOrderUpdate?: () => void;
 }
 
-export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
+export function OrderStatusSection({ orders: propOrders, onOrderUpdate }: OrderStatusSectionProps) {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
@@ -46,7 +47,7 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
     };
   };
 
-  // Fetch orders function
+  // Fetch orders function (only if orders not provided as prop)
   const fetchOrders = async () => {
     try {
       setLoading(true);
@@ -63,10 +64,15 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
     }
   };
 
-  // Initial fetch
+  // Use prop orders if provided, otherwise fetch internally
   useEffect(() => {
-    fetchOrders();
-  }, []);
+    if (propOrders !== undefined) {
+      setOrders(propOrders);
+      setLoading(false);
+    } else {
+      fetchOrders();
+    }
+  }, [propOrders]);
 
   // Calculate order status counts
   const statusCounts = useMemo(() => {
@@ -103,7 +109,6 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
   }, [orders]);
 
   const handleAcceptOrder = async (order: Order) => {
-    console.log('accepttttttttttttt')
     if (!canEdit) {
       toast.error('You do not have permission to accept orders');
       return;
@@ -115,14 +120,11 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
     
     try {
       setProcessingOrderId(order.id);
-      const response = await ordersService.acceptOrder(order.id);
+      const orderId = (order as any)._id || order.id;
+      const response = await ordersService.acceptOrder(orderId);
       if (response.success) {
         toast.success(response.message || `Order ${order.billNumber} accepted successfully`);
-        // Refresh orders
-        const refreshResponse = await ordersService.getAll({ limit: 1000 });
-        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-        // Notify parent component
+        // Notify parent component to refresh (single API call)
         if (onOrderUpdate) {
           onOrderUpdate();
         }
@@ -153,14 +155,11 @@ export function OrderStatusSection({ onOrderUpdate }: OrderStatusSectionProps) {
     
     try {
       setProcessingOrderId(order.id);
-      const response = await ordersService.rejectOrder(order.id);
+      const orderId = (order as any)._id || order.id;
+      const response = await ordersService.rejectOrder(orderId);
       if (response.success) {
         toast.success(response.message || `Order ${order.billNumber} rejected successfully`);
-        // Refresh orders
-        const refreshResponse = await ordersService.getAll({ limit: 1000 });
-        const mappedOrders = (refreshResponse.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-        // Notify parent component
+        // Notify parent component to refresh (single API call)
         if (onOrderUpdate) {
           onOrderUpdate();
         }

@@ -27,7 +27,7 @@ export function SuccessMsgModal({
       <DialogContent className="sm:max-w-[425px] bg-card border-border">
         <DialogHeader>
           <DialogTitle className="text-xl font-display text-foreground flex items-center gap-2">
-            <CheckCircle className="h-5 w-5 text-success" />
+            <CheckCircle className="h-2 w-2 text-success" />
             {title}
           </DialogTitle>
         </DialogHeader>
