@@ -233,7 +233,7 @@ return (
               {/* Recent Arrivals Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className={`text-3xl font-display font-bold sm: text-xl ${
+                  <h2 className={`text-2xl font-display font-bold sm: text-xl ${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
                     Recent Arrivals
@@ -283,7 +283,7 @@ return (
               {/* Most Recommended Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className={`text-3xl font-display font-bold sm: text-xl${
+                  <h2 className={`text-2xl font-display font-bold sm: text-xl${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
                     Most Recommended
@@ -345,7 +345,7 @@ return (
               {/* Products Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-6">
-                  <h2 className={`text-3xl font-display font-bold ${
+                  <h2 className={`text-2xl font-display font-bold ${
                     theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
                   }`}>
                     All Products
@@ -425,7 +425,7 @@ return (
                       }`}>
                         {seasonalTheme.subtitle}
                       </p>
-                      <h3 className={`text-3xl font-semibold ${
+                      <h3 className={`text-2xl font-semibold ${
                         theme === 'dark' ? 'text-foreground' : 'text-gray-900'
                       }`}>
                         {seasonalTheme.emoji && <span className="mr-2">{seasonalTheme.emoji}</span>}

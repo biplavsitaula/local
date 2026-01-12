@@ -59,10 +59,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
         )}
       </div>
 
-      {/* Quick View Button */}
+      {/* Quick View Button - Always visible on mobile, hover on desktop */}
       <button
         onClick={() => onViewDetails(product)}
-        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-foreground opacity-0 shadow-lg backdrop-blur-sm transition-all group-hover:opacity-100 hover:bg-primary hover:text-primary-foreground cursor-pointer"
+        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-foreground opacity-100 md:opacity-0 shadow-lg backdrop-blur-sm transition-all md:group-hover:opacity-100 hover:bg-primary hover:text-primary-foreground cursor-pointer"
       >
         <Eye className="h-5 w-5" />
       </button>

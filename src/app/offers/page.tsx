@@ -136,7 +136,7 @@ const Offers = () => {
     }
     return false;
   });
-
+  
   // Filter discounted products based on search query
   const filteredProducts = discountedProducts.filter((product) => {
     if (!searchQuery.trim()) return true;
