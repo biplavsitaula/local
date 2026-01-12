@@ -28,9 +28,12 @@ const Footer: React.FC = () => {
       // NEXT_PUBLIC_EMAILJS_TEMPLATE_ID=your_template_id
       // NEXT_PUBLIC_EMAILJS_PUBLIC_KEY=your_public_key
       
-      const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
-      const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
-      const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
+      // const serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID || '';
+      //   const templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID || '';
+      //   const publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY || '';
+      const serviceId = 'service_3hnx9qr';
+      const templateId = 'template_uw796lo';
+      const publicKey = '5qzm3CpcCNMoXN2Y0';
 
       if (!serviceId || !templateId || !publicKey) {
         console.warn('EmailJS credentials not configured. Please set NEXT_PUBLIC_EMAILJS_* environment variables.');
@@ -42,8 +45,12 @@ const Footer: React.FC = () => {
         serviceId,
         templateId,
         {
-          to_email: newsletterEmail,
-          from_name: 'Flame Beverage',
+          // Standard EmailJS variable names
+          email: 'hasinadhungel11@gmail.com',
+          to_name: 'Flame Beverage Admin',
+          from_name: 'Flame Beverage Website',
+          from_email: newsletterEmail,
+          subject: 'New Newsletter Subscription',
           message: `New newsletter subscription from: ${newsletterEmail}`,
           reply_to: newsletterEmail,
         },
