@@ -202,20 +202,20 @@ const Offers = () => {
         </h1>
 
         {/* Offer Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12">
           {offers.map((offer, index) => {
             const Icon = offer.icon;
             return (
               <div
                 key={index}
-                className={`relative p-6 rounded-xl bg-gradient-to-br ${offer.color} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
+                className={`relative p-3 sm:p-6 rounded-xl bg-gradient-to-br ${offer.color} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
               >
                 <div className="absolute -right-4 -top-4 opacity-20">
-                  <Icon className="w-24 h-24" />
+                  <Icon className="w-16 sm:w-24 h-16 sm:h-24" />
                 </div>
-                <Icon className="w-10 h-10 mb-4" />
-                <h3 className="text-xl font-bold mb-2">{offer.title}</h3>
-                <p className="text-white/80">{offer.description}</p>
+                <Icon className="w-8 sm:w-10 h-8 sm:h-10 mb-2 sm:mb-4" />
+                <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-2">{offer.title}</h3>
+                <p className="text-white/80 text-xs sm:text-base">{offer.description}</p>
               </div>
             );
           })}
