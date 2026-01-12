@@ -255,7 +255,7 @@ return (
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : filteredRecentArrivals.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     {filteredRecentArrivals.map((product, index) => (
                       <ProductCard
                         key={product.id || `recent-${index}`}
@@ -305,7 +305,7 @@ return (
                     <Loader2 className="h-8 w-8 animate-spin text-primary" />
                   </div>
                 ) : filteredMostRecommended.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                  <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
                     {filteredMostRecommended.map((product, index) => (
                       <ProductCard
                         key={product.id || `recommended-${index}`}

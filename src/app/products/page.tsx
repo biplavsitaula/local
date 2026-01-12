@@ -514,10 +514,10 @@ const Products: React.FC = () => {
          {/* Products Grid */}
          {!loading && !error && filteredProducts.length > 0 ? (
            <>
-             <div className={`grid gap-6 ${
+             <div className={`grid ${
                viewMode === 'grid'
-                 ? 'grid-cols-1 md:grid-cols-3 lg:grid-cols-4'
-                 : 'grid-cols-1'
+                 ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4'
+                 : 'grid-cols-1 gap-4'
              }`}>
                {filteredProducts.map((product, index) => (
                  <ProductCard
