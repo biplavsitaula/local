@@ -70,7 +70,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Image - Square */}
       <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
         <Image
-          src={product?.image || "/assets/beer.jpeg"}
+          src={product?.image || "/assets/liquor.jpeg"}
           alt={product?.name || 'Product image'}
           className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
