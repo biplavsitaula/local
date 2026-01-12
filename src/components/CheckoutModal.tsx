@@ -264,7 +264,7 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
 
             {/* Payment Method Selection */}
             <div className="mb-4 sm:mb-6">
-              <h3 className="text-base sm:text-lg font-display font-semibold text-foreground mb-3 sm:mb-4">
+              <h3 className="text-base sm:text-lg font-display font-semibold text-foreground mb-2 sm:mb-3">
                 {t("paymentTitle")}
               </h3>
               <div className="grid grid-cols-2 gap-2 sm:gap-3">
@@ -274,33 +274,27 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
                     setSelectedPayment("cod");
                     setSelectedGateway(null);
                   }}
-                  className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-left ${
+                  className={`flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg border-2 transition-all cursor-pointer ${
                     selectedPayment === "cod"
-                      ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
+                      ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-md"
                       : "border-border bg-card hover:border-flame-orange/50"
                   }`}
                 >
-                  <Package className={`w-5 h-5 sm:w-6 sm:h-6 mb-1.5 sm:mb-2 ${selectedPayment === "cod" ? "text-text-inverse" : "text-flame-orange"}`} />
-                  <div className="font-semibold mb-0.5 sm:mb-1 text-xs sm:text-sm">{t("cod")}</div>
-                  <div className={`text-xs ${selectedPayment === "cod" ? "text-text-inverse/80" : "text-muted-foreground"}`}>
-                    {t("payWhenReceive")}
-                  </div>
+                  <Package className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${selectedPayment === "cod" ? "text-text-inverse" : "text-flame-orange"}`} />
+                  <span className="font-medium text-xs sm:text-sm">{t("cod")}</span>
                 </button>
 
                 {/* Pay Online */}
                 <button
                   onClick={() => setSelectedPayment("online")}
-                  className={`p-3 sm:p-4 rounded-lg sm:rounded-xl border-2 transition-all cursor-pointer text-left ${
+                  className={`flex items-center gap-2 sm:gap-3 px-3 py-2 sm:px-4 sm:py-2.5 rounded-lg border-2 transition-all cursor-pointer ${
                     selectedPayment === "online"
-                      ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-lg"
+                      ? "border-flame-orange bg-primary-gradient text-text-inverse shadow-md"
                       : "border-border bg-card hover:border-flame-orange/50"
                   }`}
                 >
-                  <CreditCard className={`w-5 h-5 sm:w-6 sm:h-6 mb-1.5 sm:mb-2 ${selectedPayment === "online" ? "text-text-inverse" : "text-flame-orange"}`} />
-                  <div className="font-semibold mb-0.5 sm:mb-1 text-xs sm:text-sm">{t("online")}</div>
-                  <div className={`text-xs ${selectedPayment === "online" ? "text-text-inverse/80" : "text-muted-foreground"}`}>
-                    {t("esewaKhaltiCard")}
-                  </div>
+                  <CreditCard className={`w-4 h-4 sm:w-5 sm:h-5 shrink-0 ${selectedPayment === "online" ? "text-text-inverse" : "text-flame-orange"}`} />
+                  <span className="font-medium text-xs sm:text-sm">{t("online")}</span>
                 </button>
               </div>
             </div>
