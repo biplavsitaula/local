@@ -119,49 +119,45 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
           )}
         </div>
 
-        {/* Quantity Selector and Actions */}
+        {/* Quantity Selector and Actions - All in one row */}
         {product.inStock === true && (
-          <div className="mt-3 flex flex-col gap-2">
-            {/* Row 1: Quantity Selector */}
-            <div className="flex items-center justify-center">
-              <div className="flex items-center rounded-lg border border-border">
-                <button
-                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
-                >
-                  <Minus className="h-4 w-4" />
-                </button>
-                <span className="w-10 text-center text-sm font-medium text-foreground">
-                  {quantity}
-                </span>
-                <button
-                  onClick={() => setQuantity(quantity + 1)}
-                  className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
-                >
-                  <Plus className="h-4 w-4" />
-                </button>
-              </div>
+          <div className="mt-3 flex items-center gap-2">
+            {/* Quantity Selector */}
+            <div className="flex items-center rounded-lg border border-border shrink-0">
+              <button
+                onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+              >
+                <Minus className="h-3.5 w-3.5" />
+              </button>
+              <span className="w-6 text-center text-sm font-medium text-foreground">
+                {quantity}
+              </span>
+              <button
+                onClick={() => setQuantity(quantity + 1)}
+                className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+              >
+                <Plus className="h-3.5 w-3.5" />
+              </button>
             </div>
             
-            {/* Row 2: Action Buttons */}
-            <div className="flex items-center gap-2">
-              <button
-                onClick={handleAddToCart}
-                disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary-border bg-btn-outline py-2 px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <ShoppingCart className="h-4 w-4" />
-                <span className="text-xs">{t('addToCart')}</span>
-              </button>
-              <button
-                onClick={handleBuyNow}
-                disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-gradient py-2 px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
-              >
-                <Zap className="h-4 w-4" />
-                <span className="text-xs">{t('buyNow')}</span>
-              </button>
-            </div>
+            {/* Action Buttons */}
+            <button
+              onClick={handleAddToCart}
+              disabled={!product.inStock}
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg border border-primary-border bg-btn-outline py-2 px-2 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ShoppingCart className="h-3.5 w-3.5" />
+              <span className="text-xs">{t('addToCart')}</span>
+            </button>
+            <button
+              onClick={handleBuyNow}
+              disabled={!product.inStock}
+              className="flex flex-1 items-center justify-center gap-1 rounded-lg bg-primary-gradient py-2 px-2 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <Zap className="h-3.5 w-3.5" />
+              <span className="text-xs">{t('buyNow')}</span>
+            </button>
           </div>
         )}
       </div>

@@ -516,7 +516,7 @@ const Products: React.FC = () => {
            <>
              <div className={`grid ${
                viewMode === 'grid'
-                 ? 'grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4'
+                 ? 'grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
                  : 'grid-cols-1 gap-4'
              }`}>
                {filteredProducts.map((product, index) => (

@@ -6,7 +6,8 @@ import { useCart } from "@/contexts/CartContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
 import { Product } from "@/types";
-import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, ChevronDown } from "lucide-react";
+import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, LayoutGrid } from "lucide-react";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -255,31 +256,37 @@ const Categories = () => {
 
         {/* Mobile Dropdown - visible on small screens only */}
         <div className="md:hidden mb-8">
-          <div className="relative">
-            <select
-              value={selectedCategory || ""}
-              onChange={(e) => setSelectedCategory(e.target.value || null)}
-              className={`w-full appearance-none px-4 py-3 pr-10 rounded-xl border-2 font-medium text-sm cursor-pointer transition-all ${
-                currentTheme === 'dark'
-                  ? selectedCategory
-                    ? "bg-flame-orange/20 border-flame-orange text-foreground"
-                    : "bg-card border-border text-foreground hover:border-flame-orange/50"
-                  : selectedCategory
-                    ? "bg-orange-50 border-orange-500 text-gray-900"
-                    : "bg-white border-gray-200 text-gray-900 hover:border-orange-400"
-              }`}
-            >
-              <option value="">{t('allProducts')}</option>
-              {categories.map((category) => (
-                <option key={category.id} value={category.id}>
-                  {t(category.key as any)}
-                </option>
-              ))}
-            </select>
-            <ChevronDown className={`absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 pointer-events-none ${
-              currentTheme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
-            }`} />
-          </div>
+          <Select
+            value={selectedCategory || "all"}
+            onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+          >
+            <SelectTrigger className={`w-full ${
+              currentTheme === 'dark'
+                ? 'bg-card border-border'
+                : 'bg-white border-gray-200'
+            }`}>
+              <SelectValue placeholder={t('allProducts')} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">
+                <div className="flex items-center gap-2">
+                  <LayoutGrid className="h-4 w-4" />
+                  <span>{t('allProducts')}</span>
+                </div>
+              </SelectItem>
+              {categories.map((category) => {
+                const Icon = category.icon;
+                return (
+                  <SelectItem key={category.id} value={category.id}>
+                    <div className="flex items-center gap-2">
+                      <Icon className="h-4 w-4" />
+                      <span>{t(category.key as any)}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Category Grid - hidden on mobile, visible on md and larger */}
@@ -376,7 +383,7 @@ const Categories = () => {
             {/* Products Grid */}
             {filteredProducts.length > 0 ? (
               <>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                   {filteredProducts.map((product, index) => (
                     <ProductCard
                       key={product.id || `product-${index}`}

@@ -107,33 +107,6 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
 
             {/* Quantity Selector & Add to Cart */}
             <div className="mt-6 space-y-4">
-              {/* Quantity Selector */}
-              <div className="flex items-center gap-4">
-                <span className="text-sm text-muted-foreground">Quantity:</span>
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={decrementQuantity}
-                    disabled={quantity <= 1}
-                    className="h-9 w-9 border-border/50"
-                  >
-                    <Minus className="w-4 h-4" />
-                  </Button>
-                  <span className="w-12 text-center text-lg font-medium text-foreground">
-                    {quantity}
-                  </span>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={incrementQuantity}
-                    className="h-9 w-9 border-border/50"
-                  >
-                    <Plus className="w-4 h-4" />
-                  </Button>
-                </div>
-              </div>
-
               {/* Total */}
               <div className="flex items-center justify-between py-3 border-t border-border/50">
                 <span className="text-muted-foreground">Total:</span>
@@ -142,14 +115,41 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
                 </span>
               </div>
 
-              {/* Add to Cart Button */}
-              <Button
-                onClick={handleAddToCart}
-                className="w-full bg-flame-orange hover:bg-flame-red text-primary-foreground py-6 text-lg font-medium"
-              >
-                <ShoppingCart className="w-5 h-5 mr-2" />
-                {t('addToCart')}
-              </Button>
+              {/* Quantity Selector & Add to Cart - Single Row */}
+              <div className="flex items-center gap-3">
+                {/* Quantity Selector */}
+                <div className="flex items-center border border-border/50 rounded-lg shrink-0">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={decrementQuantity}
+                    disabled={quantity <= 1}
+                    className="h-10 w-10"
+                  >
+                    <Minus className="w-4 h-4" />
+                  </Button>
+                  <span className="w-8 text-center text-base font-medium text-foreground">
+                    {quantity}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    onClick={incrementQuantity}
+                    className="h-10 w-10"
+                  >
+                    <Plus className="w-4 h-4" />
+                  </Button>
+                </div>
+
+                {/* Add to Cart Button */}
+                <Button
+                  onClick={handleAddToCart}
+                  className="flex-1 bg-flame-orange hover:bg-flame-red text-primary-foreground py-5 text-base font-medium"
+                >
+                  <ShoppingCart className="w-5 h-5 mr-2" />
+                  {t('addToCart')}
+                </Button>
+              </div>
             </div>
           </div>
         </div>
