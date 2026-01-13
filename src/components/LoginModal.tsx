@@ -85,7 +85,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
               {t("flameBeverage")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
-              {t('welcomeBack' as any)}
+              {t('welcomeBack')}
             </p>
           </div>
 
@@ -107,7 +107,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             {/* Email */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
-                {t('emailAddress' as any)}
+                {t('emailAddress')}
               </label>
               <div className="relative">
                 <Mail className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
@@ -115,7 +115,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  placeholder={t('enterEmail' as any)}
+                  placeholder={t('enterEmail')}
                   className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -125,7 +125,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             {/* Password */}
             <div>
               <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
-                {t('password' as any)}
+                {t('password')}
               </label>
               <div className="relative">
                 <Lock className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
@@ -133,7 +133,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                  placeholder={t('enterPassword' as any)}
+                  placeholder={t('enterPassword')}
                   className="w-full pl-9 sm:pl-10 pr-10 sm:pr-12 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                   required
                 />
@@ -154,7 +154,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 onClick={() => setShowForgotPassword(true)}
                 className="text-xs sm:text-sm text-primary-text hover:text-secondary-text"
               >
-                {t('forgotPassword' as any)}
+                {t('forgotPassword')}
               </button>
             </div>
 
@@ -177,7 +177,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
               )}
               {isLoading 
-                ? t('loggingIn' as any)
+                ? t('loggingIn')
                 : t('login')
               }
             </button>
@@ -190,7 +190,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             </div>
             <div className="relative flex justify-center text-xs uppercase">
               <span className="bg-card px-2 text-muted-foreground">
-                {t('orContinueWith' as any)}
+                {t('orContinueWith')}
               </span>
             </div>
           </div>
@@ -199,11 +199,11 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           <div className="grid grid-cols-2 gap-2 sm:gap-4">
             <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
               <span className="text-lg sm:text-xl">G</span>
-              <span className="font-medium">{t('google' as any)}</span>
+              <span className="font-medium">{t('google')}</span>
             </button>
             <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
               <span className="text-lg sm:text-xl">f</span>
-              <span className="font-medium">{t('facebook' as any)}</span>
+              <span className="font-medium">{t('facebook')}</span>
             </button>
           </div>
         </div>

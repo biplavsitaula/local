@@ -270,8 +270,8 @@ const Header: React.FC<IHeaderProps> = ({
            </Link>
          </nav>
 
-         {/* Actions */}
-         <div className="flex items-center gap-2">
+        {/* Actions */}
+        <div className={`flex items-center gap-2 ${hideSearch ? 'ml-auto' : ''}`}>
           {/* Login Button */}
           <Button
             variant="outline"
