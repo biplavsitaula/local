@@ -402,7 +402,7 @@ export default function ReviewsPage() {
 
  const renderSortableTh = (label: string, columnKey: SortKey) => (
    <th
-     className="text-left p-4 text-sm font-semibold text-foreground"
+     className="text-left p-3 md:p-4 text-lg md:text-sm font-semibold text-foreground"
      aria-sort={
        sortKey === columnKey ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'
      }
@@ -415,7 +415,7 @@ export default function ReviewsPage() {
        }`}
      >
        <span>{label}</span>
-       <ArrowUpDown className="h-4 w-4 opacity-70" />
+       <ArrowUpDown className="h-5 w-5 md:h-4 md:w-4 opacity-70" />
      </button>
    </th>
  );
@@ -423,7 +423,7 @@ export default function ReviewsPage() {
 
  const renderReviewSortableTh = (label: string, columnKey: ReviewSortKey) => (
    <th
-     className="text-left p-4 text-sm font-semibold text-foreground"
+     className="text-left p-3 md:p-4 text-lg md:text-sm font-semibold text-foreground"
      aria-sort={
        reviewSortKey === columnKey ? (reviewSortDir === 'asc' ? 'ascending' : 'descending') : 'none'
      }
@@ -436,7 +436,7 @@ export default function ReviewsPage() {
        }`}
      >
        <span>{label}</span>
-       <ArrowUpDown className="h-4 w-4 opacity-70" />
+       <ArrowUpDown className="h-5 w-5 md:h-4 md:w-4 opacity-70" />
      </button>
    </th>
  );
@@ -467,8 +467,8 @@ export default function ReviewsPage() {
    <div className="space-y-6">
      {/* Header */}
      <div>
-       <h1 className="text-3xl font-display font-bold text-foreground">Reviews</h1>
-       <p className="text-muted-foreground mt-1">Customer feedback and ratings.</p>
+       <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Reviews</h1>
+       <p className="text-base md:text-sm text-muted-foreground mt-1">Customer feedback and ratings.</p>
      </div>
 
 
@@ -478,7 +478,7 @@ export default function ReviewsPage() {
        <div className="glass-card rounded-xl p-6 border border-border/50">
          <div className="flex items-center gap-2 mb-6">
            <Star className="h-5 w-5 text-flame-orange" />
-           <h2 className="text-lg font-semibold text-foreground">Most Reviewed Products</h2>
+           <h2 className="text-base md:text-lg font-semibold text-foreground">Most Reviewed Products</h2>
          </div>
          <div className="space-y-4">
            {top5Reviewed.map((product) => (
@@ -500,14 +500,14 @@ export default function ReviewsPage() {
                  )}
                </div>
                <div className="flex-1 min-w-0">
-                 <p className="text-sm font-medium text-foreground truncate">{product.name}</p>
-                 <span className="text-xs px-2 py-0.5 rounded-full bg-secondary/50 text-foreground capitalize inline-block mt-1">
+                 <p className="text-lg md:text-sm font-medium text-foreground truncate">{product.name}</p>
+                 <span className="text-base md:text-xs px-2 py-0.5 rounded-full bg-secondary/50 text-foreground capitalize inline-block mt-1">
                    {product.category}
                  </span>
                </div>
                <div className="text-right">
-                 <p className="text-sm font-semibold text-foreground">{(product as any).reviewCount || 0}</p>
-                 <p className="text-xs text-muted-foreground">reviews</p>
+                 <p className="text-lg md:text-sm font-semibold text-foreground">{(product as any).reviewCount || 0}</p>
+                 <p className="text-base md:text-xs text-muted-foreground">reviews</p>
                </div>
              </div>
            ))}
@@ -517,7 +517,7 @@ export default function ReviewsPage() {
 
        {/* Review Summary Card */}
        <div className="glass-card rounded-xl p-6 border border-border/50">
-         <h2 className="text-lg font-semibold text-foreground mb-6">Review Summary</h2>
+         <h2 className="text-base md:text-lg font-semibold text-foreground mb-6">Review Summary</h2>
         
          {/* Average Rating */}
          <div className="mb-6 pb-6 border-b border-border/50">
@@ -528,23 +528,23 @@ export default function ReviewsPage() {
                <p className="text-sm text-muted-foreground">/ 5</p>
              </div>
            </div>
-           <p className="text-sm text-muted-foreground">Average Rating</p>
+           <p className="text-lg md:text-sm text-muted-foreground">Average Rating</p>
          </div>
 
 
          {/* Total Reviews */}
          <div className="mb-6 pb-6 border-b border-border/50">
            <p className="text-3xl font-bold text-foreground mb-1">{totalReviews.toLocaleString()}</p>
-           <p className="text-sm text-muted-foreground">Total reviews</p>
+           <p className="text-lg md:text-sm text-muted-foreground">Total reviews</p>
          </div>
 
 
          {/* Rating Distribution */}
          <div className="space-y-3">
-           <p className="text-sm font-semibold text-foreground mb-3">Rating Distribution</p>
+           <p className="text-lg md:text-sm font-semibold text-foreground mb-3">Rating Distribution</p>
            {ratingDistribution.map((rating: any) => (
              <div key={rating.stars} className="space-y-1">
-               <div className="flex items-center justify-between text-sm">
+               <div className="flex items-center justify-between text-lg md:text-sm">
                  <div className="flex items-center gap-2">
                    <span className="text-foreground">{rating.stars}</span>
                    <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
@@ -566,7 +566,7 @@ export default function ReviewsPage() {
 
      {/* Most Reviewed Products Table */}
      <div className="space-y-4">
-       <h2 className="text-2xl font-display font-bold text-foreground">Most Reviewed Products</h2>
+       <h2 className="text-xl md:text-2xl font-display font-bold text-foreground">Most Reviewed Products</h2>
       
        {/* Search Bar */}
        <div className="relative">
@@ -593,7 +593,7 @@ export default function ReviewsPage() {
                  {renderSortableTh('Status', 'status')}
                  {renderSortableTh('Rating', 'rating')}
                  {renderSortableTh('Sales', 'sales')}
-                 <th className="text-left p-4 text-sm font-semibold text-foreground">Actions</th>
+                 <th className="text-left p-3 md:p-4 text-lg md:text-sm font-semibold text-foreground">Actions</th>
                </tr>
              </thead>
              <tbody>
@@ -605,9 +605,9 @@ export default function ReviewsPage() {
                   
                    return (
                      <tr key={product.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                       <td className="p-4">
-                         <div className="flex items-center gap-3">
-                           <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
+                       <td className="p-3 md:p-4">
+                         <div className="flex items-center gap-2 md:gap-3">
+                           <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                              {product.image || product.imageUrl ? (
                                <Image
                                  src={product.image || product.imageUrl || '/assets/liquor1.jpeg'}
@@ -621,20 +621,20 @@ export default function ReviewsPage() {
                              )}
                            </div>
                            <div>
-                             <p className="text-sm font-medium text-foreground">{product.name}</p>
-                             <p className="text-xs text-muted-foreground">{(product as any).reviewCount || 0} reviews</p>
+                             <p className="text-lg md:text-sm font-medium text-foreground">{product.name}</p>
+                             <p className="text-base md:text-xs text-muted-foreground">{(product as any).reviewCount || 0} reviews</p>
                            </div>
                          </div>
                        </td>
-                       <td className="p-4">
-                         <span className="text-xs px-2 py-1 rounded-full bg-secondary/50 text-foreground capitalize">
+                       <td className="p-3 md:p-4">
+                         <span className="text-base md:text-xs px-2 py-1 rounded-full bg-secondary/50 text-foreground capitalize">
                            {product.category}
                          </span>
                        </td>
-                       <td className="p-4 text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
-                       <td className="p-4 text-sm text-foreground">{stock} units</td>
-                       <td className="p-4">
-                         <span className={`text-xs px-2 py-1 rounded-full ${
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">{stock} units</td>
+                       <td className="p-3 md:p-4">
+                         <span className={`text-base md:text-xs px-2 py-1 rounded-full ${
                            status.variant === 'destructive'
                              ? 'bg-destructive/20 text-destructive'
                              : status.variant === 'warning'
@@ -644,15 +644,15 @@ export default function ReviewsPage() {
                            {status.label}
                          </span>
                        </td>
-                       <td className="p-4 text-sm text-foreground">
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">
                          {product.rating ? (
                            <span className="flex items-center gap-1">
-                             <Star className="h-4 w-4 text-yellow-400 fill-yellow-400" />
+                             <Star className="h-5 w-5 md:h-4 md:w-4 text-yellow-400 fill-yellow-400" />
                              <span>{product.rating.toFixed(1)}</span>
                            </span>
                          ) : '-'}
                        </td>
-                       <td className="p-4 text-sm text-foreground">
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">
                          {(product as any).sales ? (product as any).sales.toLocaleString() : '-'}
                        </td>
                        <td className="p-4">
@@ -681,7 +681,7 @@ export default function ReviewsPage() {
                  })
                ) : (
                  <tr>
-                   <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                   <td colSpan={8} className="p-8 text-center text-lg md:text-sm text-muted-foreground">
                      No products found
                    </td>
                  </tr>
@@ -697,7 +697,7 @@ export default function ReviewsPage() {
      <div className="space-y-4">
        <div className="flex items-center gap-2">
          <MessageSquare className="h-6 w-6 text-flame-orange" />
-         <h2 className="text-2xl font-display font-bold text-foreground">All Reviews</h2>
+         <h2 className="text-xl md:text-2xl font-display font-bold text-foreground">All Reviews</h2>
        </div>
       
        {/* Search and Filter Bar for Reviews */}
@@ -729,7 +729,7 @@ export default function ReviewsPage() {
          {showReviewFilters && (
            <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
              <div className="flex items-center justify-between mb-2">
-               <h3 className="text-sm font-semibold text-foreground">Filter Reviews</h3>
+               <h3 className="text-lg md:text-sm font-semibold text-foreground">Filter Reviews</h3>
                <div className="flex items-center gap-2">
                  {hasActiveReviewFilters && (
                    <Button
@@ -755,7 +755,7 @@ export default function ReviewsPage() {
              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                {/* Rating Filter */}
                <div className="space-y-2">
-                 <label className="text-xs font-medium text-foreground">Rating</label>
+                 <label className="text-base md:text-xs font-medium text-foreground">Rating</label>
                  <Select
                    value={reviewFilters.rating || 'all'}
                    onValueChange={(value) => setReviewFilters({ ...reviewFilters, rating: value === 'all' ? '' : value })}
@@ -776,7 +776,7 @@ export default function ReviewsPage() {
 
                {/* Product Filter */}
                <div className="space-y-2">
-                 <label className="text-xs font-medium text-foreground">Product</label>
+                 <label className="text-base md:text-xs font-medium text-foreground">Product</label>
                  <Select
                    value={reviewFilters.product || 'all'}
                    onValueChange={(value) => setReviewFilters({ ...reviewFilters, product: value === 'all' ? '' : value })}
@@ -795,7 +795,7 @@ export default function ReviewsPage() {
 
                {/* Date Range Filter */}
                <div className="space-y-2">
-                 <label className="text-xs font-medium text-foreground">Date Range</label>
+                 <label className="text-base md:text-xs font-medium text-foreground">Date Range</label>
                  <Select
                    value={reviewFilters.dateRange || 'all'}
                    onValueChange={(value) => setReviewFilters({ ...reviewFilters, dateRange: value === 'all' ? '' : value })}
@@ -828,7 +828,7 @@ export default function ReviewsPage() {
                  {renderReviewSortableTh('Rating', 'rating')}
                  <th className="text-left p-4 text-sm font-semibold text-foreground">Comment</th>
                  {renderReviewSortableTh('Date', 'createdAt')}
-                 <th className="text-left p-4 text-sm font-semibold text-foreground">Actions</th>
+                 <th className="text-left p-3 md:p-4 text-lg md:text-sm font-semibold text-foreground">Actions</th>
                </tr>
              </thead>
              <tbody>
@@ -837,35 +837,35 @@ export default function ReviewsPage() {
                    const reviewId = review._id || review.id || '';
                    return (
                      <tr key={reviewId} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                       <td className="p-4">
-                         <p className="text-sm font-medium text-foreground">{review.customerName}</p>
+                       <td className="p-3 md:p-4">
+                         <p className="text-lg md:text-sm font-medium text-foreground">{review.customerName}</p>
                        </td>
-                       <td className="p-4">
-                         <p className="text-sm text-foreground">{review.productName || '-'}</p>
+                       <td className="p-3 md:p-4">
+                         <p className="text-lg md:text-sm text-foreground">{review.productName || '-'}</p>
                        </td>
-                       <td className="p-4">
+                       <td className="p-3 md:p-4">
                          <div className="flex items-center gap-1">
                            {[1, 2, 3, 4, 5].map((star) => (
                              <Star
                                key={star}
-                               className={`h-4 w-4 ${
+                               className={`h-5 w-5 md:h-4 md:w-4 ${
                                  star <= (review.rating || 0)
                                    ? "text-yellow-400 fill-yellow-400"
                                    : "text-muted-foreground"
                                }`}
                              />
                            ))}
-                           <span className="ml-2 text-sm text-muted-foreground">
+                           <span className="ml-2 text-lg md:text-sm text-muted-foreground">
                              ({review.rating})
                            </span>
                          </div>
                        </td>
-                       <td className="p-4">
-                         <p className="text-sm text-muted-foreground line-clamp-2 max-w-xs">
+                       <td className="p-3 md:p-4">
+                         <p className="text-lg md:text-sm text-muted-foreground line-clamp-2 max-w-xs">
                            {review.comment || '-'}
                          </p>
                        </td>
-                       <td className="p-4 text-sm text-foreground">
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">
                          {review.createdAt ? formatDate(review.createdAt) : '-'}
                        </td>
                        <td className="p-4">
@@ -891,7 +891,7 @@ export default function ReviewsPage() {
                  })
                ) : (
                  <tr>
-                   <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                   <td colSpan={6} className="p-8 text-center text-lg md:text-sm text-muted-foreground">
                      No reviews found
                    </td>
                  </tr>

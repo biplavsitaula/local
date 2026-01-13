@@ -61,7 +61,7 @@ return (
       {loading && (
         <div className="flex flex-col items-center justify-center py-16">
           <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-          <p className="text-muted-foreground">Loading products...</p>
+          <p className="text-base md:text-sm text-muted-foreground">Loading products...</p>
         </div>
       )}
 
@@ -72,11 +72,11 @@ return (
       {error && !loading && (
         <div className="text-center py-16">
           <AlertCircle className="h-12 w-12 text-destructive mx-auto mb-4" />
-          <h3 className="text-xl font-semibold text-foreground mb-2">Error loading products</h3>
-          <p className="text-muted-foreground mb-6">{error}</p>
+          <h3 className="text-lg md:text-xl font-semibold text-foreground mb-2">Error loading products</h3>
+          <p className="text-base md:text-sm text-muted-foreground mb-6">{error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
+            className="px-6 py-3 text-base md:text-sm bg-primary-gradient text-text-inverse rounded-xl hover:shadow-primary-lg transition-all cursor-pointer"
           >
             Retry
           </button>
@@ -102,7 +102,7 @@ return (
          
           {filteredProducts.length === 0 && (
             <div className="text-center py-12">
-              <p className="text-muted-foreground">
+              <p className="text-base md:text-sm text-muted-foreground">
                 No products found matching your criteria.
               </p>
             </div>
@@ -115,7 +115,7 @@ return (
               <button
                 onClick={handleLoadMore}
                 disabled={loadingMore}
-                className="flex items-center gap-2 px-8 py-3 bg-flame-gradient text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-flame-orange/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-8 py-3 text-base md:text-sm bg-flame-gradient text-white font-semibold rounded-xl hover:shadow-lg hover:shadow-flame-orange/30 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {loadingMore ? (
                   <>
@@ -126,7 +126,7 @@ return (
                   <>
                     Load More Products
                     {totalProducts > 0 && (
-                      <span className="text-sm opacity-80">
+                      <span className="text-base md:text-sm opacity-80">
                         ({products.length} of {totalProducts})
                       </span>
                     )}
@@ -140,7 +140,7 @@ return (
           {/* Show total count when all loaded */}
           {!limit && !hasMore && products.length > 0 && (
             <div className="text-center mt-8">
-              <p className="text-muted-foreground">
+              <p className="text-base md:text-sm text-muted-foreground">
                 Showing all {products.length} products
               </p>
             </div>
