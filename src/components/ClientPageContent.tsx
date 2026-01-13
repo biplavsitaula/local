@@ -104,7 +104,8 @@ useEffect(() => {
       const response = await productsService.getAll({
         sortBy: 'createdAt',
         sortOrder: 'desc',
-        limit: 20 // Fetch more to ensure we have enough after filtering
+        limit: 20, // Fetch more to ensure we have enough after filtering
+        search: searchQuery || undefined,
       });
     
       let products = response.data || [];
@@ -114,7 +115,8 @@ useEffect(() => {
         const altResponse = await productsService.getAll({
           sortBy: 'updatedAt',
           sortOrder: 'desc',
-          limit: 20
+          limit: 20,
+          search: searchQuery || undefined,
         });
         products = altResponse.data || [];
       }
@@ -143,7 +145,7 @@ useEffect(() => {
 
 
   fetchRecentArrivals();
-}, []);
+}, [searchQuery]);
 
 
 
@@ -155,7 +157,8 @@ useEffect(() => {
       setLoadingRecommended(true);
       const response = await productsService.getAll({
         view: 'recommended',
-        limit: 8
+        limit: 8,
+        search: searchQuery || undefined,
       });
       const mappedProducts = (response.data || []).slice(0, 8).map(mapApiProductToProduct);
       setMostRecommended(mappedProducts);
@@ -171,23 +174,13 @@ useEffect(() => {
 
 
   fetchMostRecommended();
-}, []);
+}, [searchQuery]);
 
 
-// Filter function for search
-const filterBySearch = (products: Product[]) => {
-  if (!searchQuery.trim()) return products;
-  const query = searchQuery.toLowerCase().trim();
-  return products.filter((product) =>
-    product.name.toLowerCase().includes(query) ||
-    product.category?.toLowerCase().includes(query) ||
-    product.description?.toLowerCase().includes(query)
-  );
-};
-
-// Filtered products based on search query
-const filteredRecentArrivals = filterBySearch(recentArrivals);
-const filteredMostRecommended = filterBySearch(mostRecommended);
+// Search is now handled by API, so we can use products directly
+// No need for client-side filtering since API handles search
+const filteredRecentArrivals = recentArrivals;
+const filteredMostRecommended = mostRecommended;
 
 
 
@@ -335,11 +328,13 @@ return (
 
               <CategorySection
                 selected={selectedCategory}
-                onSelect={(value: string) =>
+                onSelect={(value: string) => {
+                  // Normalize category value - CategorySection sends "All" or category names like "Whiskey"
+                  const normalizedValue = value === "All" || value === "all" ? "All" : value;
                   setSelectedCategory(
-                    selectedCategory === value ? "All" : value
-                  )
-                }
+                    selectedCategory === normalizedValue ? "All" : normalizedValue
+                  );
+                }}
               />
 
 
@@ -369,7 +364,7 @@ return (
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
                   onCheckout={() => setCheckoutOpen(true)}
-                  limit={10}
+                  limit={selectedCategory && selectedCategory !== "All" ? undefined : 10}
                 />
               </section>
               {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">

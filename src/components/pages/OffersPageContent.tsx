@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
@@ -72,7 +72,7 @@ const OffersPageContent = () => {
   };
 
   // Fetch products from API with pagination
-  const fetchProducts = async (pageNum: number, append: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -83,7 +83,8 @@ const OffersPageContent = () => {
       
       const response = await productsService.getAll({
         page: pageNum,
-        limit: ITEMS_PER_PAGE
+        limit: ITEMS_PER_PAGE,
+        search: searchQuery || undefined,
       });
       
       const mappedProducts = (response.data || []).map(mapApiProductToProduct);
@@ -95,7 +96,7 @@ const OffersPageContent = () => {
       }
       
       // Check if there are more products to load
-      const pagination = (response ).pagination;
+      const pagination = (response as any).pagination;
       if (pagination) {
         setTotalProducts(pagination.total || 0);
         setHasMore(pageNum < (pagination.pages || 1));
@@ -111,14 +112,14 @@ const OffersPageContent = () => {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [searchQuery]);
 
-  // Initial fetch
+  // Fetch products when search changes
   useEffect(() => {
     setPage(1);
     setProducts([]);
     fetchProducts(1, false);
-  }, []);
+  }, [fetchProducts]);
 
   // Handle load more
   const handleLoadMore = () => {
@@ -137,16 +138,9 @@ const OffersPageContent = () => {
     return false;
   });
   
-  // Filter discounted products based on search query
-  const filteredProducts = discountedProducts.filter((product) => {
-    if (!searchQuery.trim()) return true;
-    const query = searchQuery.toLowerCase().trim();
-    return (
-      product.name.toLowerCase().includes(query) ||
-      product.category?.toLowerCase().includes(query) ||
-      product.description?.toLowerCase().includes(query)
-    );
-  });
+  // Search is handled by API, so we just use discounted products
+  // No need for additional client-side search filtering
+  const filteredProducts = discountedProducts;
 
   const offers = [
     {

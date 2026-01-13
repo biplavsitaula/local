@@ -109,8 +109,8 @@ return (
           )}
 
 
-          {/* Load More Button - only show if not using limit prop and there are more products */}
-          {!limit && hasMore && filteredProducts.length > 0 && (
+          {/* Load More Button - only show if not using limit prop, no category selected, and there are more products */}
+          {!limit && hasMore && filteredProducts.length > 0 && (!selectedCategory || selectedCategory === 'All' || selectedCategory === '') && (
             <div className="flex justify-center mt-8">
               <button
                 onClick={handleLoadMore}

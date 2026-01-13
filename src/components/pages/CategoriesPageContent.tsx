@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useTheme } from "@/contexts/ThemeContext";
@@ -77,7 +77,7 @@ const CategoriesPageContent = () => {
   };
 
   // Fetch products from API with pagination
-  const fetchProducts = async (pageNum: number, append: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -86,26 +86,48 @@ const CategoriesPageContent = () => {
       }
       setError(null);
       
+      // Map category to API format
+      // For "whisky", don't filter by category in API since API might use "whiskey"
+      // We'll filter client-side to handle both variations
+      let apiCategory: string | null = selectedCategory;
+      if (selectedCategory === 'whisky') {
+        apiCategory = null; // Fetch all and filter client-side
+      }
+      
+      // When a category is selected, fetch all products (use high limit, always from page 1)
+      // Otherwise use pagination with ITEMS_PER_PAGE
+      const limit = selectedCategory ? 1000 : ITEMS_PER_PAGE;
+      const fetchPage = selectedCategory ? 1 : pageNum; // Always fetch page 1 when category is selected
+      
       const response = await productsService.getAll({
-        page: pageNum,
-        limit: ITEMS_PER_PAGE
+        page: fetchPage,
+        limit: limit,
+        search: searchQuery || undefined,
+        category: apiCategory || undefined,
       });
       
       const mappedProducts = (response.data || []).map(mapApiProductToProduct);
       
-      if (append) {
+      // When category is selected, always replace (don't append) since we fetch all at once
+      if (append && !selectedCategory) {
         setProducts(prev => [...prev, ...mappedProducts]);
       } else {
         setProducts(mappedProducts);
       }
       
       // Check if there are more products to load
-      const pagination = (response ).pagination;
+      const pagination = (response as any).pagination;
       if (pagination) {
         setTotalProducts(pagination.total || 0);
-        setHasMore(pageNum < (pagination.pages || 1));
+        // When category is selected, we fetch all products at once, so no more pages
+        if (selectedCategory) {
+          setHasMore(false);
+        } else {
+          setHasMore(pageNum < (pagination.pages || 1));
+        }
       } else {
-        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
+        // When category is selected, assume we got all products
+        setHasMore(selectedCategory ? false : mappedProducts.length === ITEMS_PER_PAGE);
       }
     } catch (err: any) {
       setError(err.message || 'Failed to fetch products');
@@ -116,14 +138,14 @@ const CategoriesPageContent = () => {
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [searchQuery, selectedCategory]);
 
-  // Initial fetch
+  // Fetch products when search or category changes
   useEffect(() => {
     setPage(1);
     setProducts([]);
     fetchProducts(1, false);
-  }, []);
+  }, [fetchProducts]);
 
   // Handle load more
   const handleLoadMore = () => {
@@ -146,27 +168,24 @@ const CategoriesPageContent = () => {
     { id: "beer", name: "Beer", nameNe: "बियर", icon: Beer, color: "from-yellow-400 to-amber-500" },
   ];
 
+  // Products are already filtered by API, but we need to handle category normalization
+  // API might return "whiskey" but we filter by "whisky", so normalize here
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
-    // Search filter
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(
-        (p) =>
-          p.name.toLowerCase().includes(query) ||
-          p.category?.toLowerCase().includes(query) ||
-          p.description?.toLowerCase().includes(query)
-      );
-    }
-
-    // Category filter
+    // Normalize category matching - handle both "whiskey" and "whisky"
     if (selectedCategory) {
-      filtered = filtered.filter((p) => p.category === selectedCategory);
+      filtered = filtered.filter((p) => {
+        const productCategory = p.category?.toLowerCase();
+        if (selectedCategory === 'whisky') {
+          return productCategory === 'whisky' || productCategory === 'whiskey';
+        }
+        return productCategory === selectedCategory.toLowerCase();
+      });
     }
 
     return filtered;
-  }, [products, searchQuery, selectedCategory]);
+  }, [products, selectedCategory]);
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
     setNotificationProduct(product);
@@ -336,8 +355,8 @@ const CategoriesPageContent = () => {
                   ))}
                 </div>
 
-                {/* Load More Button */}
-                {hasMore && !searchQuery && (
+                {/* Load More Button - only show when no category is selected */}
+                {hasMore && !searchQuery && !selectedCategory && (
                   <div className="flex justify-center mt-10">
                     <button
                       onClick={handleLoadMore}

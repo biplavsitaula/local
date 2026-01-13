@@ -31,6 +31,10 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
    { id: 'tequila', name: 'Tequila', nameNe: 'टकिला', icon: FlameKindling, color: 'from-lime-500 to-lime-700' },
    { id: 'cognac', name: 'Cognac', nameNe: 'कोग्न्याक', icon: Coffee, color: 'from-orange-600 to-orange-800' },
    { id: 'champagne', name: 'Champagne', nameNe: 'शैम्पेन', icon: Sparkles, color: 'from-yellow-400 to-yellow-600' },
+   { id: 'beer', name: 'Beer', nameNe: 'बियर', icon: Beer, color: 'from-yellow-400 to-yellow-600' },
+   { id: 'wine', name: 'Wine', nameNe: 'वाइन', icon: Grape, color: 'from-purple-500 to-pink-500' },
+   { id: 'brandy', name: 'Brandy', nameNe: 'ब्राण्डी', icon: GlassWater, color: 'from-orange-600 to-orange-800' },
+   
  ];
 
 

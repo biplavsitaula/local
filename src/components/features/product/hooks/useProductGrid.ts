@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import { productsService } from "@/services/products.service";
 import { Product } from "@/types";
 
@@ -50,7 +50,7 @@ export function useProductGrid({
   };
 
   // Fetch products from API
-  const fetchProducts = async (pageNum: number, append: boolean = false) => {
+  const fetchProducts = useCallback(async (pageNum: number, append: boolean = false) => {
     try {
       if (append) {
         setLoadingMore(true);
@@ -59,14 +59,34 @@ export function useProductGrid({
       }
       setError(null);
      
+      // Map category to API format
+      // API returns categories with mixed case (Whiskey, Cognac, etc.)
+      // So we fetch all products and filter client-side with case-insensitive matching
+      const normalizedCategory = selectedCategory?.toLowerCase();
+      
+      // Don't send category to API since API has mixed case categories
+      // We'll filter client-side with case-insensitive matching
+      // Only send search query to API
+     
+      // Fetch products based on whether category is selected
+      const hasCategory = normalizedCategory && normalizedCategory !== 'all' && normalizedCategory !== '';
+      // When category is selected, fetch all products for filtering
+      // Otherwise, fetch only 10 products by default
+      const limit = hasCategory ? 10000 : ITEMS_PER_PAGE; // Fetch all when category selected, 10 otherwise
+      const fetchPage = hasCategory ? 1 : pageNum; // When category selected, always page 1
+     
       const response = await productsService.getAll({
-        page: pageNum,
-        limit: ITEMS_PER_PAGE
+        page: fetchPage,
+        limit: limit,
+        search: searchQuery || undefined,
+        // Don't send category - filter client-side instead
       });
      
       const mappedProducts = (response.data || []).map(mapApiProductToProduct);
      
-      if (append) {
+      // When category is selected, always replace (fetch all at once)
+      // When no category, append for pagination
+      if (append && !hasCategory) {
         setProducts(prev => [...prev, ...mappedProducts]);
       } else {
         setProducts(mappedProducts);
@@ -75,9 +95,17 @@ export function useProductGrid({
       const pagination = (response as any).pagination;
       if (pagination) {
         setTotalProducts(pagination.total || 0);
-        setHasMore(pageNum < (pagination.pages || 1));
+        // When category is selected, we fetch all products, so no more pages
+        if (hasCategory) {
+          setHasMore(false);
+        } else {
+          // When no category, check if there are more pages
+          setHasMore(pageNum < (pagination.pages || 1));
+        }
       } else {
-        setHasMore(mappedProducts.length === ITEMS_PER_PAGE);
+        // When category is selected, assume we got all products
+        // Otherwise, check if we got a full page
+        setHasMore(hasCategory ? false : mappedProducts.length === ITEMS_PER_PAGE);
       }
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch products');
@@ -88,14 +116,14 @@ export function useProductGrid({
       setLoading(false);
       setLoadingMore(false);
     }
-  };
+  }, [searchQuery, selectedCategory]);
 
-  // Initial fetch
+  // Fetch products when search or category changes
   useEffect(() => {
     setPage(1);
     setProducts([]);
     fetchProducts(1, false);
-  }, []);
+  }, [fetchProducts]);
 
   // Handle load more
   const handleLoadMore = () => {
@@ -105,23 +133,36 @@ export function useProductGrid({
   };
 
   const filteredProducts = useMemo(() => {
-    const filtered = products.filter((product) => {
-      const matchesSearch =
-        product?.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (product?.nameNe && product?.nameNe?.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        (product?.description && product?.description?.toLowerCase().includes(searchQuery.toLowerCase()));
-      
-      const matchesCategory =
-        !selectedCategory ||
-        selectedCategory === "All" ||
-        selectedCategory === "" ||
-        product?.category?.toLowerCase() === selectedCategory.toLowerCase();
-      
-      return matchesSearch && matchesCategory;
-    });
+    // Filter products client-side with case-insensitive category matching
+    // API returns categories with mixed case (Whiskey, Cognac, Vodka, etc.)
+    let filtered = [...products];
+    
+    const normalizedCategory = selectedCategory?.toLowerCase();
+    const hasCategory = normalizedCategory && normalizedCategory !== 'all' && normalizedCategory !== '';
+    
+    if (hasCategory) {
+      filtered = filtered.filter((product) => {
+        const productCategory = product?.category?.toLowerCase();
+        
+        // Handle whiskey/whisky variations (API might use either)
+        if (normalizedCategory === 'whisky' || normalizedCategory === 'whiskey') {
+          return productCategory === 'whisky' || productCategory === 'whiskey';
+        }
+        
+        // Case-insensitive matching for all other categories
+        return productCategory === normalizedCategory;
+      });
+    }
    
-    return limit ? filtered.slice(0, limit) : filtered;
-  }, [products, searchQuery, selectedCategory, limit]);
+    // Show 10 products by default, all products when category is selected
+    if (hasCategory) {
+      // When category is selected, show all filtered products
+      return filtered;
+    } else {
+      // When no category, show only 10 products (or use limit prop if provided)
+      return limit ? filtered.slice(0, limit) : filtered.slice(0, 10);
+    }
+  }, [products, selectedCategory, limit]);
 
   const handleViewDetails = (product: Product) => {
     setSelectedProduct(product);
