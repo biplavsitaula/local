@@ -183,29 +183,6 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             </button>
           </form>
 
-          {/* Divider */}
-          <div className="relative my-4 sm:my-6">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                {t('orContinueWith')}
-              </span>
-            </div>
-          </div>
-
-          {/* Social Login */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
-              <span className="text-lg sm:text-xl">G</span>
-              <span className="font-medium">{t('google')}</span>
-            </button>
-            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
-              <span className="text-lg sm:text-xl">f</span>
-              <span className="font-medium">{t('facebook')}</span>
-            </button>
-          </div>
         </div>
       </div>
 
