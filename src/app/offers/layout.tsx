@@ -1,29 +1,33 @@
-"use client";
+import { Metadata } from "next";
 
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { CartProvider } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { AuthModalProvider } from "@/contexts/AuthModalContext";
+export const metadata: Metadata = {
+  title: "Special Offers & Deals",
+  description: "Discover amazing deals and discounts on premium spirits at Flame Beverage. Save on whisky, vodka, rum, wine, and more. Limited time offers available!",
+  keywords: [
+    "liquor deals Nepal",
+    "whisky discount",
+    "vodka offers",
+    "wine sale",
+    "beer promotion",
+    "alcohol discounts",
+    "special offers spirits",
+    "Flame Beverage deals",
+  ],
+  openGraph: {
+    title: "Special Offers & Deals | Flame Beverage",
+    description: "Discover amazing deals and discounts on premium spirits. Save on whisky, vodka, rum, wine, and more!",
+    url: "/offers",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/offers",
+  },
+};
 
 export default function OffersLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <CartProvider>
-            <AuthModalProvider>
-              {children}
-            </AuthModalProvider>
-          </CartProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  );
+  return children;
 }
-
-

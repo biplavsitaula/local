@@ -1,29 +1,23 @@
-"use client";
+import { Metadata } from "next";
 
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { CartProvider } from "@/contexts/CartContext";
-import { AuthProvider } from "@/contexts/AuthContext";
-import { AuthModalProvider } from "@/contexts/AuthModalContext";
+export const metadata: Metadata = {
+  title: "Privacy Policy",
+  description: "Learn how Flame Beverage protects your privacy and handles your personal data. Our commitment to data security and transparency.",
+  openGraph: {
+    title: "Privacy Policy | Flame Beverage",
+    description: "Learn how Flame Beverage protects your privacy and handles your personal data.",
+    url: "/privacy",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/privacy",
+  },
+};
 
 export default function PrivacyLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <CartProvider>
-            <AuthModalProvider>
-              {children}
-            </AuthModalProvider>
-          </CartProvider>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  );
+  return children;
 }
-
-

@@ -1,39 +1,18 @@
-"use client";
+import { Metadata } from "next";
 
-import { AdminSidebar } from "@/components/features/admin/AdminSidebar";
-import { AdminHeader } from "@/components/features/admin/AdminHeader";
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+export const metadata: Metadata = {
+  title: "Dashboard",
+  description: "Flame Beverage User Dashboard - View your orders, track deliveries, and manage your account.",
+  robots: {
+    index: false,
+    follow: false,
+  },
+};
 
-interface DashboardLayoutProps {
+export default function DashboardLayout({
+  children,
+}: {
   children: React.ReactNode;
+}) {
+  return children;
 }
-
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
-  return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          <div className="min-h-screen gradient-galaxy">
-            <AdminSidebar />
-            <div className="ml-64 min-h-screen flex flex-col relative">
-              <AdminHeader />
-              <main className="flex-1 p-6 overflow-auto relative z-10">{children}</main>
-            </div>
-          </div>
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  );
-}
-
-
-
-
-
-
-
-
-
-

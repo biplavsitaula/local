@@ -1,23 +1,27 @@
-"use client";
+import { Metadata } from "next";
 
-import { ThemeProvider } from "@/contexts/ThemeContext";
-import { LanguageProvider } from "@/contexts/LanguageContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+export const metadata: Metadata = {
+  title: "Login",
+  description: "Sign in to your Flame Beverage account to access exclusive deals, track orders, and enjoy a personalized shopping experience.",
+  robots: {
+    index: false,
+    follow: true,
+  },
+  openGraph: {
+    title: "Login | Flame Beverage",
+    description: "Sign in to your Flame Beverage account to access exclusive deals and track orders.",
+    url: "/login",
+    type: "website",
+  },
+  alternates: {
+    canonical: "/login",
+  },
+};
 
 export default function LoginLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    <ThemeProvider>
-      <LanguageProvider>
-        <AuthProvider>
-          {children}
-        </AuthProvider>
-      </LanguageProvider>
-    </ThemeProvider>
-  );
+  return children;
 }
-
-
