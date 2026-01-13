@@ -40,13 +40,13 @@ export function AdminHeader({ onSearch, onMenuClick }: AdminHeaderProps) {
 
       {/* Search */}
       <div className="relative flex-1 max-w-xs sm:max-w-sm md:w-80">
-        <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+        {/* <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Search products, categories..."
           value={searchQuery}
           onChange={handleSearchChange}
           className="pl-8 sm:pl-10 bg-secondary/50 border-border text-sm"
-        />
+        /> */}
       </div>
 
       {/* Actions */}
