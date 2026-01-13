@@ -224,8 +224,8 @@ const Header: React.FC<IHeaderProps> = ({
            </div>
          )}
 
-         {/* Navigation Links - Desktop */}
-         <nav className="hidden lg:flex items-center gap-6">
+         {/* Navigation Links - Desktop & Tablet */}
+         <nav className="hidden md:flex items-center gap-4 lg:gap-6">
            <Link
              href="/products"
              className={`text-sm font-medium transition-colors ${
@@ -469,7 +469,7 @@ const Header: React.FC<IHeaderProps> = ({
 
        {/* Mobile Menu */}
        {isMenuOpen && (
-         <div className={`lg:hidden pb-4 border-t pt-4 transition-colors ${
+         <div className={`md:hidden pb-4 border-t pt-4 transition-colors ${
            theme === 'dark' ? 'border-border/40' : 'border-gray-200'
          }`}>
            <nav className="flex flex-col gap-3">

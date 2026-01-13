@@ -242,10 +242,11 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${                      theme === 'dark'
-                      ? 'text-white-text hover:text-flame-orange'
-                      : 'text-orange-600 hover:text-orange-700'
-                  }`}
+                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
+                      theme === 'dark'
+                        ? 'text-white-text hover:text-flame-orange'
+                        : 'text-orange-600 hover:text-orange-700'
+                    }`}
                   >
                     {t("viewAll")}
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -354,10 +355,11 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${                      theme === 'dark'
-                      ? 'text-white-text hover:text-flame-orange'
-                      : 'text-orange-600 hover:text-orange-700'
-                  }`}
+                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
+                      theme === 'dark'
+                        ? 'text-white-text hover:text-flame-orange'
+                        : 'text-orange-600 hover:text-orange-700'
+                    }`}
                   >
                     {t("viewAll")}
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
