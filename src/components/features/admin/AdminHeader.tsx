@@ -1,6 +1,6 @@
 "use client";
 import { useState } from 'react';
-import { Search, User } from 'lucide-react';
+import { Search, User, Menu, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
 import { NotificationDropdown } from '@/components/features/admin/NotificationDropdown';
@@ -9,9 +9,10 @@ import { useAuth } from '@/contexts/AuthContext';
 
 interface AdminHeaderProps {
   onSearch?: (query: string) => void;
+  onMenuClick?: () => void;
 }
 
-export function AdminHeader({ onSearch }: AdminHeaderProps) {
+export function AdminHeader({ onSearch, onMenuClick }: AdminHeaderProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user } = useAuth();
 
@@ -28,6 +29,15 @@ export function AdminHeader({ onSearch }: AdminHeaderProps) {
 
   return (
     <header className="h-16 border-b border-border bg-card/50 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 gap-2 sm:gap-4">
+      {/* Mobile Menu Button */}
+      <button
+        onClick={onMenuClick}
+        className="lg:hidden p-2 -ml-2 text-foreground hover:bg-secondary rounded-lg transition-colors"
+        aria-label="Toggle menu"
+      >
+        <Menu className="h-5 w-5" />
+      </button>
+
       {/* Search */}
       <div className="relative flex-1 max-w-xs sm:max-w-sm md:w-80">
         <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
