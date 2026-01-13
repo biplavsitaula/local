@@ -137,22 +137,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             </div>
             
             {/* Row 2: Action Buttons */}
-            <div className="flex gap-1.5 sm:gap-2">
+            <div className="flex gap-1 sm:gap-2">
               <button
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-lg border border-primary-border bg-btn-outline py-1.5 sm:py-2.5 px-2 sm:px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-0.5 sm:gap-1.5 rounded-lg border border-primary-border bg-btn-outline py-1.5 sm:py-2.5 px-1 sm:px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 min-w-0"
               >
-                <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="text-[10px] sm:text-xs whitespace-nowrap">{t('addToCart')}</span>
+                <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="text-[9px] sm:text-xs whitespace-nowrap">{t('addToCart')}</span>
               </button>
               <button
                 onClick={handleBuyNow}
                 disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-primary-gradient py-1.5 sm:py-2.5 px-2 sm:px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-0.5 sm:gap-1.5 rounded-lg bg-primary-gradient py-1.5 sm:py-2.5 px-1 sm:px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 min-w-0"
               >
-                <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
-                <span className="text-[10px] sm:text-xs whitespace-nowrap">{t('buyNow')}</span>
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4 flex-shrink-0" />
+                <span className="text-[9px] sm:text-xs whitespace-nowrap">{t('buyNow')}</span>
               </button>
             </div>
           </div>

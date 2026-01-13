@@ -50,7 +50,7 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
       </h2>
       
       {/* Mobile: Dropdown */}
-      <div className="block sm:hidden mb-4">
+      <div className="block md:hidden mb-4">
         <Select
           value={selected === 'All' || selected === '' ? 'all' : selected.toLowerCase()}
           onValueChange={(value) => onSelect(value === 'all' ? 'All' : categories.find(c => c.id === value)?.name || 'All')}
@@ -78,8 +78,8 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
         </Select>
       </div>
 
-      {/* Desktop: Grid with compact boxes (2 rows on mobile) */}
-      <div className="hidden sm:grid grid-cols-4 gap-2 lg:grid-cols-8">
+      {/* Responsive Grid: Show on md and above, with better breakpoints */}
+      <div className="hidden md:grid grid-cols-4 gap-2 lg:grid-cols-6 xl:grid-cols-8">
         {categories.map((category) => {
           const isSelected = selected === category.name || (category.id === 'all' && (selected === 'All' || selected === ''));
           const Icon = category.icon;
@@ -88,7 +88,7 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
             <button
               key={category.id}
               onClick={() => onSelect(category.id === 'all' ? 'All' : category.name)}
-              className={`group flex flex-col items-center gap-1 rounded-lg border p-2 transition-all duration-300 cursor-pointer ${
+              className={`group flex flex-col items-center gap-1 sm:gap-1.5 rounded-lg border p-2 sm:p-2.5 transition-all duration-300 cursor-pointer ${
                 isSelected
                   ? `border-flame-orange bg-gradient-to-br ${category.color} shadow-lg shadow-flame-orange/20`
                   : currentTheme === 'dark'
@@ -96,10 +96,10 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
                   : 'border-gray-200 bg-white hover:border-orange-300 hover:shadow-md'
               }`}
             >
-              <Icon className={`text-xl transition-transform group-hover:scale-110 ${
+              <Icon className={`text-lg sm:text-xl md:text-2xl transition-transform group-hover:scale-110 ${
                 isSelected ? 'text-white' : currentTheme === 'dark' ? 'text-flame-orange' : 'text-orange-600'
               }`} />
-              <span className={`text-[10px] font-medium text-center leading-tight ${
+              <span className={`text-[10px] sm:text-xs font-medium text-center leading-tight ${
                 isSelected
                   ? 'text-white'
                   : currentTheme === 'dark'
