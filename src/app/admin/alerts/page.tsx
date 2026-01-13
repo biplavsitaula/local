@@ -147,7 +147,7 @@ function StockProductTable({ products, title, searchPlaceholder = "Search produc
                          <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden">
                            {product.image || product.imageUrl ? (
                              <Image
-                               src={product.image || product.imageUrl || ''}
+                               src={product.image || product.imageUrl || '/assets/liquor1.jpeg'}
                                alt={product.name || ''}
                                width={40}
                                height={40}

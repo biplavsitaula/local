@@ -90,11 +90,15 @@ const AboutPageContent = () => {
             </div>
             <div className="flex items-center gap-2 sm:gap-4 justify-center">
               <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-primary-text shrink-0" />
-              <span className="text-xs sm:text-sm md:text-base text-muted-foreground">+977 9800000000</span>
+              <span className="text-xs sm:text-sm md:text-base text-muted-foreground"> <a href="tel:+9779800000000" className="break-all hover:text-flame-orange transition-colors">
+                  +977 9800000000
+                </a></span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 justify-center col-span-2 sm:col-span-1">
               <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-primary-text shrink-0" />
-              <span className="text-xs sm:text-sm md:text-base text-muted-foreground">info@flamebeverage.com</span>
+              <span className="text-xs sm:text-sm md:text-base text-muted-foreground"> <a href="mailto:info@flamebeverage.com" className="break-all hover:text-flame-orange transition-colors">
+                  info@flamebeverage.com
+                </a></span>
             </div>
           </div>
         </div>

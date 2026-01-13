@@ -267,7 +267,7 @@ export default function TopSellersPage() {
              </div>
              <div className="w-12 h-12 rounded-lg overflow-hidden bg-secondary/50">
                {p.imageUrl ? (
-                 <Image src={p.imageUrl} alt={p.name} width={48} height={48} />
+                 <Image src={p.imageUrl || '/assets/liquor1.jpeg'} alt={p.name} width={48} height={48} />
                ) : (
                  <Package />
                )}

@@ -26,8 +26,8 @@ export function AdminLayoutWrapper({ children }: { children: React.ReactNode }) 
         <AdminSidebar onClose={() => setIsMobileMenuOpen(false)} />
       </div>
       
-      {/* Main Content Area - Offset by sidebar width on desktop */}
-      <div className="flex-1 flex flex-col overflow-hidden lg:ml-64 w-full">
+      {/* Main Content Area - No margin needed on desktop since sidebar is static */}
+      <div className="flex-1 flex flex-col overflow-hidden w-full">
         {/* Header - Fixed at top */}
         <AdminHeader onMenuClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
         
