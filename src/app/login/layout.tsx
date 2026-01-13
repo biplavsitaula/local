@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Login",
   description: "Sign in to your Flame Beverage account to access exclusive deals, track orders, and enjoy a personalized shopping experience.",

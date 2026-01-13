@@ -36,10 +36,8 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
 
   const handleBuyNow = () => {
     addToCart(product, quantity);
-    if (onAddToCart) {
-      onAddToCart(product, quantity);
-    }
-    onBuyNow(product, quantity);
+    onClose(); // Close the product detail modal first
+    onBuyNow(product, quantity); // Then open checkout modal
   };
 
   return (
@@ -82,14 +80,21 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
             </h2>
 
             {/* Price */}
-            <div className="mt-4 flex items-center gap-3">
-              <span className="text-3xl font-bold text-primary">
-                Rs. {(product?.price || 0).toLocaleString()}
-              </span>
-              {product?.originalPrice && (
-                <span className="text-lg text-muted-foreground line-through">
-                  Rs. {(product?.originalPrice || 0).toLocaleString()}
+            <div className="mt-4">
+              <div className="flex items-center gap-3">
+                <span className="text-3xl font-bold text-primary">
+                  Rs. {((product?.price || 0) * quantity).toLocaleString()}
                 </span>
+                {product?.originalPrice && (
+                  <span className="text-lg text-muted-foreground line-through">
+                    Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
+                  </span>
+                )}
+              </div>
+              {quantity > 1 && (
+                <p className="mt-1 text-sm text-muted-foreground">
+                  (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
+                </p>
               )}
             </div>
 

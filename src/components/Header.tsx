@@ -38,6 +38,7 @@ const Header: React.FC<IHeaderProps> = ({
  onSearchChange,
  onCheckout,
  onLoginClick,
+ hideSearch = false,
 }) => {
  const { language, setLanguage, t } = useLanguage();
  const { theme, toggleTheme } = useTheme();
@@ -204,22 +205,24 @@ const Header: React.FC<IHeaderProps> = ({
          </Link>
 
          {/* Search - Desktop (moved before navigation) */}
-         <div className="hidden md:flex flex-1 max-w-xl relative">
-           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-             theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
-           }`} />
-           <Input
-             type="text"
-             placeholder={t("search")}
-             value={searchQuery}
-             onChange={(e) => onSearchChange(e.target.value)}
-             className={`pl-10 transition-colors ${
-               theme === 'dark'
-                 ? 'bg-secondary/50 border-border/50 focus:border-primary-border'
-                 : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
-             }`}
-           />
-         </div>
+         {!hideSearch && (
+           <div className="hidden md:flex flex-1 max-w-xl relative">
+             <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+               theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
+             }`} />
+             <Input
+               type="text"
+               placeholder={t("search")}
+               value={searchQuery}
+               onChange={(e) => onSearchChange(e.target.value)}
+               className={`pl-10 transition-colors ${
+                 theme === 'dark'
+                   ? 'bg-secondary/50 border-border/50 focus:border-primary-border'
+                   : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
+               }`}
+             />
+           </div>
+         )}
 
          {/* Navigation Links - Desktop */}
          <nav className="hidden lg:flex items-center gap-6">
@@ -535,24 +538,26 @@ const Header: React.FC<IHeaderProps> = ({
 
 
        {/* Mobile Search */}
-       <div className="md:hidden pb-4">
-         <div className="relative">
-           <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
-             theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
-           }`} />
-           <Input
-             type="text"
-             placeholder={t("search")}
-             value={searchQuery}
-             onChange={(e) => onSearchChange(e.target.value)}
-             className={`pl-10 transition-colors ${
-               theme === 'dark'
-                 ? 'bg-secondary/50 border-border/50'
-                 : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
-             }`}
-           />
+       {!hideSearch && (
+         <div className="md:hidden pb-4">
+           <div className="relative">
+             <Search className={`absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 ${
+               theme === 'dark' ? 'text-muted-foreground' : 'text-gray-400'
+             }`} />
+             <Input
+               type="text"
+               placeholder={t("search")}
+               value={searchQuery}
+               onChange={(e) => onSearchChange(e.target.value)}
+               className={`pl-10 transition-colors ${
+                 theme === 'dark'
+                   ? 'bg-secondary/50 border-border/50'
+                   : 'bg-gray-50 border-gray-200 focus:border-orange-400 focus:bg-white'
+               }`}
+             />
+           </div>
          </div>
-       </div>
+       )}
      </div>
    </header>
  );

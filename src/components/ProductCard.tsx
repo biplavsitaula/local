@@ -37,9 +37,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
   const handleBuyNow = () => {
     addToCart(product, quantity);
-    if (onAddToCart) {
-      onAddToCart(product, quantity);
-    }
+    // Don't show toast for Buy Now - proceed directly to checkout
     onBuyNow(product, quantity);
   };
 

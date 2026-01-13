@@ -1,5 +1,8 @@
 import { Metadata } from "next";
 import ProductsPageContent from "@/components/pages/ProductsPageContent";
+import { Providers } from "@/components/Providers";
+
+export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
   title: "All Products",
@@ -26,5 +29,9 @@ export const metadata: Metadata = {
 };
 
 export default function ProductsPage() {
-  return <ProductsPageContent />;
+  return (
+    <Providers>
+      <ProductsPageContent />
+    </Providers>
+  );
 }

@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Privacy Policy",
   description: "Learn how Flame Beverage protects your privacy and handles your personal data. Our commitment to data security and transparency.",

@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "About Us",
   description: "Learn about Flame Beverage - Nepal's trusted online liquor store. Over 10 years of experience, 5000+ happy customers, and a commitment to quality service.",

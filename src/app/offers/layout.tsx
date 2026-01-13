@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Special Offers & Deals",
   description: "Discover amazing deals and discounts on premium spirits at Flame Beverage. Save on whisky, vodka, rum, wine, and more. Limited time offers available!",

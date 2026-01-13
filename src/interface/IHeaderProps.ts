@@ -3,4 +3,5 @@ export interface IHeaderProps {
     onSearchChange: (query: string) => void;
     onCheckout?: () => void;
     onLoginClick?: () => void;
+    hideSearch?: boolean;
   }

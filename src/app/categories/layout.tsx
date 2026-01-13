@@ -1,5 +1,7 @@
 import { Metadata } from "next";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Categories",
   description: "Explore our diverse categories of premium spirits - Whisky, Vodka, Rum, Gin, Wine, Beer, Tequila, and more. Find your favorite beverages at Flame Beverage.",

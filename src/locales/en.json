@@ -249,6 +249,14 @@
   "registrationFailed": "Registration failed. Please try again.",
   "ageVerificationRequired": "Age Verification Required",
   "siteAgreement": "By entering this site, you agree to our",
-  "cartIsEmpty": "Your cart is empty"
+  "cartIsEmpty": "Your cart is empty",
+  "ourMission": "Our Mission",
+  "missionDesc": "To provide premium quality spirits and beverages to our customers with exceptional service and convenient delivery across Nepal.",
+  "ourVision": "Our Vision",
+  "visionDesc": "To become the most trusted and preferred destination for premium spirits in Nepal, known for quality, authenticity, and customer satisfaction.",
+  "contactUs": "Contact Us",
+  "browseByCategory": "Browse by Category",
+  "selectCategory": "Select a Category",
+  "clearFilter": "Clear Filter"
 }
 
