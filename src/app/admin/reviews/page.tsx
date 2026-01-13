@@ -62,24 +62,95 @@ export default function ReviewsPage() {
      ]);
 
 
-     setReviewSummary(summaryRes.data || {});
+    setReviewSummary(summaryRes.data || {});
     
-     // Most reviewed API already returns full product data
-     const mostReviewedData = mostReviewedRes.data || [];
-     const productsWithReviews = mostReviewedData.map((item: any) => ({
-       id: item._id,
-       name: item.name,
-       category: item.category,
-       rating: item.rating,
-       imageUrl: item.imageUrl,
-       reviewCount: item.reviewCount || 0,
-       price: item.price,
-       stock: item.stock,
-       sales: item.sales,
-     }));
+    // Map reviews from API response
+    const rawReviews = reviewsRes.data || [];
+    const mappedReviews: Review[] = rawReviews.map((review: any) => ({
+      _id: review._id,
+      id: review._id,
+      productId: review.productId?._id || review.productId || '',
+      productName: review.productId?.name || null,
+      customerName: review.customerName || '',
+      rating: review.rating || 0,
+      comment: review.comment || '',
+      createdAt: review.createdAt || '',
+      updatedAt: review.updatedAt || '',
+    }));
     
-     setMostReviewedProducts(productsWithReviews);
-     setReviews(reviewsRes.data || []);
+    setReviews(mappedReviews);
+    
+    // Calculate review counts per product from the reviews data
+    const productReviewCounts = new Map<string, number>();
+    const productRatings = new Map<string, number[]>();
+    
+    mappedReviews.forEach((review) => {
+      if (review.productId) {
+        // Count reviews
+        const count = productReviewCounts.get(review.productId) || 0;
+        productReviewCounts.set(review.productId, count + 1);
+        
+        // Collect ratings for average calculation
+        if (!productRatings.has(review.productId)) {
+          productRatings.set(review.productId, []);
+        }
+        productRatings.get(review.productId)!.push(review.rating || 0);
+      }
+    });
+    
+    // Use most reviewed API data if available, otherwise calculate from reviews
+    const mostReviewedData = mostReviewedRes.data || [];
+    let productsWithReviews: any[] = [];
+    
+    if (mostReviewedData.length > 0) {
+      // Use API data
+      productsWithReviews = mostReviewedData.map((item: any) => ({
+        id: item._id || item.id,
+        _id: item._id || item.id,
+        name: item.name,
+        category: item.category,
+        rating: item.rating || item.averageRating || 0,
+        imageUrl: item.imageUrl || item.image,
+        reviewCount: item.reviewCount || 0,
+        price: item.price || 0,
+        stock: item.stock || 0,
+        sales: item.sales || 0,
+      }));
+    } else {
+      // Calculate from reviews data
+      const productsMap = new Map<string, any>();
+      rawReviews.forEach((review: any) => {
+        if (review.productId && review.productId._id) {
+          const productId = review.productId._id;
+          if (!productsMap.has(productId)) {
+            const ratings = productRatings.get(productId) || [];
+            const avgRating = ratings.length > 0 
+              ? ratings.reduce((sum, r) => sum + r, 0) / ratings.length 
+              : 0;
+            
+            productsMap.set(productId, {
+              id: productId,
+              _id: productId,
+              name: review.productId.name,
+              category: review.productId.category,
+              imageUrl: review.productId.imageUrl,
+              reviewCount: productReviewCounts.get(productId) || 0,
+              rating: avgRating,
+              price: 0, // Price not in review data
+              stock: 0, // Stock not in review data
+              sales: 0, // Sales not in review data
+            });
+          }
+        }
+      });
+      
+      // Convert map to array and sort by review count
+      productsWithReviews = Array.from(productsMap.values())
+        .sort((a, b) => (b.reviewCount || 0) - (a.reviewCount || 0))
+        .slice(0, 10);
+    }
+    
+    setMostReviewedProducts(productsWithReviews);
 
 
    } catch (err: any) {

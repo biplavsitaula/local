@@ -89,10 +89,8 @@ export function ExportButton({
   useEffect(() => {
     if (open) {
       setDataType(defaultDataType);
-      // Reset to month/year mode for orders and payments, keep date range for products (not applicable)
-      if (defaultDataType !== 'products') {
-        setUseDateRange(false);
-      }
+      // Reset to month/year mode for all data types
+      setUseDateRange(false);
     }
   }, [open, defaultDataType]);
 
@@ -148,9 +146,7 @@ export function ExportButton({
       
       // Generate subtitle based on data type and date selection
       let subtitle: string;
-      if (dataType === 'products') {
-        subtitle = title;
-      } else if (useDateRange) {
+      if (useDateRange) {
         const startFormatted = new Date(startDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         const endFormatted = new Date(endDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
         subtitle = `${title} - ${startFormatted} to ${endFormatted}`;
@@ -338,8 +334,25 @@ export function ExportButton({
               volume: apiProduct.volume || '',
               alcoholContent: apiProduct.alcoholContent || apiProduct.alcohol || '',
               origin: apiProduct.origin || '',
+              createdAt: apiProduct.createdAt || apiProduct.updatedAt || null,
             };
           });
+          
+          // Apply date filtering for products
+          if (useDateRange && start && end) {
+            productList = productList.filter(p => {
+              if (!p.createdAt) return false;
+              const productDate = new Date(p.createdAt);
+              return productDate >= start && productDate <= end;
+            });
+          } else if (!useDateRange) {
+            // Filter by month and year
+            productList = productList.filter(p => {
+              if (!p.createdAt) return false;
+              const productDate = new Date(p.createdAt);
+              return productDate.getMonth() === month && productDate.getFullYear() === year;
+            });
+          }
           
           // Apply additional client-side filters
           if (productFilters) {
@@ -404,6 +417,7 @@ export function ExportButton({
               Volume: p.volume || '',
               'Alcohol Content': p.alcoholContent || '',
               Origin: p.origin || '',
+              'Created Date': p.createdAt ? new Date(p.createdAt).toLocaleDateString() : '',
             };
           });
         case 'orders':
@@ -652,10 +666,6 @@ export function ExportButton({
               value={dataType} 
               onValueChange={(v) => {
                 setDataType(v as DataType);
-                // Reset date range mode when switching to products
-                if (v === 'products') {
-                  setUseDateRange(false);
-                }
               }}
             >
               <SelectTrigger className="bg-secondary/50 border-border">
@@ -669,43 +679,41 @@ export function ExportButton({
             </Select>
           </div>
           
-          {/* Date Selection Mode - Only show for orders and payments */}
-          {dataType !== 'products' && (
-            <div className="space-y-2">
-              <label className="text-sm font-medium text-foreground">Date Selection</label>
-              <Select 
-                value={useDateRange ? 'range' : 'month'} 
-                onValueChange={(v) => {
-                  setUseDateRange(v === 'range');
-                  // If switching to month/year, reset custom date range
-                  if (v === 'month') {
-                    const date = new Date();
-                    date.setDate(1);
-                    setStartDate(date.toISOString().split('T')[0]);
-                    setEndDate(new Date().toISOString().split('T')[0]);
-                  }
-                }}
-              >
-                <SelectTrigger className="bg-secondary/50 border-border">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="month">Month & Year</SelectItem>
-                  <SelectItem value="range">Custom Date Range</SelectItem>
-                </SelectContent>
-              </Select>
-              {dataType === 'payments' && paymentFilters?.dateRange && !useDateRange && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Table filter active: {paymentFilters.dateRange === '7d' ? 'Last 7 days' : 
-                                       paymentFilters.dateRange === '30d' ? 'Last 30 days' : 
-                                       paymentFilters.dateRange === '90d' ? 'Last 90 days' : ''}
-                </p>
-              )}
-            </div>
-          )}
+          {/* Date Selection Mode - Show for all data types */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium text-foreground">Date Selection</label>
+            <Select 
+              value={useDateRange ? 'range' : 'month'} 
+              onValueChange={(v) => {
+                setUseDateRange(v === 'range');
+                // If switching to month/year, reset custom date range
+                if (v === 'month') {
+                  const date = new Date();
+                  date.setDate(1);
+                  setStartDate(date.toISOString().split('T')[0]);
+                  setEndDate(new Date().toISOString().split('T')[0]);
+                }
+              }}
+            >
+              <SelectTrigger className="bg-secondary/50 border-border">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="month">Month & Year</SelectItem>
+                <SelectItem value="range">Custom Date Range</SelectItem>
+              </SelectContent>
+            </Select>
+            {dataType === 'payments' && paymentFilters?.dateRange && !useDateRange && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Table filter active: {paymentFilters.dateRange === '7d' ? 'Last 7 days' : 
+                                     paymentFilters.dateRange === '30d' ? 'Last 30 days' : 
+                                     paymentFilters.dateRange === '90d' ? 'Last 90 days' : ''}
+              </p>
+            )}
+          </div>
 
           {/* Month/Year Selection */}
-          {dataType !== 'products' && !useDateRange && (
+          {!useDateRange && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Month</label>
@@ -737,7 +745,7 @@ export function ExportButton({
           )}
 
           {/* Date Range Selection */}
-          {dataType !== 'products' && useDateRange && (
+          {useDateRange && (
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <label className="text-sm font-medium text-foreground">Start Date</label>
