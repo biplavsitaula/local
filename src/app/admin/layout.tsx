@@ -1,4 +1,6 @@
 import { Metadata } from "next";
+import { Providers } from "@/components/Providers";
+import { AdminLayoutWrapper } from "@/components/features/admin/AdminLayoutWrapper";
 
 export const dynamic = "force-dynamic";
 
@@ -22,5 +24,9 @@ export default function AdminLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return children;
+  return (
+    <Providers requireAgeVerification={false}>
+      <AdminLayoutWrapper>{children}</AdminLayoutWrapper>
+    </Providers>
+  );
 }

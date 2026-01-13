@@ -27,36 +27,38 @@ export function AdminHeader({ onSearch }: AdminHeaderProps) {
   };
 
   return (
-    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-xl flex items-center justify-between px-6">
+    <header className="h-16 border-b border-border bg-card/50 backdrop-blur-xl flex items-center justify-between px-4 sm:px-6 gap-2 sm:gap-4">
       {/* Search */}
-      <div className="relative w-80">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+      <div className="relative flex-1 max-w-xs sm:max-w-sm md:w-80">
+        <Search className="absolute left-2 sm:left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
         <Input 
           placeholder="Search products, categories..."
           value={searchQuery}
           onChange={handleSearchChange}
-          className="pl-10 bg-secondary/50 border-border"
+          className="pl-8 sm:pl-10 bg-secondary/50 border-border text-sm"
         />
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-4">
-        <ExportButton />
-        <AddProductModal />
+      <div className="flex items-center gap-2 sm:gap-4 shrink-0">
+        <div className="hidden sm:flex items-center gap-2 sm:gap-4">
+          <ExportButton />
+          <AddProductModal />
+        </div>
         <NotificationDropdown />
 
-        <div className="flex items-center gap-3 pl-4 border-l border-border">
-          <div className="text-right">
+        <div className="flex items-center gap-2 sm:gap-3 pl-2 sm:pl-4 border-l border-border">
+          <div className="hidden sm:block text-right">
             <p className="text-sm font-medium text-foreground">{user?.fullName || 'Admin User'}</p>
             <p className="text-xs text-muted-foreground">{formatRole(user?.role)}</p>
           </div>
-          <div className="w-10 h-10 rounded-full gradient-gold flex items-center justify-center">
+          <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full gradient-gold flex items-center justify-center shrink-0">
             {user?.fullName ? (
-              <span className="text-sm font-bold text-primary-foreground">
+              <span className="text-xs sm:text-sm font-bold text-primary-foreground">
                 {user.fullName.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2)}
               </span>
             ) : (
-              <User className="h-5 w-5 text-primary-foreground" />
+              <User className="h-4 w-4 sm:h-5 sm:w-5 text-primary-foreground" />
             )}
           </div>
         </div>
