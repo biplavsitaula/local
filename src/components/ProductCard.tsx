@@ -85,27 +85,27 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       </div>
 
       {/* Content */}
-      <div className="p-4">
-        <p className="text-xs text-muted-foreground capitalize">{product?.category}</p>
-        <h3 className="mt-1 line-clamp-1 font-display text-lg font-bold text-tertiary-text">
+      <div className="p-3 sm:p-4">
+        <p className="text-[10px] sm:text-xs text-muted-foreground capitalize">{product?.category}</p>
+        <h3 className="mt-1 line-clamp-1 font-display text-sm sm:text-base md:text-lg font-bold text-tertiary-text">
           {language === 'en' ? product?.name : product?.nameNe}
         </h3>
-        <p className="mt-1 text-sm text-muted-foreground">
+        <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
           {product?.volume} • {product?.alcoholContent || product?.alcohol}
         </p>
 
         {/* Price */}
-        <div className="mt-3 flex items-center gap-2">
-          <span className="text-xl font-bold text-primary">
+        <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 flex-wrap">
+          <span className="text-base sm:text-lg md:text-xl font-bold text-primary">
             Rs. {((product?.price || 0) * quantity).toLocaleString()}
           </span>
           {product?.originalPrice && (
-            <span className="text-sm text-muted-foreground line-through">
+            <span className="text-xs sm:text-sm text-muted-foreground line-through">
               Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
             </span>
           )}
           {quantity > 1 && (
-              <span className="text-xs text-muted-foreground">
+              <span className="text-[10px] sm:text-xs text-muted-foreground">
                 (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
               </span>
           )}
@@ -113,46 +113,46 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
         {/* Quantity Selector and Actions */}
         {product.inStock === true && (
-          <div className="mt-3 space-y-2">
+          <div className="mt-2 sm:mt-3 space-y-2">
             {/* Row 1: Quantity Selector */}
-            <div className="flex items-center gap-2">
-              <span className="text-xs text-muted-foreground">{t('quantity')}:</span>
+            <div className="flex items-center gap-1 sm:gap-2">
+              <span className="text-[10px] sm:text-xs text-muted-foreground">{t('quantity')}:</span>
               <div className="flex items-center rounded-lg border border-border">
                 <button
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                  className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+                  className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                 >
-                  <Minus className="h-3.5 w-3.5" />
+                  <Minus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </button>
-                <span className="w-8 text-center text-sm font-medium text-foreground">
+                <span className="w-6 sm:w-8 text-center text-xs sm:text-sm font-medium text-foreground">
                   {quantity}
                 </span>
                 <button
                   onClick={() => setQuantity(quantity + 1)}
-                  className="flex h-8 w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+                  className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                 >
-                  <Plus className="h-3.5 w-3.5" />
+                  <Plus className="h-3 w-3 sm:h-3.5 sm:w-3.5" />
                 </button>
               </div>
             </div>
             
             {/* Row 2: Action Buttons */}
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 sm:gap-2">
               <button
                 onClick={handleAddToCart}
                 disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-primary-border bg-btn-outline py-2.5 px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-lg border border-primary-border bg-btn-outline py-1.5 sm:py-2.5 px-2 sm:px-3 font-medium text-primary-text transition-all hover:bg-primary-hover hover:text-text-inverse cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <ShoppingCart className="h-4 w-4" />
-                <span className="text-xs whitespace-nowrap">{t('addToCart')}</span>
+                <ShoppingCart className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-[10px] sm:text-xs whitespace-nowrap">{t('addToCart')}</span>
               </button>
               <button
                 onClick={handleBuyNow}
                 disabled={!product.inStock}
-                className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-primary-gradient py-2.5 px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+                className="flex flex-1 items-center justify-center gap-1 sm:gap-1.5 rounded-lg bg-primary-gradient py-1.5 sm:py-2.5 px-2 sm:px-3 font-medium text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
               >
-                <Zap className="h-4 w-4" />
-                <span className="text-xs whitespace-nowrap">{t('buyNow')}</span>
+                <Zap className="h-3 w-3 sm:h-4 sm:w-4" />
+                <span className="text-[10px] sm:text-xs whitespace-nowrap">{t('buyNow')}</span>
               </button>
             </div>
           </div>

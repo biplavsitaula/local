@@ -74,107 +74,107 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
 
           {/* Details */}
           <div className="flex flex-col">
-            <p className="text-sm uppercase tracking-wide text-muted-foreground">{product?.category}</p>
-            <h2 className="mt-2 font-display text-3xl font-bold text-tertiary-text">
+            <p className="text-xs sm:text-sm uppercase tracking-wide text-muted-foreground">{product?.category}</p>
+            <h2 className="mt-2 font-display text-xl sm:text-2xl md:text-3xl font-bold text-tertiary-text">
               {language === 'en' ? product?.name : product?.nameNe}
             </h2>
 
             {/* Price */}
-            <div className="mt-4">
-              <div className="flex items-center gap-3">
-                <span className="text-3xl font-bold text-primary">
+            <div className="mt-3 sm:mt-4">
+              <div className="flex items-center gap-2 sm:gap-3 flex-wrap">
+                <span className="text-xl sm:text-2xl md:text-3xl font-bold text-primary">
                   Rs. {((product?.price || 0) * quantity).toLocaleString()}
                 </span>
                 {product?.originalPrice && (
-                  <span className="text-lg text-muted-foreground line-through">
+                  <span className="text-sm sm:text-base md:text-lg text-muted-foreground line-through">
                     Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
                   </span>
                 )}
               </div>
               {quantity > 1 && (
-                <p className="mt-1 text-sm text-muted-foreground">
+                <p className="mt-1 text-xs sm:text-sm text-muted-foreground">
                   (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
                 </p>
               )}
             </div>
 
             {/* Status */}
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4">
               {product.inStock !== false ? (
-                <span className="inline-flex items-center gap-2 rounded-full bg-green-500/20 px-3 py-1 text-sm font-medium text-green-500">
-                  <span className="h-2 w-2 rounded-full bg-green-500" />
+                <span className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-green-500/20 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-green-500">
+                  <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-green-500" />
                   {t('inStock')}
                 </span>
               ) : (
-                <span className="inline-flex items-center gap-2 rounded-full bg-destructive/20 px-3 py-1 text-sm font-medium text-destructive">
-                  <span className="h-2 w-2 rounded-full bg-destructive" />
+                <span className="inline-flex items-center gap-1.5 sm:gap-2 rounded-full bg-destructive/20 px-2 sm:px-3 py-1 text-xs sm:text-sm font-medium text-destructive">
+                  <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-destructive" />
                   {t('outOfStock')}
                 </span>
               )}
             </div>
 
             {/* Product Info */}
-            <div className="mt-6 grid grid-cols-3 gap-4">
-              <div className="rounded-lg bg-muted/50 p-3 text-center">
-                <Wine className="mx-auto h-5 w-5 text-primary" />
-                <p className="mt-1 text-xs text-muted-foreground">{t('volume')}</p>
-                <p className="font-medium text-foreground">{product?.volume}</p>
+            <div className="mt-4 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-4">
+              <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center">
+                <Wine className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">{t('volume')}</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">{product?.volume}</p>
               </div>
-              <div className="rounded-lg bg-muted/50 p-3 text-center">
-                <Percent className="mx-auto h-5 w-5 text-primary" />
-                <p className="mt-1 text-xs text-muted-foreground">{t('alcoholContent')}</p>
-                <p className="font-medium text-foreground">{product?.alcoholContent || product?.alcohol}</p>
+              <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center">
+                <Percent className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">{t('alcoholContent')}</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">{product?.alcoholContent || product?.alcohol}</p>
               </div>
-              <div className="rounded-lg bg-muted/50 p-3 text-center">
-                <MapPin className="mx-auto h-5 w-5 text-primary" />
-                <p className="mt-1 text-xs text-muted-foreground">{t('origin')}</p>
-                <p className="font-medium text-foreground">{product?.origin || 'N/A'}</p>
+              <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center">
+                <MapPin className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
+                <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">{t('origin')}</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">{product?.origin || 'N/A'}</p>
               </div>
             </div>
 
             {/* Description */}
-            <div className="mt-6">
-              <h3 className="font-semibold text-foreground">{t('description')}</h3>
-              <p className="mt-2 text-muted-foreground">
+            <div className="mt-4 sm:mt-6">
+              <h3 className="text-sm sm:text-base font-semibold text-foreground">{t('description')}</h3>
+              <p className="mt-1 sm:mt-2 text-xs sm:text-sm md:text-base text-muted-foreground">
                 {language === 'en' ? product?.description : product?.descriptionNe || product?.description}
               </p>
             </div>
 
             {/* Quantity & Actions */}
             {product.inStock !== false && (
-              <div className="mt-6 space-y-4">
-                <div className="flex items-center gap-4">
-                  <span className="font-medium text-foreground">{t('quantity')}:</span>
+              <div className="mt-4 sm:mt-6 space-y-3 sm:space-y-4">
+                <div className="flex items-center gap-2 sm:gap-4">
+                  <span className="text-sm sm:text-base font-medium text-foreground">{t('quantity')}:</span>
                   <div className="flex items-center rounded-lg border border-border">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+                      className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                     >
-                      <Minus className="h-4 w-4" />
+                      <Minus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </button>
-                    <span className="w-12 text-center font-medium text-foreground">{quantity}</span>
+                    <span className="w-8 sm:w-12 text-center text-sm sm:text-base font-medium text-foreground">{quantity}</span>
                     <button
                       onClick={() => setQuantity(quantity + 1)}
-                      className="flex h-10 w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
+                      className="flex h-8 w-8 sm:h-10 sm:w-10 items-center justify-center text-foreground hover:bg-muted cursor-pointer"
                     >
-                      <Plus className="h-4 w-4" />
+                      <Plus className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                     </button>
                   </div>
                 </div>
 
-                <div className="flex gap-3">
+                <div className="flex gap-2 sm:gap-3">
                   <button
                     onClick={handleAddToCart}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg border-2 border-primary bg-transparent py-3 font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                    className="flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border-2 border-primary bg-transparent py-2 sm:py-3 text-sm sm:text-base font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground cursor-pointer"
                   >
-                    <ShoppingCart className="h-5 w-5" />
+                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
                     {t('addToCart')}
                   </button>
                   <button
                     onClick={handleBuyNow}
-                    className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary-gradient py-3 font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer"
+                    className="flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg bg-primary-gradient py-2 sm:py-3 text-sm sm:text-base font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer"
                   >
-                    <Zap className="h-5 w-5" />
+                    <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
                     {t('buyNow')}
                   </button>
                 </div>

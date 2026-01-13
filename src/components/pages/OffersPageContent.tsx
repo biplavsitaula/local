@@ -196,36 +196,36 @@ const OffersPageContent = () => {
     <div className="min-h-screen bg-background">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
       
-      <main className="container mx-auto px-4 py-8 pt-24">
-        <h1 className="text-3xl md:text-4xl font-display font-bold text-ternary-text text-center mb-8">
+      <main className="container mx-auto px-4 py-6 sm:py-8 pt-20 sm:pt-24">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-ternary-text text-center mb-6 sm:mb-8">
           {t("specialOffers" )}
         </h1>
 
         {/* Offer Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-12">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-8 sm:mb-12">
           {offers.map((offer, index) => {
             const Icon = offer.icon;
             return (
               <div
                 key={index}
-                className={`relative p-3 sm:p-6 rounded-xl bg-gradient-to-br ${offer.color} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
+                className={`relative p-2 sm:p-4 md:p-6 rounded-lg sm:rounded-xl bg-gradient-to-br ${offer.color} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
               >
                 <div className="absolute -right-4 -top-4 opacity-20">
-                  <Icon className="w-16 sm:w-24 h-16 sm:h-24" />
+                  <Icon className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24" />
                 </div>
-                <Icon className="w-8 sm:w-10 h-8 sm:h-10 mb-2 sm:mb-4" />
-                <h3 className="text-sm sm:text-xl font-bold mb-1 sm:mb-2">{offer.title}</h3>
-                <p className="text-white/80 text-xs sm:text-base">{offer.description}</p>
+                <Icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4" />
+                <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-0.5 sm:mb-1 md:mb-2">{offer.title}</h3>
+                <p className="text-white/80 text-[10px] sm:text-xs md:text-base leading-tight">{offer.description}</p>
               </div>
             );
           })}
         </div>
 
         {/* Discounted Products */}
-        <div className="mb-8">
-          <div className="flex items-center gap-3 mb-6">
-            <Percent className="w-8 h-8 text-secondary-text" />
-            <h2 className="text-2xl font-display font-bold text-ternary-text">
+        <div className="mb-6 sm:mb-8">
+          <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
+            <Percent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-secondary-text" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-ternary-text">
               {t("productsOnSale" )}
             </h2>
           </div>

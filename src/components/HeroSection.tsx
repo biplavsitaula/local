@@ -97,22 +97,22 @@ const HeroSection: React.FC = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center pt-4">
+          <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
             <Link href="/products">
               <Button
                 size="lg"
                 variant="default"
-                className="gradient-gold text-primary-foreground font-semibold px-8 py-6 text-lg hover:opacity-90 transition-all group border-0"
+                className="gradient-gold text-primary-foreground font-semibold px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg hover:opacity-90 transition-all group border-0"
               >
                 Explore Collection
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
             <Link href="/categories">
               <Button
                 size="lg"
                 variant="outline"
-                className={`px-8 py-6 text-lg transition-colors ${
+                className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg transition-colors ${
                   theme === 'dark'
                     ? 'border-border/50 text-foreground hover:bg-card/10'
                     : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400'
@@ -124,24 +124,24 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-6 pt-12 max-w-xl mx-auto">
+          <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 max-w-xl mx-auto">
             <div className="text-center">
-              <p className={`text-3xl font-bold ${
+              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                 theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
               }`}>500+</p>
-              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Products</p>
+              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Products</p>
             </div>
             <div className="text-center">
-              <p className={`text-3xl font-bold ${
+              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                 theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
               }`}>1hr</p>
-              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Delivery</p>
+              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Delivery</p>
             </div>
             <div className="text-center">
-              <p className={`text-3xl font-bold ${
+              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
                 theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
               }`}>10k+</p>
-              <p className={`text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Customers</p>
+              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Customers</p>
             </div>
           </div>
         </div>

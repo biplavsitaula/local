@@ -194,8 +194,8 @@ const CategoriesPageContent = () => {
     }`}>
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
       
-      <main className="container mx-auto px-4 py-8 pt-24">
-        <h1 className={`text-3xl md:text-4xl font-display font-bold text-center mb-8 ${
+      <main className="container mx-auto px-4 py-6 sm:py-8 pt-20 sm:pt-24">
+        <h1 className={`text-2xl sm:text-3xl md:text-4xl font-display font-bold text-center mb-6 sm:mb-8 ${
           currentTheme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
         }`}>
           {t("browseByCategory" )}

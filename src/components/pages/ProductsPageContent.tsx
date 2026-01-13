@@ -243,13 +243,13 @@ const ProductsPageContent: React.FC = () => {
      <main className="container mx-auto px-4 py-8 pt-24">
        <div className="container mx-auto px-4">
          {/* Page Header */}
-         <div className="mb-8">
-           <h1 className={`text-3xl md:text-4xl font-bold font-display mb-2 ${
+         <div className="mb-6 sm:mb-8">
+           <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold font-display mb-1 sm:mb-2 ${
              currentTheme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
            }`}>
              {t('allProducts')}
            </h1>
-           <p className={currentTheme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
+           <p className={`text-sm sm:text-base ${currentTheme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>
              {t('discoverCollection')}
            </p>
          </div>
