@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { authService } from "@/services/auth.service";
 import { Mail, Loader2, X, CheckCircle } from "lucide-react";
@@ -19,6 +19,16 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
 
+  // Reset form state when modal opens
+  useEffect(() => {
+    if (open) {
+      setEmail("");
+      setError(null);
+      setSuccess(false);
+      setIsLoading(false);
+    }
+  }, [open]);
+
   if (!open) return null;
 
   const handleClose = () => {
@@ -26,6 +36,13 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     setError(null);
     setSuccess(false);
     onClose();
+  };
+
+  const handleBackToLogin = () => {
+    setEmail("");
+    setError(null);
+    setSuccess(false);
+    onSwitchToLogin?.();
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -98,7 +115,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 </div>
               </div>
               <button
-                onClick={onSwitchToLogin}
+                onClick={handleBackToLogin}
                 className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold"
               >
                 {t("backToLogin")}
@@ -111,7 +128,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 {/* Email */}
                 <div>
                   <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
-                    {t('emailAddress' as any)}
+                    {t('emailAddress')}
                   </label>
                   <div className="relative">
                     <Mail className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
@@ -119,7 +136,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      placeholder={t('enterEmail' as any)}
+                      placeholder={t('enterEmail')}
                       className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
                       required
                     />
@@ -151,7 +168,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               {/* Back to Login */}
               <div className="mt-4 text-center">
                 <button
-                  onClick={onSwitchToLogin}
+                  onClick={handleBackToLogin}
                   className="text-xs sm:text-sm text-primary-text hover:text-secondary-text"
                 >
                   {t("backToLogin")}
