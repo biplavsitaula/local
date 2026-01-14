@@ -117,17 +117,20 @@ const ProductsPageContent: React.FC = () => {
      setError(null);
     
      // Map category to API format
-     // For "whisky", don't filter by category in API since API might use "whiskey"
+     // For "whisky" or "whiskey", don't filter by category in API since API might use either variation
      // We'll filter client-side to handle both variations
      let apiCategory: string | null = selectedCategory;
-     if (selectedCategory === 'whisky') {
+     const normalizedCategory = selectedCategory?.toLowerCase();
+     if (normalizedCategory === 'whisky' || normalizedCategory === 'whiskey') {
        apiCategory = null; // Fetch all and filter client-side
      }
     
-     // When a category is selected, fetch all products (use high limit, always from page 1)
+     // When search query OR category is selected, fetch all products (use high limit, always from page 1)
+     // This ensures search and category filtering work across ALL products, not just 10
      // Otherwise use pagination with ITEMS_PER_PAGE
-     const limit = selectedCategory ? 1000 : ITEMS_PER_PAGE;
-     const fetchPage = selectedCategory ? 1 : pageNum; // Always fetch page 1 when category is selected
+     const hasActiveFilter = searchQuery || selectedCategory;
+     const limit = hasActiveFilter ? 10000 : ITEMS_PER_PAGE;
+     const fetchPage = hasActiveFilter ? 1 : pageNum; // Always fetch page 1 when filter is active
     
      const response = await productsService.getAll({
        page: fetchPage,
@@ -138,8 +141,8 @@ const ProductsPageContent: React.FC = () => {
     
      const mappedProducts = (response.data || []).map(mapApiProductToProduct);
     
-     // When category is selected, always replace (don't append) since we fetch all at once
-     if (append && !selectedCategory) {
+     // When filter is active, always replace (don't append) since we fetch all at once
+     if (append && !hasActiveFilter) {
        setProducts(prev => [...prev, ...mappedProducts]);
      } else {
        setProducts(mappedProducts);
@@ -149,15 +152,15 @@ const ProductsPageContent: React.FC = () => {
      const pagination = (response as any).pagination;
      if (pagination) {
        setTotalProducts(pagination.total || 0);
-       // When category is selected, we fetch all products at once, so no more pages
-       if (selectedCategory) {
+       // When filter is active, we fetch all products at once, so no more pages
+       if (hasActiveFilter) {
          setHasMore(false);
        } else {
          setHasMore(pageNum < (pagination.pages || 1));
        }
      } else {
-       // When category is selected, assume we got all products
-       setHasMore(selectedCategory ? false : mappedProducts.length === ITEMS_PER_PAGE);
+       // When filter is active, assume we got all products
+       setHasMore(hasActiveFilter ? false : mappedProducts.length === ITEMS_PER_PAGE);
      }
    } catch (err: any) {
      setError(err?.message || 'Failed to fetch products');
@@ -233,14 +236,18 @@ const ProductsPageContent: React.FC = () => {
    let filtered = [...products];
 
   // Search is handled by API, but we do client-side filtering for category normalization
-  // This handles cases where API returns "whiskey" but we filter by "whisky"
+  // This handles cases where API returns "whiskey" but we filter by "whisky" (or vice versa)
   if (selectedCategory) {
     filtered = filtered.filter((p) => {
       const productCategory = p?.category?.toLowerCase();
-      if (selectedCategory === 'whisky') {
+      const normalizedSelectedCategory = selectedCategory.toLowerCase();
+      
+      // Handle both "whisky" and "whiskey" variations
+      if (normalizedSelectedCategory === 'whisky' || normalizedSelectedCategory === 'whiskey') {
         return productCategory === 'whisky' || productCategory === 'whiskey';
       }
-      return productCategory === selectedCategory.toLowerCase();
+      
+      return productCategory === normalizedSelectedCategory;
     });
   }
 
@@ -589,8 +596,8 @@ const ProductsPageContent: React.FC = () => {
              </div>
 
 
-             {/* Load More Button - only show when no category is selected */}
-             {hasMore && !selectedCategory && (
+             {/* Load More Button - only show when no filters are active */}
+             {hasMore && !searchQuery && !selectedCategory && (
                <div className="flex justify-center mt-10">
                  <button
                    onClick={handleLoadMore}

@@ -169,8 +169,11 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
 
       <CategorySelector
         categories={categories}
-        selectedCategory={selected || null}
-        onCategorySelect={(categoryId) => onSelect(categoryId || '')}
+        selectedCategory={selected === 'All' || selected === '' ? null : selected}
+        onCategorySelect={(categoryId) => {
+          // Convert null (from "all" category) to "All" for ClientPageContent
+          onSelect(categoryId === null || categoryId === 'all' ? 'All' : categoryId);
+        }}
       />  
      </div>
    </section>

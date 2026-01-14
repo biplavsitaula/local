@@ -364,7 +364,7 @@ return (
                   searchQuery={searchQuery}
                   selectedCategory={selectedCategory}
                   onCheckout={() => setCheckoutOpen(true)}
-                  limit={selectedCategory && selectedCategory !== "All" ? undefined : 10}
+                  limit={selectedCategory && selectedCategory !== "All" ? undefined : undefined}
                 />
               </section>
               {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">

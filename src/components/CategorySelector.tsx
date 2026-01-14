@@ -37,11 +37,22 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
       <div className={`hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8 ${className}`}>
         {categories.map((category) => {
           const Icon = category.icon;
-          const isSelected = selectedCategory === category.id;
+          // Handle "all" category - it should be selected when selectedCategory is null
+          const isSelected = category.id === 'all' 
+            ? selectedCategory === null || selectedCategory === 'all'
+            : selectedCategory === category.id;
           return (
             <button
               key={category.id}
-              onClick={() => onCategorySelect(isSelected ? null : category.id)}
+              onClick={() => {
+                // If clicking "all" category, pass null to show all products
+                if (category.id === 'all') {
+                  onCategorySelect(null);
+                } else {
+                  // Toggle: if already selected, deselect (show all), otherwise select this category
+                  onCategorySelect(isSelected ? null : category.id);
+                }
+              }}
               className={`relative p-3 rounded-xl transition-all duration-300 cursor-pointer group ${
                 isSelected
                   ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`

@@ -5,9 +5,8 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
-import { settingsService } from "@/services/settings.service";
 import { Product } from "@/types";
-import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, LayoutGrid, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from "lucide-react";
+import { Loader2, AlertCircle, Wine } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
@@ -15,26 +14,9 @@ import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
 import CategorySelector from "@/components/CategorySelector";
+import { useCategories } from "@/hooks/useCategories";
 
 const ITEMS_PER_PAGE = 10;
-
-// Mapping for category metadata (icons, colors, Nepali names)
-const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
-  whisky: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: "व्हिस्की" },
-  whiskey: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: "व्हिस्की" },
-  vodka: { icon: GlassWater, color: "from-blue-400 to-cyan-500", nameNe: "भोड्का" },
-  rum: { icon: Cherry, color: "from-amber-600 to-yellow-500", nameNe: "रम" },
-  gin: { icon: Martini, color: "from-emerald-400 to-teal-500", nameNe: "जिन" },
-  wine: { icon: Grape, color: "from-purple-500 to-pink-500", nameNe: "वाइन" },
-  beer: { icon: Beer, color: "from-yellow-400 to-amber-500", nameNe: "बियर" },
-  tequila: { icon: FlameKindling, color: "from-lime-500 to-lime-700", nameNe: "टकिला" },
-  cognac: { icon: Coffee, color: "from-orange-600 to-orange-800", nameNe: "कोग्न्याक" },
-  champagne: { icon: Sparkles, color: "from-yellow-400 to-yellow-600", nameNe: "शैम्पेन" },
-  brandy: { icon: GlassWater, color: "from-orange-600 to-orange-800", nameNe: "ब्राण्डी" },
-};
-
-// Default metadata for unknown categories
-const defaultMetadata = { icon: Package, color: "from-gray-500 to-gray-700", nameNe: "" };
 
 const CategoriesPageContent = () => {
   const { t, language } = useLanguage();
@@ -54,7 +36,9 @@ const CategoriesPageContent = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
-  const [apiCategories, setApiCategories] = useState<{ name: string; icon: string }[]>([]);
+  
+  // Use categories hook
+  const { categories } = useCategories({ includeAll: false });
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
@@ -107,16 +91,18 @@ const CategoriesPageContent = () => {
       setError(null);
       
       // Map category to API format
-      // For "whisky", don't filter by category in API since API might use "whiskey"
+      // For "whisky" or "whiskey", don't filter by category in API since API might use either variation
       // We'll filter client-side to handle both variations
       let apiCategory: string | null = selectedCategory;
-      if (selectedCategory === 'whisky') {
+      const normalizedCategory = selectedCategory?.toLowerCase();
+      if (normalizedCategory === 'whisky' || normalizedCategory === 'whiskey') {
         apiCategory = null; // Fetch all and filter client-side
       }
       
       // When a category is selected, fetch all products (use high limit, always from page 1)
+      // This ensures category filtering works across ALL products, not just 10
       // Otherwise use pagination with ITEMS_PER_PAGE
-      const limit = selectedCategory ? 1000 : ITEMS_PER_PAGE;
+      const limit = selectedCategory ? 10000 : ITEMS_PER_PAGE;
       const fetchPage = selectedCategory ? 1 : pageNum; // Always fetch page 1 when category is selected
       
       const response = await productsService.getAll({
@@ -179,41 +165,8 @@ const CategoriesPageContent = () => {
     setMounted(true);
   }, []);
 
-  // Fetch categories from API
-  useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const response = await settingsService.getCategories();
-        if (response.success && response.data) {
-          setApiCategories(response.data);
-        }
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
-
-  // Build categories array from API data
-  const categories = useMemo(() => {
-    return apiCategories
-      .filter((cat) => cat && cat.name) // Filter out invalid entries
-      .map((cat) => {
-        const catName = cat.name;
-        const lowerCat = catName.toLowerCase();
-        const metadata = categoryMetadata[lowerCat] || defaultMetadata;
-        return {
-          id: lowerCat,
-          name: catName.charAt(0).toUpperCase() + catName.slice(1), // Capitalize first letter
-          nameNe: metadata.nameNe || catName,
-          icon: metadata.icon,
-          color: metadata.color,
-        };
-      });
-  }, [apiCategories]);
-
   // Products are already filtered by API, but we need to handle category normalization
-  // API might return "whiskey" but we filter by "whisky", so normalize here
+  // API might return "whiskey" but we filter by "whisky" (or vice versa), so normalize here
   const filteredProducts = useMemo(() => {
     let filtered = [...products];
 
@@ -221,10 +174,14 @@ const CategoriesPageContent = () => {
     if (selectedCategory) {
       filtered = filtered.filter((p) => {
         const productCategory = p.category?.toLowerCase();
-        if (selectedCategory === 'whisky') {
+        const normalizedSelectedCategory = selectedCategory.toLowerCase();
+        
+        // Handle both "whisky" and "whiskey" variations
+        if (normalizedSelectedCategory === 'whisky' || normalizedSelectedCategory === 'whiskey') {
           return productCategory === 'whisky' || productCategory === 'whiskey';
         }
-        return productCategory === selectedCategory.toLowerCase();
+        
+        return productCategory === normalizedSelectedCategory;
       });
     }
 
