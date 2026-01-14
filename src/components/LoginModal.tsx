@@ -81,7 +81,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 className="sm:w-[100px] sm:h-[80px]"
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
+            <h1 className="text-xl sm:text-2xl font-display font-bold bg-gradient-to-r from-flame-yellow via-flame-orange to-flame-red bg-clip-text text-transparent mb-1 sm:mb-2">
               {t("flameBeverage")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
