@@ -5,7 +5,6 @@ import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { categories } from '@/data/products';
 import { Product } from '@/types';
 import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2 } from 'lucide-react';
 import ProductCard from '@/components/ProductCard';
@@ -15,9 +14,28 @@ import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
 import { productsService, Product as ApiProduct } from '@/services/products.service';
+import { settingsService } from '@/services/settings.service';
 
 
 const ITEMS_PER_PAGE = 10;
+
+// Mapping for category metadata (icons and Nepali names)
+const categoryMetadata: Record<string, { icon: string; nameNe: string }> = {
+  whisky: { icon: '🥃', nameNe: 'व्हिस्की' },
+  whiskey: { icon: '🥃', nameNe: 'व्हिस्की' },
+  vodka: { icon: '🍸', nameNe: 'भोड्का' },
+  rum: { icon: '🍹', nameNe: 'रम' },
+  gin: { icon: '🍸', nameNe: 'जिन' },
+  wine: { icon: '🍷', nameNe: 'वाइन' },
+  beer: { icon: '🍺', nameNe: 'बियर' },
+  tequila: { icon: '🌵', nameNe: 'टकिला' },
+  cognac: { icon: '🥃', nameNe: 'कोग्न्याक' },
+  champagne: { icon: '🍾', nameNe: 'शैम्पेन' },
+  brandy: { icon: '🥃', nameNe: 'ब्राण्डी' },
+};
+
+// Default metadata for unknown categories
+const defaultMetadata = { icon: '🍶', nameNe: '' };
 
 
 const ProductsPageContent: React.FC = () => {
@@ -42,6 +60,7 @@ const ProductsPageContent: React.FC = () => {
  const [checkoutOpen, setCheckoutOpen] = useState(false);
  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
  const [notificationQuantity, setNotificationQuantity] = useState(1);
+ const [apiCategories, setApiCategories] = useState<string[]>([]);
 
 
  // Map API product to internal Product type
@@ -171,6 +190,34 @@ const ProductsPageContent: React.FC = () => {
    setMounted(true);
  }, []);
 
+ // Fetch categories from API
+ useEffect(() => {
+   const fetchCategories = async () => {
+     try {
+       const response = await settingsService.getCategories();
+       if (response.success && response.data) {
+         setApiCategories(response.data);
+       }
+     } catch (error) {
+       console.error('Error fetching categories:', error);
+     }
+   };
+   fetchCategories();
+ }, []);
+
+ // Build categories array from API data
+ const categories = useMemo(() => {
+   return apiCategories.map((cat) => {
+     const lowerCat = cat.toLowerCase();
+     const metadata = categoryMetadata[lowerCat] || defaultMetadata;
+     return {
+       id: lowerCat,
+       name: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize first letter
+       nameNe: metadata.nameNe || cat,
+       icon: metadata.icon,
+     };
+   });
+ }, [apiCategories]);
 
  // Use default theme during SSR to prevent hydration mismatch
  const currentTheme = mounted ? theme : 'dark';

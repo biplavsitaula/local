@@ -5,8 +5,9 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
+import { settingsService } from "@/services/settings.service";
 import { Product } from "@/types";
-import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, LayoutGrid } from "lucide-react";
+import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, LayoutGrid, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -16,6 +17,24 @@ import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
 
 const ITEMS_PER_PAGE = 10;
+
+// Mapping for category metadata (icons, colors, Nepali names)
+const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
+  whisky: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: "व्हिस्की" },
+  whiskey: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: "व्हिस्की" },
+  vodka: { icon: GlassWater, color: "from-blue-400 to-cyan-500", nameNe: "भोड्का" },
+  rum: { icon: Cherry, color: "from-amber-600 to-yellow-500", nameNe: "रम" },
+  gin: { icon: Martini, color: "from-emerald-400 to-teal-500", nameNe: "जिन" },
+  wine: { icon: Grape, color: "from-purple-500 to-pink-500", nameNe: "वाइन" },
+  beer: { icon: Beer, color: "from-yellow-400 to-amber-500", nameNe: "बियर" },
+  tequila: { icon: FlameKindling, color: "from-lime-500 to-lime-700", nameNe: "टकिला" },
+  cognac: { icon: Coffee, color: "from-orange-600 to-orange-800", nameNe: "कोग्न्याक" },
+  champagne: { icon: Sparkles, color: "from-yellow-400 to-yellow-600", nameNe: "शैम्पेन" },
+  brandy: { icon: GlassWater, color: "from-orange-600 to-orange-800", nameNe: "ब्राण्डी" },
+};
+
+// Default metadata for unknown categories
+const defaultMetadata = { icon: Package, color: "from-gray-500 to-gray-700", nameNe: "" };
 
 const CategoriesPageContent = () => {
   const { t, language } = useLanguage();
@@ -35,6 +54,7 @@ const CategoriesPageContent = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+  const [apiCategories, setApiCategories] = useState<string[]>([]);
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
@@ -159,14 +179,35 @@ const CategoriesPageContent = () => {
     setMounted(true);
   }, []);
 
-  const categories = [
-    { id: "whisky", name: "Whisky", nameNe: "व्हिस्की", icon: Wine, color: "from-amber-500 to-orange-600" },
-    { id: "vodka", name: "Vodka", nameNe: "भोड्का", icon: GlassWater, color: "from-blue-400 to-cyan-500" },
-    { id: "rum", name: "Rum", nameNe: "रम", icon: Cherry, color: "from-amber-600 to-yellow-500" },
-    { id: "gin", name: "Gin", nameNe: "जिन", icon: Martini, color: "from-emerald-400 to-teal-500" },
-    { id: "wine", name: "Wine", nameNe: "वाइन", icon: Grape, color: "from-purple-500 to-pink-500" },
-    { id: "beer", name: "Beer", nameNe: "बियर", icon: Beer, color: "from-yellow-400 to-amber-500" },
-  ];
+  // Fetch categories from API
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await settingsService.getCategories();
+        if (response.success && response.data) {
+          setApiCategories(response.data);
+        }
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
+  // Build categories array from API data
+  const categories = useMemo(() => {
+    return apiCategories.map((cat) => {
+      const lowerCat = cat.toLowerCase();
+      const metadata = categoryMetadata[lowerCat] || defaultMetadata;
+      return {
+        id: lowerCat,
+        name: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize first letter
+        nameNe: metadata.nameNe || cat,
+        icon: metadata.icon,
+        color: metadata.color,
+      };
+    });
+  }, [apiCategories]);
 
   // Products are already filtered by API, but we need to handle category normalization
   // API might return "whiskey" but we filter by "whisky", so normalize here

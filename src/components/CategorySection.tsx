@@ -1,41 +1,87 @@
 "use client";
 
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useTheme } from '@/contexts/ThemeContext';
-import { Wine, Beer, GlassWater, Martini, Grape, Cherry, LayoutGrid, Sparkles, Coffee, FlameKindling, ChevronDown } from 'lucide-react';
+import { Wine, Beer, GlassWater, Martini, Grape, Cherry, LayoutGrid, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from 'lucide-react';
 import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { settingsService } from '@/services/settings.service';
 
+// Mapping for category metadata (icons, colors, Nepali names)
+const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
+  all: { icon: LayoutGrid, color: 'from-flame-orange to-flame-red', nameNe: 'सबै' },
+  whiskey: { icon: Wine, color: 'from-amber-500 to-amber-700', nameNe: 'व्हिस्की' },
+  vodka: { icon: GlassWater, color: 'from-blue-400 to-blue-600', nameNe: 'भोड्का' },
+  rum: { icon: Cherry, color: 'from-red-500 to-red-700', nameNe: 'रम' },
+  gin: { icon: Martini, color: 'from-cyan-400 to-cyan-600', nameNe: 'जिन' },
+  tequila: { icon: FlameKindling, color: 'from-lime-500 to-lime-700', nameNe: 'टकिला' },
+  cognac: { icon: Coffee, color: 'from-orange-600 to-orange-800', nameNe: 'कोग्न्याक' },
+  champagne: { icon: Sparkles, color: 'from-yellow-400 to-yellow-600', nameNe: 'शैम्पेन' },
+  beer: { icon: Beer, color: 'from-yellow-400 to-yellow-600', nameNe: 'बियर' },
+  wine: { icon: Grape, color: 'from-purple-500 to-pink-500', nameNe: 'वाइन' },
+  brandy: { icon: GlassWater, color: 'from-orange-600 to-orange-800', nameNe: 'ब्राण्डी' },
+};
+
+// Default metadata for unknown categories
+const defaultMetadata = { icon: Package, color: 'from-gray-500 to-gray-700', nameNe: '' };
 
 const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }) => {
  const { language, t } = useLanguage();
  const { theme } = useTheme();
  const [mounted, setMounted] = useState(false);
-
+ const [apiCategories, setApiCategories] = useState<string[]>([]);
+ const [loading, setLoading] = useState(true);
 
  // Prevent hydration mismatch by only rendering after mount
  useEffect(() => {
    setMounted(true);
  }, []);
 
+ // Fetch categories from API
+ useEffect(() => {
+   const fetchCategories = async () => {
+     try {
+       const response = await settingsService.getCategories();
+       if (response.success && response.data) {
+         setApiCategories(response.data);
+       }
+     } catch (error) {
+       console.error('Error fetching categories:', error);
+     } finally {
+       setLoading(false);
+     }
+   };
+   fetchCategories();
+ }, []);
 
- // Categories matching the API response
- const categories = [
-   { id: 'all', name: 'All', nameNe: 'सबै', icon: LayoutGrid, color: 'from-flame-orange to-flame-red' },
-   { id: 'whiskey', name: 'Whiskey', nameNe: 'व्हिस्की', icon: Wine, color: 'from-amber-500 to-amber-700' },
-   { id: 'vodka', name: 'Vodka', nameNe: 'भोड्का', icon: GlassWater, color: 'from-blue-400 to-blue-600' },
-   { id: 'rum', name: 'Rum', nameNe: 'रम', icon: Cherry, color: 'from-red-500 to-red-700' },
-   { id: 'gin', name: 'Gin', nameNe: 'जिन', icon: Martini, color: 'from-cyan-400 to-cyan-600' },
-   { id: 'tequila', name: 'Tequila', nameNe: 'टकिला', icon: FlameKindling, color: 'from-lime-500 to-lime-700' },
-   { id: 'cognac', name: 'Cognac', nameNe: 'कोग्न्याक', icon: Coffee, color: 'from-orange-600 to-orange-800' },
-   { id: 'champagne', name: 'Champagne', nameNe: 'शैम्पेन', icon: Sparkles, color: 'from-yellow-400 to-yellow-600' },
-   { id: 'beer', name: 'Beer', nameNe: 'बियर', icon: Beer, color: 'from-yellow-400 to-yellow-600' },
-   { id: 'wine', name: 'Wine', nameNe: 'वाइन', icon: Grape, color: 'from-purple-500 to-pink-500' },
-   { id: 'brandy', name: 'Brandy', nameNe: 'ब्राण्डी', icon: GlassWater, color: 'from-orange-600 to-orange-800' },
-   
- ];
+ // Build categories array from API data
+ const categories = useMemo(() => {
+   // Always start with "All" category
+   const allCategory = {
+     id: 'all',
+     name: 'All',
+     nameNe: categoryMetadata.all.nameNe,
+     icon: categoryMetadata.all.icon,
+     color: categoryMetadata.all.color,
+   };
+
+   // Map API categories to full category objects
+   const mappedCategories = apiCategories.map((cat) => {
+     const lowerCat = cat.toLowerCase();
+     const metadata = categoryMetadata[lowerCat] || defaultMetadata;
+     return {
+       id: lowerCat,
+       name: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize first letter
+       nameNe: metadata.nameNe || cat,
+       icon: metadata.icon,
+       color: metadata.color,
+     };
+   });
+
+   return [allCategory, ...mappedCategories];
+ }, [apiCategories]);
 
 
  // Use default theme during SSR to prevent hydration mismatch

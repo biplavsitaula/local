@@ -77,7 +77,7 @@ export const settingsService = {
    * Get all categories (Admin only)
    */
   getCategories: async (): Promise<ApiResponse<string[]>> => {
-    return apiGet<string[]>('/settings/categories');
+    return apiGet<string[]>('/settings/categories', undefined, false);
   },
 
   /**
