@@ -21,8 +21,8 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
       <div className="relative z-10 w-full max-w-lg mx-auto">
         <div className="relative rounded-2xl bg-black/90 p-8 md:p-12 text-center border-2 border-flame-orange shadow-[0_0_40px_rgba(255,140,0,0.3)]">
           {/* Logo with flame animation from bottom to top */}
-          <div className="flex justify-center mb-1">
-            <AnimatedLogo width={160} height={100} />
+          <div className="flex justify-center mb-4">
+            <AnimatedLogo width={120} height={80} />
           </div>
 
           {/* Brand Name */}

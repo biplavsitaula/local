@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { AlertTriangle, ArrowLeft, Home } from "lucide-react";
 import { getCurrentLanguageTranslations } from "@/helpers/languageHelper";
+import AnimatedLogo from "@/components/AnimatedLogo";
 
 export default function NotFound() {
   const router = useRouter();
@@ -23,11 +24,12 @@ export default function NotFound() {
       {/* Modal */}
       <div className="relative z-10 w-full max-w-md mx-4 animate-scale-in">
         <div className="glass-dark rounded-2xl p-8 text-center border border-border-primary-accent shadow-2xl">
-          {/* Icon */}
-          <div className="flex justify-center mb-6">
+          {/* Icon */ }
+          <div className="flex justify-center mb-2">
             <div className="relative">
-              <div className="w-20 h-20 rounded-full bg-flame-gradient flex items-center justify-center animate-pulse-glow">
-                <AlertTriangle className="w-10 h-10 text-primary-foreground" />
+              <div className="">
+                {/* <AlertTriangle className="w-10 h-10 text-primary-foreground" /> */}
+                <AnimatedLogo width={80} height={60} />
               </div>
             </div>
           </div>
@@ -47,7 +49,7 @@ export default function NotFound() {
           </p>
 
           {/* Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4">
+          <div className="flex flex-col sm:flex-row gap-4 mb-4">
             <Button
               onClick={() => router.back()}
               variant="outline"

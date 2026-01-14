@@ -91,7 +91,7 @@ const Footer: React.FC = () => {
             theme === 'dark' ? 'bg-black' : 'bg-gray-100'
           }`}>
               <Image
-                src="/assets/newlogo.png"
+                src="/assets/flameMainLogo.png"
                 alt="Flame Beverage logo"
                 width={180}
                 height={48}

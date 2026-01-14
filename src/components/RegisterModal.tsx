@@ -117,7 +117,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">
               <Image 
-                src="/assets/flame-dark-logo.png" 
+                src="/assets/flame200.png" 
                 alt="Flame Beverage logo" 
                 width={80} 
                 height={64}

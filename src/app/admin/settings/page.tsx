@@ -159,7 +159,7 @@ export default function SettingsPage() {
   }, []);
 
   const handleAddCategory = async () => {
-    if (!newCategory.trim()) return;
+    if (!newCategory.trim()) return;  
     
     try {
       setLoadingCategories(true);
