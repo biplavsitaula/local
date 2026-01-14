@@ -6,7 +6,7 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Product } from '@/types';
-import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2, Wine, Beer, GlassWater, Martini, Grape, Cherry, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from 'lucide-react';
+import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2, LayoutGrid } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
@@ -16,28 +16,9 @@ import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
 import CategorySelector from '@/components/CategorySelector';
 import { productsService, Product as ApiProduct } from '@/services/products.service';
-import { settingsService } from '@/services/settings.service';
-
+import { useCategories } from '@/hooks/useCategories';
 
 const ITEMS_PER_PAGE = 10;
-
-// Mapping for category metadata (icons and Nepali names)
-const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
-  whisky: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: 'व्हिस्की' },
-  whiskey: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: 'व्हिस्की' },
-  vodka: { icon: GlassWater, color: "from-blue-400 to-cyan-500", nameNe: 'भोड्का' },
-  rum: { icon: Cherry, color: "from-amber-600 to-yellow-500", nameNe: 'रम' },
-  gin: { icon: Martini, color: "from-emerald-400 to-teal-500", nameNe: 'जिन' },
-  wine: { icon: Grape, color: "from-purple-500 to-pink-500", nameNe: 'वाइन' },
-  beer: { icon: Beer, color: "from-yellow-400 to-amber-500", nameNe: 'बियर' },
-  tequila: { icon: FlameKindling, color: "from-lime-500 to-lime-700", nameNe: 'टकिला' },
-  cognac: { icon: Coffee, color: "from-orange-600 to-orange-800", nameNe: 'कोग्न्याक' },
-  champagne: { icon: Sparkles, color: "from-yellow-400 to-yellow-600", nameNe: 'शैम्पेन' },
-  brandy: { icon: GlassWater, color: "from-orange-600 to-orange-800", nameNe: 'ब्राण्डी' },
-};
-
-// Default metadata for unknown categories
-const defaultMetadata = { icon: Package, color: "from-gray-500 to-gray-700", nameNe: '' };
 
 
 const ProductsPageContent: React.FC = () => {
@@ -59,10 +40,12 @@ const ProductsPageContent: React.FC = () => {
  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
  const [showFilters, setShowFilters] = useState(false);
- const [checkoutOpen, setCheckoutOpen] = useState(false);
- const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
- const [notificationQuantity, setNotificationQuantity] = useState(1);
- const [apiCategories, setApiCategories] = useState<{ name: string; icon: string }[]>([]);
+  const [checkoutOpen, setCheckoutOpen] = useState(false);
+  const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
+  const [notificationQuantity, setNotificationQuantity] = useState(1);
+  
+  // Use categories hook
+  const { categories } = useCategories({ includeAll: false });
 
 
  // Map API product to internal Product type
@@ -194,39 +177,6 @@ const ProductsPageContent: React.FC = () => {
  useEffect(() => {
    setMounted(true);
  }, []);
-
- // Fetch categories from API
- useEffect(() => {
-   const fetchCategories = async () => {
-     try {
-       const response = await settingsService.getCategories();
-       if (response.success && response.data) {
-         setApiCategories(response.data);
-       }
-     } catch (error) {
-       console.error('Error fetching categories:', error);
-     }
-   };
-   fetchCategories();
- }, []);
-
- // Build categories array from API data
- const categories = useMemo(() => {
-   return apiCategories
-     .filter((cat) => cat && cat.name) // Filter out invalid entries
-     .map((cat) => {
-       const catName = cat.name;
-       const lowerCat = catName.toLowerCase();
-       const metadata = categoryMetadata[lowerCat] || defaultMetadata;
-       return {
-         id: lowerCat,
-         name: catName.charAt(0).toUpperCase() + catName.slice(1), // Capitalize first letter
-         nameNe: metadata.nameNe || catName,
-         icon: metadata.icon,
-         color: metadata.color,
-       };
-     });
- }, [apiCategories]);
 
  // Use default theme during SSR to prevent hydration mismatch
  const currentTheme = mounted ? theme : 'dark';
@@ -385,14 +335,23 @@ const ProductsPageContent: React.FC = () => {
                  side="bottom"
                  className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}
                >
-                 <SelectItem value="all" className="cursor-pointer">
-                   {t('allCategories')}
-                 </SelectItem>
-                 {categories.map((cat) => (
-                   <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
-                     {language === 'en' ? cat.name : cat.nameNe}
-                   </SelectItem>
-                 ))}
+                <SelectItem value="all" className="cursor-pointer">
+                  <div className="flex items-center gap-2">
+                    <LayoutGrid className="w-4 h-4 text-flame-orange" />
+                    <span>{t('allCategories')}</span>
+                  </div>
+                </SelectItem>
+                {categories.map((cat) => {
+                  const Icon = cat.icon;
+                  return (
+                    <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
+                      <div className="flex items-center gap-2">
+                        <Icon className="w-4 h-4 text-flame-orange" />
+                        <span>{language === 'en' ? cat.name : cat.nameNe}</span>
+                      </div>
+                    </SelectItem>
+                  );
+                })}
                </SelectContent>
              </Select>
 
