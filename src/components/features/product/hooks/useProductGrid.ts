@@ -100,7 +100,7 @@ export function useProductGrid({
           setHasMore(false);
         } else {
           // When no category, check if there are more pages
-          setHasMore(pageNum < (pagination.pages || 1));
+        setHasMore(pageNum < (pagination.pages || 1));
         }
       } else {
         // When category is selected, assume we got all products

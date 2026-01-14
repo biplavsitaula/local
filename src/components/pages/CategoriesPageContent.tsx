@@ -8,13 +8,13 @@ import { productsService, Product as ApiProduct } from "@/services/products.serv
 import { settingsService } from "@/services/settings.service";
 import { Product } from "@/types";
 import { Wine, Beer, GlassWater, Martini, Grape, Cherry, Loader2, AlertCircle, LayoutGrid, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from "lucide-react";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
+import CategorySelector from "@/components/CategorySelector";
 
 const ITEMS_PER_PAGE = 10;
 
@@ -264,80 +264,12 @@ const CategoriesPageContent = () => {
           {t("browseByCategory" )}
         </h1>
 
-        {/* Categories Grid - Desktop */}
-        <div className="hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 mb-12">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            const isSelected = selectedCategory === category.id;
-            return (
-              <button
-                key={category.id}
-                onClick={() => setSelectedCategory(isSelected ? null : category.id)}
-                className={`relative p-6 rounded-2xl transition-all duration-300 cursor-pointer group ${
-                  isSelected
-                    ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`
-                    : currentTheme === 'dark'
-                      ? 'bg-card hover:bg-card/80 border border-border hover:border-flame-orange/50'
-                      : 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-orange-300 shadow-sm'
-                }`}
-              >
-                <div className={`flex flex-col items-center gap-3 ${
-                  isSelected ? '' : currentTheme === 'dark' ? 'text-foreground' : 'text-gray-700'
-                }`}>
-                  <div className={`p-3 rounded-xl ${
-                    isSelected 
-                      ? 'bg-white/20' 
-                      : currentTheme === 'dark'
-                        ? 'bg-secondary'
-                        : 'bg-orange-50'
-                  }`}>
-                    <Icon className={`w-8 h-8 ${
-                      isSelected ? 'text-white' : 'text-flame-orange'
-                    }`} />
-                  </div>
-                  <span className="font-medium text-sm">
-                    {language === "en" ? category.name : category.nameNe}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Categories Dropdown - Mobile */}
-        <div className="md:hidden mb-8">
-          <Select
-            value={selectedCategory || "all"}
-            onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
-          >
-            <SelectTrigger className={`w-full ${
-              currentTheme === 'dark'
-                ? 'bg-card border-border text-foreground'
-                : 'bg-white border-gray-200 text-gray-900'
-            }`}>
-              <SelectValue placeholder={t("selectCategory" )} />
-            </SelectTrigger>
-            <SelectContent className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}>
-              <SelectItem value="all" className="cursor-pointer">
-                <div className="flex items-center gap-2">
-                  <LayoutGrid className="w-4 h-4 text-flame-orange" />
-                  <span>{t("allCategories" )}</span>
-                </div>
-              </SelectItem>
-              {categories.map((category) => {
-                const Icon = category.icon;
-                return (
-                  <SelectItem key={category.id} value={category.id} className="cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <Icon className="w-4 h-4 text-flame-orange" />
-                      <span>{language === "en" ? category.name : category.nameNe}</span>
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-        </div>
+        {/* Categories Selector */}
+        <CategorySelector
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        />
 
         {/* Selected Category Header */}
         {selectedCategory && (

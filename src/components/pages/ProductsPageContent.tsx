@@ -6,13 +6,15 @@ import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { Product } from '@/types';
-import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2 } from 'lucide-react';
+import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2, Wine, Beer, GlassWater, Martini, Grape, Cherry, Sparkles, Coffee, FlameKindling, Package, LucideIcon } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import ProductCard from '@/components/ProductCard';
 import ProductDetailModal from '@/components/ProductDetailModal';
 import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
+import CategorySelector from '@/components/CategorySelector';
 import { productsService, Product as ApiProduct } from '@/services/products.service';
 import { settingsService } from '@/services/settings.service';
 
@@ -20,22 +22,22 @@ import { settingsService } from '@/services/settings.service';
 const ITEMS_PER_PAGE = 10;
 
 // Mapping for category metadata (icons and Nepali names)
-const categoryMetadata: Record<string, { icon: string; nameNe: string }> = {
-  whisky: { icon: '🥃', nameNe: 'व्हिस्की' },
-  whiskey: { icon: '🥃', nameNe: 'व्हिस्की' },
-  vodka: { icon: '🍸', nameNe: 'भोड्का' },
-  rum: { icon: '🍹', nameNe: 'रम' },
-  gin: { icon: '🍸', nameNe: 'जिन' },
-  wine: { icon: '🍷', nameNe: 'वाइन' },
-  beer: { icon: '🍺', nameNe: 'बियर' },
-  tequila: { icon: '🌵', nameNe: 'टकिला' },
-  cognac: { icon: '🥃', nameNe: 'कोग्न्याक' },
-  champagne: { icon: '🍾', nameNe: 'शैम्पेन' },
-  brandy: { icon: '🥃', nameNe: 'ब्राण्डी' },
+const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
+  whisky: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: 'व्हिस्की' },
+  whiskey: { icon: Wine, color: "from-amber-500 to-orange-600", nameNe: 'व्हिस्की' },
+  vodka: { icon: GlassWater, color: "from-blue-400 to-cyan-500", nameNe: 'भोड्का' },
+  rum: { icon: Cherry, color: "from-amber-600 to-yellow-500", nameNe: 'रम' },
+  gin: { icon: Martini, color: "from-emerald-400 to-teal-500", nameNe: 'जिन' },
+  wine: { icon: Grape, color: "from-purple-500 to-pink-500", nameNe: 'वाइन' },
+  beer: { icon: Beer, color: "from-yellow-400 to-amber-500", nameNe: 'बियर' },
+  tequila: { icon: FlameKindling, color: "from-lime-500 to-lime-700", nameNe: 'टकिला' },
+  cognac: { icon: Coffee, color: "from-orange-600 to-orange-800", nameNe: 'कोग्न्याक' },
+  champagne: { icon: Sparkles, color: "from-yellow-400 to-yellow-600", nameNe: 'शैम्पेन' },
+  brandy: { icon: GlassWater, color: "from-orange-600 to-orange-800", nameNe: 'ब्राण्डी' },
 };
 
 // Default metadata for unknown categories
-const defaultMetadata = { icon: '🍶', nameNe: '' };
+const defaultMetadata = { icon: Package, color: "from-gray-500 to-gray-700", nameNe: '' };
 
 
 const ProductsPageContent: React.FC = () => {
@@ -218,6 +220,7 @@ const ProductsPageContent: React.FC = () => {
          name: catName.charAt(0).toUpperCase() + catName.slice(1), // Capitalize first letter
          nameNe: metadata.nameNe || catName,
          icon: metadata.icon,
+         color: metadata.color,
        };
      });
  }, [apiCategories]);
@@ -359,22 +362,32 @@ const ProductsPageContent: React.FC = () => {
 
            {/* Desktop Filters */}
            <div className="hidden lg:flex items-center gap-4">
-             {/* Category Dropdown */}
-             <div className="relative">
-               <select
-                 value={selectedCategory || ''}
-                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                 className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
+             {/* Category Dropdown - Uses categories from API response */}
+             <Select
+               value={selectedCategory || "all"}
+               onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+             >
+               <SelectTrigger className={`w-[180px] ${
+                 currentTheme === 'dark'
+                   ? 'bg-card/80 border-border text-foreground'
+                   : 'bg-white border-gray-200 text-gray-900'
+               }`}>
+                 <SelectValue placeholder={t('allCategories')} />
+               </SelectTrigger>
+               <SelectContent 
+                 side="bottom"
+                 className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}
                >
-                 <option value="">{t('allCategories')}</option>
+                 <SelectItem value="all" className="cursor-pointer">
+                   {t('allCategories')}
+                 </SelectItem>
                  {categories.map((cat) => (
-                   <option key={cat.id} value={cat.id}>
-                   {language === 'en' ? cat.name : cat.nameNe}
-                   </option>
+                   <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
+                     {language === 'en' ? cat.name : cat.nameNe}
+                   </SelectItem>
                  ))}
-               </select>
-               <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
-             </div>
+               </SelectContent>
+             </Select>
 
 
              {/* Price Range */}
@@ -446,7 +459,7 @@ const ProductsPageContent: React.FC = () => {
          {/* Mobile Filters Panel */}
          {showFilters && (
            <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
-             {/* Category */}
+             {/* Category - Uses categories from API response */}
              <div>
                <label className="text-sm font-medium text-foreground mb-2 block">{t('category')}</label>
                <select
@@ -513,33 +526,12 @@ const ProductsPageContent: React.FC = () => {
          )}
 
 
-         {/* Category Pills */}
-         <div className="flex flex-wrap gap-2 mb-8">
-           <button
-             onClick={() => setSelectedCategory(null)}
-             className={`px-4 py-2 rounded-full text-sm font-medium transition-all cursor-pointer ${
-               !selectedCategory
-                 ? 'bg-primary-gradient text-text-inverse'
-                 : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
-             }`}
-           >
-             {t('all')}
-           </button>
-           {categories.map((cat) => (
-             <button
-               key={cat.id}
-               onClick={() => setSelectedCategory(cat.id)}
-               className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 cursor-pointer ${
-                 selectedCategory === cat.id
-                   ? 'bg-primary-gradient text-text-inverse'
-                   : 'bg-card/80 border border-border text-foreground hover:border-border-primary-accent'
-               }`}
-             >
-               <span>{cat.icon}</span>
-               {language === 'en' ? cat.name : cat.nameNe}
-             </button>
-           ))}
-         </div>
+        {/* Category Selector */}
+        {/* <CategorySelector
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategorySelect={setSelectedCategory}
+        /> */}
 
 
          {/* Loading State */}

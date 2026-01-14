@@ -8,6 +8,7 @@ import { Wine, Beer, GlassWater, Martini, Grape, Cherry, LayoutGrid, Sparkles, C
 import { ICategorySectionProps } from '@/interface/ICategorySectionProps';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { settingsService } from '@/services/settings.service';
+import CategorySelector from './CategorySelector';
 
 // Mapping for category metadata (icons, colors, Nepali names)
 const categoryMetadata: Record<string, { icon: LucideIcon; color: string; nameNe: string }> = {
@@ -103,7 +104,7 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
       </h2>
       
       {/* Mobile: Dropdown */}
-      <div className="block md:hidden mb-4">
+      {/* <div className="block md:hidden mb-4">
         <Select
           value={selected === 'All' || selected === '' ? 'all' : selected.toLowerCase()}
           onValueChange={(value) => onSelect(value === 'all' ? 'All' : categories.find(c => c.id === value)?.name || 'All')}
@@ -129,10 +130,10 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
             })}
           </SelectContent>
         </Select>
-      </div>
+      </div> */}
 
       {/* Responsive Grid: Show on md and above, with better breakpoints */}
-      <div className="hidden md:grid grid-cols-4 gap-2 lg:grid-cols-6 xl:grid-cols-8">
+      {/* <div className="hidden md:grid grid-cols-4 gap-2 lg:grid-cols-6 xl:grid-cols-8">
         {categories.map((category) => {
           const isSelected = selected === category.name || (category.id === 'all' && (selected === 'All' || selected === ''));
           const Icon = category.icon;
@@ -164,7 +165,13 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
             </button>
           );
         })}
-      </div>
+      </div> */}
+
+      <CategorySelector
+        categories={categories}
+        selectedCategory={selected || null}
+        onCategorySelect={(categoryId) => onSelect(categoryId || '')}
+      />  
      </div>
    </section>
  );
