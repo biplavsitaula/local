@@ -54,7 +54,7 @@ const CategoriesPageContent = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
-  const [apiCategories, setApiCategories] = useState<string[]>([]);
+  const [apiCategories, setApiCategories] = useState<{ name: string; icon: string }[]>([]);
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
@@ -196,17 +196,20 @@ const CategoriesPageContent = () => {
 
   // Build categories array from API data
   const categories = useMemo(() => {
-    return apiCategories.map((cat) => {
-      const lowerCat = cat.toLowerCase();
-      const metadata = categoryMetadata[lowerCat] || defaultMetadata;
-      return {
-        id: lowerCat,
-        name: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize first letter
-        nameNe: metadata.nameNe || cat,
-        icon: metadata.icon,
-        color: metadata.color,
-      };
-    });
+    return apiCategories
+      .filter((cat) => cat && cat.name) // Filter out invalid entries
+      .map((cat) => {
+        const catName = cat.name;
+        const lowerCat = catName.toLowerCase();
+        const metadata = categoryMetadata[lowerCat] || defaultMetadata;
+        return {
+          id: lowerCat,
+          name: catName.charAt(0).toUpperCase() + catName.slice(1), // Capitalize first letter
+          nameNe: metadata.nameNe || catName,
+          icon: metadata.icon,
+          color: metadata.color,
+        };
+      });
   }, [apiCategories]);
 
   // Products are already filtered by API, but we need to handle category normalization

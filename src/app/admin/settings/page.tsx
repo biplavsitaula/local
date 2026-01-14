@@ -5,14 +5,37 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Save, Loader2, Plus } from 'lucide-react';
+import { 
+  Save, Loader2, Plus, Trash2,
+  Wine, Beer, GlassWater, Martini, Grape, Cherry, Sparkles, Coffee, 
+  FlameKindling, Package, Milk, Droplets, Citrus, Apple, CupSoda,
+  LucideIcon
+} from 'lucide-react';
 import { settingsService } from '@/services/settings.service';
 import { seasonalThemesService, SeasonalThemeApiResponse } from '@/services/seasonal-themes.service';
 import { AddThemeModal } from '@/components/features/admin/settings/AddThemeModal';
 import { toast } from 'sonner';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
-import { Trash2 } from 'lucide-react';
 import { SuccessMsgModal } from '@/components/SuccessMsgModal';
+
+// Available icons for categories
+const categoryIcons: { name: string; icon: LucideIcon; label: string }[] = [
+  { name: "wine", icon: Wine, label: "Wine / Whiskey" },
+  { name: "beer", icon: Beer, label: "Beer" },
+  { name: "glasswater", icon: GlassWater, label: "Glass / Vodka" },
+  { name: "martini", icon: Martini, label: "Martini / Gin" },
+  { name: "grape", icon: Grape, label: "Grape / Wine" },
+  { name: "cherry", icon: Cherry, label: "Cherry / Rum" },
+  { name: "sparkles", icon: Sparkles, label: "Sparkles / Champagne" },
+  { name: "coffee", icon: Coffee, label: "Coffee / Cognac" },
+  { name: "flamekindling", icon: FlameKindling, label: "Flame / Tequila" },
+  { name: "package", icon: Package, label: "Package / Other" },
+  { name: "milk", icon: Milk, label: "Milk / Dairy" },
+  { name: "droplets", icon: Droplets, label: "Droplets / Juice" },
+  { name: "citrus", icon: Citrus, label: "Citrus / Lemon" },
+  { name: "apple", icon: Apple, label: "Apple / Cider" },
+  { name: "cupsoda", icon: CupSoda, label: "Soda / Soft Drinks" },
+];
 
 export default function SettingsPage() {
   const [loading, setLoading] = useState(true);
@@ -40,8 +63,9 @@ export default function SettingsPage() {
   const [theme, setTheme] = useState("default");
   const [addThemeModalOpen, setAddThemeModalOpen] = useState(false);
   const [selectedTheme, setSelectedTheme] = useState<SeasonalThemeApiResponse | null>(null);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<{ name: string; icon: string }[]>([]);
   const [newCategory, setNewCategory] = useState("");
+  const [newCategoryIcon, setNewCategoryIcon] = useState("");
   const [loadingCategories, setLoadingCategories] = useState(false);
   const { canEdit } = useRoleAccess();
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -139,10 +163,13 @@ export default function SettingsPage() {
     
     try {
       setLoadingCategories(true);
-      const response = await settingsService.addCategory(newCategory.trim());
+      // Pass icon if selected (convert "none" to undefined)
+      const iconValue = newCategoryIcon && newCategoryIcon !== "none" ? newCategoryIcon : undefined;
+      const response = await settingsService.addCategory(newCategory.trim(), iconValue);
       if (response.success) {
         setCategories(response.data || []);
         setNewCategory("");
+        setNewCategoryIcon("");
         toast.success('Category added successfully');
       } else {
         toast.error(response.message || 'Failed to add category');
@@ -159,16 +186,16 @@ export default function SettingsPage() {
     }
   };
 
-  const handleDeleteCategory = async (category: string) => {
-    if (!confirm(`Are you sure you want to delete the category "${category}"?`)) {
+  const handleDeleteCategory = async (categoryName: string) => {
+    if (!confirm(`Are you sure you want to delete the category "${categoryName}"?`)) {
       return;
     }
     
     try {
       setLoadingCategories(true);
-      const response = await settingsService.deleteCategory(category);
+      const response = await settingsService.deleteCategory(categoryName);
       if (response.success) {
-        setCategories(prev => prev.filter(c => c !== category));
+        setCategories(prev => prev.filter(c => c.name !== categoryName));
         toast.success('Category deleted successfully');
       } else {
         toast.error(response.message || 'Failed to delete category');
@@ -490,24 +517,50 @@ export default function SettingsPage() {
               </div>
             ) : categories.length > 0 ? (
               <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
-                {categories.map((category, index) => (
-                  <div
-                    key={index}
-                    className="flex items-center justify-between p-3 rounded-lg border border-border bg-secondary/30"
-                  >
-                    <span className="text-sm font-medium text-foreground capitalize">{category}</span>
-                    {canEdit && (
-                      <button
-                        onClick={() => handleDeleteCategory(category)}
-                        disabled={loadingCategories}
-                        className="p-1 hover:bg-destructive/10 rounded transition-colors disabled:opacity-50"
-                        title="Delete category"
-                      >
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                      </button>
-                    )}
-                  </div>
-                ))}
+                {categories.map((category, index) => {
+                  // Find the icon component if it's a lucide icon name
+                  const iconData = categoryIcons.find((i: { name: string; icon: LucideIcon; label: string }) => i.name === category.icon);
+                  const IconComp = iconData?.icon;
+                  const isImageUrl = category.icon?.startsWith('http') || category.icon?.startsWith('/');
+                  
+                  return (
+                    <div
+                      key={index}
+                      className="flex items-center justify-between p-3 rounded-lg border border-border bg-secondary/30"
+                    >
+                      <div className="flex items-center gap-2">
+                        {/* Show icon if available */}
+                        {category.icon && (
+                          isImageUrl ? (
+                            <div className="w-5 h-5 rounded overflow-hidden flex-shrink-0">
+                              <img 
+                                src={category.icon} 
+                                alt="" 
+                                className="w-full h-full object-contain"
+                                onError={(e) => {
+                                  (e.target as HTMLImageElement).style.display = 'none';
+                                }}
+                              />
+                            </div>
+                          ) : IconComp ? (
+                            <IconComp className="h-4 w-4 text-flame-orange flex-shrink-0" />
+                          ) : null
+                        )}
+                        <span className="text-sm font-medium text-foreground capitalize">{category.name}</span>
+                      </div>
+                      {canEdit && (
+                        <button
+                          onClick={() => handleDeleteCategory(category.name)}
+                          disabled={loadingCategories}
+                          className="p-1 hover:bg-destructive/10 rounded transition-colors disabled:opacity-50"
+                          title="Delete category"
+                        >
+                          <Trash2 className="h-4 w-4 text-destructive" />
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             ) : (
               <p className="text-sm text-muted-foreground py-4">No categories found. Add your first category above.</p>

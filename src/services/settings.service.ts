@@ -74,17 +74,57 @@ export const settingsService = {
   },
 
   /**
-   * Get all categories (Admin only)
+   * Category object with name and icon
    */
-  getCategories: async (): Promise<ApiResponse<string[]>> => {
-    return apiGet<string[]>('/settings/categories', undefined, false);
+  // Category type is defined inline for simplicity
+  
+  /**
+   * Get all categories (Admin only)
+   * Returns normalized format: array of objects with name and icon
+   */
+  getCategories: async (): Promise<ApiResponse<{ name: string; icon: string }[]>> => {
+    const response = await apiGet<string[] | { name: string; icon: string }[]>('/settings/categories', undefined, false);
+    
+    // Normalize response: convert string[] to {name, icon}[]
+    if (response.success && response.data) {
+      const normalized = response.data.map((item) => {
+        if (typeof item === 'string') {
+          return { name: item, icon: '' };
+        }
+        return item;
+      });
+      return {
+        ...response,
+        data: normalized,
+      };
+    }
+    
+    return response as ApiResponse<{ name: string; icon: string }[]>;
   },
 
   /**
    * Add a new category (Super Admin only)
+   * @param category - Category name
+   * @param icon - Optional icon (lucide icon name or image URL)
    */
-  addCategory: async (category: string): Promise<ApiResponse<string[]>> => {
-    return apiPost<string[]>('/settings/categories', { category });
+  addCategory: async (category: string, icon?: string): Promise<ApiResponse<{ name: string; icon: string }[]>> => {
+    const response = await apiPost<string[] | { name: string; icon: string }[]>('/settings/categories', { category, icon });
+    
+    // Normalize response: convert string[] to {name, icon}[]
+    if (response.success && response.data) {
+      const normalized = response.data.map((item) => {
+        if (typeof item === 'string') {
+          return { name: item, icon: icon || '' };
+        }
+        return item;
+      });
+      return {
+        ...response,
+        data: normalized,
+      };
+    }
+    
+    return response as ApiResponse<{ name: string; icon: string }[]>;
   },
 
   /**

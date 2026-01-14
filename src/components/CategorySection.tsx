@@ -31,7 +31,7 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
  const { language, t } = useLanguage();
  const { theme } = useTheme();
  const [mounted, setMounted] = useState(false);
- const [apiCategories, setApiCategories] = useState<string[]>([]);
+ const [apiCategories, setApiCategories] = useState<{ name: string; icon: string }[]>([]);
  const [loading, setLoading] = useState(true);
 
  // Prevent hydration mismatch by only rendering after mount
@@ -67,18 +67,21 @@ const CategorySection: React.FC<ICategorySectionProps> = ({ selected, onSelect }
      color: categoryMetadata.all.color,
    };
 
-   // Map API categories to full category objects
-   const mappedCategories = apiCategories.map((cat) => {
-     const lowerCat = cat.toLowerCase();
-     const metadata = categoryMetadata[lowerCat] || defaultMetadata;
-     return {
-       id: lowerCat,
-       name: cat.charAt(0).toUpperCase() + cat.slice(1), // Capitalize first letter
-       nameNe: metadata.nameNe || cat,
-       icon: metadata.icon,
-       color: metadata.color,
-     };
-   });
+   // Map API categories to full category objects (filter out invalid entries)
+   const mappedCategories = apiCategories
+     .filter((cat) => cat && cat.name)
+     .map((cat) => {
+       const catName = cat.name;
+       const lowerCat = catName.toLowerCase();
+       const metadata = categoryMetadata[lowerCat] || defaultMetadata;
+       return {
+         id: lowerCat,
+         name: catName.charAt(0).toUpperCase() + catName.slice(1), // Capitalize first letter
+         nameNe: metadata.nameNe || catName,
+         icon: metadata.icon,
+         color: metadata.color,
+       };
+     });
 
    return [allCategory, ...mappedCategories];
  }, [apiCategories]);
