@@ -58,7 +58,7 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
     const fetchOffers = async () => {
       try {
         setLoading(true);
-        const response = await offersService.getAllAdmin();
+        const response = await offersService.getAll();
         
         if (response.success) {
           // Filter only active offers and sort by order, limit to 4

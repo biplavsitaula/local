@@ -172,7 +172,7 @@ const OffersPageContent = () => {
         setOffersLoading(true);
         setOffersError(null);
         
-        const response = await offersService.getAllAdmin();
+        const response = await offersService.getAll();
         
         if (response.success) {
           // Filter only active offers and sort by order

@@ -78,10 +78,11 @@ const handleUnauthorized = () => {
 */
 async function apiFetch<T>(
  endpoint: string,
- options?: RequestInit & { requireAuth?: boolean }
+ options?: RequestInit & { requireAuth?: boolean; skipRedirectOn401?: boolean }
 ): Promise<ApiResponse<T>> {
  const url = `${API_BASE_URL}${endpoint}`;
  const requireAuth = options?.requireAuth !== false; // Default to true
+ const skipRedirectOn401 = options?.skipRedirectOn401 === true; // Default to false
   // Get token if authentication is required
  const token = requireAuth ? tokenManager.getToken() : null;
   const headers: Record<string, string> = {
@@ -100,7 +101,10 @@ async function apiFetch<T>(
 
  // Handle 401 Unauthorized
  if (response.status === 401) {
-   handleUnauthorized();
+   // Only redirect if not explicitly skipped (e.g., during token validation)
+   if (!skipRedirectOn401) {
+     handleUnauthorized();
+   }
    const errorData = await response.json().catch(() => ({ message: 'Unauthorized' }));
    throw new Error(errorData?.message || 'Unauthorized. Please login again.');
  }
@@ -137,12 +141,9 @@ async function apiFetch<T>(
 export async function apiGet<T>(
  endpoint: string,
  params?: Record<string, any>,
- requireAuth: boolean = true
+ requireAuth: boolean = true,
+ skipRedirectOn401: boolean = false
 ): Promise<ApiResponse<T>> {
-    
- const token = tokenManager.getToken();
-
-
  const queryString = params
    ? '?' + new URLSearchParams(
        Object.entries(params).reduce((acc, [key, value]) => {
@@ -156,6 +157,7 @@ export async function apiGet<T>(
   return apiFetch<T>(`${endpoint}${queryString}`, {
    method: 'GET',
    requireAuth,
+   skipRedirectOn401,
  });
 }
 

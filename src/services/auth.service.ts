@@ -70,9 +70,10 @@ export const authService = {
 
   /**
    * Get current user profile
+   * skipRedirectOn401 is true by default since this is used for token validation
    */
-  getProfile: async (): Promise<ApiResponse<User>> => {
-    return apiGet<User>('/auth/profile');
+  getProfile: async (skipRedirectOn401: boolean = true): Promise<ApiResponse<User>> => {
+    return apiGet<User>('/auth/profile', undefined, true, skipRedirectOn401);
   },
 
   /**

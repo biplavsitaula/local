@@ -112,10 +112,10 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg transition-colors ${
+                className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg transition-colors border-2 ${
                   theme === 'dark'
-                    ? 'border-border/50 text-foreground hover:bg-card/10'
-                    : 'border-gray-300 text-gray-700 hover:bg-gray-100 hover:border-gray-400'
+                    ? 'border-flame-orange/60 text-foreground hover:bg-card/10 hover:border-flame-orange'
+                    : 'border-flame-orange/50 text-gray-700 hover:bg-gray-100 hover:border-flame-orange'
                 }`}
               >
                 Categories
