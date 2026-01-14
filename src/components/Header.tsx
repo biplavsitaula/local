@@ -193,7 +193,7 @@ const Header: React.FC<IHeaderProps> = ({
      <div className="container mx-auto px-4">
        <div className="flex h-16 items-center justify-between gap-4">
          {/* Logo */}
-         <Link href="/" className="flex items-center gap-2 shrink-0">
+         {/* <Link href="/" className="flex items-center gap-2 shrink-0">
            <div className="w-10 h-10 rounded-full bg-flame-gradient flex items-center justify-center shadow-md">
              <Flame className="w-6 h-6 text-primary-foreground" />
            </div>
@@ -202,6 +202,16 @@ const Header: React.FC<IHeaderProps> = ({
            }`}>
              Flame Beverage
            </span>
+         </Link> */}
+         <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:opacity-90 transition-opacity">
+           <Image 
+             src="/assets/flameMainLogo.png" 
+             alt="Flame Beverage logo" 
+             width={180} 
+             height={48}
+             className="h-8 w-auto sm:h-10 md:h-12 object-contain"
+             priority
+           />
          </Link>
 
          {/* Search - Desktop (moved before navigation) */}
