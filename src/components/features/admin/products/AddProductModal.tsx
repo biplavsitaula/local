@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import {
   Dialog,
   DialogContent,
@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag } from "lucide-react";
+import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag, X, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 import { useProductMutation } from "@/hooks/useProductMutation";
 import { Product } from "@/types";
@@ -57,6 +57,9 @@ export function AddProductModal({
   const isEditMode = !!product;
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
   const setOpen = controlledOnOpenChange || setInternalOpen;
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   
   const [formData, setFormData] = useState({
     name: "",
@@ -91,6 +94,10 @@ export function AddProductModal({
         tag: product.tag || "",
         isRecommended: (product as any).isRecommended || false,
       });
+      // Set image preview for edit mode
+      if (product.image) {
+        setImagePreview(product.image);
+      }
     } else if (!product && open) {
       setFormData({
         name: "",
@@ -105,8 +112,64 @@ export function AddProductModal({
         tag: "",
         isRecommended: false,
       });
+      setImagePreview(null);
     }
   }, [product, open]);
+
+  // Handle file upload
+  const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    if (file.size > maxSize) {
+      toast.error('Image size must be less than 5MB');
+      return;
+    }
+
+    setUploadingImage(true);
+    
+    try {
+      // Convert to base64 for preview and storage
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setImagePreview(base64String);
+        setFormData(prev => ({ ...prev, imageUrl: base64String }));
+        setUploadingImage(false);
+      };
+      reader.onerror = () => {
+        toast.error('Failed to read image file');
+        setUploadingImage(false);
+      };
+      reader.readAsDataURL(file);
+    } catch (err) {
+      toast.error('Failed to process image');
+      setUploadingImage(false);
+    }
+    
+    // Reset file input
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Remove selected image
+  const handleRemoveImage = () => {
+    setImagePreview(null);
+    setFormData(prev => ({ ...prev, imageUrl: '' }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -217,6 +280,7 @@ export function AddProductModal({
           tag: "",
           isRecommended: false,
         });
+        setImagePreview(null);
       }
       setErrors({});
     } catch (err: any) {
@@ -237,6 +301,9 @@ export function AddProductModal({
   const handleClose = () => {
     setOpen(false);
     setErrors({});
+    if (!isEditMode) {
+      setImagePreview(null);
+    }
   };
 
   const dialogContent = (
@@ -505,24 +572,65 @@ export function AddProductModal({
 
           <div className="space-y-2">
             <Label htmlFor="imageUrl" className="text-foreground">
-              Image URL
+              Product Image
             </Label>
 
+            {/* Image Preview */}
+            {imagePreview && (
+              <div className="relative w-full h-32 rounded-lg border border-border overflow-hidden bg-secondary/30">
+                <img 
+                  src={imagePreview} 
+                  alt="Product preview" 
+                  className="w-full h-full object-contain"
+                />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 h-6 w-6"
+                  onClick={handleRemoveImage}
+                >
+                  <X className="h-3 w-3" />
+                </Button>
+              </div>
+            )}
+
+            {/* Upload Options */}
             <div className="flex gap-2">
               <Input
                 id="imageUrl"
-                value={formData.imageUrl}
-                onChange={(e) =>
-                  setFormData({ ...formData, imageUrl: e.target.value })
-                }
-                placeholder="https://example.com/image.jpg"
+                value={imagePreview?.startsWith('data:') ? '' : formData.imageUrl}
+                onChange={(e) => {
+                  setFormData({ ...formData, imageUrl: e.target.value });
+                  setImagePreview(e.target.value || null);
+                }}
+                placeholder="Enter image URL or upload file"
                 className={cn(
                   "bg-secondary/50 border-border flex-1",
                   errors.imageUrl && "border-flame-red"
                 )}
+                disabled={imagePreview?.startsWith('data:')}
               />
-              <Button type="button" variant="outline" size="icon">
-                <Upload className="h-4 w-4" />
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                onChange={handleFileSelect}
+                className="hidden"
+              />
+              <Button 
+                type="button" 
+                variant="outline" 
+                size="icon"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingImage}
+                title="Upload image from computer"
+              >
+                {uploadingImage ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
               </Button>
             </div>
 
@@ -533,7 +641,7 @@ export function AddProductModal({
             )}
 
             <p className="text-xs text-muted-foreground">
-              Image is optional
+              Upload an image (JPEG, PNG, GIF, WebP - max 5MB) or enter a URL
             </p>
           </div>
 
