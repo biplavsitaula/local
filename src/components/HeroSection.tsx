@@ -82,7 +82,7 @@ const HeroSection: React.FC = () => {
           </div> */}
 
           <div className="flex justify-center items-center">
-            <AnimatedLogo width={120} height={48} />
+            <AnimatedLogo width={80} height={48} />
           </div>
 
           {/* Main Title */}

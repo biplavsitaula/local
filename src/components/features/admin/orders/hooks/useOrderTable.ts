@@ -4,6 +4,8 @@ import { Order } from '@/hooks/useOrderStore';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { toast } from 'sonner';
+import Image from 'next/image';
+import HeroTitle from '@/components/HeroTitle';
 
 interface UseOrderTableProps {
   orders: Order[];
@@ -425,8 +427,8 @@ export function useOrderTable({
         <body>
           <div class="invoice-container">
             <div class="header">
-              <div class="logo">🔥</div>
-              <div class="company-name">FLAME BEVERAGE</div>
+              <img src="/assets/flameMainLogo.png" alt="Flame Beverage" style="width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; display: block; margin-left: auto; margin-right: auto;" />
+              <div class="company-name" style="background: linear-gradient(135deg, #f97316, #dc2626); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; font-size: 32px; font-weight: bold; margin-bottom: 5px; letter-spacing: 2px;">Flame Beverage</div>
               <div class="company-subtitle">Premium Liquor Store</div>
               <div class="bill-info">
                 <span><strong>Bill No:</strong> ${order.billNumber}</span>
@@ -838,6 +840,7 @@ export function useOrderTable({
     getStatusColor,
   };
 }
+
 
 
 
