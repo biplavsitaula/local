@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 import ForgotPasswordModal from "./ForgotPasswordModal";
+import HeroTitle from "./HeroTitle";
 
 interface LoginModalProps {
   open: boolean;
@@ -81,9 +82,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 className="sm:w-[100px] sm:h-[80px]"
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold bg-gradient-to-r from-flame-yellow via-flame-orange to-flame-red bg-clip-text text-transparent mb-1 sm:mb-2">
+            {/* <h1 className="text-xl sm:text-2xl font-display font-bold bg-gradient-to-r from-flame-yellow via-flame-orange to-flame-red bg-clip-text text-transparent mb-1 sm:mb-2">
               {t("flameBeverage")}
-            </h1>
+            </h1> */}
+            <HeroTitle text={t("flameBeverage")} size="sm" />
             <p className="text-sm sm:text-base text-muted-foreground">
               {t('welcomeBack')}
             </p>
@@ -174,7 +176,9 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
               {isLoading ? (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
               ) : (
-                <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                // <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                // <Image src="/assets/flame200.png" alt="Flame Beverage logo" width={20} height={20} />
+                <></>
               )}
               {isLoading 
                 ? t('loggingIn')

@@ -7,6 +7,7 @@ import { Flame, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, X, Shield } from 
 import Link from "next/link";
 import Image from "next/image";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import HeroTitle from "./HeroTitle";
 
 interface RegisterModalProps {
   open: boolean;
@@ -124,9 +125,11 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                 className="sm:w-[100px] sm:h-[80px]"
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
+            {/* <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
               {t("flameBeverage")}
-            </h1>
+            </h1> */}
+            <HeroTitle text={t("flameBeverage")} size="sm" />
+
             <p className="text-sm sm:text-base text-muted-foreground">
               {t('createAccount')}
             </p>
@@ -334,7 +337,8 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
               {isLoading ? (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
               ) : (
-                <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                // <Flame className="w-4 h-4 sm:w-5 sm:h-5" />
+                <></>
               )}
               {isLoading 
                 ? t('creatingAccount')
@@ -344,7 +348,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
           </form>
 
           {/* Divider */}
-          <div className="relative my-4 sm:my-6">
+          {/* <div className="relative my-4 sm:my-6">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-border"></div>
             </div>
@@ -353,10 +357,10 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
                 {t('orContinueWith')}
               </span>
             </div>
-          </div>
+          </div> */}
 
           {/* Social Login */}
-          <div className="grid grid-cols-2 gap-2 sm:gap-4">
+          {/* <div className="grid grid-cols-2 gap-2 sm:gap-4">
             <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
               <span className="text-lg sm:text-xl">G</span>
               <span className="font-medium">{t('google')}</span>
@@ -365,7 +369,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
               <span className="text-lg sm:text-xl">f</span>
               <span className="font-medium">{t('facebook')}</span>
             </button>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

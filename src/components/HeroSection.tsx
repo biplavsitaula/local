@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
 import AnimatedLogo from "@/components/AnimatedLogo";
+import HeroTitle from "@/components/HeroTitle";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
@@ -85,9 +86,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Main Title */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
-            <span className="flame-text">{t("heroTitle")}</span>
-          </h1>
+          <HeroTitle text={t("heroTitle")} size="lg" />
 
           {/* Subtitle */}
           <p className={`text-lg sm:text-xl max-w-2xl mx-auto ${
