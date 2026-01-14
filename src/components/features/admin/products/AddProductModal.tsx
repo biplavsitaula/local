@@ -307,7 +307,7 @@ export function AddProductModal({
   };
 
   const dialogContent = (
-    <DialogContent className="sm:max-w-[500px] bg-card border-border">
+    <DialogContent className="sm:max-w-[500px] max-h-[90vh] overflow-y-auto bg-card border-border">
       <DialogHeader>
         <DialogTitle className="text-xl font-display text-flame-orange">
           {isEditMode ? "Edit Product" : "Add New Product"}
