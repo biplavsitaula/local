@@ -1,19 +1,3 @@
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 "use client";
 
 
@@ -339,7 +323,7 @@ export default function TopSellersPage() {
                <tr key={p._id} className="border-t">
                  <td className="p-4">{p.name}</td>
                  <td className="p-4">{p.category}</td>
-                 <td className="p-4">${p.price}</td>
+                 <td className="p-4">Rs {p.price}</td>
                  <td className="p-4">{p.stock}</td>
                  <td className="p-4">
                    <span className={`px-2 py-1 rounded ${status.color}`}>

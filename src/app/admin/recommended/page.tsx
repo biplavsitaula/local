@@ -521,7 +521,7 @@ export default function RecommendedPage() {
                            {product.category}
                          </span>
                        </td>
-                       <td className="p-4 text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
+                       <td className="p-4 text-sm text-foreground">Rs {(product.price || 0).toLocaleString()}</td>
                        <td className="p-4">
                          <div>
                            <p className="text-sm text-foreground">{stock} units</p>

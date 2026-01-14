@@ -631,7 +631,7 @@ export default function ReviewsPage() {
                            {product.category}
                          </span>
                        </td>
-                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">${(product.price || 0).toLocaleString()}</td>
+                       <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">Rs {(product.price || 0).toLocaleString()}</td>
                        <td className="p-3 md:p-4 text-lg md:text-sm text-foreground">{stock} units</td>
                        <td className="p-3 md:p-4">
                          <span className={`text-base md:text-xs px-2 py-1 rounded-full ${
