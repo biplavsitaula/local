@@ -271,10 +271,7 @@ const CategoriesPageContent = () => {
                 ? 'bg-card border-border text-foreground'
                 : 'bg-white border-gray-200 text-gray-900'
             }`}>
-              <div className="flex items-center gap-2">
-                <LayoutGrid className="w-4 h-4 text-flame-orange" />
-                <SelectValue placeholder={t("selectCategory" )} />
-              </div>
+              <SelectValue placeholder={t("selectCategory" )} />
             </SelectTrigger>
             <SelectContent className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}>
               <SelectItem value="all" className="cursor-pointer">

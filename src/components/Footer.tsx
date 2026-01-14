@@ -160,7 +160,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -172,7 +172,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/products"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -184,7 +184,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/#categories"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -196,7 +196,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/offers"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -219,7 +219,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/about"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -231,7 +231,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/terms"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
@@ -243,7 +243,7 @@ const Footer: React.FC = () => {
               <li>
                 <Link
                   href="/privacy"
-                  className={`text-xs sm:text-sm transition-colors ${
+                  className={`text-xs sm:text-sm underline transition-colors ${
                     theme === 'dark'
                       ? 'text-muted-foreground hover:text-primary-text'
                       : 'text-gray-600 hover:text-orange-600'
