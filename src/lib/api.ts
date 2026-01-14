@@ -205,6 +205,21 @@ export async function apiDelete<T>(
  });
 }
 
+/**
+* PATCH request
+*/
+export async function apiPatch<T>(
+ endpoint: string,
+ data?: any,
+ requireAuth: boolean = true
+): Promise<ApiResponse<T>> {
+ return apiFetch<T>(endpoint, {
+   method: 'PATCH',
+   body: data ? JSON.stringify(data) : undefined,
+   requireAuth,
+ });
+}
+
 
 
 

@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
+import { offersService, Offer } from "@/services/offers.service";
 import { Product } from "@/types";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
@@ -11,9 +12,47 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
-import { Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle } from "lucide-react";
+import { 
+  Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle, 
+  Tag, Zap, Star, Heart, ShoppingBag, Award, Crown, Flame,
+  Package, BadgePercent, PartyPopper, Ticket, Trophy,
+  LucideIcon
+} from "lucide-react";
 
 const ITEMS_PER_PAGE = 10;
+
+// Map icon string names to Lucide icon components
+const iconMap: Record<string, LucideIcon> = {
+  truck: Truck,
+  clock: Clock,
+  gift: Gift,
+  sparkles: Sparkles,
+  tag: Tag,
+  zap: Zap,
+  star: Star,
+  heart: Heart,
+  percent: Percent,
+  shopping: ShoppingBag,
+  shoppingbag: ShoppingBag,
+  award: Award,
+  crown: Crown,
+  flame: Flame,
+  package: Package,
+  badgepercent: BadgePercent,
+  partypopper: PartyPopper,
+  ticket: Ticket,
+  trophy: Trophy,
+};
+
+// Default gradient colors for offers
+const defaultGradients = [
+  "from-green-500 to-emerald-600",
+  "from-blue-500 to-cyan-600",
+  "from-purple-500 to-pink-600",
+  "from-primary-btn to-secondary-btn",
+  "from-orange-500 to-red-600",
+  "from-indigo-500 to-purple-600",
+];
 
 const OffersPageContent = () => {
   const { t, language } = useLanguage();
@@ -30,6 +69,11 @@ const OffersPageContent = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+  
+  // Offers state
+  const [offers, setOffers] = useState<Offer[]>([]);
+  const [offersLoading, setOffersLoading] = useState(true);
+  const [offersError, setOffersError] = useState<string | null>(null);
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: any): Product => {
@@ -121,6 +165,35 @@ const OffersPageContent = () => {
     fetchProducts(1, false);
   }, [fetchProducts]);
 
+  // Fetch offers from API
+  useEffect(() => {
+    const fetchOffers = async () => {
+      try {
+        setOffersLoading(true);
+        setOffersError(null);
+        
+        const response = await offersService.getAllAdmin();
+        
+        if (response.success) {
+          // Filter only active offers and sort by order
+          const activeOffers = (response.data || [])
+            .filter(offer => offer.isActive)
+            .sort((a, b) => (a.order || 0) - (b.order || 0));
+          setOffers(activeOffers);
+        } else {
+          setOffersError(response.message || 'Failed to load offers');
+        }
+      } catch (err: any) {
+        console.error('Error fetching offers:', err);
+        setOffersError(err?.message || 'Failed to load offers');
+      } finally {
+        setOffersLoading(false);
+      }
+    };
+
+    fetchOffers();
+  }, []);
+
   // Handle load more
   const handleLoadMore = () => {
     const nextPage = page + 1;
@@ -142,32 +215,39 @@ const OffersPageContent = () => {
   // No need for additional client-side search filtering
   const filteredProducts = discountedProducts;
 
-  const offers = [
-    {
-      icon: Truck,
-      title: t("freeDeliveryTitle" ),
-      description: t("freeDeliveryDesc" ),
-      color: "from-green-500 to-emerald-600",
-    },
-    {
-      icon: Clock,
-      title: t("expressDelivery" ),
-      description: t("expressDeliveryDesc" ),
-      color: "from-blue-500 to-cyan-600",
-    },
-    {
-      icon: Gift,
-      title: t("bulkDiscountTitle" ),
-      description: t("bulkDiscountDesc" ),
-      color: "from-purple-500 to-pink-600",
-    },
-    {
-      icon: Sparkles,
-      title: t("festivalSpecial" ),
-      description: t("festivalSpecialDesc" ),
-      color: "from-primary-btn to-secondary-btn",
-    },
-  ];
+  // Helper function to check if icon is an image URL
+  const isImageUrl = (icon?: string): boolean => {
+    if (!icon) return false;
+    return icon.startsWith('http') || icon.startsWith('/');
+  };
+
+  // Helper function to get icon component from icon name string
+  const getIconComponent = (iconName?: string): LucideIcon => {
+    if (!iconName) return Gift; // Default icon
+    const normalizedName = iconName.toLowerCase().trim();
+    return iconMap[normalizedName] || Gift;
+  };
+
+  // Helper function to get gradient color
+  const getGradientColor = (color?: string, index: number = 0): string => {
+    if (!color || color.trim() === '') {
+      // Return a default gradient based on index
+      return defaultGradients[index % defaultGradients.length];
+    }
+    
+    // If it's a hex color, create a gradient from it
+    if (color.startsWith('#')) {
+      return `from-[${color}] to-[${color}]/80`;
+    }
+    
+    // If it already looks like a gradient class, use it
+    if (color.includes('from-') || color.includes('to-')) {
+      return color;
+    }
+    
+    // Otherwise, try to use it as a Tailwind color
+    return `from-${color}-500 to-${color}-600`;
+  };
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
     // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
@@ -196,24 +276,76 @@ const OffersPageContent = () => {
         </h1>
 
         {/* Offer Cards */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-8 sm:mb-12">
-          {offers.map((offer, index) => {
-            const Icon = offer.icon;
-            return (
-              <div
-                key={index}
-                className={`relative p-2 sm:p-4 md:p-6 rounded-lg sm:rounded-xl bg-gradient-to-br ${offer.color} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
-              >
-                <div className="absolute -right-4 -top-4 opacity-20">
-                  <Icon className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24" />
+        {offersLoading ? (
+          <div className="flex items-center justify-center py-8 mb-8 sm:mb-12">
+            <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <span className="ml-2 text-muted-foreground">{t('loading') || 'Loading offers...'}</span>
+          </div>
+        ) : offersError ? (
+          <div className="text-center py-8 mb-8 sm:mb-12 bg-card rounded-xl">
+            <AlertCircle className="h-8 w-8 text-destructive mx-auto mb-2" />
+            <p className="text-muted-foreground">{offersError}</p>
+          </div>
+        ) : offers.length > 0 ? (
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 mb-8 sm:mb-12">
+            {offers.map((offer, index) => {
+              const isImage = isImageUrl(offer.icon);
+              const Icon = !isImage ? getIconComponent(offer.icon) : null;
+              const gradientColor = getGradientColor(offer.color, index);
+              
+              return (
+                <div
+                  key={offer._id || offer.id || index}
+                  className={`relative p-2 sm:p-4 md:p-6 rounded-lg sm:rounded-xl bg-gradient-to-br ${gradientColor} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
+                  style={offer.color?.startsWith('#') ? { 
+                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}dd)` 
+                  } : undefined}
+                >
+                  <div className="absolute -right-4 -top-4 opacity-20">
+                    {isImage ? (
+                      <img 
+                        src={offer.icon} 
+                        alt="" 
+                        className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24 object-contain"
+                      />
+                    ) : Icon && (
+                      <Icon className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24" />
+                    )}
+                  </div>
+                  {isImage ? (
+                    <img 
+                      src={offer.icon} 
+                      alt={offer.title} 
+                      className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4 object-contain"
+                    />
+                  ) : Icon && (
+                    <Icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4" />
+                  )}
+                  <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-0.5 sm:mb-1 md:mb-2">
+                    {offer.title}
+                  </h3>
+                  {offer.description && (
+                    <p className="text-white/80 text-[10px] sm:text-xs md:text-base leading-tight">
+                      {offer.description}
+                    </p>
+                  )}
+                  {(offer.discountPercent || offer.discountAmount) && (
+                    <div className="mt-1 sm:mt-2">
+                      <span className="inline-block bg-white/20 backdrop-blur-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs md:text-sm font-semibold">
+                        {offer.discountPercent ? `${offer.discountPercent}% OFF` : `Rs. ${offer.discountAmount} OFF`}
+                      </span>
+                    </div>
+                  )}
                 </div>
-                <Icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4" />
-                <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-0.5 sm:mb-1 md:mb-2">{offer.title}</h3>
-                <p className="text-white/80 text-[10px] sm:text-xs md:text-base leading-tight">{offer.description}</p>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        ) : (
+          <div className="text-center py-8 mb-8 sm:mb-12 bg-card rounded-xl">
+            <Gift className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+            <p className="text-muted-foreground">{t('noOffers') || 'No special offers available at the moment'}</p>
+          </div>
+        )}
 
         {/* Discounted Products */}
         <div className="mb-6 sm:mb-8">

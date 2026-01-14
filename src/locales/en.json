@@ -257,6 +257,8 @@
   "contactUs": "Contact Us",
   "browseByCategory": "Browse by Category",
   "selectCategory": "Select a Category",
-  "clearFilter": "Clear Filter"
+  "clearFilter": "Clear Filter",
+  "loading": "Loading...",
+  "noOffers": "No special offers available at the moment"
 }
 

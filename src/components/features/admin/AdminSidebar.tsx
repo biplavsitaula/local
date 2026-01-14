@@ -18,6 +18,7 @@ import {
   Loader2,
   Warehouse,
   X,
+  Tag,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +30,7 @@ const menuItems = [
   { title: "Products", icon: Package, path: "/admin/products" },
   { title: "Inventory", icon: Warehouse, path: "/admin/inventory" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
+  { title: "Offers", icon: Tag, path: "/admin/adminOffer" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },
   { title: "Notifications", icon: Bell, path: "/admin/notifications" },
   { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
