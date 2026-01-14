@@ -12,12 +12,15 @@ const categoryData = [
 ];
 
 const COLORS = [
-  'hsl(25 95% 53%)',
-  'hsl(0 72% 51%)',
-  'hsl(45 93% 47%)',
-  'hsl(142 76% 36%)',
-  'hsl(280 60% 50%)',
-  'hsl(0 0% 15%)',
+  'hsl(25 95% 53%)',   // Orange - Whiskey
+  'hsl(200 90% 50%)',  // Cyan/Blue - Vodka
+  'hsl(45 93% 47%)',   // Yellow/Gold - Rum
+  'hsl(142 76% 36%)',  // Green - Wine
+  'hsl(280 60% 50%)',  // Purple - Beer
+  'hsl(340 82% 52%)',  // Pink - Champagne
+  'hsl(30 80% 45%)',   // Brown - Cognac
+  'hsl(160 70% 45%)',  // Teal - Gin
+  'hsl(80 65% 45%)',   // Lime - Tequila
 ];
 
 export function CategoryPieChart({ data }: ICategoryPieChartProps) {
