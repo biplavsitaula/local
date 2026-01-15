@@ -77,7 +77,7 @@ export function useProductGrid({
      
       const response = await productsService.getAll({
         page: fetchPage,
-        limit: 5,
+        limit: 10,
         search: searchQuery || undefined,
         // Don't send category - filter client-side instead
       });

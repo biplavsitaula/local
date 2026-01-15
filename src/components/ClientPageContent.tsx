@@ -157,7 +157,7 @@ useEffect(() => {
       setLoadingRecommended(true);
       const response = await productsService.getAll({
         view: 'recommended',
-        limit: 8,
+        limit: 10,
         search: searchQuery || undefined,
       });
       const mappedProducts = (response.data || []).slice(0, 8).map(mapApiProductToProduct);
