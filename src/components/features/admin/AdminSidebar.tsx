@@ -78,7 +78,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
             priority
           />
           <div className="text-left mt-2 text-bold">
-            <p>Admin Panel</p>
+            <h1>Admin Panel</h1>
           </div>
         </div>
         {/* Close button for mobile */}

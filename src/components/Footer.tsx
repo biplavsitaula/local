@@ -87,7 +87,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="space-y-3 sm:space-y-4 col-span-2 md:col-span-1">
-        <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-2 sm:gap-3">
               <Image
                 src="/assets/flameMainLogo.png"
                 alt="Flame Beverage logo"
@@ -96,7 +96,7 @@ const Footer: React.FC = () => {
                 className="object-contain h-10 sm:h-12 w-auto"
                 priority
               />
-          </div>
+            </div>
 
 
             {/* <div className="flex items-center gap-2">
@@ -148,7 +148,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Quick Links */}
-          <div>
+          <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
@@ -207,7 +207,7 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Legal */}
-          <div>
+          <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
               theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
@@ -254,9 +254,9 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Contact */}
-          <div>
+          <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
               {t('customerService')}
             </h4>
@@ -293,9 +293,9 @@ const Footer: React.FC = () => {
           </div>
 
           {/* Newsletter */}
-          <div className="col-span-2 md:col-span-1">
+          <div className="col-span-2 md:col-span-1 mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-foreground' : 'text-gray-900'
+              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
             }`}>
               {t('newsletter')}
             </h4>
@@ -308,6 +308,7 @@ const Footer: React.FC = () => {
               onSubmit={handleNewsletterSubmit}
               className="flex gap-2"
             >
+              <div className="border-2 border-ternary-text rounded-md">
               <Input
                 type="email"
                 placeholder="Your email"
@@ -320,6 +321,7 @@ const Footer: React.FC = () => {
                   : 'bg-gray-50 border-gray-200 focus:border-orange-400'
                 }`}
               />
+              </div>
               <Button 
                 type="submit"
                 disabled={isSubmitting || isSubmitted || !newsletterEmail}
