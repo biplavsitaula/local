@@ -82,11 +82,11 @@ const HeroSection: React.FC = () => {
           </div> */}
 
           <div className="flex justify-center items-center">
-            <AnimatedLogo width={80} height={48} />
+            <AnimatedLogo width={80} height={60} />
           </div>
 
           {/* Main Title */}
-          <HeroTitle text={t("heroTitle")} size="lg" />
+          <HeroTitle text={t("heroTitle")} size="md" />
 
           {/* Subtitle */}
           <p className={`text-lg sm:text-xl max-w-2xl mx-auto ${
