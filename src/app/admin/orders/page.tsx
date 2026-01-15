@@ -121,6 +121,8 @@ const Orders = () => {
     // Refresh using current state
     const isFiltering = !!(filtersRef.current.search || filtersRef.current.status || filtersRef.current.paymentMethod);
     fetchOrders(isFiltering ? 1 : currentPage, isFiltering);
+    // Dispatch event for OrderStatusSection to refresh its data
+    window.dispatchEvent(new CustomEvent('orderChanged'));
   }, [fetchOrders, currentPage]);
 
   // Filter orders based on search and filters for OrderTable (client-side when filtering)
@@ -200,7 +202,8 @@ const Orders = () => {
       </div>
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
-        <OrderStatusSection orders={orders} onOrderUpdate={handleOrderUpdate} />
+        {/* Don't pass orders prop - let OrderStatusSection fetch all orders for accurate status counts */}
+        <OrderStatusSection onOrderUpdate={handleOrderUpdate} />
       </div>
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '200ms' }}>

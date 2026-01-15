@@ -324,9 +324,9 @@ export default function NotificationsPage() {
      <div className="flex items-center justify-between opacity-0 animate-fade-in">
        <div>
          <h1 className="text-3xl font-display font-bold text-foreground">Notifications</h1>
-         <p className="text-muted-foreground mt-1">
-           Manage and view all your notifications ({notifications.length} total, {unreadCount} unread)
-         </p>
+        <p className="text-muted-foreground mt-1">
+          Manage and view all your notifications ({totalItems} total, {unreadCount} unread)
+        </p>
        </div>
        <div className="flex items-center gap-2">
          {unreadCount > 0 && (

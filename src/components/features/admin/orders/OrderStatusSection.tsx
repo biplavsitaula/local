@@ -74,6 +74,18 @@ export function OrderStatusSection({ orders: propOrders, onOrderUpdate }: OrderS
     }
   }, [propOrders]);
 
+  // Listen for order changes to refresh status counts
+  useEffect(() => {
+    const handleOrderChange = () => {
+      if (propOrders === undefined) {
+        fetchOrders();
+      }
+    };
+
+    window.addEventListener('orderChanged', handleOrderChange);
+    return () => window.removeEventListener('orderChanged', handleOrderChange);
+  }, [propOrders]);
+
   // Calculate order status counts
   const statusCounts = useMemo(() => {
     const counts: Record<string, number> = {
