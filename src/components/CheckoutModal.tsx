@@ -445,7 +445,16 @@ const CheckoutModal = ({ open, onClose, buyNowItem }: IPaymentCheckbox) => {
             {!paid && (
               <button
                 onClick={handlePayment}
-                disabled={isProcessing || !formData.fullName || !formData.phoneNumber || formData.phoneNumber.length !== 10 || !formData.deliveryAddress || (selectedPayment === "online" && !selectedGateway) || items.length === 0}
+                disabled={
+                  isProcessing || 
+                  !formData.fullName || 
+                  !formData.phoneNumber || 
+                  formData.phoneNumber.length !== 10 || 
+                  !formData.deliveryAddress || 
+                  !formData.email ||
+                  (selectedPayment === "online" && !selectedGateway) || 
+                  items.length === 0
+                }
                 className="w-full rounded-lg sm:rounded-xl bg-primary-gradient px-4 py-3 sm:px-6 sm:py-4 text-base sm:text-base font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 {isProcessing ? (
