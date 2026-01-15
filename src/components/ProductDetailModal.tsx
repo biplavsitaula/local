@@ -35,7 +35,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
   };
 
   const handleBuyNow = () => {
-    addToCart(product, quantity);
+    // Buy Now goes directly to checkout without adding to cart
     onClose(); // Close the product detail modal first
     onBuyNow(product, quantity); // Then open checkout modal
   };

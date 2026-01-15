@@ -186,9 +186,7 @@ const filteredMostRecommended = mostRecommended;
 
 
 const handleBuyNow = (product: Product, quantity: number = 1) => {
-  // ProductCard already adds to cart before calling onBuyNow, so we just open checkout
-  setNotificationProduct(product);
-  setNotificationQuantity(quantity);
+  // Buy Now goes directly to checkout without adding to cart or showing notification
   setCheckoutOpen(true);
 };
 

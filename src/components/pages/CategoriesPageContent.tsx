@@ -189,8 +189,7 @@ const CategoriesPageContent = () => {
   }, [products, selectedCategory]);
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
-    setNotificationProduct(product);
-    setNotificationQuantity(quantity);
+    // Buy Now goes directly to checkout without adding to cart or showing notification
     setCheckoutOpen(true);
   };
 
