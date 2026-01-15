@@ -85,6 +85,8 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
     </th>
   );
 
+  console.log(categories,'categories')
+
   return (
     <div className="space-y-4">
       {/* Filter Bar */}

@@ -1,5 +1,6 @@
 import { useMemo, useState, useEffect } from 'react';
 import { Product } from '@/types';
+import { useCategories } from '@/hooks/useCategories';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
@@ -34,6 +35,9 @@ export function useProductTable({
   onRefresh,
   onFiltersChange,
 }: UseProductTableProps) {
+  // Fetch dynamic categories from API
+  const { categories: apiCategories } = useCategories();
+  
   const [sortKey, setSortKey] = useState<SortKey>('name');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
   const [editProduct, setEditProduct] = useState<Product | null>(null);
@@ -198,13 +202,10 @@ export function useProductTable({
     setCurrentPage(1);
   }, [filter, filters, sortKey, sortDir]);
 
+  // Map API categories to category names for the dropdown
   const categories = useMemo(() => {
-    const cats = new Set<string>();
-    products.forEach(p => {
-      if (p.category) cats.add(p.category);
-    });
-    return Array.from(cats).sort();
-  }, [products]);
+    return apiCategories.map(cat => cat.name);
+  }, [apiCategories]);
 
   const clearFilters = () => {
     setFilters({
