@@ -75,6 +75,8 @@ const getMethodPill = (method: "cod" | "qr", gateway: string | null) => {
   };
 };
 
+const ITEMS_PER_PAGE = 25;
+
 export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }: PaymentTableProps) {
   // --------------------
   // Hooks must always run first
@@ -92,10 +94,14 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
     maxAmount: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   
   // Use the searchQuery prop from parent (already debounced)
   const query = searchQuery;
+  
+  // Check if search or filters are active
+  const hasActiveSearchOrFilters = query.trim() !== '' || filters.status || filters.dateRange || filters.minAmount || filters.maxAmount;
   
   // Expose filters to parent component
   useEffect(() => {
@@ -157,9 +163,11 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
         setLoading(true);
         setError(null);
 
-        // Fetch all payments and filter on client side
+        // When search/filters are active, fetch all to filter client-side
+        // Otherwise, use server-side pagination
         const response = await paymentsService.getAll({
-          limit: 100,
+          limit: hasActiveSearchOrFilters ? 1000 : ITEMS_PER_PAGE,
+          page: hasActiveSearchOrFilters ? 1 : currentPage,
         });
 
         let mappedPayments = (response.data || []).map(mapApiPaymentToPayment);
@@ -172,6 +180,11 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
         }
         
         setPayments(mappedPayments);
+        
+        // Set pagination info
+        const pagination = (response as any).pagination;
+        setTotalPages(pagination?.pages || Math.ceil(mappedPayments.length / ITEMS_PER_PAGE));
+        setTotalItems(pagination?.total || mappedPayments.length);
       } catch (err: any) {
         setError(err.message || "Failed to load payments");
         setPayments([]);
@@ -181,7 +194,7 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
     };
 
     fetchPayments();
-  }, [methodFilter]);
+  }, [methodFilter, currentPage, hasActiveSearchOrFilters]);
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
@@ -269,12 +282,21 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
     });
   }, [payments, query, sortDir, sortKey, filters]);
 
-  // Apply pagination
+  // Apply pagination - only client-side when search/filters are active
   const rows = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredAndSortedRows.slice(startIndex, endIndex);
-  }, [filteredAndSortedRows, currentPage, itemsPerPage]);
+    if (hasActiveSearchOrFilters) {
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      return filteredAndSortedRows.slice(startIndex, endIndex);
+    }
+    // Server-side pagination - data is already paginated
+    return filteredAndSortedRows;
+  }, [filteredAndSortedRows, currentPage, hasActiveSearchOrFilters]);
+
+  // Calculate total pages
+  const calculatedTotalPages = hasActiveSearchOrFilters 
+    ? Math.ceil(filteredAndSortedRows.length / ITEMS_PER_PAGE)
+    : totalPages;
 
   // Reset to page 1 when filters or search change
   useEffect(() => {
@@ -540,24 +562,20 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
       </div>
       
       {/* Pagination */}
-      {(() => {
-        const totalPages = Math.ceil(filteredAndSortedRows.length / itemsPerPage);
-        
-        return filteredAndSortedRows.length > itemsPerPage ? (
-          <div className="border-t border-border/50 p-4">
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={(page) => {
-                setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
-              }}
-              itemsPerPage={itemsPerPage}
-              totalItems={filteredAndSortedRows.length}
-            />
-          </div>
-        ) : null;
-      })()}
+      {calculatedTotalPages > 1 && (
+        <div className="border-t border-border/50 p-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={calculatedTotalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={hasActiveSearchOrFilters ? filteredAndSortedRows.length : totalItems}
+          />
+        </div>
+      )}
     </div>
   );
 }

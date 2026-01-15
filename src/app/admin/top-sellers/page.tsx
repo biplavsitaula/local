@@ -24,6 +24,7 @@ import { Pagination } from "@/components/ui/pagination";
 type SortKey = "name" | "category" | "price" | "stock" | "rating" | "sales";
 type SortDir = "asc" | "desc";
 
+const ITEMS_PER_PAGE = 25;
 
 interface Product {
  _id?: string;
@@ -53,37 +54,66 @@ export default function TopSellersPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<ProductType | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
+  // Check if search is active
+  const hasActiveSearch = searchQuery.trim() !== '';
 
- const fetchData = useCallback(async () => {
+ const fetchData = useCallback(async (page: number = 1, isSearching: boolean = false) => {
    try {
      setLoading(true);
+     
+     // When search is active, fetch all to search client-side
+     // Otherwise, use server-side pagination
      const [productsRes, insightsRes] = await Promise.all([
-       topSellersService.getProducts(),
+       topSellersService.getProducts({
+         limit: isSearching ? 1000 : ITEMS_PER_PAGE,
+         page: isSearching ? 1 : page,
+         search: searchQuery || undefined,
+       }),
        topSellersService.getInsights(),
      ]);
 
 
      setTopSellingProducts(productsRes.data || []);
      setInsights(insightsRes.data || null);
+     
+     const pagination = (productsRes as any).pagination;
+     setTotalPages(pagination?.pages || Math.ceil((productsRes.data || []).length / ITEMS_PER_PAGE));
+     setTotalItems(pagination?.total || (productsRes.data || []).length);
    } catch (err: any) {
      setError(err.message || "Failed to load data");
    } finally {
      setLoading(false);
    }
- }, []);
+ }, [searchQuery]);
 
 
+ // Fetch data when page changes (server-side pagination)
  useEffect(() => {
-   fetchData();
- }, [fetchData]);
+   if (!hasActiveSearch) {
+     fetchData(currentPage, false);
+   }
+ }, [currentPage, fetchData, hasActiveSearch]);
+
+ // Fetch all data when search is active
+ useEffect(() => {
+   if (hasActiveSearch) {
+     fetchData(1, true);
+   }
+ }, [hasActiveSearch, fetchData, searchQuery]);
+
+ // Reset to page 1 when search changes
+ useEffect(() => {
+   setCurrentPage(1);
+ }, [searchQuery]);
 
 
  // Listen for product changes
  useEffect(() => {
    const handleProductChanged = () => {
-     fetchData();
+     fetchData(currentPage, hasActiveSearch);
    };
 
 
@@ -91,7 +121,7 @@ export default function TopSellersPage() {
    return () => {
      window.removeEventListener('productChanged', handleProductChanged);
    };
- }, [fetchData]);
+ }, [fetchData, currentPage, hasActiveSearch]);
 
 
  // Handle edit product
@@ -170,11 +200,16 @@ export default function TopSellersPage() {
        }
      });
 
-   // Apply pagination
-   const startIndex = (currentPage - 1) * itemsPerPage;
-   const endIndex = startIndex + itemsPerPage;
-   return filtered.slice(startIndex, endIndex);
- }, [topSellingProducts, searchQuery, sortKey, sortDir, currentPage, itemsPerPage]);
+   // Apply client-side pagination only when search is active
+   if (hasActiveSearch) {
+     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+     const endIndex = startIndex + ITEMS_PER_PAGE;
+     return filtered.slice(startIndex, endIndex);
+   }
+   
+   // Server-side pagination - data is already paginated
+   return filtered;
+ }, [topSellingProducts, searchQuery, sortKey, sortDir, currentPage, hasActiveSearch]);
 
  const totalFiltered = useMemo(() => {
    return topSellingProducts.filter((p) => {
@@ -186,12 +221,9 @@ export default function TopSellersPage() {
    });
  }, [topSellingProducts, searchQuery]);
 
- const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
-
- // Reset to page 1 when filters or search change
- useEffect(() => {
-   setCurrentPage(1);
- }, [searchQuery, sortKey, sortDir]);
+ const calculatedTotalPages = hasActiveSearch 
+   ? Math.ceil(totalFiltered.length / ITEMS_PER_PAGE)
+   : totalPages;
 
 
  const getStatus = (p: Product) => {
@@ -360,17 +392,17 @@ export default function TopSellersPage() {
           })}
         </tbody>
       </table>
-      {totalFiltered.length > itemsPerPage && (
+      {calculatedTotalPages > 1 && (
         <div className="border-t border-border/50 p-4">
           <Pagination
             currentPage={currentPage}
-            totalPages={totalPages}
+            totalPages={calculatedTotalPages}
             onPageChange={(page) => {
               setCurrentPage(page);
               window.scrollTo({ top: 0, behavior: 'smooth' });
             }}
-            itemsPerPage={itemsPerPage}
-            totalItems={totalFiltered.length}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={hasActiveSearch ? totalFiltered.length : totalItems}
           />
         </div>
       )}

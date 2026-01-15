@@ -18,6 +18,7 @@ import { Pagination } from '@/components/ui/pagination';
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
 type SortDir = 'asc' | 'desc';
 
+const ITEMS_PER_PAGE = 25;
 
 export default function RecommendedPage() {
  const [searchQuery, setSearchQuery] = useState('');
@@ -39,32 +40,61 @@ export default function RecommendedPage() {
     minRating: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
+  // Check if any filter/search is active
+  const hasActiveFilters = !!(searchQuery.trim() !== '' || 
+    filters.category || 
+    filters.stockStatus || 
+    filters.minPrice || 
+    filters.maxPrice || 
+    filters.minRating);
 
- const fetchRecommended = useCallback(async () => {
+ const fetchRecommended = useCallback(async (page: number = 1, isFiltering: boolean = false) => {
    try {
      setLoading(true);
      setError(null);
-     const response = await productsService.getAll({ view: 'recommended', limit: 100 });
+     
+     // When filters are active, fetch all to filter client-side
+     // Otherwise, use server-side pagination
+     const response = await productsService.getAll({ 
+       view: 'recommended', 
+       limit: isFiltering ? 1000 : ITEMS_PER_PAGE,
+       page: isFiltering ? 1 : page,
+       search: searchQuery || undefined,
+     });
+     
      setRecommendedProducts(response.data || []);
+     setTotalPages(response.pagination?.pages || 1);
+     setTotalItems(response.pagination?.total || (response.data || []).length);
    } catch (err: any) {
      setError(err.message || 'Failed to load recommended products');
    } finally {
      setLoading(false);
    }
- }, []);
+ }, [searchQuery]);
 
 
+ // Fetch data when page changes (server-side pagination)
  useEffect(() => {
-   fetchRecommended();
- }, [fetchRecommended]);
+   if (!hasActiveFilters) {
+     fetchRecommended(currentPage, false);
+   }
+ }, [currentPage, fetchRecommended, hasActiveFilters]);
+
+ // Fetch all data when filters are active
+ useEffect(() => {
+   if (hasActiveFilters) {
+     fetchRecommended(1, true);
+   }
+ }, [hasActiveFilters, fetchRecommended, searchQuery, filters.category, filters.stockStatus, filters.minPrice, filters.maxPrice, filters.minRating]);
 
 
  // Listen for product changes
  useEffect(() => {
    const handleProductChanged = () => {
-     fetchRecommended();
+     fetchRecommended(currentPage, hasActiveFilters);
    };
 
 
@@ -72,7 +102,7 @@ export default function RecommendedPage() {
    return () => {
      window.removeEventListener('productChanged', handleProductChanged);
    };
- }, [fetchRecommended]);
+ }, [fetchRecommended, currentPage, hasActiveFilters]);
 
 
  // Handle edit product
@@ -200,11 +230,16 @@ export default function RecommendedPage() {
        }
      });
 
-   // Apply pagination
-   const startIndex = (currentPage - 1) * itemsPerPage;
-   const endIndex = startIndex + itemsPerPage;
-   return filtered.slice(startIndex, endIndex);
- }, [recommendedProducts, searchQuery, filters, sortKey, sortDir, currentPage, itemsPerPage]);
+   // Apply pagination only when filters are active (client-side pagination)
+   if (hasActiveFilters) {
+     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+     const endIndex = startIndex + ITEMS_PER_PAGE;
+     return filtered.slice(startIndex, endIndex);
+   }
+   
+   // Server-side pagination - data is already paginated
+   return filtered;
+ }, [recommendedProducts, searchQuery, filters, sortKey, sortDir, currentPage, hasActiveFilters]);
 
  const totalFiltered = useMemo(() => {
    return recommendedProducts
@@ -245,12 +280,14 @@ export default function RecommendedPage() {
      });
  }, [recommendedProducts, searchQuery, filters]);
 
- const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
+ const calculatedTotalPages = hasActiveFilters 
+   ? Math.ceil(totalFiltered.length / ITEMS_PER_PAGE)
+   : totalPages;
 
  // Reset to page 1 when filters or search change
  useEffect(() => {
    setCurrentPage(1);
- }, [searchQuery, filters, sortKey, sortDir]);
+ }, [searchQuery, filters.category, filters.stockStatus, filters.minPrice, filters.maxPrice, filters.minRating]);
 
 
  const getStock = (p: any) => p.stock ?? 0;
@@ -270,9 +307,6 @@ export default function RecommendedPage() {
      minRating: '',
    });
  };
-
- const hasActiveFilters = filters.category || filters.stockStatus || filters.minPrice || filters.maxPrice || filters.minRating;
-
 
  const renderSortableTh = (label: string, columnKey: SortKey) => (
    <th
@@ -586,17 +620,17 @@ export default function RecommendedPage() {
             </tbody>
           </table>
         </div>
-        {totalFiltered.length > itemsPerPage && (
+        {calculatedTotalPages > 1 && (
           <div className="border-t border-border/50 p-4">
             <Pagination
               currentPage={currentPage}
-              totalPages={totalPages}
+              totalPages={calculatedTotalPages}
               onPageChange={(page) => {
                 setCurrentPage(page);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
               }}
-              itemsPerPage={itemsPerPage}
-              totalItems={totalFiltered.length}
+              itemsPerPage={ITEMS_PER_PAGE}
+              totalItems={hasActiveFilters ? totalFiltered.length : totalItems}
             />
           </div>
         )}

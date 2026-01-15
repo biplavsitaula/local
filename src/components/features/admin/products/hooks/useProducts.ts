@@ -4,6 +4,8 @@ import { Product as ProductType } from '@/types';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 
+const ITEMS_PER_PAGE = 25;
+
 export function useProducts() {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,6 +14,7 @@ export function useProducts() {
   const [searchInput, setSearchInput] = useState('');
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
   const [tableFilters, setTableFilters] = useState<{
     category?: string;
     stockStatus?: string;
@@ -37,6 +40,14 @@ export function useProducts() {
     } as ProductType;
   };
 
+  // Check if any search/filter is active
+  const hasActiveFilters = searchInput.trim() !== '' || 
+    tableFilters.category || 
+    tableFilters.stockStatus || 
+    tableFilters.minPrice || 
+    tableFilters.maxPrice || 
+    tableFilters.minRating;
+
   const fetchProducts = useCallback(async (filter: string, search?: string, pageNum?: number) => {
     try {
       setLoading(true);
@@ -51,11 +62,15 @@ export function useProducts() {
         'recommended': 'recommended',
       };
 
+      // When search is active, fetch all matching results from server
+      // Otherwise, use server-side pagination
+      const isSearching = search && search.trim() !== '';
+      
       const filters = {
         view: viewMap[filter] || 'all' as const,
         search: search || undefined,
-        page: pageNum || page,
-        limit: 50,
+        page: isSearching ? 1 : (pageNum || page),
+        limit: isSearching ? 1000 : ITEMS_PER_PAGE, // Fetch all when searching, paginate otherwise
       };
 
       const response = await productsService.getAll(filters);
@@ -63,6 +78,7 @@ export function useProducts() {
       
       setProducts(mappedProducts);
       setTotalPages(response.pagination?.pages || 1);
+      setTotalItems(response.pagination?.total || mappedProducts.length);
     } catch (err: any) {
       setError(err.message || 'Failed to load products');
       setProducts([]);
@@ -71,14 +87,23 @@ export function useProducts() {
     }
   }, [page]);
 
+  // Fetch when filter or page changes (not search - that's debounced)
   useEffect(() => {
-    fetchProducts(currentFilter, searchInput);
-  }, [currentFilter, searchInput, fetchProducts]);
+    fetchProducts(currentFilter, searchInput, page);
+  }, [currentFilter, page]);
+
+  // Separate effect for search with reset to page 1
+  useEffect(() => {
+    if (searchInput !== undefined) {
+      setPage(1); // Reset to page 1 when searching
+      fetchProducts(currentFilter, searchInput, 1);
+    }
+  }, [searchInput, currentFilter]);
 
   // Listen for product changed event (added or updated) to refresh the list
   useEffect(() => {
     const handleProductChanged = () => {
-      fetchProducts(currentFilter, searchInput);
+      fetchProducts(currentFilter, searchInput, page);
     };
 
     window.addEventListener('productChanged', handleProductChanged);
@@ -86,11 +111,11 @@ export function useProducts() {
     return () => {
       window.removeEventListener('productChanged', handleProductChanged);
     };
-  }, [currentFilter, searchInput, fetchProducts]);
+  }, [currentFilter, searchInput, page, fetchProducts]);
 
   const refetch = useCallback(() => {
-    fetchProducts(currentFilter, searchInput);
-  }, [currentFilter, searchInput, fetchProducts]);
+    fetchProducts(currentFilter, searchInput, page);
+  }, [currentFilter, searchInput, page, fetchProducts]);
 
   return {
     products,
@@ -103,9 +128,12 @@ export function useProducts() {
     page,
     setPage,
     totalPages,
+    totalItems,
     tableFilters,
     setTableFilters,
     refetch,
+    hasActiveFilters,
+    itemsPerPage: ITEMS_PER_PAGE,
   };
 }
 

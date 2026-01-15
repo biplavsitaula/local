@@ -1,12 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo } from 'react';
+import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
 import { OrderTable } from '@/components/features/admin/orders/OrderTable';
 import { OrderStatusSection } from '@/components/features/admin/orders/OrderStatusSection';
 import { ExportButton } from '@/components/features/admin/ExportButton';
 import { ordersService, Order as ApiOrder } from '@/services/orders.service';
 import { Order } from '@/hooks/useOrderStore';
 import { Loader2 } from 'lucide-react';
+import { Pagination } from '@/components/ui/pagination';
+
+const ITEMS_PER_PAGE = 25;
 
 const Orders = () => {
   const [orderFilters, setOrderFilters] = useState<{
@@ -19,6 +22,16 @@ const Orders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  
+  // Use ref to track filters without causing re-renders
+  const filtersRef = useRef(orderFilters);
+  filtersRef.current = orderFilters;
+
+  // Check if any filter is active
+  const hasActiveFilters = !!(orderFilters.search || orderFilters.status || orderFilters.paymentMethod);
 
   const mapApiOrderToOrder = (apiOrder: ApiOrder): Order => {
     const customerName = (apiOrder.customer as any)?.fullName || 
@@ -48,36 +61,74 @@ const Orders = () => {
     };
   };
 
-  // Single API call to fetch all orders
-  const fetchOrders = useCallback(async () => {
+  // Fetch orders with server-side pagination - no dependencies on orderFilters object
+  const fetchOrders = useCallback(async (page: number = 1, isFiltering: boolean = false) => {
     try {
       setLoading(true);
       setError(null);
+      
+      // Use ref to get current filters without dependency
+      const currentFilters = filtersRef.current;
+      
+      // When filters are active, fetch all to filter/search client-side
+      // Otherwise, use server-side pagination
       const response = await ordersService.getAll({
-        limit: 1000, // Fetch all, paginate client-side
+        limit: isFiltering ? 1000 : ITEMS_PER_PAGE,
+        page: isFiltering ? 1 : page,
+        search: currentFilters.search || undefined,
+        status: currentFilters.status || undefined,
+        paymentMethod: currentFilters.paymentMethod || undefined,
       });
+      
       const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
       setOrders(mappedOrders);
+      setTotalPages(response.pagination?.pages || Math.ceil(mappedOrders.length / ITEMS_PER_PAGE));
+      setTotalItems(response.pagination?.total || mappedOrders.length);
     } catch (err: any) {
       setError(err.message || 'Failed to load orders');
       setOrders([]);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, []); // Empty dependency array - uses ref for filters
 
   // Initial fetch
   useEffect(() => {
-    fetchOrders();
+    fetchOrders(1, false);
   }, [fetchOrders]);
+
+  // Fetch when page changes (only for server-side pagination without filters)
+  useEffect(() => {
+    if (!hasActiveFilters && currentPage > 1) {
+      fetchOrders(currentPage, false);
+    }
+  }, [currentPage, hasActiveFilters, fetchOrders]);
+
+  // Fetch all data when filters change
+  useEffect(() => {
+    if (hasActiveFilters) {
+      setCurrentPage(1);
+      fetchOrders(1, true);
+    } else {
+      // Reset to page 1 and fetch without filters
+      setCurrentPage(1);
+      fetchOrders(1, false);
+    }
+    // Only trigger when actual filter values change
+  }, [orderFilters.search, orderFilters.status, orderFilters.paymentMethod, fetchOrders]);
 
   const handleOrderUpdate = useCallback(() => {
-    // Single refresh call that updates both components
-    fetchOrders();
-  }, [fetchOrders]);
+    // Refresh using current state
+    const isFiltering = !!(filtersRef.current.search || filtersRef.current.status || filtersRef.current.paymentMethod);
+    fetchOrders(isFiltering ? 1 : currentPage, isFiltering);
+  }, [fetchOrders, currentPage]);
 
-  // Filter orders based on search and filters for OrderTable
+  // Filter orders based on search and filters for OrderTable (client-side when filtering)
   const filteredOrders = useMemo(() => {
+    if (!hasActiveFilters) {
+      return orders; // Server already filtered/paginated
+    }
+
     let filtered = [...orders];
 
     // Apply search filter
@@ -112,7 +163,20 @@ const Orders = () => {
     }
 
     return filtered;
-  }, [orders, orderFilters]);
+  }, [orders, orderFilters, hasActiveFilters]);
+
+  // Client-side pagination when filters are active
+  const paginatedOrders = useMemo(() => {
+    if (hasActiveFilters) {
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      return filteredOrders.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+    }
+    return filteredOrders;
+  }, [filteredOrders, currentPage, hasActiveFilters]);
+
+  const calculatedTotalPages = hasActiveFilters 
+    ? Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) 
+    : totalPages;
 
   if (loading) {
     return (
@@ -141,11 +205,26 @@ const Orders = () => {
 
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '200ms' }}>
         <OrderTable 
-          orders={filteredOrders} 
+          orders={paginatedOrders} 
           allOrders={orders}
           onFiltersChange={setOrderFilters} 
           onOrderUpdate={handleOrderUpdate} 
         />
+        {/* Server-side pagination */}
+        {calculatedTotalPages > 1 && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={currentPage}
+              totalPages={calculatedTotalPages}
+              onPageChange={(page) => {
+                setCurrentPage(page);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={ITEMS_PER_PAGE}
+              totalItems={hasActiveFilters ? filteredOrders.length : totalItems}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

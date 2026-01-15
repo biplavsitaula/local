@@ -75,8 +75,17 @@ export function NotificationDropdown() {
        unread = wrapped.unreadCount || 0;
      }
 
+     // Deduplicate notifications based on ID and message
+     const seen = new Set<string>();
+     const uniqueNotifications = notificationsList.filter((n) => {
+       const id = n._id || n.id || '';
+       const uniqueKey = `${id}-${n.message}`;
+       if (seen.has(uniqueKey)) return false;
+       seen.add(uniqueKey);
+       return true;
+     });
 
-     setNotifications(notificationsList);
+     setNotifications(uniqueNotifications);
      setUnreadCount(unread);
    } catch (err) {
      console.error('Failed to fetch notifications:', err);

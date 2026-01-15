@@ -13,12 +13,14 @@ import { EditReviewModal, DeleteReviewModal } from '@/components/features/admin/
 import { AddProductModal } from '@/components/features/admin/products/AddProductModal';
 import { DeleteProductModal } from '@/components/features/admin/products/DeleteProductModal';
 import { Product } from '@/types';
+import { Pagination } from '@/components/ui/pagination';
 
 
 type SortKey = 'name' | 'category' | 'price' | 'stock' | 'status' | 'rating' | 'sales';
 type ReviewSortKey = 'customerName' | 'rating' | 'createdAt' | 'productName';
 type SortDir = 'asc' | 'desc';
 
+const ITEMS_PER_PAGE = 25;
 
 export default function ReviewsPage() {
  const [searchQuery, setSearchQuery] = useState('');
@@ -47,18 +49,33 @@ export default function ReviewsPage() {
    dateRange: '',
    product: '',
  });
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+
+  // Check if any filter/search is active
+  const hasActiveFilters = reviewSearchQuery.trim() !== '' || 
+    reviewFilters.rating || 
+    reviewFilters.dateRange || 
+    reviewFilters.product;
 
 
- const fetchData = useCallback(async () => {
+ const fetchData = useCallback(async (page: number = 1) => {
    try {
      setLoading(true);
      setError(null);
 
+     // When filters are active, fetch all to filter client-side
+     // Otherwise, use server-side pagination
+     const reviewsFilters = hasActiveFilters 
+       ? { limit: 1000 }
+       : { page, limit: ITEMS_PER_PAGE };
 
      const [summaryRes, mostReviewedRes, reviewsRes] = await Promise.all([
        reviewsService.getSummary(),
        reviewsService.getMostReviewed(10),
-       reviewsService.getAll(),
+       reviewsService.getAll(reviewsFilters),
      ]);
 
 
@@ -151,7 +168,11 @@ export default function ReviewsPage() {
     }
     
     setMostReviewedProducts(productsWithReviews);
-
+    
+    // Set pagination info
+    const pagination = (reviewsRes as any).pagination;
+    setTotalPages(pagination?.pages || Math.ceil(mappedReviews.length / ITEMS_PER_PAGE));
+    setTotalItems(pagination?.total || mappedReviews.length);
 
    } catch (err: any) {
      setError(err.message || 'Failed to load reviews');
@@ -162,10 +183,24 @@ export default function ReviewsPage() {
    }
  }, []);
 
-
+ // Fetch data when page changes (server-side pagination)
  useEffect(() => {
-   fetchData();
- }, [fetchData]);
+   if (!hasActiveFilters) {
+     fetchData(currentPage);
+   }
+ }, [currentPage, fetchData, hasActiveFilters]);
+
+ // Fetch all data when filters are active
+ useEffect(() => {
+   if (hasActiveFilters) {
+     fetchData(1);
+   }
+ }, [hasActiveFilters, fetchData, reviewSearchQuery, reviewFilters.rating, reviewFilters.dateRange, reviewFilters.product]);
+
+ // Reset to page 1 when filters change
+ useEffect(() => {
+   setCurrentPage(1);
+ }, [reviewSearchQuery, reviewFilters.rating, reviewFilters.dateRange, reviewFilters.product]);
 
 
  // Listen for review changes from modals
@@ -265,60 +300,77 @@ export default function ReviewsPage() {
  }, [reviews]);
 
  // Filter and sort reviews
- const filteredAndSortedReviews = reviews
-   .filter((r) => {
-     const query = reviewSearchQuery.toLowerCase();
-     const matchesSearch = (
-       (r.customerName || '').toLowerCase().includes(query) ||
-       (r.productName || '').toLowerCase().includes(query) ||
-       (r.comment || '').toLowerCase().includes(query)
-     );
+ const filteredReviews = useMemo(() => {
+   return reviews
+     .filter((r) => {
+       const query = reviewSearchQuery.toLowerCase();
+       const matchesSearch = (
+         (r.customerName || '').toLowerCase().includes(query) ||
+         (r.productName || '').toLowerCase().includes(query) ||
+         (r.comment || '').toLowerCase().includes(query)
+       );
 
-     // Apply rating filter
-     if (reviewFilters.rating) {
-       const rating = parseInt(reviewFilters.rating);
-       if (!isNaN(rating) && (r.rating || 0) !== rating) {
+       // Apply rating filter
+       if (reviewFilters.rating) {
+         const rating = parseInt(reviewFilters.rating);
+         if (!isNaN(rating) && (r.rating || 0) !== rating) {
+           return false;
+         }
+       }
+
+       // Apply product filter
+       if (reviewFilters.product && r.productName?.toLowerCase() !== reviewFilters.product.toLowerCase()) {
          return false;
        }
-     }
 
-     // Apply product filter
-     if (reviewFilters.product && r.productName?.toLowerCase() !== reviewFilters.product.toLowerCase()) {
-       return false;
-     }
-
-     // Apply date range filter
-     if (reviewFilters.dateRange) {
-       const now = new Date();
-       let cutoffDate = new Date();
-       if (reviewFilters.dateRange === '7d') {
-         cutoffDate.setDate(now.getDate() - 7);
-       } else if (reviewFilters.dateRange === '30d') {
-         cutoffDate.setDate(now.getDate() - 30);
-       } else if (reviewFilters.dateRange === '90d') {
-         cutoffDate.setDate(now.getDate() - 90);
+       // Apply date range filter
+       if (reviewFilters.dateRange) {
+         const now = new Date();
+         let cutoffDate = new Date();
+         if (reviewFilters.dateRange === '7d') {
+           cutoffDate.setDate(now.getDate() - 7);
+         } else if (reviewFilters.dateRange === '30d') {
+           cutoffDate.setDate(now.getDate() - 30);
+         } else if (reviewFilters.dateRange === '90d') {
+           cutoffDate.setDate(now.getDate() - 90);
+         }
+         const reviewDate = new Date(r.createdAt);
+         if (reviewDate < cutoffDate) return false;
        }
-       const reviewDate = new Date(r.createdAt);
-       if (reviewDate < cutoffDate) return false;
-     }
 
-     return matchesSearch;
-   })
-   .sort((a, b) => {
-     const dir = reviewSortDir === 'asc' ? 1 : -1;
-     switch (reviewSortKey) {
-       case 'customerName':
-         return dir * (a.customerName || '').localeCompare(b.customerName || '');
-       case 'productName':
-         return dir * (a.productName || '').localeCompare(b.productName || '');
-       case 'rating':
-         return dir * ((a.rating || 0) - (b.rating || 0));
-       case 'createdAt':
-         return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
-       default:
-         return 0;
-     }
-   });
+       return matchesSearch;
+     })
+     .sort((a, b) => {
+       const dir = reviewSortDir === 'asc' ? 1 : -1;
+       switch (reviewSortKey) {
+         case 'customerName':
+           return dir * (a.customerName || '').localeCompare(b.customerName || '');
+         case 'productName':
+           return dir * (a.productName || '').localeCompare(b.productName || '');
+         case 'rating':
+           return dir * ((a.rating || 0) - (b.rating || 0));
+         case 'createdAt':
+           return dir * (new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+         default:
+           return 0;
+       }
+     });
+ }, [reviews, reviewSearchQuery, reviewFilters, reviewSortKey, reviewSortDir]);
+
+ // Apply pagination to reviews
+ const filteredAndSortedReviews = useMemo(() => {
+   if (hasActiveFilters) {
+     // Client-side pagination when filtering
+     const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+     return filteredReviews.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+   }
+   // Server-side pagination - data is already paginated
+   return filteredReviews;
+ }, [filteredReviews, currentPage, hasActiveFilters]);
+
+ const calculatedTotalPages = hasActiveFilters 
+   ? Math.ceil(filteredReviews.length / ITEMS_PER_PAGE)
+   : totalPages;
 
 
  // Filter and sort for table
@@ -899,6 +951,21 @@ export default function ReviewsPage() {
              </tbody>
            </table>
          </div>
+         {/* Pagination for Reviews */}
+         {calculatedTotalPages > 1 && (
+           <div className="border-t border-border/50 p-4">
+             <Pagination
+               currentPage={currentPage}
+               totalPages={calculatedTotalPages}
+               onPageChange={(page) => {
+                 setCurrentPage(page);
+                 window.scrollTo({ top: 0, behavior: 'smooth' });
+               }}
+               itemsPerPage={ITEMS_PER_PAGE}
+               totalItems={hasActiveFilters ? filteredReviews.length : totalItems}
+             />
+           </div>
+         )}
        </div>
      </div>
 

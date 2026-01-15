@@ -17,6 +17,7 @@ import { Pagination } from '@/components/ui/pagination';
 type ApiNotificationType = 'New Payment' | 'New Order' | 'Low Stock Alert' | 'Super Admin Update' | 'System Update';
 type FilterType = 'all' | 'payment' | 'order' | 'low-stock' | 'super-admin' | 'system';
 
+const ITEMS_PER_PAGE = 25;
 
 // Map API types to filter types
 const apiTypeToFilterType: Record<string, FilterType> = {
@@ -59,15 +60,24 @@ export default function NotificationsPage() {
     search: '',
   });
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 25;
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
 
+  // Check if any filter is active
+  const hasActiveFilters = filters.readStatus || filters.dateRange || filters.search || selectedType !== 'all';
 
- const fetchNotifications = useCallback(async () => {
+ const fetchNotifications = useCallback(async (page: number = 1, isFiltering: boolean = false) => {
    try {
      setLoading(true);
      setError(null);
     
-     const notificationsRes = await notificationsService.getAll();
+     // When filters are active, fetch all to filter client-side
+     // Otherwise, use server-side pagination
+     const apiFilters = isFiltering 
+       ? { limit: 1000 } 
+       : { page, limit: ITEMS_PER_PAGE };
+     
+     const notificationsRes = await notificationsService.getAll(apiFilters);
 
 
      // API returns: { success, message, data: [...], pagination, unreadCount }
@@ -92,18 +102,30 @@ export default function NotificationsPage() {
 
      setNotifications(notificationsList);
      setUnreadCount(unread);
+     setTotalPages(notificationsRes.pagination?.pages || Math.ceil(notificationsList.length / ITEMS_PER_PAGE));
+     setTotalItems(notificationsRes.pagination?.total || notificationsList.length);
    } catch (err: any) {
      setError(err.message || 'Failed to load notifications');
      console.error('Notifications error:', err);
    } finally {
      setLoading(false);
    }
- }, []);
+ }, []); // Remove hasActiveFilters from dependencies to keep callback stable
 
 
+ // Fetch data when page changes (server-side pagination)
  useEffect(() => {
-   fetchNotifications();
- }, [fetchNotifications]);
+   if (!hasActiveFilters) {
+     fetchNotifications(currentPage, false);
+   }
+ }, [currentPage, fetchNotifications, hasActiveFilters]);
+
+ // Fetch all data when filters are active
+ useEffect(() => {
+   if (hasActiveFilters) {
+     fetchNotifications(1, true);
+   }
+ }, [hasActiveFilters, fetchNotifications, selectedType, filters.readStatus, filters.dateRange, filters.search]);
 
 
  const handleMarkAsRead = async (id: string) => {
@@ -210,8 +232,6 @@ export default function NotificationsPage() {
    });
  };
 
- const hasActiveFilters = filters.readStatus || filters.dateRange || filters.search;
-
 
  // Count notifications by type
  const getTypeCount = (type: FilterType): number => {
@@ -246,19 +266,27 @@ export default function NotificationsPage() {
 
   const filteredNotifications = applyFilters(filterByType(selectedType));
 
-  // Pagination logic
+  // Pagination logic - only paginate client-side when filters are active
   const paginatedNotifications = useMemo(() => {
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    return filteredNotifications.slice(startIndex, endIndex);
-  }, [filteredNotifications, currentPage, itemsPerPage]);
+    if (hasActiveFilters) {
+      // Client-side pagination when filtering
+      const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = startIndex + ITEMS_PER_PAGE;
+      return filteredNotifications.slice(startIndex, endIndex);
+    }
+    // Server-side pagination - data is already paginated
+    return filteredNotifications;
+  }, [filteredNotifications, currentPage, hasActiveFilters]);
 
-  const totalPages = Math.ceil(filteredNotifications.length / itemsPerPage);
+  // Calculate total pages based on whether we're filtering
+  const calculatedTotalPages = hasActiveFilters 
+    ? Math.ceil(filteredNotifications.length / ITEMS_PER_PAGE)
+    : totalPages;
 
-  // Reset to page 1 when filters change
+  // Reset to page 1 only when filters actually change (not on every render)
   useEffect(() => {
     setCurrentPage(1);
-  }, [selectedType, filters]);
+  }, [selectedType, filters.readStatus, filters.dateRange, filters.search]);
 
 
  if (loading) {
@@ -282,9 +310,9 @@ export default function NotificationsPage() {
            <p className="text-lg font-semibold text-foreground mb-2">Error loading notifications</p>
            <p className="text-muted-foreground">{error}</p>
          </div>
-         <Button onClick={fetchNotifications} variant="outline">
-           Try Again
-         </Button>
+        <Button onClick={() => fetchNotifications(currentPage, !!hasActiveFilters)} variant="outline">
+          Try Again
+        </Button>
        </div>
      </div>
    );
@@ -541,17 +569,17 @@ export default function NotificationsPage() {
               </div>
             )}
           </ScrollArea>
-          {filteredNotifications.length > itemsPerPage && (
+          {calculatedTotalPages > 1 && (
             <div className="border-t border-border/50 p-4">
               <Pagination
                 currentPage={currentPage}
-                totalPages={totalPages}
+                totalPages={calculatedTotalPages}
                 onPageChange={(page) => {
                   setCurrentPage(page);
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}
-                itemsPerPage={itemsPerPage}
-                totalItems={filteredNotifications.length}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={hasActiveFilters ? filteredNotifications.length : totalItems}
               />
             </div>
           )}

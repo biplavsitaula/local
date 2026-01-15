@@ -8,6 +8,7 @@ import { Loader2, AlertCircle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
 import { useProducts } from './hooks/useProducts';
+import { Pagination } from '@/components/ui/pagination';
 
 type FilterType = 'all' | 'out-of-stock' | 'low-stock' | 'top-sellers' | 'top-reviewed' | 'recommended';
 
@@ -23,9 +24,12 @@ const Products = () => {
     page,
     setPage,
     totalPages,
+    totalItems,
     tableFilters,
     setTableFilters,
     refetch,
+    hasActiveFilters,
+    itemsPerPage,
   } = useProducts();
   
   const debouncedSearch = useDebounce(searchInput, 300);
@@ -119,6 +123,21 @@ const Products = () => {
         <div className="mt-6">
           {renderContent()}
         </div>
+        {/* Server-side pagination - only show when not actively searching */}
+        {!loading && !error && totalPages > 1 && !hasActiveFilters && (
+          <div className="mt-4">
+            <Pagination
+              currentPage={page}
+              totalPages={totalPages}
+              onPageChange={(newPage) => {
+                setPage(newPage);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              itemsPerPage={itemsPerPage}
+              totalItems={totalItems}
+            />
+          </div>
+        )}
       </Tabs>
     </div>
   );
