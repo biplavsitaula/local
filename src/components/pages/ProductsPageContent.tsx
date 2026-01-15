@@ -331,7 +331,8 @@ const ProductsPageContent: React.FC = () => {
                </SelectTrigger>
                <SelectContent 
                  side="bottom"
-                 className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}
+                 position="popper"
+                 className={`max-h-[300px] ${currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}`}
                >
                 <SelectItem value="all" className="cursor-pointer">
                   <div className="flex items-center gap-2">
@@ -437,7 +438,11 @@ const ProductsPageContent: React.FC = () => {
                 }`}>
                   <SelectValue placeholder={t('allCategories')} />
                 </SelectTrigger>
-                <SelectContent className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}>
+                <SelectContent 
+                  side="bottom"
+                  position="popper"
+                  className={`max-h-[300px] ${currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}`}
+                >
                   <SelectItem value="all" className="cursor-pointer">
                     <div className="flex items-center gap-2">
                       <LayoutGrid className="w-4 h-4 text-flame-orange" />
