@@ -53,7 +53,7 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                   onCategorySelect(isSelected ? null : category.id);
                 }
               }}
-              className={`relative p-3 rounded-xl transition-all duration-300 cursor-pointer group ${
+              className={`relative px-4 py-2.5 rounded-xl transition-all duration-300 cursor-pointer group ${
                 isSelected
                   ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`
                   : currentTheme === 'dark'
@@ -61,21 +61,13 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                     : 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-orange-300 shadow-sm'
               }`}
             >
-              <div className={`flex flex-col items-center gap-2 ${
+              <div className={`flex items-center gap-2 ${
                 isSelected ? '' : currentTheme === 'dark' ? 'text-foreground' : 'text-gray-700'
               }`}>
-                <div className={`p-2 rounded-lg ${
-                  isSelected 
-                    ? 'bg-white/20' 
-                    : currentTheme === 'dark'
-                      ? 'bg-secondary'
-                      : 'bg-orange-50'
-                }`}>
-                  <Icon className={`w-5 h-5 ${
-                    isSelected ? 'text-white' : 'text-flame-orange'
-                  }`} />
-                </div>
-                <span className="font-medium text-xs">
+                <Icon className={`w-4 h-4 ${
+                  isSelected ? 'text-white' : 'text-flame-orange'
+                }`} />
+                <span className="font-medium text-sm">
                   {language === "en" ? category.name : category.nameNe}
                 </span>
               </div>
