@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useCart } from "@/contexts/CartContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { IPaymentCheckbox } from "@/interface/IPaymentCheckout";
@@ -9,9 +9,24 @@ import Link from "next/link";
 import { ordersService, CheckoutPayload } from "@/services/orders.service";
 import Image from "next/image";
 
-const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
+const CheckoutModal = ({ open, onClose, buyNowItem }: IPaymentCheckbox) => {
   const { t, language } = useLanguage();
-  const { items, total, totalItems, clear: clearCart } = useCart();
+  const { items: cartItems, total: cartTotal, totalItems, clear: clearCart } = useCart();
+  
+  // Use buyNowItem if provided, otherwise use cart items
+  const items = useMemo(() => {
+    if (buyNowItem) {
+      return [{ product: buyNowItem.product, quantity: buyNowItem.quantity }];
+    }
+    return cartItems;
+  }, [buyNowItem, cartItems]);
+  
+  const total = useMemo(() => {
+    if (buyNowItem) {
+      return (buyNowItem.product.price || 0) * buyNowItem.quantity;
+    }
+    return cartTotal;
+  }, [buyNowItem, cartTotal]);
   const [selectedPayment, setSelectedPayment] = useState<"cod" | "online">("cod");
   const [selectedGateway, setSelectedGateway] = useState<"esewa" | "khalti" | "card" | null>(null);
   const [formData, setFormData] = useState({
@@ -105,8 +120,10 @@ const CheckoutModal = ({ open, onClose }: IPaymentCheckbox) => {
           billNumber: responseData?.billNumber || responseData?.order?.billNumber,
           statusInfo: responseData?.statusInfo,
         });
-        // Clear the cart after successful checkout
-        clearCart();
+        // Clear the cart after successful checkout (only if not using buyNowItem)
+        if (!buyNowItem) {
+          clearCart();
+        }
         // Close modal after showing success message (increased timeout to show message)
         setTimeout(() => {
           handleClose();

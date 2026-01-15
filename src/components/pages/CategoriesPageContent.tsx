@@ -36,6 +36,7 @@ const CategoriesPageContent = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+  const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
   
   // Use categories hook
   const { categories } = useCategories({ includeAll: false });
@@ -190,6 +191,7 @@ const CategoriesPageContent = () => {
 
   const handleBuyNow = (product: Product, quantity: number = 1) => {
     // Buy Now goes directly to checkout without adding to cart or showing notification
+    setBuyNowItem({ product, quantity });
     setCheckoutOpen(true);
   };
 
@@ -348,7 +350,11 @@ const CategoriesPageContent = () => {
       {/* Checkout Modal */}
       <CheckoutModal
         open={checkoutOpen}
-        onClose={() => setCheckoutOpen(false)}
+        onClose={() => {
+          setCheckoutOpen(false);
+          setBuyNowItem(null);
+        }}
+        buyNowItem={buyNowItem}
       />
 
       <CartNotification

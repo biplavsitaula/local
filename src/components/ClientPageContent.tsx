@@ -46,6 +46,7 @@ const [loadingRecommended, setLoadingRecommended] = useState(true);
 const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
 const [notificationQuantity, setNotificationQuantity] = useState(1);
+const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
 
 
 
@@ -187,6 +188,7 @@ const filteredMostRecommended = mostRecommended;
 
 const handleBuyNow = (product: Product, quantity: number = 1) => {
   // Buy Now goes directly to checkout without adding to cart or showing notification
+  setBuyNowItem({ product, quantity });
   setCheckoutOpen(true);
 };
 
@@ -440,7 +442,11 @@ return (
             <Footer />
             <CheckoutModal
               open={checkoutOpen}
-              onClose={() => setCheckoutOpen(false)}
+              onClose={() => {
+                setCheckoutOpen(false);
+                setBuyNowItem(null);
+              }}
+              buyNowItem={buyNowItem}
             />
 
 

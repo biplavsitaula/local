@@ -43,6 +43,7 @@ const ProductsPageContent: React.FC = () => {
   const [checkoutOpen, setCheckoutOpen] = useState(false);
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
+  const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
   
   // Use categories hook
   const { categories } = useCategories({ includeAll: false });
@@ -226,6 +227,7 @@ const ProductsPageContent: React.FC = () => {
 
  const handleBuyNow = (product: Product, quantity: number = 1) => {
    // Buy Now goes directly to checkout without adding to cart or showing notification
+   setBuyNowItem({ product, quantity });
    setCheckoutOpen(true);
  };
 
@@ -648,7 +650,11 @@ const ProductsPageContent: React.FC = () => {
      {/* Checkout Modal */}
      <CheckoutModal
        open={checkoutOpen}
-       onClose={() => setCheckoutOpen(false)}
+       onClose={() => {
+         setCheckoutOpen(false);
+         setBuyNowItem(null);
+       }}
+       buyNowItem={buyNowItem}
      />
 
 
