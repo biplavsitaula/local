@@ -104,17 +104,19 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
                 <span>{t("allCategories")}</span>
               </div>
             </SelectItem>
-            {categories.map((category) => {
-              const Icon = category.icon;
-              return (
-                <SelectItem key={category.id} value={category.id} className="cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <Icon className="w-4 h-4 text-flame-orange" />
-                    <span>{language === "en" ? category.name : category.nameNe}</span>
-                  </div>
-                </SelectItem>
-              );
-            })}
+            {categories
+              .filter((category) => category.id !== 'all')
+              .map((category) => {
+                const Icon = category.icon;
+                return (
+                  <SelectItem key={category.id} value={category.id} className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <Icon className="w-4 h-4 text-flame-orange" />
+                      <span>{language === "en" ? category.name : category.nameNe}</span>
+                    </div>
+                  </SelectItem>
+                );
+              })}
           </SelectContent>
         </Select>
       </div>
