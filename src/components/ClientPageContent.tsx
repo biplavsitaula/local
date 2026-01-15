@@ -335,9 +335,6 @@ return (
                 }}
               />
 
-
-
-
               {/* Products Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -365,38 +362,7 @@ return (
                   limit={selectedCategory && selectedCategory !== "All" ? undefined : 10}
                 />
               </section>
-              {/* <section className="mx-auto w-full max-w-6xl grid gap-3 px-4 md:grid-cols-4 md:px-8">
-                <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-orange/30 to-flame-red/20 p-4 text-foreground shadow-glow">
-                  <p className="text-lg font-semibold">1-hour delivery</p>
-                  <p className="text-sm text-muted-foreground">
-                    Track to your door in lightning speed.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
-                  <p className="text-lg font-semibold">
-                    12 bottle bundle offer
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Stock up & save across categories.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-flame-orange/20 bg-card p-4 text-foreground shadow-card">
-                  <p className="text-lg font-semibold">
-                    Fast delivery windows
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Predictable time windows with alerts.
-                  </p>
-                </div>
-                <div className="rounded-2xl border border-flame-orange/20 bg-gradient-to-r from-flame-red/30 to-flame-orange/30 p-4 text-foreground shadow-glow">
-                  <p className="text-lg font-semibold">
-                    Free delivery on 2000+
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Visible at top, hides on scroll.
-                  </p>
-                </div>
-              </section> */}
+            
               {showSeasonalSection && (
                 <section className={`mx-auto w-full max-w-6xl min-w-0 relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors mb-4 ${
                   theme === 'dark'
