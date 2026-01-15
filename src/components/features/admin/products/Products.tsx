@@ -3,6 +3,7 @@
 import { ProductTable } from '@/components/features/admin/products/ProductTable';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ExportButton } from '@/components/features/admin/ExportButton';
+import { ImportButton } from '@/components/features/admin/ImportButton';
 import { Loader2, AlertCircle, Search } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { useDebounce } from '@/hooks/useDebounce';
@@ -82,6 +83,7 @@ const Products = () => {
               className="pl-10 bg-secondary/50 border-border"
             />
           </div>
+          <ImportButton onImportSuccess={refetch} />
           <ExportButton 
             defaultDataType="products" 
             productFilters={{
