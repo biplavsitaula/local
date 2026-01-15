@@ -72,12 +72,12 @@ export function useProductGrid({
       const hasCategory = normalizedCategory && normalizedCategory !== 'all' && normalizedCategory !== '';
       // When category is selected, fetch all products for filtering
       // Otherwise, fetch only 10 products by default
-      const limit = hasCategory ? 10000 : ITEMS_PER_PAGE; // Fetch all when category selected, 10 otherwise
+      const fetchLimit = hasCategory ? 10000 : ITEMS_PER_PAGE; // Fetch all when category selected, 10 otherwise
       const fetchPage = hasCategory ? 1 : pageNum; // When category selected, always page 1
      
       const response = await productsService.getAll({
         page: fetchPage,
-        limit: limit,
+        limit: 5,
         search: searchQuery || undefined,
         // Don't send category - filter client-side instead
       });
@@ -159,8 +159,9 @@ export function useProductGrid({
       // When category is selected, show all filtered products
       return filtered;
     } else {
-      // When no category, show only 10 products (or use limit prop if provided)
-      return limit ? filtered.slice(0, limit) : filtered.slice(0, 10);
+      // When no category, show products based on limit prop or default to ITEMS_PER_PAGE (10)
+      const displayLimit = limit || ITEMS_PER_PAGE;
+      return filtered.slice(0, displayLimit);
     }
   }, [products, selectedCategory, limit]);
 

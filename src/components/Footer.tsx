@@ -87,9 +87,7 @@ const Footer: React.FC = () => {
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
           <div className="space-y-3 sm:space-y-4 col-span-2 md:col-span-1">
-        <div className={`flex items-center gap-2 sm:gap-3 p-2 rounded-lg ${
-            theme === 'dark' ? 'bg-black' : 'bg-gray-100'
-          }`}>
+        <div className="flex items-center gap-2 sm:gap-3">
               <Image
                 src="/assets/flameMainLogo.png"
                 alt="Flame Beverage logo"
