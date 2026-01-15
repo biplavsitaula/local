@@ -422,25 +422,44 @@ const ProductsPageContent: React.FC = () => {
          </div>
 
 
-         {/* Mobile Filters Panel */}
-         {showFilters && (
-           <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
-             {/* Category - Uses categories from API response */}
-             <div>
-               <label className="text-sm font-medium text-foreground mb-2 block">{t('category')}</label>
-               <select
-                 value={selectedCategory || ''}
-                 onChange={(e) => setSelectedCategory(e.target.value || null)}
-                 className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
-               >
-                 <option value="">{t('allCategories')}</option>
-                 {categories.map((cat) => (
-                   <option key={cat.id} value={cat.id}>
-                   {language === 'en' ? cat.name : cat.nameNe}
-                   </option>
-                 ))}
-               </select>
-             </div>
+        {/* Mobile Filters Panel */}
+        {showFilters && (
+          <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
+            {/* Category - Uses categories from API response with styled dropdown */}
+            <div>
+              <label className="text-sm font-medium text-foreground mb-2 block">{t('category')}</label>
+              <Select
+                value={selectedCategory || "all"}
+                onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
+              >
+                <SelectTrigger className={`w-full ${
+                  currentTheme === 'dark'
+                    ? 'bg-background border-border text-foreground'
+                    : 'bg-white border-gray-200 text-gray-900'
+                }`}>
+                  <SelectValue placeholder={t('allCategories')} />
+                </SelectTrigger>
+                <SelectContent className={currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}>
+                  <SelectItem value="all" className="cursor-pointer">
+                    <div className="flex items-center gap-2">
+                      <LayoutGrid className="w-4 h-4 text-flame-orange" />
+                      <span>{t('allCategories')}</span>
+                    </div>
+                  </SelectItem>
+                  {categories.map((cat) => {
+                    const Icon = cat.icon;
+                    return (
+                      <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
+                        <div className="flex items-center gap-2">
+                          <Icon className="w-4 h-4 text-flame-orange" />
+                          <span>{language === 'en' ? cat.name : cat.nameNe}</span>
+                        </div>
+                      </SelectItem>
+                    );
+                  })}
+                </SelectContent>
+              </Select>
+            </div>
 
 
              {/* Price Range */}
