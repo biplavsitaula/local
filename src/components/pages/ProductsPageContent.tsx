@@ -36,7 +36,7 @@ const ProductsPageContent: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
  const [sortBy, setSortBy] = useState('newest');
- const [priceRange, setPriceRange] = useState<[number, number]>([0, 100000]);
+ const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
  const [showFilters, setShowFilters] = useState(false);
@@ -180,7 +180,7 @@ const ProductsPageContent: React.FC = () => {
 
  // Use default theme during SSR to prevent hydration mismatch
  const currentTheme = mounted ? theme : 'dark';
-
+ console.log("products", products);
 
  const filteredProducts = useMemo(() => {
    let filtered = [...products];
@@ -246,11 +246,11 @@ const ProductsPageContent: React.FC = () => {
    setSearchQuery('');
    setSelectedCategory(null);
    setSortBy('newest');
-   setPriceRange([0, 100000]);
+   setPriceRange([0, 10000000]);
  };
 
 
- const hasActiveFilters = searchQuery || selectedCategory || priceRange[0] > 0 || priceRange[1] < 100000;
+ const hasActiveFilters = searchQuery || selectedCategory || priceRange[0] > 0 || priceRange[1] < 10000000;
  return (
    <div className={`min-h-screen transition-colors ${
      currentTheme === 'dark'
@@ -364,12 +364,12 @@ const ProductsPageContent: React.FC = () => {
                  }}
                  className="appearance-none pl-4 pr-10 py-3 bg-card/80 border border-border rounded-xl text-foreground focus:outline-none focus:border-primary-border cursor-pointer"
                >
-                 <option value="0-100000">{t('allPrices')}</option>
+                 <option value="0-10000000">{t('allPrices')}</option>
                  <option value="0-1000">{t('under1000')}</option>
                  <option value="1000-3000">{t('price1000to3000')}</option>
                  <option value="3000-5000">{t('price3000to5000')}</option>
                  <option value="5000-10000">{t('price5000to10000')}</option>
-                 <option value="10000-100000">{t('above10000')}</option>
+                 <option value="10000-10000000">{t('above10000')}</option>
                </select>
                <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
              </div>
@@ -471,12 +471,12 @@ const ProductsPageContent: React.FC = () => {
                  }}
                  className="w-full px-4 py-3 bg-background border border-border rounded-xl text-foreground"
                >
-                 <option value="0-100000">{t('allPrices')}</option>
+                 <option value="0-10000000">{t('allPrices')}</option>
                  <option value="0-1000">{t('under1000')}</option>
                  <option value="1000-3000">{t('price1000to3000')}</option>
                  <option value="3000-5000">{t('price3000to5000')}</option>
                  <option value="5000-10000">{t('price5000to10000')}</option>
-                 <option value="10000-100000">{t('above10000')}</option>
+                 <option value="10000-10000000">{t('above10000')}</option>
                </select>
              </div>
 
