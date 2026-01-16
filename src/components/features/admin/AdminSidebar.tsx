@@ -19,6 +19,7 @@ import {
   Warehouse,
   X,
   Tag,
+  Images,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -38,6 +39,7 @@ const menuItems = [
   { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },
   { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
   { title: "Reviews", icon: Star, path: "/admin/reviews" },
+  { title: "Featured Images", icon: Images, path: "/admin/featuredImage" },
 ];
 
 interface AdminSidebarProps {
