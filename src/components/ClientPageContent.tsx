@@ -14,6 +14,7 @@ import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import HeroSection from "@/components/HeroSection";
 import ImageCarousel from "@/components/ImageCarousel";
+import BrandCarousel from "@/components/BrandCarousel";
 import ProductGrid from "@/components/features/product/ProductGrid";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
@@ -228,6 +229,9 @@ return (
               
               {/* Image Carousel / Promotional Banners */}
               <ImageCarousel />
+
+              {/* Brands Section */}
+              <BrandCarousel />
             
               {/* Recent Arrivals Section */}
               <section className="container mx-auto px-4">

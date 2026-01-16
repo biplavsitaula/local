@@ -20,6 +20,7 @@ import {
   X,
   Tag,
   Images,
+  Building2,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -29,6 +30,7 @@ import Image from "next/image";
 const menuItems = [
   { title: "Dashboard", icon: LayoutDashboard, path: "/dashboard" },
   { title: "Products", icon: Package, path: "/admin/products" },
+  { title: "Brands", icon: Building2, path: "/admin/brand" },
   { title: "Inventory", icon: Warehouse, path: "/admin/inventory" },
   { title: "Orders", icon: ShoppingCart, path: "/admin/orders" },
   { title: "Offers", icon: Tag, path: "/admin/adminOffer" },

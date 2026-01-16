@@ -42,6 +42,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         // Get discount and tag values
         const discountPercent = (productData as any).discountPercent ?? productData.discountPercentage ?? 0;
         const tag = (productData as any).tag || '';
+        const brand = (productData as any).brand || '';
         
         // Map CreateProductRequest to service format - API expects 'type' not 'category'
         const serviceData: Record<string, any> = {
@@ -55,6 +56,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
         // Only include optional fields if they have values
         if (discountPercent > 0) serviceData.discountPercent = discountPercent;
         if (tag) serviceData.tag = tag;
+        if (brand) serviceData.brand = brand;
         if (productData.rating !== undefined) serviceData.rating = productData.rating;
         if (productData.isRecommended) serviceData.isRecommended = productData.isRecommended;
         
@@ -115,6 +117,10 @@ export const useProductMutation = (): UseProductMutationReturn => {
         // Handle tag
         const tagValue = (productData as any).tag;
         if (tagValue !== undefined) serviceData.tag = tagValue;
+        
+        // Handle brand
+        const brandValue = (productData as any).brand;
+        if (brandValue !== undefined) serviceData.brand = brandValue;
         
         const response = await productsService.update(productId, serviceData);
         const resData = response.data as any;

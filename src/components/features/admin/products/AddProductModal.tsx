@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag, X, Image as ImageIcon } from "lucide-react";
+import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag, X, Image as ImageIcon, Building2 } from "lucide-react";
 import { toast } from "sonner";
 import { useProductMutation } from "@/hooks/useProductMutation";
 import { Product } from "@/types";
@@ -26,18 +26,7 @@ import { cn } from "@/lib/utils";
 import { useEffect } from "react";
 import { Loader2 } from "lucide-react";
 import { SuccessMsgModal } from "@/components/SuccessMsgModal";
-
-const categories = [
-  "Whiskey",
-  "Vodka",
-  "Cognac",
-  "Tequila",
-  "Gin",
-  "Rum",
-  "Champagne",
-  "Wine",
-  "Beer",
-];
+import { useCategories } from "@/hooks/useCategories";
 
 interface AddProductModalProps {
   product?: Product | null;
@@ -53,6 +42,7 @@ export function AddProductModal({
   onSuccess
 }: AddProductModalProps = {}) {
   const { createProductMutation, updateProductMutation, loading, error } = useProductMutation();
+  const { categories, loading: categoriesLoading } = useCategories();
   const [internalOpen, setInternalOpen] = useState(false);
   const isEditMode = !!product;
   const open = controlledOpen !== undefined ? controlledOpen : internalOpen;
@@ -64,6 +54,7 @@ export function AddProductModal({
   const [formData, setFormData] = useState({
     name: "",
     category: "",
+    brand: "",
     price: "",
     originalPrice: "",
     stock: "",
@@ -82,8 +73,8 @@ export function AddProductModal({
     if (product && open) {
       setFormData({
         name: product.name || "",
-        // category: product.category || "",
         category: product.category?.toLowerCase() || "",
+        brand: (product as any).brand || "",
         price: product.price?.toString() || "",
         originalPrice: product.originalPrice?.toString() || "",
         stock: (product.stock ?? 0).toString(),
@@ -102,6 +93,7 @@ export function AddProductModal({
       setFormData({
         name: "",
         category: "",
+        brand: "",
         price: "",
         originalPrice: "",
         stock: "",
@@ -229,6 +221,7 @@ export function AddProductModal({
         type: categoryToType,
         price: parseFloat(formData.price),
         image: formData.imageUrl,
+        brand: formData.brand || "",
         discountPercent: formData.discountPercent ? parseFloat(formData.discountPercent) : 0,
         tag: formData.tag ? formData.tag.toUpperCase() : "",
         ...(formData.originalPrice && { originalPrice: parseFloat(formData.originalPrice) }),
@@ -270,6 +263,7 @@ export function AddProductModal({
         setFormData({
           name: "",
           category: "",
+          brand: "",
           price: "",
           originalPrice: "",
           stock: "",
@@ -337,6 +331,25 @@ export function AddProductModal({
             )}
           </div>
 
+          <div className="space-y-2">
+            <Label htmlFor="brand" className="text-foreground">
+              Brand{" "}
+              <span className="text-muted-foreground text-xs">(Optional)</span>
+            </Label>
+            <div className="relative">
+              <Building2 className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Input
+                id="brand"
+                value={formData.brand}
+                onChange={(e) =>
+                  setFormData({ ...formData, brand: e.target.value })
+                }
+                placeholder="e.g., Johnnie Walker, Grey Goose"
+                className="bg-secondary/50 border-border pl-10"
+              />
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="category" className="text-foreground">
@@ -347,6 +360,7 @@ export function AddProductModal({
                 onValueChange={(value) =>
                   setFormData({ ...formData, category: value })
                 }
+                disabled={categoriesLoading}
               >
                 <SelectTrigger
                   className={cn(
@@ -354,12 +368,12 @@ export function AddProductModal({
                     errors.category && "border-flame-red"
                   )}
                 >
-                  <SelectValue placeholder="Select category" />
+                  <SelectValue placeholder={categoriesLoading ? "Loading..." : "Select category"} />
                 </SelectTrigger>
                 <SelectContent>
                   {categories.map((cat) => (
-                    <SelectItem key={cat} value={cat}>
-                      {cat}
+                    <SelectItem key={cat.id} value={cat.id}>
+                      {cat.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

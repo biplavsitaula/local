@@ -31,6 +31,15 @@ export interface ProductFilters {
   limit?: number;
 }
 
+export interface BrandData {
+  _id?: string;
+  name: string;
+  logo?: string;
+  description?: string;
+  isActive?: boolean;
+  productCount: number;
+}
+
 export const productsService = {
   /**
    * Get all products with filters (Public endpoint)
@@ -65,6 +74,13 @@ export const productsService = {
    */
   delete: async (id: string): Promise<ApiResponse<void>> => {
     return apiDelete<void>(`/products/${id}`);
+  },
+
+  /**
+   * Get all brands (Public endpoint)
+   */
+  getBrands: async (): Promise<ApiResponse<BrandData[]>> => {
+    return apiGet<BrandData[]>('/products/brands', undefined, false);
   },
 };
 

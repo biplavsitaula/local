@@ -17,38 +17,38 @@ interface CarouselSlide {
 
 // Default slides (fallback when API returns no data)
 const defaultSlides: CarouselSlide[] = [
-  {
-    id: "default-1",
-    image: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=1400&h=500&fit=crop&q=80",
-    title: "Premium Whiskey Collection",
-    subtitle: "Discover the finest aged spirits from around the world",
-    ctaText: "Shop Now",
-    ctaLink: "/products?category=whiskey",
-  },
-  {
-    id: "default-2",
-    image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1400&h=500&fit=crop&q=80",
-    title: "Exclusive Wine Selection",
-    subtitle: "Handpicked wines from renowned vineyards",
-    ctaText: "Explore Wines",
-    ctaLink: "/products?category=wine",
-  },
-  {
-    id: "default-3",
-    image: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=1400&h=500&fit=crop&q=80",
-    title: "Craft Beer Festival",
-    subtitle: "Limited edition brews and artisanal favorites",
-    ctaText: "View Collection",
-    ctaLink: "/products?category=beer",
-  },
-  {
-    id: "default-4",
-    image: "https://images.unsplash.com/photo-1574610604430-04733b64acaf?w=1400&h=500&fit=crop&q=80",
-    title: "Special Offers",
-    subtitle: "Up to 30% off on selected premium spirits",
-    ctaText: "Shop Deals",
-    ctaLink: "/offers",
-  },
+  // {
+  //   id: "default-1",
+  //   image: "https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=1400&h=500&fit=crop&q=80",
+  //   title: "Premium Whiskey Collection",
+  //   subtitle: "Discover the finest aged spirits from around the world",
+  //   ctaText: "Shop Now",
+  //   ctaLink: "/products?category=whiskey",
+  // },
+  // {
+  //   id: "default-2",
+  //   image: "https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=1400&h=500&fit=crop&q=80",
+  //   title: "Exclusive Wine Selection",
+  //   subtitle: "Handpicked wines from renowned vineyards",
+  //   ctaText: "Explore Wines",
+  //   ctaLink: "/products?category=wine",
+  // },
+  // {
+  //   id: "default-3",
+  //   image: "https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=1400&h=500&fit=crop&q=80",
+  //   title: "Craft Beer Festival",
+  //   subtitle: "Limited edition brews and artisanal favorites",
+  //   ctaText: "View Collection",
+  //   ctaLink: "/products?category=beer",
+  // },
+  // {
+  //   id: "default-4",
+  //   image: "https://images.unsplash.com/photo-1574610604430-04733b64acaf?w=1400&h=500&fit=crop&q=80",
+  //   title: "Special Offers",
+  //   subtitle: "Up to 30% off on selected premium spirits",
+  //   ctaText: "Shop Deals",
+  //   ctaLink: "/offers",
+  // },
 ];
 
 export default function ImageCarousel() {
@@ -219,7 +219,7 @@ export default function ImageCarousel() {
                   {slide.ctaText && (
                     <a
                       href={slide.ctaLink}
-                      className={`inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 ${
+                      className={`inline-flex items-center gap-2 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all duration-300 ${
                         theme === "dark"
                           ? "bg-gradient-to-r from-flame-orange to-orange-500 text-white hover:shadow-[0_0_20px_rgba(255,107,0,0.5)] hover:scale-105"
                           : "bg-orange-500 text-white hover:bg-orange-600 hover:scale-105"
