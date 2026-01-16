@@ -250,6 +250,18 @@ const Footer: React.FC = () => {
                   {t('privacyPolicy')}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/contactUs"
+                  className={`text-xs sm:text-sm underline transition-colors ${
+                    theme === 'dark'
+                      ? 'text-muted-foreground hover:text-primary-text'
+                      : 'text-gray-600 hover:text-orange-600'
+                  }`}
+                >
+                  {t('contactUs')}
+                </Link>
+              </li>
             </ul>
           </div>
 
