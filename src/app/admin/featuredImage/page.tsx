@@ -44,7 +44,7 @@ function FeatureImageModal({
     name: "",
     description: "",
     tag: "",
-    ctaLink: "",
+    // ctaLink: "",
     isActive: true,
     order: 0,
   });
@@ -59,7 +59,7 @@ function FeatureImageModal({
         name: featureImage.name || "",
         description: featureImage.description || "",
         tag: featureImage.tag || "",
-        ctaLink: featureImage.ctaLink || "",
+        // ctaLink: featureImage.ctaLink || "",
         isActive: featureImage.isActive ?? true,
         order: featureImage.order || 0,
       });
@@ -69,7 +69,7 @@ function FeatureImageModal({
         name: "",
         description: "",
         tag: "",
-        ctaLink: "",
+        // ctaLink: "",
         isActive: true,
         order: 0,
       });
@@ -311,7 +311,7 @@ function FeatureImageModal({
           </div>
 
           {/* Tag & CTA Link */}
-          <div className="grid grid-cols-2 gap-4">
+          {/* <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-sm font-medium text-foreground">
                 Tag (Button Text)
@@ -338,7 +338,7 @@ function FeatureImageModal({
                 className="bg-secondary/50 border-border"
               />
             </div>
-          </div>
+          </div> */}
 
           {/* Order & Active Status */}
           <div className="grid grid-cols-2 gap-4">
@@ -725,7 +725,7 @@ export default function FeaturedImagesPage() {
                       {image.description}
                     </p>
                   )}
-                  {image.tag && (
+                  {/* {image.tag && (
                     <div className="flex items-center gap-2 mt-2">
                       <span className="text-xs px-2 py-1 bg-flame-orange/20 text-flame-orange rounded-full">
                         {image.tag}
@@ -741,7 +741,7 @@ export default function FeaturedImagesPage() {
                         </a>
                       )}
                     </div>
-                  )}
+                  )} */}
 
                   {/* Actions */}
                   <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
