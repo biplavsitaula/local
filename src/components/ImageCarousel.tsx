@@ -226,7 +226,7 @@ export default function ImageCarousel() {
                       }`}
                     >
                       {slide.ctaText}
-                      <ChevronRight className="w-4 h-4" />
+                      <ChevronRight className="w-4 h-4 " />
                     </a>
                   )}
                 </div>
@@ -253,7 +253,7 @@ export default function ImageCarousel() {
             setIsAutoPlaying(false);
             setTimeout(() => setIsAutoPlaying(true), 5000);
           }}
-          className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 ${
+          className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl  ${
             theme === "dark"
               ? "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
               : "bg-black/20 hover:bg-black/30 text-white backdrop-blur-sm"
@@ -268,7 +268,7 @@ export default function ImageCarousel() {
             setIsAutoPlaying(false);
             setTimeout(() => setIsAutoPlaying(true), 5000);
           }}
-          className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 ${
+          className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
             theme === "dark"
               ? "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
               : "bg-black/20 hover:bg-black/30 text-white backdrop-blur-sm"
