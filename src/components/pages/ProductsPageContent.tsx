@@ -266,8 +266,8 @@ const ProductsPageContent: React.FC = () => {
      />
 
 
-     <main className="container mx-auto px-4 py-8 pt-24">
-       <div className="container mx-auto px-4">
+     <main className="container mx-auto px-4 py-6">
+       <div className="">
          {/* Page Header */}
          <div className="mb-6 sm:mb-8">
            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold font-display mb-1 sm:mb-2 ${
