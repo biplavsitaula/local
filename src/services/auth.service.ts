@@ -5,17 +5,23 @@ export interface User {
   id?: string;
   fullName: string;
   email: string;
-  role: 'user' | 'admin' | 'superadmin';
+  role: 'user' | 'admin' | 'superadmin' | 'super_admin';
   mobile?: string;
+  isActive?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
+
+// Helper to check if user has admin access
+export const isAdminRole = (role?: string): boolean => {
+  return role === 'admin' || role === 'superadmin' || role === 'super_admin';
+};
 
 export interface RegisterData {
   fullName: string;
   email: string;
   password: string;
-  role?: 'user' | 'admin' | 'superadmin';
+  role?: 'user' | 'admin' | 'superadmin' | 'super_admin';
   mobile?: string;
 }
 
@@ -37,7 +43,7 @@ export interface UpdateProfileData {
 }
 
 export interface UserFilters {
-  role?: 'user' | 'admin' | 'superadmin';
+  role?: 'user' | 'admin' | 'superadmin' | 'super_admin';
   search?: string;
   isActive?: boolean;
   page?: number;

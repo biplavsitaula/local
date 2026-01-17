@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useRouter } from 'next/navigation';
-import { authService, User } from '@/services/auth.service';
+import { authService, User, isAdminRole } from '@/services/auth.service';
 import { tokenManager } from '@/lib/api';
 
 interface AuthContextValue {
@@ -15,7 +15,7 @@ interface AuthContextValue {
     fullName: string;
     email: string;
     password: string;
-    role?: 'user' | 'admin' | 'superadmin';
+    role?: 'user' | 'admin' | 'superadmin' | 'super_admin';
     mobile?: string;
   }) => Promise<void>;
   logout: () => Promise<void>;
@@ -67,9 +67,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(newToken);
       setUser(newUser);
       
-      // Redirect based on role
-      if (newUser.role === 'admin' || newUser.role === 'superadmin') {
-        router.push('/dashboard');
+      // Redirect based on role - admin and super_admin go to dashboard
+      if (isAdminRole(newUser.role)) {
+        router.push('/admin');
       } else {
         router.push('/');
       }
@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     fullName: string;
     email: string;
     password: string;
-    role?: 'user' | 'admin' | 'superadmin';
+    role?: 'user' | 'admin' | 'superadmin' | 'super_admin';
     mobile?: string;
   }) => {
     try {
@@ -93,9 +93,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       setToken(newToken);
       setUser(newUser);
       
-      // Redirect based on role
-      if (newUser.role === 'admin' || newUser.role === 'superadmin') {
-        router.push('/dashboard');
+      // Redirect based on role - admin and super_admin go to admin panel
+      if (isAdminRole(newUser.role)) {
+        router.push('/admin');
       } else {
         router.push('/');
       }

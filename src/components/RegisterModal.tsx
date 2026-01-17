@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Flame, Mail, Lock, Eye, EyeOff, User, Phone, Loader2, X, Shield } from "lucide-react";
@@ -13,27 +14,35 @@ interface RegisterModalProps {
   open: boolean;
   onClose: () => void;
   onSwitchToLogin: () => void;
+  isAdminContext?: boolean; // When true, shows all role options
 }
 
-const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) => {
+const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false }: RegisterModalProps) => {
   const { language, t } = useLanguage();
   const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",
     phone: "",
     password: "",
     confirmPassword: "",
-    role: "user" as "user" | "admin" | "superadmin",
+    role: "user" as "user" | "admin" | "super_admin",
     agreeToTerms: false,
   });
   const [phoneError, setPhoneError] = useState<string | null>(null);
 
-  if (!open) return null;
+  // Ensure we're on the client before using createPortal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!open || !mounted) return null;
 
   const handleClose = () => {
     setError(null);
@@ -82,7 +91,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
         email: formData.email,
         password: formData.password,
         mobile: formData.phone,
-        role: formData.role as "user" | "admin" | "superadmin",
+        role: formData.role as "user" | "admin" | "super_admin",
       });
       handleClose();
       // Navigation is handled by the auth context
@@ -101,9 +110,9 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto">
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto z-[99999]">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -218,36 +227,38 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
               )}
             </div>
 
-            {/* Role */}
-            <div>
-              <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
-                {t("role")}
-              </label>
-              <div className="relative">
-                <Shield className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10" />
-                <Select
-                  value={formData.role}
-                  onValueChange={(value: "user" | "admin" | "superadmin") => 
-                    setFormData({ ...formData, role: value })
-                  }
-                >
-                  <SelectTrigger className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20">
-                    <SelectValue placeholder={t("selectRole")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="user">
-                      {t("roleUser")}
-                    </SelectItem>
-                    <SelectItem value="admin">
-                      {t("roleAdmin")}
-                    </SelectItem>
-                    <SelectItem value="superadmin">
-                      {t("roleSuperAdmin")}
-                    </SelectItem>
-                  </SelectContent>
-                </Select>
+            {/* Role - Only show all options in admin context */}
+            {isAdminContext && (
+              <div>
+                <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
+                  {t("role")}
+                </label>
+                <div className="relative">
+                  <Shield className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground z-10" />
+                  <Select
+                    value={formData.role}
+                    onValueChange={(value: "user" | "admin" | "super_admin") => 
+                      setFormData({ ...formData, role: value })
+                    }
+                  >
+                    <SelectTrigger className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20">
+                      <SelectValue placeholder={t("selectRole")} />
+                    </SelectTrigger>
+                    <SelectContent className="z-[999999]">
+                      <SelectItem value="user">
+                        {t("roleUser")}
+                      </SelectItem>
+                      <SelectItem value="admin">
+                        {t("roleAdmin")}
+                      </SelectItem>
+                      <SelectItem value="super_admin">
+                        {t("roleSuperAdmin")}
+                      </SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Password */}
             <div>
@@ -374,6 +385,9 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin }: RegisterModalProps) =
       </div>
     </div>
   );
+
+  // Use createPortal to render modal at document body level
+  return createPortal(modalContent, document.body);
 };
 
 export default RegisterModal;

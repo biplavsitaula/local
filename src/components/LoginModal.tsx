@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useAuth } from "@/contexts/AuthContext";
 import { Flame, Mail, Lock, Eye, EyeOff, Loader2, X } from "lucide-react";
@@ -25,12 +26,19 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
 
-  if (!open) return null;
+  // Ensure we're on the client before using createPortal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!open || !mounted) return null;
 
   const handleClose = () => {
     setError(null);
@@ -58,9 +66,9 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto">
+  const modalContent = (
+    <div className="fixed inset-0 z-[99999] flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto z-[99999]">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -201,6 +209,9 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
       />
     </div>
   );
+
+  // Use createPortal to render modal at document body level
+  return createPortal(modalContent, document.body);
 };
 
 export default LoginModal;
