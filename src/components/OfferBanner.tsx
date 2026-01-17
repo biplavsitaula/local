@@ -115,8 +115,8 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
     return (
       <div className={`relative overflow-hidden ${
         theme === 'dark'
-          ? 'bg-gradient-to-r from-secondary/30 via-secondary/20 to-secondary/30'
-          : 'bg-gradient-to-r from-orange-50/80 via-yellow-50/80 to-orange-50/80'
+          ? 'bg-background'
+          : 'bg-white/95'
       }`}>
         <div className="relative container mx-auto px-4 py-2 sm:py-3">
           <div className="flex items-center justify-center gap-2">
@@ -134,8 +134,8 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
   return (
     <div className={`relative overflow-hidden ${
       theme === 'dark'
-        ? 'bg-gradient-to-r from-secondary/30 via-secondary/20 to-secondary/30'
-        : 'bg-gradient-to-r from-orange-50/80 via-yellow-50/80 to-orange-50/80'
+        ? 'bg-background'
+        : 'bg-white/95'
     }`}>
       <div className="relative container mx-auto px-4 py-2 sm:py-3">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">

@@ -12,18 +12,18 @@ const HeroSection: React.FC = () => {
   const { theme } = useTheme();
 
   return (
-    <section className={`relative min-h-[70vh] flex items-center justify-center overflow-hidden transition-colors ${
+    <section className={`relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors ${
       theme === 'dark' ? 'galaxy-bg' : 'bg-gradient-to-b from-orange-50/30 via-yellow-50/20 to-orange-50/30'
     }`}>
       {/* Animated Background Elements */}
-      <div className="absolute inset-0 overflow-hidden">
+      {/* <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-flame-orange/10 rounded-full blur-3xl animate-pulse" />
         <div
           className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-flame-red/10 rounded-full blur-3xl animate-pulse"
           style={{ animationDelay: "1s" }}
         />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-flame-yellow/5 rounded-full blur-3xl" />
-      </div>
+      </div> */}
 
 
       <div className="relative z-10 container mx-auto px-4 text-center">
@@ -34,9 +34,15 @@ const HeroSection: React.FC = () => {
               ? 'shadow-flame-gold bg-secondary/50 border border-flame-gold text-flame-gold'
               : 'shadow-orange-200 bg-white/80 border border-orange-300 text-orange-600'
           }`}>
+        
             <Sparkles className={`w-4 h-4 ${theme === 'dark' ? 'text-flame-yellow' : 'text-orange-500'}`} />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
+            <span className="bg-gradient-to-b from-red-600 via-orange-500 to-amber-400 bg-clip-text text-transparent">Premium Spirits & Fine</span>
+            <br />
+            <span className="bg-gradient-to-b from-amber-400 via-yellow-500 to-amber-300 bg-clip-text text-transparent">Beverages</span>
+          </h1>
 
           {/* Flame Transition Effect */}
           {/* <div className="relative flex items-center justify-center py-1 pointer-events-none">
@@ -81,12 +87,12 @@ const HeroSection: React.FC = () => {
             </div>
           </div> */}
 
-          <div className="flex justify-center items-center">
+          {/* <div className="flex justify-center items-center">
             <AnimatedLogo width={80} height={60} />
-          </div>
+          </div> */}
 
           {/* Main Title */}
-          <HeroTitle text={t("heroTitle")} size="md" />
+          {/* <HeroTitle text={t("heroTitle")} size="md" /> */}
 
           {/* Subtitle */}
           <p className={`text-lg sm:text-xl max-w-2xl mx-auto ${
@@ -147,7 +153,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Bottom Gradient */}
-      <div className={`absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t ${
+      <div className={`absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t ${
         theme === 'dark' ? 'from-background' : 'from-gray-50'
       } to-transparent`} />
     </section>

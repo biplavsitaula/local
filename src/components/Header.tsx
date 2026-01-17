@@ -172,11 +172,11 @@ const Header: React.FC<IHeaderProps> = ({
 
 
  return (
-   <header className={`sticky top-0 z-40 w-full border-b backdrop-blur-xl transition-colors ${
-     theme === 'dark'
-       ? 'border-border/40 bg-background/80'
-       : 'border-border/60 bg-white/95 shadow-sm'
-   }`}>
+  <header className={`sticky top-0 z-40 w-full border-b transition-colors ${
+    theme === 'dark'
+      ? 'border-border/40 bg-background'
+      : 'border-border/60 bg-white/95 shadow-sm backdrop-blur-xl'
+  }`}>
     {/* Offer Banner */}
     <div
       className="grid transition-[grid-template-rows] duration-300 ease-out"
