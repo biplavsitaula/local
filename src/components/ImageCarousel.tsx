@@ -200,7 +200,7 @@ export default function ImageCarousel() {
 
               {/* Content */}
               <div className="absolute inset-0 flex items-center">
-                <div className="px-6 sm:px-10 md:px-16 max-w-xl">
+                <div className="px-6 sm:pl-20 md:pl-24 sm:pr-10 md:pr-16 max-w-xl">
                   <p
                     className={`text-xs sm:text-sm uppercase tracking-[0.2em] mb-2 sm:mb-3 ${
                       theme === "dark"
@@ -216,7 +216,7 @@ export default function ImageCarousel() {
                   <p className="text-sm sm:text-base md:text-lg text-white/80 mb-4 sm:mb-6 line-clamp-2">
                     {slide.subtitle}
                   </p>
-                  {slide.ctaText && (
+                  {/* {slide.ctaText && (
                     <a
                       href={slide.ctaLink}
                       className={`inline-flex items-center gap-2 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold transition-all duration-300 ${
@@ -228,7 +228,7 @@ export default function ImageCarousel() {
                       {slide.ctaText}
                       <ChevronRight className="w-4 h-4 " />
                     </a>
-                  )}
+                  )} */}
                 </div>
               </div>
 
