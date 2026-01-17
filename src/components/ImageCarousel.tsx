@@ -246,21 +246,21 @@ export default function ImageCarousel() {
           ))}
         </div>
 
-        {/* Navigation Arrows */}
+        {/* Navigation Arrows - Hidden on mobile */}
         <button
           onClick={() => {
             prevSlide();
             setIsAutoPlaying(false);
             setTimeout(() => setIsAutoPlaying(true), 5000);
           }}
-          className={`absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl  ${
+          className={`hidden sm:flex absolute left-4 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all duration-300 border-2 border-primary-text hover:border-ternary-text ${
             theme === "dark"
               ? "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
               : "bg-black/20 hover:bg-black/30 text-white backdrop-blur-sm"
           }`}
           aria-label="Previous slide"
         >
-          <ChevronLeft className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronLeft className="w-6 h-6" />
         </button>
         <button
           onClick={() => {
@@ -268,14 +268,14 @@ export default function ImageCarousel() {
             setIsAutoPlaying(false);
             setTimeout(() => setIsAutoPlaying(true), 5000);
           }}
-          className={`absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 rounded-full transition-all duration-300 border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
+          className={`hidden sm:flex absolute right-4 top-1/2 -translate-y-1/2 p-3 rounded-xl transition-all duration-300 border-2 border-primary-text hover:border-ternary-text ${
             theme === "dark"
               ? "bg-white/10 hover:bg-white/20 text-white backdrop-blur-sm"
               : "bg-black/20 hover:bg-black/30 text-white backdrop-blur-sm"
           }`}
           aria-label="Next slide"
         >
-          <ChevronRight className="w-5 h-5 sm:w-6 sm:h-6" />
+          <ChevronRight className="w-6 h-6" />
         </button>
 
         {/* Dots Navigation */}
