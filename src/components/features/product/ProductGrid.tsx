@@ -11,6 +11,8 @@ import { useProductGrid } from "./hooks/useProductGrid";
 interface ProductGridProps {
  searchQuery: string;
  selectedCategory: string;
+ selectedOriginType?: string;
+ selectedSubCategory?: string;
  onCheckout?: () => void;
  limit?: number;
 }
@@ -21,6 +23,8 @@ interface ProductGridProps {
 const ProductGrid: React.FC<ProductGridProps> = ({
  searchQuery,
  selectedCategory,
+ selectedOriginType,
+ selectedSubCategory,
  onCheckout,
  limit,
 }) => {
@@ -39,6 +43,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
  } = useProductGrid({
    searchQuery,
    selectedCategory,
+   selectedOriginType,
+   selectedSubCategory,
    limit,
  });
 

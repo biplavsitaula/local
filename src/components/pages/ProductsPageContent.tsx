@@ -14,9 +14,9 @@ import CheckoutModal from '@/components/CheckoutModal';
 import Footer from '@/components/Footer';
 import Header from '@/components/Header';
 import CartNotification from '@/components/CartNotification';
-import CategorySelector from '@/components/CategorySelector';
+import HierarchicalCategorySelector from '@/components/HierarchicalCategorySelector';
 import { productsService, Product as ApiProduct } from '@/services/products.service';
-import { useCategories } from '@/hooks/useCategories';
+import { useCategories, CategoryFilter } from '@/hooks/useCategories';
 
 const ITEMS_PER_PAGE = 10;
 
@@ -34,7 +34,7 @@ const ProductsPageContent: React.FC = () => {
  const [hasMore, setHasMore] = useState(true);
  const [totalProducts, setTotalProducts] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
- const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+ const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>({});
  const [sortBy, setSortBy] = useState('newest');
  const [priceRange, setPriceRange] = useState<[number, number]>([0, 10000000]);
  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
@@ -45,8 +45,8 @@ const ProductsPageContent: React.FC = () => {
   const [notificationQuantity, setNotificationQuantity] = useState(1);
   const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
   
-  // Use categories hook
-  const { categories } = useCategories({ includeAll: false });
+  // Use categories hook with subcategories
+  const { categories } = useCategories({ includeAll: true, fetchSubCategories: true });
 
 
  // Map API product to internal Product type
@@ -86,6 +86,8 @@ const ProductsPageContent: React.FC = () => {
      stock: apiProduct?.stock,
      rating: apiProduct?.rating,
      tag,
+     originType: apiProduct?.originType || 'domestic',
+     subCategory: apiProduct?.subCategory || '',
    } as Product;
  };
 
@@ -100,19 +102,21 @@ const ProductsPageContent: React.FC = () => {
      }
      setError(null);
     
+     const hasFilter = selectedFilter.category || selectedFilter.originType || selectedFilter.subCategory;
+    
      // Map category to API format
      // For "whisky" or "whiskey", don't filter by category in API since API might use either variation
      // We'll filter client-side to handle both variations
-     let apiCategory: string | null = selectedCategory;
-     const normalizedCategory = selectedCategory?.toLowerCase();
+     let apiCategory: string | null = selectedFilter.category || null;
+     const normalizedCategory = selectedFilter.category?.toLowerCase();
      if (normalizedCategory === 'whisky' || normalizedCategory === 'whiskey') {
        apiCategory = null; // Fetch all and filter client-side
      }
     
-     // When search query OR category is selected, fetch all products (use high limit, always from page 1)
-     // This ensures search and category filtering work across ALL products, not just 10
+     // When search query OR filter is selected, fetch all products (use high limit, always from page 1)
+     // This ensures search and filtering work across ALL products, not just 10
      // Otherwise use pagination with ITEMS_PER_PAGE
-     const hasActiveFilter = searchQuery || selectedCategory;
+     const hasActiveFilter = searchQuery || hasFilter;
      const limit = hasActiveFilter ? 10000 : ITEMS_PER_PAGE;
      const fetchPage = hasActiveFilter ? 1 : pageNum; // Always fetch page 1 when filter is active
     
@@ -155,7 +159,7 @@ const ProductsPageContent: React.FC = () => {
      setLoading(false);
      setLoadingMore(false);
    }
- }, [searchQuery, selectedCategory]);
+ }, [searchQuery, selectedFilter]);
 
 
  // Fetch products when search or category changes
@@ -186,12 +190,11 @@ const ProductsPageContent: React.FC = () => {
  const filteredProducts = useMemo(() => {
    let filtered = [...products];
 
-  // Search is handled by API, but we do client-side filtering for category normalization
-  // This handles cases where API returns "whiskey" but we filter by "whisky" (or vice versa)
-  if (selectedCategory) {
+  // Filter by category - normalize category matching
+  if (selectedFilter.category && selectedFilter.category !== 'all') {
     filtered = filtered.filter((p) => {
       const productCategory = p?.category?.toLowerCase();
-      const normalizedSelectedCategory = selectedCategory.toLowerCase();
+      const normalizedSelectedCategory = selectedFilter.category!.toLowerCase();
       
       // Handle both "whisky" and "whiskey" variations
       if (normalizedSelectedCategory === 'whisky' || normalizedSelectedCategory === 'whiskey') {
@@ -199,6 +202,22 @@ const ProductsPageContent: React.FC = () => {
       }
       
       return productCategory === normalizedSelectedCategory;
+    });
+  }
+
+  // Filter by origin type
+  if (selectedFilter.originType) {
+    filtered = filtered.filter((p: any) => {
+      const productOriginType = (p.originType || 'domestic').toLowerCase();
+      return productOriginType === selectedFilter.originType!.toLowerCase();
+    });
+  }
+
+  // Filter by subcategory
+  if (selectedFilter.subCategory) {
+    filtered = filtered.filter((p: any) => {
+      const productSubCategory = (p.subCategory || '').toLowerCase();
+      return productSubCategory === selectedFilter.subCategory!.toLowerCase();
     });
   }
 
@@ -222,7 +241,7 @@ const ProductsPageContent: React.FC = () => {
 
 
    return filtered;
- }, [products, selectedCategory, sortBy, priceRange]);
+ }, [products, selectedFilter, sortBy, priceRange]);
 
 
  const handleBuyNow = (product: Product, quantity: number = 1) => {
@@ -246,13 +265,13 @@ const ProductsPageContent: React.FC = () => {
 
  const clearFilters = () => {
    setSearchQuery('');
-   setSelectedCategory(null);
+   setSelectedFilter({});
    setSortBy('newest');
    setPriceRange([0, 10000000]);
  };
 
 
- const hasActiveFilters = searchQuery || selectedCategory || priceRange[0] > 0 || priceRange[1] < 10000000;
+ const hasActiveFilters = searchQuery || selectedFilter.category || selectedFilter.originType || selectedFilter.subCategory || priceRange[0] > 0 || priceRange[1] < 10000000;
  return (
    <div className={`min-h-screen transition-colors ${
      currentTheme === 'dark'
@@ -317,47 +336,9 @@ const ProductsPageContent: React.FC = () => {
            </button>
 
 
-           {/* Desktop Filters */}
-           <div className="hidden lg:flex items-center gap-4">
-             {/* Category Dropdown - Uses categories from API response */}
-             <Select
-               value={selectedCategory || "all"}
-               onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
-             >
-               <SelectTrigger className={`w-[180px] ${
-                 currentTheme === 'dark'
-                   ? 'bg-card/80 border-border text-foreground'
-                   : 'bg-white border-gray-200 text-gray-900'
-               }`}>
-                 <SelectValue placeholder={t('allCategories')} />
-               </SelectTrigger>
-               <SelectContent 
-                 side="bottom"
-                 position="popper"
-                 className={`max-h-[300px] ${currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}`}
-               >
-                <SelectItem value="all" className="cursor-pointer">
-                  <div className="flex items-center gap-2">
-                    <LayoutGrid className="w-4 h-4 text-flame-orange" />
-                    <span>{t('allCategories')}</span>
-                  </div>
-                </SelectItem>
-                {categories.map((cat) => {
-                  const Icon = cat.icon;
-                  return (
-                    <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
-                      <div className="flex items-center gap-2">
-                        <Icon className="w-4 h-4 text-flame-orange" />
-                        <span>{language === 'en' ? cat.name : cat.nameNe}</span>
-                      </div>
-                    </SelectItem>
-                  );
-                })}
-               </SelectContent>
-             </Select>
-
-
-             {/* Price Range */}
+          {/* Desktop Filters */}
+          <div className="hidden lg:flex items-center gap-4">
+            {/* Price Range */}
              <div className="relative">
                <select
                  value={`${priceRange[0]}-${priceRange[1]}`}
@@ -423,51 +404,10 @@ const ProductsPageContent: React.FC = () => {
          </div>
 
 
-        {/* Mobile Filters Panel */}
-        {showFilters && (
-          <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
-            {/* Category - Uses categories from API response with styled dropdown */}
-            <div>
-              <label className="text-sm font-medium text-foreground mb-2 block">{t('category')}</label>
-              <Select
-                value={selectedCategory || "all"}
-                onValueChange={(value) => setSelectedCategory(value === "all" ? null : value)}
-              >
-                <SelectTrigger className={`w-full ${
-                  currentTheme === 'dark'
-                    ? 'bg-background border-border text-foreground'
-                    : 'bg-white border-gray-200 text-gray-900'
-                }`}>
-                  <SelectValue placeholder={t('allCategories')} />
-                </SelectTrigger>
-                <SelectContent 
-                  side="bottom"
-                  position="popper"
-                  className={`max-h-[300px] ${currentTheme === 'dark' ? 'bg-card border-border' : 'bg-white border-gray-200'}`}
-                >
-                  <SelectItem value="all" className="cursor-pointer">
-                    <div className="flex items-center gap-2">
-                      <LayoutGrid className="w-4 h-4 text-flame-orange" />
-                      <span>{t('allCategories')}</span>
-                    </div>
-                  </SelectItem>
-                  {categories.map((cat) => {
-                    const Icon = cat.icon;
-                    return (
-                      <SelectItem key={cat.id} value={cat.id} className="cursor-pointer">
-                        <div className="flex items-center gap-2">
-                          <Icon className="w-4 h-4 text-flame-orange" />
-                          <span>{language === 'en' ? cat.name : cat.nameNe}</span>
-                        </div>
-                      </SelectItem>
-                    );
-                  })}
-                </SelectContent>
-              </Select>
-            </div>
-
-
-             {/* Price Range */}
+       {/* Mobile Filters Panel */}
+       {showFilters && (
+         <div className="lg:hidden bg-card/90 backdrop-blur-sm border border-border rounded-xl p-4 mb-6 space-y-4">
+            {/* Price Range */}
              <div>
                <label className="text-sm font-medium text-foreground mb-2 block">{t('priceRange')}</label>
                <select
@@ -516,15 +456,17 @@ const ProductsPageContent: React.FC = () => {
          )}
 
 
-        {/* Category Selector */}
-        {/* <CategorySelector
-          categories={categories}
-          selectedCategory={selectedCategory}
-          onCategorySelect={setSelectedCategory}
-        /> */}
+        {/* Hierarchical Category Selector */}
+        <div className="mb-8">
+          <HierarchicalCategorySelector
+            categories={categories}
+            selectedFilter={selectedFilter}
+            onFilterChange={setSelectedFilter}
+          />
+        </div>
 
 
-         {/* Loading State */}
+        {/* Loading State */}
          {loading && (
            <div className="flex flex-col items-center justify-center py-16">
              <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
@@ -579,8 +521,8 @@ const ProductsPageContent: React.FC = () => {
              </div>
 
 
-             {/* Load More Button - only show when no filters are active */}
-             {hasMore && !searchQuery && !selectedCategory && (
+            {/* Load More Button - only show when no filters are active */}
+            {hasMore && !searchQuery && !selectedFilter.category && (
                <div className="flex justify-center mt-10">
                  <button
                    onClick={handleLoadMore}

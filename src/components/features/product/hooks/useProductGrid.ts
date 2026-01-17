@@ -5,6 +5,8 @@ import { Product } from "@/types";
 interface UseProductGridProps {
   searchQuery: string;
   selectedCategory: string;
+  selectedOriginType?: string;
+  selectedSubCategory?: string;
   limit?: number;
 }
 
@@ -13,6 +15,8 @@ const ITEMS_PER_PAGE = 10;
 export function useProductGrid({
   searchQuery,
   selectedCategory,
+  selectedOriginType,
+  selectedSubCategory,
   limit,
 }: UseProductGridProps) {
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -46,6 +50,8 @@ export function useProductGrid({
       stock: apiProduct?.stock || 0,
       rating: apiProduct?.rating || 0,
       tag: apiProduct?.discountPercent ? `${apiProduct?.discountPercent}% OFF` : apiProduct?.tag,
+      originType: apiProduct?.originType || 'domestic',
+      subCategory: apiProduct?.subCategory || '',
     } as Product;
   };
 
@@ -68,12 +74,14 @@ export function useProductGrid({
       // We'll filter client-side with case-insensitive matching
       // Only send search query to API
      
-      // Fetch products based on whether category is selected
+      // Fetch products based on whether any filter is selected
       const hasCategory = normalizedCategory && normalizedCategory !== 'all' && normalizedCategory !== '';
-      // When category is selected, fetch all products for filtering
+      const hasFilter = hasCategory || selectedOriginType || selectedSubCategory;
+      
+      // When any filter is selected, fetch all products for filtering
       // Otherwise, fetch only 10 products by default
-      const fetchLimit = hasCategory ? 10000 : ITEMS_PER_PAGE; // Fetch all when category selected, 10 otherwise
-      const fetchPage = hasCategory ? 1 : pageNum; // When category selected, always page 1
+      const fetchLimit = hasFilter ? 10000 : ITEMS_PER_PAGE; // Fetch all when filter selected, 10 otherwise
+      const fetchPage = hasFilter ? 1 : pageNum; // When filter selected, always page 1
      
       const response = await productsService.getAll({
         page: fetchPage,
@@ -84,9 +92,9 @@ export function useProductGrid({
      
       const mappedProducts = (response.data || []).map(mapApiProductToProduct);
      
-      // When category is selected, always replace (fetch all at once)
-      // When no category, append for pagination
-      if (append && !hasCategory) {
+      // When filter is selected, always replace (fetch all at once)
+      // When no filter, append for pagination
+      if (append && !hasFilter) {
         setProducts(prev => [...prev, ...mappedProducts]);
       } else {
         setProducts(mappedProducts);
@@ -95,17 +103,17 @@ export function useProductGrid({
       const pagination = (response as any).pagination;
       if (pagination) {
         setTotalProducts(pagination.total || 0);
-        // When category is selected, we fetch all products, so no more pages
-        if (hasCategory) {
+        // When filter is selected, we fetch all products, so no more pages
+        if (hasFilter) {
           setHasMore(false);
         } else {
-          // When no category, check if there are more pages
+          // When no filter, check if there are more pages
         setHasMore(pageNum < (pagination.pages || 1));
         }
       } else {
-        // When category is selected, assume we got all products
+        // When filter is selected, assume we got all products
         // Otherwise, check if we got a full page
-        setHasMore(hasCategory ? false : mappedProducts.length === ITEMS_PER_PAGE);
+        setHasMore(hasFilter ? false : mappedProducts.length === ITEMS_PER_PAGE);
       }
     } catch (err: any) {
       setError(err?.message || 'Failed to fetch products');
@@ -116,7 +124,7 @@ export function useProductGrid({
       setLoading(false);
       setLoadingMore(false);
     }
-  }, [searchQuery, selectedCategory]);
+  }, [searchQuery, selectedCategory, selectedOriginType, selectedSubCategory]);
 
   // Fetch products when search or category changes
   useEffect(() => {
@@ -140,6 +148,7 @@ export function useProductGrid({
     const normalizedCategory = selectedCategory?.toLowerCase();
     const hasCategory = normalizedCategory && normalizedCategory !== 'all' && normalizedCategory !== '';
     
+    // Filter by category
     if (hasCategory) {
       filtered = filtered.filter((product) => {
         const productCategory = product?.category?.toLowerCase();
@@ -153,17 +162,35 @@ export function useProductGrid({
         return productCategory === normalizedCategory;
       });
     }
+    
+    // Filter by origin type
+    if (selectedOriginType) {
+      filtered = filtered.filter((product: any) => {
+        const productOriginType = (product?.originType || 'domestic').toLowerCase();
+        return productOriginType === selectedOriginType.toLowerCase();
+      });
+    }
+    
+    // Filter by subcategory
+    if (selectedSubCategory) {
+      filtered = filtered.filter((product: any) => {
+        const productSubCategory = (product?.subCategory || '').toLowerCase();
+        return productSubCategory === selectedSubCategory.toLowerCase();
+      });
+    }
    
-    // Show 10 products by default, all products when category is selected
-    if (hasCategory) {
-      // When category is selected, show all filtered products
+    const hasFilter = hasCategory || selectedOriginType || selectedSubCategory;
+   
+    // Show all products when any filter is selected, otherwise show limited
+    if (hasFilter) {
+      // When filter is selected, show all filtered products
       return filtered;
     } else {
-      // When no category, show products based on limit prop or default to ITEMS_PER_PAGE (10)
+      // When no filter, show products based on limit prop or default to ITEMS_PER_PAGE (10)
       const displayLimit = limit || ITEMS_PER_PAGE;
       return filtered.slice(0, displayLimit);
     }
-  }, [products, selectedCategory, limit]);
+  }, [products, selectedCategory, selectedOriginType, selectedSubCategory, limit]);
 
   const handleViewDetails = (product: Product) => {
     setSelectedProduct(product);

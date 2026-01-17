@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag, X, Image as ImageIcon, Building2 } from "lucide-react";
+import { Plus, Upload, Link, Star, AlertCircle, Percent, Tag, X, Image as ImageIcon, Building2, Globe, Layers } from "lucide-react";
 import { toast } from "sonner";
 import { useProductMutation } from "@/hooks/useProductMutation";
 import { Product } from "@/types";
@@ -54,7 +54,9 @@ export function AddProductModal({
   const [formData, setFormData] = useState({
     name: "",
     category: "",
+    subCategory: "",
     brand: "",
+    originType: "domestic",
     price: "",
     originalPrice: "",
     stock: "",
@@ -74,7 +76,9 @@ export function AddProductModal({
       setFormData({
         name: product.name || "",
         category: product.category?.toLowerCase() || "",
+        subCategory: (product as any).subCategory || "",
         brand: (product as any).brand || "",
+        originType: (product as any).originType || "domestic",
         price: product.price?.toString() || "",
         originalPrice: product.originalPrice?.toString() || "",
         stock: (product.stock ?? 0).toString(),
@@ -93,7 +97,9 @@ export function AddProductModal({
       setFormData({
         name: "",
         category: "",
+        subCategory: "",
         brand: "",
+        originType: "domestic",
         price: "",
         originalPrice: "",
         stock: "",
@@ -219,6 +225,8 @@ export function AddProductModal({
       const productData = {
         name: formData.name,
         type: categoryToType,
+        subCategory: formData.subCategory || "",
+        originType: formData.originType || "domestic",
         price: parseFloat(formData.price),
         image: formData.imageUrl,
         brand: formData.brand || "",
@@ -263,7 +271,9 @@ export function AddProductModal({
         setFormData({
           name: "",
           category: "",
+          subCategory: "",
           brand: "",
+          originType: "domestic",
           price: "",
           originalPrice: "",
           stock: "",
@@ -383,6 +393,52 @@ export function AddProductModal({
                   <AlertCircle className="h-3 w-3" /> {errors.category}
                 </p>
               )}
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="subCategory" className="text-foreground">
+                Sub Category{" "}
+                <span className="text-muted-foreground text-xs">(Optional)</span>
+              </Label>
+              <div className="relative">
+                <Layers className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  id="subCategory"
+                  value={formData.subCategory}
+                  onChange={(e) =>
+                    setFormData({ ...formData, subCategory: e.target.value })
+                  }
+                  placeholder="e.g., Red Wine, Single Malt"
+                  className="bg-secondary/50 border-border pl-10"
+                />
+              </div>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="originType" className="text-foreground">
+                Origin Type
+              </Label>
+              <Select
+                value={formData.originType}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, originType: value })
+                }
+              >
+                <SelectTrigger className="bg-secondary/50 border-border">
+                  <div className="flex items-center gap-2">
+                    <Globe className="h-4 w-4 text-muted-foreground" />
+                    <SelectValue placeholder="Select origin" />
+                  </div>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="domestic">Domestic</SelectItem>
+                  <SelectItem value="imported">Imported</SelectItem>
+                </SelectContent>
+              </Select>
+              <p className="text-xs text-muted-foreground">
+                Default: Domestic
+              </p>
             </div>
             <div className="space-y-2">
               <Label htmlFor="price" className="text-foreground">

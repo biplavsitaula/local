@@ -18,6 +18,8 @@ export type Product = {
   inStock?: boolean;
   isNew?: boolean;
   origin?: string;
+  originType?: string;
+  subCategory?: string;
 };
 
 export type CartItem = {

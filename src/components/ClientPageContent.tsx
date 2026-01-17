@@ -19,6 +19,7 @@ import ProductGrid from "@/components/features/product/ProductGrid";
 import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CartNotification from "@/components/CartNotification";
+import HierarchicalCategorySelector from "@/components/HierarchicalCategorySelector";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
@@ -29,6 +30,7 @@ import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
+import { useCategories, CategoryFilter } from "@/hooks/useCategories";
 
 
 
@@ -36,8 +38,11 @@ import { productsService, Product as ApiProduct } from "@/services/products.serv
 function PageContent() {
 const { t } = useLanguage();
 const [searchQuery, setSearchQuery] = useState("");
-const [selectedCategory, setSelectedCategory] = useState<string>("All");
+const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>({});
 const [checkoutOpen, setCheckoutOpen] = useState(false);
+
+// Use categories hook with subcategories
+const { categories } = useCategories({ includeAll: true, fetchSubCategories: true });
 const [showSeasonalSection, setShowSeasonalSection] = useState(true);
 const { theme: seasonalTheme } = useSeasonalTheme();
 const { theme } = useTheme();
@@ -334,16 +339,19 @@ return (
 
 
 
-              <CategorySection
-                selected={selectedCategory}
-                onSelect={(value: string) => {
-                  // Normalize category value - CategorySection sends "All" or category names like "Whiskey"
-                  const normalizedValue = value === "All" || value === "all" ? "All" : value;
-                  setSelectedCategory(
-                    selectedCategory === normalizedValue ? "All" : normalizedValue
-                  );
-                }}
-              />
+              {/* Hierarchical Category Selector */}
+              <section className="container mx-auto px-4">
+                <h2 className={`text-lg sm:text-xl md:text-2xl font-display font-bold mb-4 sm:mb-6 ${
+                  theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+                }`}>
+                  {t("browseByCategory")}
+                </h2>
+                <HierarchicalCategorySelector
+                  categories={categories}
+                  selectedFilter={selectedFilter}
+                  onFilterChange={setSelectedFilter}
+                />
+              </section>
 
               {/* Products Section */}
               <section className="container mx-auto px-4">
@@ -367,9 +375,11 @@ return (
                 </div>
                 <ProductGrid
                   searchQuery={searchQuery}
-                  selectedCategory={selectedCategory}
+                  selectedCategory={selectedFilter.category || "All"}
+                  selectedOriginType={selectedFilter.originType}
+                  selectedSubCategory={selectedFilter.subCategory}
                   onCheckout={() => setCheckoutOpen(true)}
-                  limit={selectedCategory && selectedCategory !== "All" ? undefined : 10}
+                  limit={selectedFilter.category ? undefined : 10}
                 />
               </section>
             
@@ -435,7 +445,7 @@ return (
                             {seasonalTheme.keyname === 'default' && 'Premium theme, quality art, collection CTA.'}
                           </p>
                           <button
-                            onClick={() => setSelectedCategory(seasonalTheme.category || "All")}
+                            onClick={() => setSelectedFilter({ category: seasonalTheme.category || undefined })}
                             className="mt-3 rounded-full gradient-gold px-4 py-2 text-sm font-semibold text-primary-foreground cursor-pointer"
                           >
                             {seasonalTheme.ctaText}
