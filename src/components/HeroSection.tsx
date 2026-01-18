@@ -38,11 +38,12 @@ const HeroSection: React.FC = () => {
             <Sparkles className={`w-4 h-4 ${theme === 'dark' ? 'text-flame-yellow' : 'text-orange-500'}`} />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
+          {/* <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
             <span className="bg-gradient-to-b from-red-600 via-orange-500 to-amber-400 bg-clip-text text-transparent">Premium Spirits & Fine</span>
             <br />
             <span className="bg-gradient-to-b from-amber-400 via-yellow-500 to-amber-300 bg-clip-text text-transparent">Beverages</span>
-          </h1>
+          </h1> */}
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight text-primary-gradient"> Premium Spirits & Fine Beverages</h1>
 
           {/* Flame Transition Effect */}
           {/* <div className="relative flex items-center justify-center py-1 pointer-events-none">
@@ -107,7 +108,7 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="default"
-                className="gradient-gold text-primary-foreground font-semibold px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg hover:opacity-90 transition-all group border-0"
+                className="btn-primary-custom font-semibold px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg group"
               >
                 Explore Collection
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />

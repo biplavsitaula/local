@@ -76,9 +76,52 @@
   /* Gradients */
   --gradient-gold: linear-gradient(135deg, hsl(25 95% 53%), hsl(0 72% 51%));
   --gradient-flame: linear-gradient(135deg, hsl(45 93% 47%), hsl(25 95% 53%), hsl(0 72% 51%));
+  --gradient-flame-text: linear-gradient(to right, hsl(45 93% 58%), hsl(25 95% 53%), hsl(20 90% 48%), hsl(0 72% 51%));
+  --gradient-flame-text-light: linear-gradient(to right, hsl(45 95% 72%), hsl(30 90% 65%), hsl(25 85% 60%), hsl(15 80% 55%));
+  --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 45%), hsl(20 90% 50%), hsl(35 95% 55%), hsl(25 95% 53%));
   --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
   --gradient-dark: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 4%));
   --gradient-galaxy: linear-gradient(180deg, hsl(260 40% 8%), hsl(270 60% 15%), hsl(260 40% 8%));
+  
+  /* Semantic Text Colors (dark mode default) - Golden/Flame tones */
+  --color-text-primary: hsl(45 100% 96%);
+  --color-text-secondary: hsl(38 85% 70%);
+  --color-text-tertiary: hsl(30 70% 60%);
+  --color-text-muted: hsl(25 50% 45%);
+  --color-text-accent: hsl(25 95% 53%);
+  --color-text-white: hsl(0 0% 100%);
+  
+  /* Semantic Border Colors */
+  --color-border-primary: hsl(25 95% 53%);
+  --color-border-primary-hover: hsl(45 93% 47%);
+  --color-border-secondary: hsl(0 0% 30%);
+  --color-border-muted: hsl(0 0% 20%);
+  
+  /* Semantic Background Colors */
+  --color-bg-overlay: hsl(0 0% 0% / 0.9);
+  --color-bg-modal: hsl(0 0% 0% / 0.9);
+  
+  /* Primary Button Colors */
+  --color-btn-primary-bg: linear-gradient(to right, hsl(0 72% 45%), hsl(20 90% 50%), hsl(35 95% 55%), hsl(25 95% 53%));
+  --color-btn-primary-bg-hover: linear-gradient(to right, hsl(0 72% 40%), hsl(20 90% 45%), hsl(35 95% 50%), hsl(25 95% 48%));
+  --color-btn-primary-text: hsl(0 0% 100%);
+  --color-btn-primary-border: hsl(25 95% 53%);
+  --color-btn-primary-border-hover: hsl(45 93% 60%);
+  
+  /* Secondary Button Colors */
+  --color-btn-secondary-bg: hsl(0 0% 0% / 0.5);
+  --color-btn-secondary-bg-hover: hsl(0 0% 20%);
+  --color-btn-secondary-text: hsl(0 0% 100%);
+  --color-btn-secondary-border: hsl(0 0% 40%);
+  --color-btn-secondary-border-hover: hsl(25 95% 53%);
+  
+  /* Outline Button Colors */
+  --color-btn-outline-bg: transparent;
+  --color-btn-outline-bg-hover: hsl(25 95% 53% / 0.1);
+  --color-btn-outline-text: hsl(25 95% 53%);
+  --color-btn-outline-text-hover: hsl(45 93% 60%);
+  --color-btn-outline-border: hsl(25 95% 53% / 0.5);
+  --color-btn-outline-border-hover: hsl(25 95% 53%);
 }
 
 @layer base {
@@ -127,15 +170,33 @@
     --color-bg-secondary: hsl(0 0% 100%);
     --color-bg-tertiary: hsl(0 0% 96%);
     --color-bg-muted: hsl(0 0% 94%);
+    --color-bg-overlay: hsl(0 0% 0% / 0.8);
+    --color-bg-modal: hsl(0 0% 100%);
     
-    --color-border-primary: hsl(0 0% 85%);
+    --color-border-primary: hsl(25 95% 53%);
+    --color-border-primary-hover: hsl(45 93% 47%);
     --color-border-secondary: hsl(0 0% 80%);
     --color-border-muted: hsl(0 0% 88%);
+    
+    /* Light mode text colors - Warm golden tones */
+    --color-text-primary: hsl(20 80% 20%);
+    --color-text-secondary: hsl(17, 80%, 52%);
+    --color-text-tertiary: hsl(30 50% 45%);
+    --color-text-muted: hsl(35 40% 55%);
+    --color-text-accent: hsl(25 95% 45%);
+    --color-text-white: hsl(0 0% 100%);
     
     /* Light theme gradients */
     --gradient-card: linear-gradient(180deg, hsl(0 0% 100%), hsl(0 0% 98%));
     --gradient-dark: linear-gradient(180deg, hsl(0 0% 98%), hsl(0 0% 96%));
     --gradient-galaxy: linear-gradient(180deg, hsl(45 50% 95%), hsl(25 40% 98%), hsl(45 50% 95%));
+    
+    /* Link colors */
+    --color-link-text: hsl(25 95% 45%);
+    --color-link-text-hover: hsl(25 95% 35%);
+    --color-link-border: hsl(25 95% 53%);
+    --color-link-border-hover: hsl(45 93% 47%);
+    
   }
 
   .dark {
@@ -182,15 +243,32 @@
     --color-bg-secondary: hsl(260 35% 10%);
     --color-bg-tertiary: hsl(260 30% 15%);
     --color-bg-muted: hsl(260 25% 18%);
+    --color-bg-overlay: hsl(0 0% 0% / 0.95);
+    --color-bg-modal: hsl(0 0% 0% / 0.9);
     
-    --color-border-primary: hsl(260 25% 20%);
-    --color-border-secondary: hsl(260 25% 25%);
-    --color-border-muted: hsl(260 25% 22%);
+    /* Dark mode text colors - Golden/Flame tones */
+    --color-text-primary: hsl(45 100% 96%);
+    --color-text-secondary: hsl(38 85% 70%);
+    --color-text-tertiary: hsl(30 70% 60%);
+    --color-text-muted: hsl(25 50% 45%);
+    --color-text-accent: hsl(25 95% 53%);
+    --color-text-white: hsl(0 0% 100%);
+    
+    --color-border-primary: hsl(25 95% 53%);
+    --color-border-primary-hover: hsl(45 93% 47%);
+    --color-border-secondary: hsl(0 0% 30%);
+    --color-border-muted: hsl(0 0% 20%);
     
     /* Dark theme gradients */
     --gradient-card: linear-gradient(180deg, hsl(0 0% 10%), hsl(0 0% 6%));
     --gradient-dark: linear-gradient(180deg, hsl(0 0% 8%), hsl(0 0% 4%));
     --gradient-galaxy: linear-gradient(180deg, hsl(260 40% 8%), hsl(270 60% 15%), hsl(260 40% 8%));
+    
+    /* Link colors */
+    --color-link-text: hsl(45 100% 96%);
+    --color-link-text-hover: hsl(25 95% 53%);
+    --color-link-border: hsl(25 95% 53%);
+    --color-link-border-hover: hsl(45 93% 47%);
   }
 }
 
@@ -288,6 +366,102 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+  }
+
+  .flame-text-glow {
+    background: var(--gradient-flame-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4));
+  }
+
+  .view-all-link {
+    display: flex;
+    align-items: center;
+    font-weight: 500;
+    transition: color 0.2s, border-color 0.2s;
+    border-width: 2px;
+    border-style: solid;
+    border-radius: 0.75rem;
+    color: var(--color-link-text);
+    border-color: var(--color-link-border);
+  }
+
+  .view-all-link:hover {
+    color: var(--color-link-text-hover);
+    border-color: var(--color-link-border-hover);
+  }
+
+  /* Semantic text color utilities - Golden/Flame tones */
+  .text-primary-text,
+  .text-color-primary {
+    color: var(--color-text-primary);
+  }
+
+  .text-secondary-text,
+  .text-color-secondary {
+    background: var(--gradient-flame-text-light);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-ternary-text,
+  .text-color-tertiary {
+    background: var(--gradient-flame-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-default-text,
+  .text-color-muted {
+    color: var(--color-text-muted);
+  }
+
+  .text-accent-text,
+  .text-color-accent {
+    color: var(--color-text-accent);
+  }
+
+  .text-white-text,
+  .text-color-white {
+    color: var(--color-text-white);
+  }
+
+  /* Primary gradient text */
+  .text-primary-gradient {
+    background: var(--gradient-flame-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .text-primary-gradient-glow {
+    background: var(--gradient-flame-text);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4));
+  }
+
+  /* Semantic border utilities */
+  .border-primary-border {
+    border-color: var(--color-border-primary);
+  }
+
+  .border-primary-border:hover,
+  .hover\:border-primary-hover:hover {
+    border-color: var(--color-border-primary-hover);
+  }
+
+  .border-secondary-border {
+    border-color: var(--color-border-secondary);
+  }
+
+  .border-muted-border {
+    border-color: var(--color-border-muted);
   }
 
   .flame-glow {
@@ -474,6 +648,50 @@
 
   .bg-flame-gradient {
     background: var(--gradient-flame);
+  }
+
+  .bg-gradient-btn-primary {
+    background: var(--gradient-btn-primary);
+  }
+
+  /* Primary Button */
+  .btn-primary-custom {
+    background: var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-text);
+    border: 2px solid var(--color-btn-primary-border);
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary-custom:hover {
+    background: var(--color-btn-primary-bg-hover);
+    border-color: var(--color-btn-primary-border-hover);
+  }
+
+  /* Secondary Button */
+  .btn-secondary-custom {
+    background: var(--color-btn-secondary-bg);
+    color: var(--color-btn-secondary-text);
+    border: 2px solid var(--color-btn-secondary-border);
+    transition: all 0.3s ease;
+  }
+
+  .btn-secondary-custom:hover {
+    background: var(--color-btn-secondary-bg-hover);
+    border-color: var(--color-btn-secondary-border-hover);
+  }
+
+  /* Outline Button */
+  .btn-outline-custom {
+    background: var(--color-btn-outline-bg);
+    color: var(--color-btn-outline-text);
+    border: 2px solid var(--color-btn-outline-border);
+    transition: all 0.3s ease;
+  }
+
+  .btn-outline-custom:hover {
+    background: var(--color-btn-outline-bg-hover);
+    color: var(--color-btn-outline-text-hover);
+    border-color: var(--color-btn-outline-border-hover);
   }
   
   .bg-primary-gradient {

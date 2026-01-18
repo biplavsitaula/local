@@ -241,18 +241,12 @@ return (
               {/* Recent Arrivals Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className={`text-lg sm:text-xl md:text-2xl font-display font-bold ${
-                    theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                  }`}>
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
                     {t("recentArrivals")}
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
-                      theme === 'dark'
-                        ? 'text-white-text hover:text-flame-orange'
-                        : 'text-orange-600 hover:text-orange-700'
-                    }`}
+                    className="view-all-link gap-1 sm:gap-2 text-xs sm:text-sm p-1.5 sm:p-2 rounded-lg sm:rounded-xl"
                   >
                     {t("viewAll")}
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -363,11 +357,7 @@ return (
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${
-                      theme === 'dark'
-                        ? 'text-white-text hover:text-flame-orange'
-                        : 'text-orange-600 hover:text-orange-700'
-                    }`}
+                    className="view-all-link gap-1 sm:gap-2 text-xs sm:text-sm p-1.5 sm:p-2 rounded-lg sm:rounded-xl"
                   >
                     {t("viewAll")}
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
