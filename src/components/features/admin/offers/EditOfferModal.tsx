@@ -134,10 +134,10 @@ export function EditOfferModal({
     }
 
     // At least one discount type is required
-    if (!formData.discountPercent && !formData.discountAmount) {
-      newErrors.discountPercent = "Please provide either discount percent or discount amount.";
-      newErrors.discountAmount = "Please provide either discount percent or discount amount.";
-    }
+    // if (!formData.discountPercent && !formData.discountAmount) {
+    //   newErrors.discountPercent = "Please provide either discount percent or discount amount.";
+    //   newErrors.discountAmount = "Please provide either discount percent or discount amount.";
+    // }
 
     // Cannot have both discount types
     if (formData.discountPercent && formData.discountAmount) {

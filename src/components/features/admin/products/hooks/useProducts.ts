@@ -31,12 +31,21 @@ export function useProducts() {
       name: apiProduct.name || '',
       category: category || 'other',
       price: apiProduct.price || 0,
+      originalPrice: apiProduct.originalPrice,
       image: apiProduct.image || apiProduct.imageUrl || '',
+      imageUrl: apiProduct.imageUrl || apiProduct.image || '',
       stock: apiProduct.stock || 0,
       rating: apiProduct.rating || 0,
-      tag: apiProduct.tag,
+      tag: apiProduct.tag || '',
       description: apiProduct.description || '',
       sales: apiProduct.sales || apiProduct.totalSold || 0,
+      // Include additional fields for edit modal
+      originType: apiProduct.originType || 'domestic',
+      subCategory: apiProduct.subCategory || '',
+      brand: apiProduct.brand || '',
+      discountPercent: apiProduct.discountPercent || 0,
+      isRecommended: apiProduct.isRecommended || false,
+      itemLink: apiProduct.itemLink || '',
     } as ProductType;
   };
 

@@ -148,10 +148,19 @@ export function NotificationDropdown() {
    const date = new Date(dateStr);
    const now = new Date();
    const diff = now.getTime() - date.getTime();
-   const hours = Math.floor(diff / (1000 * 60 * 60));
+   
+   // Handle invalid dates
+   if (isNaN(date.getTime()) || diff < 0) {
+     return 'Just now';
+   }
+   
+   const seconds = Math.floor(diff / 1000);
+   const minutes = Math.floor(seconds / 60);
+   const hours = Math.floor(minutes / 60);
    const days = Math.floor(hours / 24);
   
-   if (hours < 1) return 'Just now';
+   if (seconds < 60) return 'Just now';
+   if (minutes < 60) return `${minutes}m ago`;
    if (hours < 24) return `${hours}h ago`;
    if (days === 1) return 'Yesterday';
    if (days < 7) return `${days}d ago`;

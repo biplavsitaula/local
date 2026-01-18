@@ -83,7 +83,8 @@ export function AddProductModal({
       const discountValue = p.discountPercent ?? "";
       
       // Get origin type - API returns as 'originType', default to 'domestic' if not set
-      const originValue = p.originType || "domestic";
+      // Normalize to lowercase to match Select values
+      const originValue = (p.originType || "domestic").toLowerCase();
       
       // Get sub category - API returns as 'subCategory'
       const subCategoryValue = p.subCategory || "";
