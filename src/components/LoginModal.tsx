@@ -25,6 +25,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
   const [showForgotPassword, setShowForgotPassword] = useState(false);
   const [mounted, setMounted] = useState(false);
   const [formData, setFormData] = useState({
@@ -42,6 +43,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
 
   const handleClose = () => {
     setError(null);
+    setEmailError(null);
     setFormData({ email: "", password: "" });
     onClose();
   };
@@ -49,6 +51,15 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
+    setEmailError(null);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setEmailError(t("invalidEmail"));
+      return;
+    }
+
     setIsLoading(true);
     
     try {
@@ -101,7 +112,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
 
           {/* Tabs */}
           <div className="flex gap-2 mb-4 sm:mb-6">
-            <button className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base">
+            <button 
+            // className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
+            className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-primary-custom text-text-inverse font-medium text-sm sm:text-base"
+            >
               {t('login')}
             </button>
             <button 
@@ -124,12 +138,18 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    setEmailError(null);
+                  }}
                   placeholder={t('enterEmail')}
-                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className={`w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20 ${emailError ? 'border-red-500' : 'border-border'}`}
                   required
                 />
               </div>
+              {emailError && (
+                <p className="text-red-500 text-xs mt-1">{emailError}</p>
+              )}
             </div>
 
             {/* Password */}

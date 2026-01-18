@@ -29,13 +29,8 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
           {/* Badge */}
-          <div className={`inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors ${
-            theme === 'dark'
-              ? 'shadow-flame-gold bg-secondary/50 border border-flame-gold text-flame-gold'
-              : 'shadow-orange-200 bg-white/80 border border-orange-300 text-orange-600'
-          }`}>
-        
-            <Sparkles className={`w-4 h-4 ${theme === 'dark' ? 'text-flame-yellow' : 'text-orange-500'}`} />
+          <div className="inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors bg-secondary/50 border border-color-primary text-color-tertiary">
+            <Sparkles className="w-4 h-4 text-color-accent" />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
           {/* <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
@@ -96,9 +91,7 @@ const HeroSection: React.FC = () => {
           {/* <HeroTitle text={t("heroTitle")} size="md" /> */}
 
           {/* Subtitle */}
-          <p className={`text-lg sm:text-xl max-w-2xl mx-auto ${
-            theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'
-          }`}>
+          <p className="text-lg sm:text-xl max-w-2xl mx-auto text-muted-foreground">
             {t("heroSubtitle")}
           </p>
 
@@ -118,11 +111,7 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className={`px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg transition-colors border-2 ${
-                  theme === 'dark'
-                    ? 'border-flame-orange/60 text-foreground hover:bg-card/10 hover:border-flame-orange'
-                    : 'border-flame-orange/50 text-gray-700 hover:bg-gray-100 hover:border-flame-orange'
-                }`}
+                className="btn-outline-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg"
               >
                 Categories
               </Button>
@@ -132,22 +121,16 @@ const HeroSection: React.FC = () => {
           {/* Stats */}
           <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 max-w-xl mx-auto">
             <div className="text-center">
-              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
-                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
-              }`}>500+</p>
-              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Products</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">500+</p>
+              <p className="text-xs sm:text-sm text-color-muted">Products</p>
             </div>
             <div className="text-center">
-              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
-                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
-              }`}>1hr</p>
-              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Delivery</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">1hr</p>
+              <p className="text-xs sm:text-sm text-color-muted">Delivery</p>
             </div>
             <div className="text-center">
-              <p className={`text-xl sm:text-2xl md:text-3xl font-bold ${
-                theme === 'dark' ? 'flame-text' : 'bg-gradient-to-r from-orange-600 to-red-600 bg-clip-text text-transparent'
-              }`}>10k+</p>
-              <p className={`text-xs sm:text-sm ${theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>Customers</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">10k+</p>
+              <p className="text-xs sm:text-sm text-color-muted">Customers</p>
             </div>
           </div>
         </div>

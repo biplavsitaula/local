@@ -160,6 +160,41 @@ export const ordersService = {
   rejectOrder: async (id: string): Promise<ApiResponse<Order>> => {
     return apiPost<Order>(`/orders/${id}/reject`, {});
   },
+
+  /**
+   * Get orders by customer email (for tracking user's orders)
+   */
+  getByEmail: async (email: string): Promise<ApiResponse<Order[]>> => {
+    try {
+      const response = await apiGet<Order[]>('/orders', { search: email }, false);
+      // Filter orders to only include those matching the email
+      if (response.data) {
+        response.data = response.data.filter(
+          order => order.customer?.email?.toLowerCase() === email.toLowerCase()
+        );
+      }
+      return response;
+    } catch (error: any) {
+      console.warn('Failed to fetch orders by email:', error);
+      return {
+        success: true,
+        message: 'Orders not available',
+        data: [],
+      };
+    }
+  },
+
+  /**
+   * Get order status by bill number (for tracking a specific order)
+   */
+  getOrderStatus: async (billNumber: string): Promise<ApiResponse<Order>> => {
+    try {
+      return await apiGet<Order>(`/orders/bill/${billNumber}`, undefined, false);
+    } catch (error: any) {
+      console.warn('Failed to fetch order status:', error);
+      throw error;
+    }
+  },
 };
 
 

@@ -4,9 +4,29 @@ import React, { useState } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
 import { Product } from '@/types';
-import { X, ShoppingCart, Zap, Plus, Minus, MapPin, Wine, Percent } from 'lucide-react';
+import { X, Plus, Minus, MapPin, Wine, Percent } from 'lucide-react';
+import ProductActionButtons from '@/components/ui/ProductActionButtons';
 import { toast } from 'sonner';
 import Image from 'next/image';
+
+const DEFAULT_IMAGE = "/assets/liquor1.jpeg";
+
+// Helper function to validate and get a valid image URL
+const getValidImageUrl = (product: Product): string => {
+  const imageUrl = product?.image || product?.imageUrl || DEFAULT_IMAGE;
+  
+  // Check if it's a valid URL format
+  if (!imageUrl || imageUrl === '') {
+    return DEFAULT_IMAGE;
+  }
+  
+  // Allow relative paths, data URLs, and valid http/https URLs
+  if (imageUrl.startsWith('/') || imageUrl.startsWith('data:') || imageUrl.startsWith('http://') || imageUrl.startsWith('https://')) {
+    return imageUrl;
+  }
+  
+  return DEFAULT_IMAGE;
+};
 
 interface ProductDetailModalProps {
   product: Product;
@@ -54,11 +74,16 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
           {/* Image */}
           <div className="relative aspect-square overflow-hidden rounded-xl bg-muted">
             <Image
-              src={product?.image || "/assets/liquor1.jpeg"}
-              alt={product?.name}
+              src={getValidImageUrl(product)}
+              alt={product?.name || 'Product'}
               className="h-full w-full object-cover"
-              width={500}
-              height={500}
+              fill
+              sizes="(max-width: 768px) 100vw, 50vw"
+              unoptimized={getValidImageUrl(product).startsWith('data:') || getValidImageUrl(product).startsWith('http')}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = DEFAULT_IMAGE;
+              }}
             />
             {product.isNew && (
               <span className="absolute left-4 top-4 rounded-full bg-primary-gradient px-4 py-1.5 text-sm font-bold text-text-inverse">
@@ -162,22 +187,11 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
                   </div>
                 </div>
 
-                <div className="flex gap-2 sm:gap-3">
-                  <button
-                    onClick={handleAddToCart}
-                    className="flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg border-2 border-primary bg-transparent py-2 sm:py-3 text-sm sm:text-base font-semibold text-primary transition-all hover:bg-primary hover:text-primary-foreground cursor-pointer"
-                  >
-                    <ShoppingCart className="h-4 w-4 sm:h-5 sm:w-5" />
-                    {t('addToCart')}
-                  </button>
-                  <button
-                    onClick={handleBuyNow}
-                    className="flex flex-1 items-center justify-center gap-1.5 sm:gap-2 rounded-lg bg-primary-gradient py-2 sm:py-3 text-sm sm:text-base font-semibold text-text-inverse transition-all hover:shadow-primary-lg cursor-pointer"
-                  >
-                    <Zap className="h-4 w-4 sm:h-5 sm:w-5" />
-                    {t('buyNow')}
-                  </button>
-                </div>
+                <ProductActionButtons
+                  onAddToCart={handleAddToCart}
+                  onBuyNow={handleBuyNow}
+                  size="md"
+                />
               </div>
             )}
           </div>

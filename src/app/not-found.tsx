@@ -35,16 +35,16 @@ export default function NotFound() {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl font-display font-bold text-foreground mb-2 flame-text">
+          <h1 className="text-4xl font-display font-bold mb-2 text-primary-gradient">
             404
           </h1>
 
-          <h2 className="text-2xl font-display font-semibold text-foreground mb-4">
+          <h2 className="text-2xl font-display font-semibold mb-4 text-color-secondary">
             {t('pageNotFound' as any)}
           </h2>
 
           {/* Message */}
-          <p className="text-lg font-medium text-foreground mb-8 text-muted-foreground">
+          <p className="text-lg font-medium mb-8 text-color-muted">
             {t('pageNotFoundMessage' as any)}
           </p>
 
@@ -53,7 +53,7 @@ export default function NotFound() {
             <Button
               onClick={() => router.back()}
               variant="outline"
-              className="flex-1 border-primary-border/50 text-foreground hover:bg-primary-btn/10 py-6 text-lg"
+              className="flex-1 btn-outline-custom py-6 text-lg"
             >
               <ArrowLeft className="w-5 h-5 mr-2" />
               {t('goBack' as any)}
@@ -61,7 +61,7 @@ export default function NotFound() {
             <Button
               asChild
               variant="default"
-              className="flex-1 bg-primary-gradient text-text-inverse font-semibold py-6 text-lg hover:opacity-90 transition-opacity border-0"
+              className="flex-1 btn-primary-custom font-semibold py-6 text-lg"
             >
               <Link href="/">
                 <Home className="w-5 h-5 mr-2" />

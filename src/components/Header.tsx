@@ -31,7 +31,33 @@ import Link from "next/link";
 import { IHeaderProps } from "@/interface/IHeaderProps";
 import OfferBanner from "@/components/OfferBanner";
 import Image from "next/image";
+import { Product } from "@/types";
 
+const DEFAULT_IMAGE = "/assets/liquor1.jpeg";
+
+// Helper function to get valid image URL
+const getValidImageUrl = (product: Product | null | undefined): string => {
+  if (!product) return DEFAULT_IMAGE;
+  
+  const imageUrl = product.image || product.imageUrl;
+  
+  if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+    return DEFAULT_IMAGE;
+  }
+  
+  const trimmedUrl = imageUrl.trim();
+  
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('/') || trimmedUrl.startsWith('data:')) {
+    return trimmedUrl;
+  }
+  
+  return DEFAULT_IMAGE;
+};
+
+// Check if URL is external (needs unoptimized)
+const isExternalUrl = (url: string): boolean => {
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+};
 
 const Header: React.FC<IHeaderProps> = ({
  searchQuery,
@@ -336,7 +362,9 @@ const Header: React.FC<IHeaderProps> = ({
            <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
              <SheetTrigger asChild>
                <Button
-                 className="bg-primary-gradient text-text-inverse hover:shadow-primary-lg flex items-center gap-2"
+                //  className="bg-primary-gradient text-text-inverse hover:shadow-primary-lg flex items-center gap-2"
+                 className="btn-primary-custom text-text-inverse hover:shadow-primary-lg flex items-center gap-2"
+
                >
                  <ShoppingCart className="w-4 h-4" />
                  <span className="hidden sm:inline">{t("myCart")}</span>
@@ -366,13 +394,18 @@ const Header: React.FC<IHeaderProps> = ({
                            key={item.product.id}
                            className="flex gap-3 p-3 rounded-lg bg-secondary/50 border border-border/50"
                          >
-                           <Image
-                             src={item.product.image || "/assets/liquor1.jpeg"}
-                             alt={item.product.name}
-                             className="w-16 h-20 object-cover rounded-md"
-                             width={64}
-                             height={80}
-                           />
+                          <Image
+                            src={getValidImageUrl(item.product)}
+                            alt={item.product.name || 'Product'}
+                            className="w-16 h-20 object-cover rounded-md"
+                            width={64}
+                            height={80}
+                            unoptimized={isExternalUrl(getValidImageUrl(item.product))}
+                            onError={(e) => {
+                              const target = e.target as HTMLImageElement;
+                              target.src = DEFAULT_IMAGE;
+                            }}
+                          />
                            <div className="flex-1 min-w-0">
                              <h4 className="font-medium text-foreground text-sm truncate">
                                {language === "en"

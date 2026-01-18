@@ -26,31 +26,31 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           </div>
 
           {/* Brand Name */}
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-gradient-primary">
+          <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-primary-gradient">
             {t("flameBeverage")}
           </h1>
 
           {/* Tagline with microphone icons */}
           <div className="flex items-center justify-center gap-2 mb-8">
             <Mic className="w-4 h-4 text-color-accent" />
-            <span className="text-sm text-color-secondary font-light">
+            <span className="text-sm text-color-white font-light">
               {t("premiumLiquorStore")}
             </span>
             <Mic className="w-4 h-4 text-color-accent" />
           </div>
 
           {/* Age Verification Heading */}
-          <h2 className="text-2xl md:text-3xl font-display font-bold mb-4 text-gradient-primary">
+          <h2 className="text-2xl md:text-3xl font-display font-bold mb-4 text-primary-gradient">
             {t("ageVerificationRequired")}
           </h2>
 
           {/* Message */}
-          <p className="text-lg md:text-xl font-medium text-color-secondary mb-4">
+          <p className="text-lg md:text-xl font-medium text-color-white mb-4">
             {t("ageDeniedMessage")}
           </p>
           
           {/* Question */}
-          <p className="text-base md:text-lg font-medium text-color-tertiary mb-10">
+          <p className="text-base md:text-lg font-medium text-color-muted mb-10">
             {t("ageQuestion")}
           </p>
 
@@ -58,13 +58,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
               onClick={onVerified}
-              className="flex-1 bg-gradient-btn-primary text-black font-bold py-6 text-lg hover:opacity-90 transition-opacity border-0 rounded-xl shadow-lg cursor-pointer"
+              className="flex-1 btn-primary-custom font-bold py-6 text-lg rounded-xl shadow-lg cursor-pointer"
             >
               {t("ageYes")}
             </button>
             <button
               onClick={onDenied}
-              className="flex-1 bg-black/50 border-2 border-color-secondary text-color-primary font-bold py-6 text-lg hover:bg-gray-800 rounded-xl cursor-pointer"
+              className="flex-1 btn-default-custom font-bold py-6 text-lg rounded-xl cursor-pointer"
             >
               {t("ageNo")}
             </button>

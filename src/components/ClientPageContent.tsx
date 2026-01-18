@@ -3,7 +3,7 @@
 
 
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { X, ArrowRight, Loader2, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import AgeDeniedScreen from "@/components/features/age-verification/AgeDeniedScreen";
@@ -20,23 +20,37 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CartNotification from "@/components/CartNotification";
 import HierarchicalCategorySelector from "@/components/HierarchicalCategorySelector";
+import { SuccessMsgModal } from "@/components/SuccessMsgModal";
 import { CartProvider } from "@/contexts/CartContext";
 import { LanguageProvider } from "@/contexts/LanguageContext";
 import { ThemeProvider } from "@/contexts/ThemeContext";
-import { AuthProvider } from "@/contexts/AuthContext";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { AuthModalProvider } from "@/contexts/AuthModalContext";
 import { AgeStatus, Product } from "@/types";
 import { useSeasonalTheme } from "@/hooks/useSeasonalTheme";
 import { useTheme } from "@/contexts/ThemeContext";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
+import { ordersService } from "@/services/orders.service";
 import { useCategories, CategoryFilter } from "@/hooks/useCategories";
+
+// Storage key for tracked orders (must match CheckoutModal)
+const TRACKED_ORDERS_KEY = 'flame_tracked_orders';
+
+interface TrackedOrder {
+  billNumber: string;
+  email: string;
+  status: string;
+  createdAt: string;
+  notified: boolean;
+}
 
 
 
 
 function PageContent() {
 const { t } = useLanguage();
+const { user, isAuthenticated } = useAuth();
 const [searchQuery, setSearchQuery] = useState("");
 const [selectedFilter, setSelectedFilter] = useState<CategoryFilter>({});
 const [checkoutOpen, setCheckoutOpen] = useState(false);
@@ -54,6 +68,87 @@ const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
 const [notificationQuantity, setNotificationQuantity] = useState(1);
 const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
+
+// Order status notification state
+const [orderStatusModal, setOrderStatusModal] = useState<{
+  open: boolean;
+  billNumber: string;
+  status: 'pending' | 'accepted' | 'rejected';
+  message: string;
+} | null>(null);
+
+// Check for order status updates
+const checkOrderStatusUpdates = useCallback(async () => {
+  if (!isAuthenticated || !user?.email) return;
+
+  try {
+    const stored = localStorage.getItem(TRACKED_ORDERS_KEY);
+    if (!stored) return;
+
+    const orders: TrackedOrder[] = JSON.parse(stored);
+    const userEmail = user.email.toLowerCase();
+    
+    // Filter orders for current user that haven't been notified
+    const userOrders = orders.filter(
+      (o) => o.email.toLowerCase() === userEmail && !o.notified && o.status === 'pending'
+    );
+
+    if (userOrders.length === 0) return;
+
+    // Check status for each order
+    for (const order of userOrders) {
+      try {
+        const response = await ordersService.getOrderStatus(order.billNumber);
+        if (response.success && response.data) {
+          const newStatus = response.data.status?.toLowerCase();
+          
+          // If status changed from pending to accepted/rejected
+          if (newStatus && newStatus !== 'pending' && order.status === 'pending') {
+            // Update stored order
+            const updatedOrders = orders.map((o) =>
+              o.billNumber === order.billNumber
+                ? { ...o, status: newStatus, notified: true }
+                : o
+            );
+            localStorage.setItem(TRACKED_ORDERS_KEY, JSON.stringify(updatedOrders));
+
+            // Show notification modal
+            const statusMessage = newStatus === 'accepted'
+              ? t('orderAcceptedMessage') || 'Your order has been accepted and is being processed!'
+              : t('orderRejectedMessage') || 'Your order has been rejected. Please contact support for more information.';
+
+            setOrderStatusModal({
+              open: true,
+              billNumber: order.billNumber,
+              status: newStatus as 'accepted' | 'rejected',
+              message: statusMessage,
+            });
+            
+            // Only show one notification at a time
+            break;
+          }
+        }
+      } catch (err) {
+        console.error('Error checking order status:', err);
+      }
+    }
+  } catch (err) {
+    console.error('Error reading tracked orders:', err);
+  }
+}, [isAuthenticated, user?.email, t]);
+
+// Poll for order status updates every 30 seconds
+useEffect(() => {
+  if (!isAuthenticated || !user?.email) return;
+
+  // Check immediately on mount
+  checkOrderStatusUpdates();
+
+  // Then check every 30 seconds
+  const interval = setInterval(checkOrderStatusUpdates, 30000);
+
+  return () => clearInterval(interval);
+}, [isAuthenticated, user?.email, checkOrderStatusUpdates]);
 
 
 
@@ -286,17 +381,12 @@ return (
               {/* Most Recommended Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className={`text-lg sm:text-xl md:text-2xl font-display font-bold ${
-                    theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                  }`}>
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
                     {t("mostRecommended")}
                   </h2>
                   <Link
                     href="/products"
-                    className={`flex items-center gap-1 sm:gap-2 text-xs sm:text-sm font-medium transition-colors border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl ${                      theme === 'dark'
-                        ? 'text-white-text hover:text-flame-orange'
-                        : 'text-orange-600 hover:text-orange-700'
-                    }`}
+                    className="view-all-link gap-1 sm:gap-2 text-xs sm:text-sm p-1.5 sm:p-2 rounded-lg sm:rounded-xl"
                   >
                     {t("viewAll")}
                     <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -335,9 +425,7 @@ return (
 
               {/* Hierarchical Category Selector */}
               <section className="container mx-auto px-4">
-                <h2 className={`text-lg sm:text-xl md:text-2xl font-display font-bold mb-4 sm:mb-6 ${
-                  theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                }`}>
+                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
                   {t("browseByCategory")}
                 </h2>
                 <HierarchicalCategorySelector
@@ -350,9 +438,7 @@ return (
               {/* Products Section */}
               <section className="container mx-auto px-4">
                 <div className="flex items-center justify-between mb-4 sm:mb-6">
-                  <h2 className={`text-lg sm:text-xl md:text-2xl font-display font-bold ${
-                    theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-                  }`}>
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
                     {t("allProducts")}
                   </h2>
                   <Link
@@ -388,32 +474,24 @@ return (
                     }`}
                     aria-label="Close seasonal section"
                   >
-                    <X className={`h-4 w-4 ${theme === 'dark' ? 'text-foreground' : 'text-gray-700'}`} />
+                    <X className="h-4 w-4 text-foreground" />
                   </button>
                   <div className={`absolute inset-0 ${seasonalTheme.gradient}`} />
                   <div className="relative grid gap-6 md:grid-cols-2 md:items-center w-full">
                     <div className="space-y-3">
-                      <p className={`text-sm uppercase tracking-[0.3em] ${
-                        theme === 'dark' ? 'text-flame-orange/80' : 'text-orange-600'
-                      }`}>
+                      <p className="text-sm uppercase tracking-[0.3em] text-color-accent">
                         {seasonalTheme.subtitle}
                       </p>
-                      <h3 className={`text-2xl font-semibold ${
-                        theme === 'dark' ? 'text-foreground' : 'text-gray-900'
-                      }`}>
+                      <h3 className="text-2xl font-semibold text-foreground">
                         {seasonalTheme.emoji && <span className="mr-2">{seasonalTheme.emoji}</span>}
                         {seasonalTheme.title}
                       </h3>
-                      <p className={theme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}>
+                      <p className="text-muted-foreground">
                         {seasonalTheme.description}
                       </p>
                       <div className="flex flex-wrap gap-2 text-sm">
                         {seasonalTheme.tags.map((tag, index) => (
-                          <span key={index} className={`rounded-full px-3 py-1 ${
-                            theme === 'dark'
-                              ? 'bg-secondary/50 text-foreground'
-                              : 'bg-orange-50 text-gray-800 border border-orange-200'
-                          }`}>
+                          <span key={index} className="rounded-full px-3 py-1 bg-secondary/50 text-foreground border border-color-muted">
                             {tag}
                           </span>
                         ))}
@@ -421,12 +499,8 @@ return (
                     </div>
                     <div className="relative h-56">
                       <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${seasonalTheme.colors.primary} blur-2xl`} />
-                      <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} p-4 ${
-                        theme === 'dark'
-                          ? 'bg-card/30 shadow-glow'
-                          : 'bg-white/80 shadow-md'
-                      }`}>
-                        <div className={`text-center ${theme === 'dark' ? 'text-foreground' : 'text-gray-900'}`}>
+                      <div className={`relative flex h-full items-center justify-center rounded-2xl border ${seasonalTheme.colors.accent} p-4 bg-card/30 shadow-glow`}>
+                        <div className="text-center text-foreground">
                           <p className="text-lg font-semibold">{t("festivalAd")}</p>
                           <p className="text-sm text-muted-foreground">
                             {seasonalTheme.keyname === 'christmas' && 'Red theme, santa art, event-specific CTA.'}
@@ -480,6 +554,24 @@ return (
               quantity={notificationQuantity}
               onClose={() => setNotificationProduct(null)}
             />
+
+            {/* Order Status Notification Modal */}
+            {orderStatusModal && (
+              <SuccessMsgModal
+                open={orderStatusModal.open}
+                onOpenChange={(open) => {
+                  if (!open) setOrderStatusModal(null);
+                }}
+                title={
+                  orderStatusModal.status === 'accepted'
+                    ? t('orderAccepted') || 'Order Accepted!'
+                    : t('orderRejected') || 'Order Rejected'
+                }
+                message={orderStatusModal.message}
+                billNumber={orderStatusModal.billNumber}
+                orderStatus={orderStatusModal.status}
+              />
+            )}
   </div>
 );
 }
@@ -517,7 +609,7 @@ export function ClientPageContent() {
  if (!mounted) {
    return (
      <div className="fixed inset-0 bg-black flex items-center justify-center">
-       <div className="w-16 h-16 border-4 border-flame-orange border-t-transparent rounded-full animate-spin" />
+       <div className="w-16 h-16 border-4 border-color-primary border-t-transparent rounded-full animate-spin" />
      </div>
    );
  }

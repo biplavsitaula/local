@@ -35,6 +35,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false 
     agreeToTerms: false,
   });
   const [phoneError, setPhoneError] = useState<string | null>(null);
+  const [emailError, setEmailError] = useState<string | null>(null);
 
   // Ensure we're on the client before using createPortal
   useEffect(() => {
@@ -47,6 +48,7 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false 
   const handleClose = () => {
     setError(null);
     setPhoneError(null);
+    setEmailError(null);
     setFormData({
       fullName: "",
       email: "",
@@ -63,6 +65,14 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false 
     e.preventDefault();
     setError(null);
     setPhoneError(null);
+    setEmailError(null);
+
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(formData.email)) {
+      setEmailError(t("invalidEmail"));
+      return;
+    }
 
     // Validate phone number (10 digits)
     const phoneRegex = /^\d{10}$/;
@@ -187,12 +197,18 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false 
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) => {
+                    setFormData({ ...formData, email: e.target.value });
+                    setEmailError(null);
+                  }}
                   placeholder={t('enterEmail')}
-                  className="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border border-border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20"
+                  className={`w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border rounded-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary-border focus:ring-2 focus:ring-primary-border/20 ${emailError ? 'border-red-500' : 'border-border'}`}
                   required
                 />
               </div>
+              {emailError && (
+                <p className="text-red-500 text-xs mt-1">{emailError}</p>
+              )}
             </div>
 
             {/* Phone */}

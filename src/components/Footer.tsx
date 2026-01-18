@@ -150,7 +150,7 @@ const Footer: React.FC = () => {
           {/* Quick Links */}
           <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+              theme === 'dark' ? 'text-color-secondary' : 'text-gray-900'
             }`}>
               {t('quickLinks')}
             </h4>
@@ -209,7 +209,7 @@ const Footer: React.FC = () => {
           {/* Legal */}
           <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+              theme === 'dark' ? 'text-color-secondary' : 'text-gray-900'
             }`}>
               {language === 'en' ? 'Legal' : 'कानूनी'}
             </h4>
@@ -268,7 +268,7 @@ const Footer: React.FC = () => {
           {/* Contact */}
           <div className="mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+              theme === 'dark' ? 'text-color-secondary' : 'text-gray-900'
             }`}>
               {t('customerService')}
             </h4>
@@ -307,7 +307,7 @@ const Footer: React.FC = () => {
           {/* Newsletter */}
           <div className="col-span-2 md:col-span-1 mt-1">
             <h4 className={`font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base ${
-              theme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+              theme === 'dark' ? 'text-color-secondary' : 'text-gray-900'
             }`}>
               {t('newsletter')}
             </h4>
