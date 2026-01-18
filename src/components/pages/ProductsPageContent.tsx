@@ -290,7 +290,7 @@ const ProductsPageContent: React.FC = () => {
          {/* Page Header */}
          <div className="mb-6 sm:mb-8">
            <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold font-display mb-1 sm:mb-2 ${
-             currentTheme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
+             currentTheme === 'dark' ? 'text-primary-gradient' : 'text-gray-900'
            }`}>
              {t('allProducts')}
            </h1>
@@ -375,7 +375,7 @@ const ProductsPageContent: React.FC = () => {
 
 
              {/* View Mode */}
-             <div className="flex items-center bg-card/80 border border-border rounded-xl overflow-hidden">
+             {/* <div className="flex items-center bg-card/80 border border-border rounded-xl overflow-hidden">
                <button
                  onClick={() => setViewMode('grid')}
                  className={`p-3 transition-colors cursor-pointer ${viewMode === 'grid' ? 'bg-primary-btn text-text-inverse' : 'text-muted-foreground hover:text-foreground'}`}
@@ -388,7 +388,7 @@ const ProductsPageContent: React.FC = () => {
                >
                  <List className="h-5 w-5" />
                </button>
-             </div>
+             </div> */}
 
 
              {/* Clear Filters */}
@@ -550,10 +550,10 @@ const ProductsPageContent: React.FC = () => {
 
 
              {/* Show total count when all loaded */}
-             {!hasMore && products.length > 0 && (
+             {!hasMore && filteredProducts.length > 0 && (
                <div className="text-center mt-10">
                  <p className="text-muted-foreground">
-                   Showing all {products.length} products
+                   Showing all {filteredProducts.length} products
                  </p>
                </div>
              )}

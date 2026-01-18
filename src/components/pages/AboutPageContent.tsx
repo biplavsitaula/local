@@ -31,7 +31,7 @@ const AboutPageContent = () => {
               <Flame className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 text-white" />
             </div>
           </div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-ternary-text mb-3 sm:mb-4">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-primary-gradient mb-3 sm:mb-4">
             {t("aboutFlameBeverage" )}
           </h1>
           <p className="text-muted-foreground text-sm sm:text-base md:text-lg max-w-2xl mx-auto">
@@ -56,8 +56,8 @@ const AboutPageContent = () => {
         <div className="grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16">
           <div className="bg-card rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 border border-border">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Award className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary-text" />
-              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-ternary-text">
+              <Award className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-color-secondary" />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
                 {t("ourMission" )}
               </h2>
             </div>
@@ -67,8 +67,8 @@ const AboutPageContent = () => {
           </div>
           <div className="bg-card rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 border border-border">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Users className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary-text" />
-              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-ternary-text">
+              <Users className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-primary-gradient" />
+              <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-primary-gradient">
                 {t("ourVision" )}
               </h2>
             </div>
@@ -80,22 +80,22 @@ const AboutPageContent = () => {
 
         {/* Contact Info */}
         <div className="bg-card rounded-lg sm:rounded-xl p-4 sm:p-6 md:p-8 border border-border">
-          <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-ternary-text mb-4 sm:mb-6 text-center">
+          <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-primary-gradient mb-4 sm:mb-6 text-center">
             {t("contactUs" )}
           </h2>
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="flex items-center gap-2 sm:gap-4 justify-center">
-              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-primary-text shrink-0" />
+              <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-color-secondary shrink-0" />
               <span className="text-xs sm:text-sm md:text-base text-muted-foreground">{t("address" )}</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 justify-center">
-              <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-primary-text shrink-0" />
+              <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-color-secondary shrink-0" />
               <span className="text-xs sm:text-sm md:text-base text-muted-foreground"> <a href="tel:+9779800000000" className="break-all hover:text-flame-orange transition-colors">
                   +977 9800000000
                 </a></span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 justify-center col-span-2 sm:col-span-1">
-              <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-primary-text shrink-0" />
+              <Mail className="w-5 h-5 sm:w-6 sm:h-6 text-color-secondary shrink-0" />
               <span className="text-xs sm:text-sm md:text-base text-muted-foreground"> <a href="mailto:info@flamebeverage.com" className="break-all hover:text-flame-orange transition-colors">
                   info@flamebeverage.com
                 </a></span>

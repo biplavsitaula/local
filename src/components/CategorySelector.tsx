@@ -1,9 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
-import { LayoutGrid, LucideIcon } from "lucide-react";
+import { LayoutGrid, LucideIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 interface Category {
@@ -30,54 +30,132 @@ const CategorySelector: React.FC<CategorySelectorProps> = ({
   const { language, t } = useLanguage();
   const { theme } = useTheme();
   const currentTheme = theme;
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const [showLeftArrow, setShowLeftArrow] = useState(false);
+  const [showRightArrow, setShowRightArrow] = useState(false);
+
+  // Check scroll position to show/hide arrows
+  const checkScrollPosition = () => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      setShowLeftArrow(container.scrollLeft > 0);
+      setShowRightArrow(
+        container.scrollLeft < container.scrollWidth - container.clientWidth - 10
+      );
+    }
+  };
+
+  useEffect(() => {
+    checkScrollPosition();
+    window.addEventListener('resize', checkScrollPosition);
+    return () => window.removeEventListener('resize', checkScrollPosition);
+  }, [categories]);
+
+  const scroll = (direction: 'left' | 'right') => {
+    const container = scrollContainerRef.current;
+    if (container) {
+      const scrollAmount = 200;
+      container.scrollBy({
+        left: direction === 'left' ? -scrollAmount : scrollAmount,
+        behavior: 'smooth'
+      });
+    }
+  };
 
   return (
     <>
-      {/* Categories Grid - Desktop */}
-      <div className={`hidden md:grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8 ${className}`}>
-        {categories.map((category) => {
-          const Icon = category.icon;
-          // Handle "all" category - it should be selected when selectedCategory is null
-          const isSelected = category.id === 'all' 
-            ? selectedCategory === null || selectedCategory === 'all'
-            : selectedCategory === category.id;
-          return (
+      {/* Horizontal Scrollable Categories - All Screens */}
+      <div className={`relative mb-8 ${className}`}>
+        {/* Left Fade & Arrow */}
+        {showLeftArrow && (
+          <>
+            <div className={`absolute left-0 top-0 bottom-0 w-12 z-10 pointer-events-none ${
+              currentTheme === 'dark' 
+                ? 'bg-gradient-to-r from-background to-transparent' 
+                : 'bg-gradient-to-r from-gray-50 to-transparent'
+            }`} />
             <button
-              key={category.id}
-              onClick={() => {
-                // If clicking "all" category, pass null to show all products
-                if (category.id === 'all') {
-                  onCategorySelect(null);
-                } else {
-                  // Toggle: if already selected, deselect (show all), otherwise select this category
-                  onCategorySelect(isSelected ? null : category.id);
-                }
-              }}
-              className={`relative px-4 py-2.5 rounded-xl transition-all duration-300 cursor-pointer group ${
-                isSelected
-                  ? `bg-gradient-to-br ${category.color} text-white shadow-lg scale-105`
-                  : currentTheme === 'dark'
-                    ? 'bg-card hover:bg-card/80 border border-border hover:border-flame-orange/50'
-                    : 'bg-white hover:bg-gray-50 border border-gray-200 hover:border-orange-300 shadow-sm'
+              onClick={() => scroll('left')}
+              className={`absolute left-0 top-1/2 -translate-y-1/2 z-20 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 ${
+                currentTheme === 'dark'
+                  ? 'bg-card border border-border text-foreground hover:bg-secondary'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
               }`}
             >
-              <div className={`flex items-center gap-2 ${
-                isSelected ? '' : currentTheme === 'dark' ? 'text-foreground' : 'text-gray-700'
-              }`}>
-                <Icon className={`w-4 h-4 ${
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+          </>
+        )}
+
+        {/* Scrollable Container */}
+        <div
+          ref={scrollContainerRef}
+          onScroll={checkScrollPosition}
+          className="flex gap-2 overflow-x-auto scrollbar-hide scroll-smooth px-1 py-1"
+          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+        >
+          {categories.map((category) => {
+            const Icon = category.icon;
+            const isSelected = category.id === 'all' 
+              ? selectedCategory === null || selectedCategory === 'all'
+              : selectedCategory === category.id;
+            
+            return (
+              <button
+                key={category.id}
+                onClick={() => {
+                  if (category.id === 'all') {
+                    onCategorySelect(null);
+                  } else {
+                    onCategorySelect(isSelected ? null : category.id);
+                  }
+                }}
+                className={`
+                  relative flex items-center gap-2 px-4 py-2 rounded-full whitespace-nowrap
+                  transition-all duration-300 cursor-pointer flex-shrink-0
+                  ${isSelected
+                    ? 'bg-gradient-to-r from-flame-orange to-flame-red text-white shadow-md shadow-flame-orange/25'
+                    : currentTheme === 'dark'
+                      ? 'bg-card/80 border border-border/50 text-foreground hover:border-flame-orange/50 hover:bg-card'
+                      : 'bg-white border border-gray-200 text-gray-700 hover:border-orange-300 hover:shadow-sm'
+                  }
+                `}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${
                   isSelected ? 'text-white' : 'text-flame-orange'
                 }`} />
                 <span className="font-medium text-sm">
                   {language === "en" ? category.name : category.nameNe}
                 </span>
-              </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Right Fade & Arrow */}
+        {showRightArrow && (
+          <>
+            <div className={`absolute right-0 top-0 bottom-0 w-12 z-10 pointer-events-none ${
+              currentTheme === 'dark' 
+                ? 'bg-gradient-to-l from-background to-transparent' 
+                : 'bg-gradient-to-l from-gray-50 to-transparent'
+            }`} />
+            <button
+              onClick={() => scroll('right')}
+              className={`absolute right-0 top-1/2 -translate-y-1/2 z-20 p-1.5 rounded-full shadow-lg transition-all duration-200 hover:scale-110 ${
+                currentTheme === 'dark'
+                  ? 'bg-card border border-border text-foreground hover:bg-secondary'
+                  : 'bg-white border border-gray-200 text-gray-700 hover:bg-gray-50'
+              }`}
+            >
+              <ChevronRight className="w-4 h-4" />
             </button>
-          );
-        })}
+          </>
+        )}
       </div>
 
-      {/* Categories Dropdown - Mobile */}
-      <div className={`md:hidden mb-8 ${className}`}>
+      {/* Mobile Dropdown Alternative (Optional - can be enabled if preferred) */}
+      <div className={`hidden mb-8 ${className}`}>
         <Select
           value={selectedCategory || "all"}
           onValueChange={(value) => onCategorySelect(value === "all" ? null : value)}

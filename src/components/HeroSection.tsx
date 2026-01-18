@@ -29,7 +29,7 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors bg-secondary/50 border border-color-primary text-color-tertiary">
+          <div className="inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors bg-secondary/50 border border-color-primary text-color-white">
             <Sparkles className="w-4 h-4 text-color-accent" />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
@@ -111,7 +111,7 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="btn-outline-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg"
+                className="btn-outline-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg hover: border-color-primary"
               >
                 Categories
               </Button>

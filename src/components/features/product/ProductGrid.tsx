@@ -144,10 +144,10 @@ return (
 
 
           {/* Show total count when all loaded */}
-          {!limit && !hasMore && products.length > 0 && (
+          {!limit && !hasMore && filteredProducts.length > 0 && (
             <div className="text-center mt-8">
               <p className="text-base md:text-sm text-muted-foreground">
-                Showing all {products.length} products
+                Showing all {filteredProducts.length} products
               </p>
             </div>
           )}

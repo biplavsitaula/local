@@ -271,7 +271,7 @@ const OffersPageContent = () => {
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
       
       <main className="container mx-auto px-4 py-6">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-ternary-text text-center mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-primary-gradient text-center mb-6 sm:mb-8">
           {t("specialOffers" )}
         </h1>
 
@@ -360,8 +360,8 @@ const OffersPageContent = () => {
         {/* Discounted Products */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-            <Percent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-secondary-text" />
-            <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-ternary-text">
+            <Percent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-color-secondary" />
+            <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
               {t("productsOnSale" )}
             </h2>
           </div>

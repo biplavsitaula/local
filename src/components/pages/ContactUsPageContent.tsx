@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Input } from "@/components/ui/input";
@@ -16,7 +15,6 @@ import { toast } from "sonner";
 
 const ContactUsPageContent = () => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -118,11 +116,7 @@ const ContactUsPageContent = () => {
   ];
 
   return (
-    <div
-      className={`min-h-screen ${
-        theme === "dark" ? "bg-background" : "bg-gray-50"
-      }`}
-    >
+    <div className="min-h-screen bg-background">
       <Header
         searchQuery={searchQuery}
         onSearchChange={setSearchQuery}
@@ -134,28 +128,14 @@ const ContactUsPageContent = () => {
         {/* Page Header */}
         <div className="text-center mb-8 sm:mb-12">
           <div className="flex justify-center mb-4">
-            <div
-              className={`p-3 sm:p-4 rounded-full ${
-                theme === "dark"
-                  ? "bg-flame-gradient"
-                  : "bg-gradient-to-r from-orange-500 to-red-500"
-              }`}
-            >
+            <div className="p-3 sm:p-4 rounded-full bg-primary-gradient">
               <MessageSquare className="w-8 h-8 sm:w-10 sm:h-10 text-white" />
             </div>
           </div>
-          <h1
-            className={`text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold mb-3 sm:mb-4 ${
-              theme === "dark" ? "text-ternary-text" : "text-gray-900"
-            }`}
-          >
+          <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-display font-bold text-primary-gradient mb-3 sm:mb-4">
             {t("getInTouch")}
           </h1>
-          <p
-            className={`text-sm sm:text-base md:text-lg max-w-2xl mx-auto ${
-              theme === "dark" ? "text-muted-foreground" : "text-gray-600"
-            }`}
-          >
+          <p className="text-sm sm:text-base md:text-lg max-w-2xl mx-auto text-muted-foreground">
             {t("contactPageSubtitle")}
           </p>
         </div>
@@ -165,58 +145,28 @@ const ContactUsPageContent = () => {
           {contactInfo.map((info, index) => (
             <div
               key={index}
-              className={`p-4 sm:p-6 rounded-xl border transition-all hover:scale-[1.02] ${
-                theme === "dark"
-                  ? "bg-card border-border hover:border-flame-orange/50"
-                  : "bg-white border-gray-200 hover:border-orange-300 shadow-sm"
-              }`}
+              className="p-4 sm:p-6 rounded-xl border transition-all hover:scale-[1.02] bg-card border-border hover:border-flame-orange/50"
             >
-              <div
-                className={`w-12 h-12 rounded-full flex items-center justify-center mb-4 ${
-                  theme === "dark"
-                    ? "bg-flame-orange/20"
-                    : "bg-orange-100"
-                }`}
-              >
-                <info.icon
-                  className={`w-6 h-6 ${
-                    theme === "dark" ? "text-flame-orange" : "text-orange-600"
-                  }`}
-                />
+              <div className="w-12 h-12 rounded-full flex items-center justify-center mb-4 bg-flame-orange/20">
+                <info.icon className="w-6 h-6 text-color-secondary" />
               </div>
-              <h3
-                className={`font-semibold mb-2 ${
-                  theme === "dark" ? "text-foreground" : "text-gray-900"
-                }`}
-              >
+              <h3 className="font-semibold mb-2 text-foreground">
                 {info.title}
               </h3>
               {info.link ? (
                 <a
                   href={info.link}
-                  className={`text-sm hover:underline ${
-                    theme === "dark"
-                      ? "text-flame-orange"
-                      : "text-orange-600"
-                  }`}
+                  className="text-sm hover:underline text-flame-orange"
                 >
                   {info.content}
                 </a>
               ) : (
-                <p
-                  className={`text-sm ${
-                    theme === "dark" ? "text-muted-foreground" : "text-gray-600"
-                  }`}
-                >
+                <p className="text-sm text-muted-foreground">
                   {info.content}
                 </p>
               )}
               {info.subContent && (
-                <p
-                  className={`text-xs mt-1 ${
-                    theme === "dark" ? "text-muted-foreground/70" : "text-gray-500"
-                  }`}
-                >
+                <p className="text-xs mt-1 text-muted-foreground/70">
                   {info.subContent}
                 </p>
               )}
@@ -227,24 +177,10 @@ const ContactUsPageContent = () => {
         {/* Main Content: Form + Map */}
         <div className="grid lg:grid-cols-2 gap-6 sm:gap-8">
           {/* Contact Form */}
-          <div
-            className={`p-6 sm:p-8 rounded-xl border ${
-              theme === "dark"
-                ? "bg-card border-border"
-                : "bg-white border-gray-200 shadow-sm"
-            }`}
-          >
+          <div className="p-6 sm:p-8 rounded-xl border bg-card border-border">
             <div className="flex items-center gap-3 mb-6">
-              <Send
-                className={`w-6 h-6 ${
-                  theme === "dark" ? "text-flame-orange" : "text-orange-600"
-                }`}
-              />
-              <h2
-                className={`text-xl sm:text-2xl font-display font-bold ${
-                  theme === "dark" ? "text-ternary-text" : "text-gray-900"
-                }`}
-              >
+              <Send className="w-6 h-6 text-color-secondary" />
+              <h2 className="text-xl sm:text-2xl font-display font-bold text-color-secondary">
                 {t("sendUsMessage")}
               </h2>
             </div>
@@ -252,11 +188,7 @@ const ContactUsPageContent = () => {
             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    className={`block text-sm font-medium mb-2 ${
-                      theme === "dark" ? "text-foreground" : "text-gray-700"
-                    }`}
-                  >
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("fullName")} *
                   </label>
                   <Input
@@ -267,19 +199,11 @@ const ContactUsPageContent = () => {
                     placeholder={t("yourName")}
                     required
                     disabled={isSubmitting || isSubmitted}
-                    className={
-                      theme === "dark"
-                        ? "bg-secondary/50 border-border"
-                        : "bg-gray-50 border-gray-200"
-                    }
+                    className="bg-secondary/50 border-border"
                   />
                 </div>
                 <div>
-                  <label
-                    className={`block text-sm font-medium mb-2 ${
-                      theme === "dark" ? "text-foreground" : "text-gray-700"
-                    }`}
-                  >
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("emailAddress")} *
                   </label>
                   <Input
@@ -290,22 +214,14 @@ const ContactUsPageContent = () => {
                     placeholder={t("yourEmail")}
                     required
                     disabled={isSubmitting || isSubmitted}
-                    className={
-                      theme === "dark"
-                        ? "bg-secondary/50 border-border"
-                        : "bg-gray-50 border-gray-200"
-                    }
+                    className="bg-secondary/50 border-border"
                   />
                 </div>
               </div>
 
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label
-                    className={`block text-sm font-medium mb-2 ${
-                      theme === "dark" ? "text-foreground" : "text-gray-700"
-                    }`}
-                  >
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("phoneNumber")}
                   </label>
                   <Input
@@ -315,19 +231,11 @@ const ContactUsPageContent = () => {
                     onChange={handleInputChange}
                     placeholder="+977 98XXXXXXXX"
                     disabled={isSubmitting || isSubmitted}
-                    className={
-                      theme === "dark"
-                        ? "bg-secondary/50 border-border"
-                        : "bg-gray-50 border-gray-200"
-                    }
+                    className="bg-secondary/50 border-border"
                   />
                 </div>
                 <div>
-                  <label
-                    className={`block text-sm font-medium mb-2 ${
-                      theme === "dark" ? "text-foreground" : "text-gray-700"
-                    }`}
-                  >
+                  <label className="block text-sm font-medium mb-2 text-foreground">
                     {t("subject")}
                   </label>
                   <select
@@ -335,11 +243,7 @@ const ContactUsPageContent = () => {
                     value={formData.subject}
                     onChange={handleInputChange}
                     disabled={isSubmitting || isSubmitted}
-                    className={`w-full h-10 px-3 rounded-md border text-sm ${
-                      theme === "dark"
-                        ? "bg-secondary/50 border-border text-foreground"
-                        : "bg-gray-50 border-gray-200 text-gray-900"
-                    }`}
+                    className="w-full h-10 px-3 rounded-md border text-sm bg-secondary/50 border-border text-foreground"
                   >
                     <option value="">{t("selectSubject")}</option>
                     <option value="general">{t("generalInquiry")}</option>
@@ -352,11 +256,7 @@ const ContactUsPageContent = () => {
               </div>
 
               <div>
-                <label
-                  className={`block text-sm font-medium mb-2 ${
-                    theme === "dark" ? "text-foreground" : "text-gray-700"
-                  }`}
-                >
+                <label className="block text-sm font-medium mb-2 text-foreground">
                   {t("yourMessage")} *
                 </label>
                 <textarea
@@ -367,22 +267,14 @@ const ContactUsPageContent = () => {
                   required
                   disabled={isSubmitting || isSubmitted}
                   rows={5}
-                  className={`w-full px-3 py-2 rounded-md border text-sm resize-none ${
-                    theme === "dark"
-                      ? "bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground"
-                      : "bg-gray-50 border-gray-200 text-gray-900 placeholder:text-gray-400"
-                  }`}
+                  className="w-full px-3 py-2 rounded-md border text-sm resize-none bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground"
                 />
               </div>
 
               <Button
                 type="submit"
                 disabled={isSubmitting || isSubmitted}
-                className={`w-full py-6 text-base font-semibold ${
-                  theme === "dark"
-                    ? "bg-flame-gradient hover:opacity-90"
-                    : "bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600"
-                } text-white`}
+                className="w-full py-6 text-base font-semibold btn-primary-custom text-white"
               >
                 {isSubmitting ? (
                   <>
@@ -407,11 +299,7 @@ const ContactUsPageContent = () => {
           {/* Map Section */}
           <div className="space-y-6">
             {/* Google Map */}
-            <div
-              className={`rounded-xl overflow-hidden border ${
-                theme === "dark" ? "border-border" : "border-gray-200 shadow-sm"
-              }`}
-            >
+            <div className="rounded-xl overflow-hidden border border-border">
               <div className="relative w-full h-[300px] sm:h-[400px]">
                 <iframe
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3532.2714895036095!2d85.30836807546954!3d27.71527087617759!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x39eb18fcb77fd4bd%3A0x58099b1deffed9d7!2sThamel%2C%20Kathmandu%2044600!5e0!3m2!1sen!2snp!4v1705000000000!5m2!1sen!2snp"
@@ -428,72 +316,38 @@ const ContactUsPageContent = () => {
             </div>
 
             {/* Additional Info Card */}
-            <div
-              className={`p-6 rounded-xl border ${
-                theme === "dark"
-                  ? "bg-card border-border"
-                  : "bg-white border-gray-200 shadow-sm"
-              }`}
-            >
+            <div className="p-6 rounded-xl border bg-card border-border">
               <div className="flex items-center gap-3 mb-4">
-                <Building2
-                  className={`w-6 h-6 ${
-                    theme === "dark" ? "text-flame-orange" : "text-orange-600"
-                  }`}
-                />
-                <h3
-                  className={`text-lg font-semibold ${
-                    theme === "dark" ? "text-foreground" : "text-gray-900"
-                  }`}
-                >
+                <Building2 className="w-6 h-6 text-color-secondary" />
+                <h3 className="text-lg font-semibold text-foreground">
                   {t("visitOurStore")}
                 </h3>
               </div>
-              <p
-                className={`text-sm mb-4 ${
-                  theme === "dark" ? "text-muted-foreground" : "text-gray-600"
-                }`}
-              >
+              <p className="text-sm mb-4 text-muted-foreground">
                 {t("visitStoreDesc")}
               </p>
 
               {/* Social Links */}
               <div className="flex items-center gap-4 pt-4 border-t border-border">
-                <span
-                  className={`text-sm font-medium ${
-                    theme === "dark" ? "text-foreground" : "text-gray-700"
-                  }`}
-                >
+                <span className="text-sm font-medium text-foreground">
                   {t("followUs")}
                 </span>
                 <div className="flex gap-3">
                   <a
                     href="#"
-                    className={`p-2 rounded-full transition-colors ${
-                      theme === "dark"
-                        ? "bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
-                        : "bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600"
-                    }`}
+                    className="p-2 rounded-full transition-colors bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
                   >
                     <Facebook className="w-5 h-5" />
                   </a>
                   <a
                     href="#"
-                    className={`p-2 rounded-full transition-colors ${
-                      theme === "dark"
-                        ? "bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
-                        : "bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600"
-                    }`}
+                    className="p-2 rounded-full transition-colors bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
                   >
                     <Instagram className="w-5 h-5" />
                   </a>
                   <a
                     href="#"
-                    className={`p-2 rounded-full transition-colors ${
-                      theme === "dark"
-                        ? "bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
-                        : "bg-gray-100 hover:bg-orange-100 text-gray-600 hover:text-orange-600"
-                    }`}
+                    className="p-2 rounded-full transition-colors bg-secondary hover:bg-flame-orange/20 text-muted-foreground hover:text-flame-orange"
                   >
                     <Twitter className="w-5 h-5" />
                   </a>

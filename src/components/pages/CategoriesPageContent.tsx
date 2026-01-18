@@ -3,7 +3,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useCart } from "@/contexts/CartContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { productsService, Product as ApiProduct } from "@/services/products.service";
 import { Product } from "@/types";
 import { Loader2, AlertCircle, Wine } from "lucide-react";
@@ -21,8 +20,6 @@ const ITEMS_PER_PAGE = 10;
 const CategoriesPageContent = () => {
   const { t, language } = useLanguage();
   const { addToCart } = useCart();
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
@@ -165,11 +162,6 @@ const CategoriesPageContent = () => {
     fetchProducts(nextPage, true);
   };
 
-  // Prevent hydration mismatch
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
   // Products are already filtered by API, but we need to handle additional filtering
   // for category normalization, originType, and subCategory
   const filteredProducts = useMemo(() => {
@@ -224,21 +216,12 @@ const CategoriesPageContent = () => {
     setCheckoutOpen(true);
   };
 
-  // Use default theme during SSR to prevent hydration mismatch
-  const currentTheme = mounted ? theme : 'dark';
-
   return (
-    <div className={`min-h-screen transition-colors ${
-      currentTheme === 'dark'
-        ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
-        : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
-    }`}>
+    <div className="min-h-screen bg-background">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
       
       <main className="container mx-auto px-4 py-6">
-        <h1 className={`text-2xl sm:text-3xl md:text-4xl font-display font-bold text-center mb-6 sm:mb-8 ${
-          currentTheme === 'dark' ? 'text-ternary-text' : 'text-gray-900'
-        }`}>
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-primary-gradient text-center mb-6 sm:mb-8">
           {t("browseByCategory" )}
         </h1>
 

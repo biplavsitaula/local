@@ -57,7 +57,7 @@ const ProductActionButtons: React.FC<ProductActionButtonsProps> = ({
       <button
         onClick={onAddToCart}
         disabled={disabled}
-        className={`flex flex-1 items-center justify-center rounded-lg btn-outline-to-primary-custom ${classes.button} font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 min-w-0 group`}
+        className={`flex flex-1 items-center justify-center rounded-lg btn-white-to-primary-custom ${classes.button} font-semibold cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 min-w-0 group`}
       >
         <ShoppingCart className={`${classes.icon} flex-shrink-0 group-hover:scale-110 transition-transform`} />
         {showLabels && (

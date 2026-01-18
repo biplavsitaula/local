@@ -104,7 +104,7 @@
     --color-secondary-foreground: hsl(0 0% 20%);
     
     --color-muted: hsl(0 0% 94%);
-    --color-muted-foreground: hsl(0 0% 45%);
+    --color-muted-foreground: hsl(0, 0%, 45%);
     
     --color-accent: hsl(38 92% 50%);
     --color-accent-foreground: hsl(0 0% 100%);
@@ -165,6 +165,7 @@
     /* PRIMARY - Flame gradient (darker for light mode) */
     --gradient-text-primary: linear-gradient(to right, hsl(25 90% 45%), hsl(15 85% 42%), hsl(5 80% 40%), hsl(0 72% 38%));
     --color-text-primary-hover: hsl(25 95% 40%);
+    --color-glow-primary: hsl(25 90% 45% / 0.5);
     --color-border-primary: hsl(25 95% 50%);
     --color-border-primary-hover: hsl(25 95% 40%);
     --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 45%), hsl(20 90% 50%), hsl(35 95% 55%), hsl(25 95% 53%));
@@ -172,7 +173,7 @@
     --color-btn-primary-text: hsl(0 0% 100%);
     
     /* SECONDARY - Rich golden for light mode */
-    --gradient-text-secondary: linear-gradient(to right, hsl(30 85% 40%), hsl(25 80% 45%), hsl(20 75% 42%), hsl(15 70% 40%));
+    --gradient-text-secondary: linear-gradient(to right, hsl(9, 76%, 35%), hsl(2, 93%, 53%), hsl(20 75% 42%), hsl(15 70% 40%));
     --color-text-secondary-hover: hsl(30 90% 35%);
     --color-border-secondary: hsl(30 70% 50%);
     --color-border-secondary-hover: hsl(30 80% 40%);
@@ -226,6 +227,10 @@
     --color-btn-outline-light-bg: transparent;
     --color-btn-outline-light-text: hsl(35 90% 55%);
     --color-btn-outline-light-border: hsl(35 90% 60% / 0.5);
+
+    /* Primary text color - dimmer golden */
+    --color-primary-text: hsl(32, 80%, 45%);
+    --color-primary-text-hover: hsl(32, 80%, 49%);
   }
 
   .dark {
@@ -304,14 +309,15 @@
        ======================================== */
     
     /* PRIMARY - Flame gradient (brighter for dark mode) */
-    --gradient-text-primary: linear-gradient(to right, hsl(25 95% 60%), hsl(15 90% 55%), hsl(5 85% 50%), hsl(0 80% 48%));
+    --gradient-text-primary: linear-gradient(to right, hsl(5 85% 50%), hsl(0 80% 48%), hsl(25 95% 60%), hsl(15 90% 55%));
     --color-text-primary-hover: hsl(25 100% 65%);
+    --color-glow-primary: hsl(25 95% 60% / 0.6);
     --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%));
     --gradient-btn-primary-hover: linear-gradient(to right, hsl(0 72% 55%), hsl(20 95% 60%), hsl(35 100% 62%), hsl(25 95% 58%));
     --color-btn-primary-text: hsl(0 0% 100%);
     
     /* SECONDARY - Rich golden for dark mode */
-    --gradient-text-secondary: linear-gradient(to right, hsl(35 90% 65%), hsl(30 85% 60%), hsl(25 80% 55%), hsl(20 75% 52%));
+    --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%));
     --color-text-secondary-hover: hsl(35 95% 70%);
     --color-border-secondary-hover: hsl(30 85% 55%);
     --gradient-btn-secondary: linear-gradient(to right, hsl(30 80% 55%), hsl(25 75% 57%), hsl(20 70% 55%));
@@ -357,6 +363,9 @@
     --color-btn-outline-light-bg: transparent;
     --color-btn-outline-light-text: hsl(40 95% 70%);
     --color-btn-outline-light-border: hsl(40 95% 65% / 0.5);
+
+    /* Primary text color - dimmer golden */
+    --color-primary-text: hsl(40 85% 58%);
   }
 }
 
@@ -696,6 +705,19 @@
     color: var(--color-btn-primary-text);
     border-color: var(--color-border-primary);
   }
+
+  .btn-white-to-primary-custom {
+    background: transparent;
+    color: hsl(0 0% 100%);
+    border: 2px solid hsl(0 0% 100% / 0.3);
+    transition: all 0.3s ease;
+  }
+
+  .btn-white-to-primary-custom:hover {
+    background: var(--gradient-btn-primary);
+    color: var(--color-btn-primary-text);
+    border-color: var(--color-border-primary);
+  }
   
   /* BACKGROUND UTILITIES */
   .bg-gradient-primary {
@@ -772,6 +794,18 @@
   /* Text Color Utilities */
   .text-primary-text {
     color: var(--color-primary-text);
+  }
+  .hover\:text-primary-text:hover {
+    color: var(--color-primary-text);
+  }
+  .text-primary-text-hover {
+    color: var(--color-primary-text-hover);
+  }
+  .text-muted-foreground {
+    color: var(--color-muted-foreground);
+  }
+  .text-muted-foreground-hover {
+    color: var(--color-muted-foreground-hover);
   }
   
   .text-secondary-text {
