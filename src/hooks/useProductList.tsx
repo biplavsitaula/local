@@ -17,13 +17,18 @@ interface UseProductListReturn {
  * Map API product to internal Product type
  */
 const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-  // Calculate original price if discount exists
-  const originalPrice = apiProduct.discountPercentage
-    ? Math.round(apiProduct.price / (1 - apiProduct.discountPercentage / 100))
-    : undefined;
+  // Get discount info from API
+  const discountPercent = apiProduct.discountPercent || apiProduct.discountPercentage || 0;
+  const discountAmount = apiProduct.discountAmount || 0;
+  const hasDiscount = discountPercent > 0 || discountAmount > 0;
+
+  // Use finalPrice as current price, original price is the base price when there's a discount
+  const currentPrice = apiProduct.finalPrice || apiProduct.price || 0;
+  const originalPrice = hasDiscount ? apiProduct.price : undefined;
 
   // Map type to category (normalize to lowercase and handle variations)
-  let category = apiProduct.type.toLowerCase();
+  const categoryValue = apiProduct.type || apiProduct.category || '';
+  let category = categoryValue ? categoryValue.toLowerCase() : 'other';
   // Handle common variations
   if (category === 'whiskey' || category === 'whisky') {
     category = 'whisky';
@@ -32,19 +37,28 @@ const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
   // Use _id from API as the product id
   const id = apiProduct._id;
 
+  // Get image - API may return as 'image' or 'imageUrl'
+  const image = apiProduct.image || apiProduct.imageUrl || '';
+
   return {
     id,
-    name: apiProduct.name,
+    name: apiProduct.name || '',
     category,
-    price: apiProduct.price,
+    price: currentPrice,
     originalPrice,
-    image: apiProduct.image,
-    description: `Premium ${apiProduct.type} - ${apiProduct.name}`,
-    volume: '750ml',
-    alcoholContent: '40%',
-    alcohol: '40%',
-    inStock: true,
-    isNew: false,
+    image,
+    imageUrl: apiProduct.imageUrl,
+    description: apiProduct.name ? `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name}` : '',
+    volume: apiProduct.volume || '750ml',
+    alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+    alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+    inStock: (apiProduct.stock || 0) > 0,
+    isNew: apiProduct.isNew || false,
+    stock: apiProduct.stock,
+    rating: apiProduct.rating,
+    tag: apiProduct.tag,
+    originType: apiProduct.originType || 'domestic',
+    subCategory: apiProduct.subCategory || '',
   } as Product;
 };
 

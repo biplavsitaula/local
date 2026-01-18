@@ -323,16 +323,26 @@ const OffersPageContent = () => {
                   )}
                   <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-0.5 sm:mb-1 md:mb-2">
                     {offer.title}
+                    {(offer.discountPercent !== undefined && offer.discountPercent > 0) && (
+                      <span className="ml-1 sm:ml-2 text-yellow-200">
+                        - {offer.discountPercent}% OFF
+                      </span>
+                    )}
+                    {(offer.discountAmount !== undefined && offer.discountAmount > 0 && !offer.discountPercent) && (
+                      <span className="ml-1 sm:ml-2 text-yellow-200">
+                        - Rs. {offer.discountAmount} OFF
+                      </span>
+                    )}
                   </h3>
                   {offer.description && (
                     <p className="text-white/80 text-[10px] sm:text-xs md:text-base leading-tight">
                       {offer.description}
                     </p>
                   )}
-                  {(offer.discountPercent || offer.discountAmount) && (
+                  {((offer.discountPercent !== undefined && offer.discountPercent > 0) || (offer.discountAmount !== undefined && offer.discountAmount > 0)) && (
                     <div className="mt-1 sm:mt-2">
                       <span className="inline-block bg-white/20 backdrop-blur-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs md:text-sm font-semibold">
-                        {offer.discountPercent ? `${offer.discountPercent}% OFF` : `Rs. ${offer.discountAmount} OFF`}
+                        {offer.discountPercent && offer.discountPercent > 0 ? `${offer.discountPercent}% OFF` : `Rs. ${offer.discountAmount} OFF`}
                       </span>
                     </div>
                   )}

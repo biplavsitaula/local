@@ -8,6 +8,7 @@ export type Product = {
   description: string;
   descriptionNe?: string;
   image: string;
+  imageUrl?: string;
   rating?: number;
   sales?: number;
   tag?: string;

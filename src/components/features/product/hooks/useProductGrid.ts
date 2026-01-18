@@ -32,6 +32,9 @@ export function useProductGrid({
   const mapApiProductToProduct = (apiProduct: any): Product => {
     const categoryValue = apiProduct?.type || apiProduct?.category || '';
     const category = categoryValue || 'Other';
+    
+    // Get image - API may return as 'image' or 'imageUrl'
+    const imageValue = apiProduct?.image || apiProduct?.imageUrl || '';
 
     return {
       id: apiProduct?._id || apiProduct?.id || '',
@@ -40,7 +43,8 @@ export function useProductGrid({
       category,
       price: apiProduct?.finalPrice || apiProduct?.price || 0,
       originalPrice: apiProduct?.discountPercent ? apiProduct?.price : undefined,
-      image: apiProduct?.image || apiProduct?.imageUrl || '',
+      image: imageValue,
+      imageUrl: apiProduct?.imageUrl || '',
       description: apiProduct?.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct?.name || 'Product'}`,
       volume: apiProduct?.volume || '750ml',
       alcoholContent: apiProduct?.alcoholPercentage ? `${apiProduct?.alcoholPercentage}%` : '40%',

@@ -8,6 +8,36 @@ import { ShoppingCart, Zap, Plus, Minus, Eye } from 'lucide-react';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
+const DEFAULT_IMAGE = "/assets/liquor1.jpeg";
+
+// Helper function to get valid image URL
+const getValidImageUrl = (product: Product | null | undefined): string => {
+  if (!product) {
+    return DEFAULT_IMAGE;
+  }
+  
+  const imageUrl = product.image || product.imageUrl;
+  
+  // Return default if no image
+  if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
+    return DEFAULT_IMAGE;
+  }
+  
+  const trimmedUrl = imageUrl.trim();
+  
+  // Check if it's a valid URL or base64
+  if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('/') || trimmedUrl.startsWith('data:')) {
+    return trimmedUrl;
+  }
+  
+  return DEFAULT_IMAGE;
+};
+
+// Check if URL is external (needs unoptimized)
+const isExternalUrl = (url: string): boolean => {
+  return url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:');
+};
+
 interface ProductCardProps {
   product: Product;
   onBuyNow: (product: Product, quantity?: number) => void;
@@ -67,12 +97,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Image - Square */}
       <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
         <Image
-          src={product?.image || "/assets/liquor1.jpeg"}
+          src={getValidImageUrl(product)}
           alt={product?.name || 'Product image'}
-          className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+          className="object-cover transition-transform duration-500 group-hover:scale-110"
           loading="lazy"
-          width={400}
-          height={400}
+          fill
+          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+          unoptimized={isExternalUrl(getValidImageUrl(product))}
+          onError={(e) => {
+            const target = e.target as HTMLImageElement;
+            target.src = DEFAULT_IMAGE;
+          }}
         />
         {!product.inStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">

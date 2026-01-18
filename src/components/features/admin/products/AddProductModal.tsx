@@ -73,25 +73,55 @@ export function AddProductModal({
 
   useEffect(() => {
     if (product && open) {
+      // Cast product to any for accessing all possible fields
+      const p = product as any;
+      
+      // Get category - API returns as 'category'
+      const categoryValue = p.category || "";
+      
+      // Get discount - API returns as 'discountPercent'
+      const discountValue = p.discountPercent ?? "";
+      
+      // Get origin type - API returns as 'originType', default to 'domestic' if not set
+      const originValue = p.originType || "domestic";
+      
+      // Get sub category - API returns as 'subCategory'
+      const subCategoryValue = p.subCategory || "";
+      
+      // Get image - API returns as 'imageUrl'
+      const imageValue = p.imageUrl || product.image || "";
+      
+      // Get tag - API returns as 'tag'
+      const tagValue = p.tag || "";
+      
+      // Get brand - API returns as 'brand'
+      const brandValue = p.brand || "";
+      
+      // Get itemLink - API returns as 'itemLink'
+      const itemLinkValue = p.itemLink || "";
+      
+      // Get isRecommended - API returns as 'isRecommended'
+      const isRecommendedValue = p.isRecommended || false;
+      
       setFormData({
         name: product.name || "",
-        category: product.category?.toLowerCase() || "",
-        subCategory: (product as any).subCategory || "",
-        brand: (product as any).brand || "",
-        originType: (product as any).originType || "domestic",
+        category: categoryValue.toLowerCase(),
+        subCategory: subCategoryValue,
+        brand: brandValue,
+        originType: originValue,
         price: product.price?.toString() || "",
         originalPrice: product.originalPrice?.toString() || "",
         stock: (product.stock ?? 0).toString(),
-        imageUrl: product.image || "",
-        itemLink: (product as any).itemLink || "",
+        imageUrl: imageValue,
+        itemLink: itemLinkValue,
         rating: product.rating?.toString() || "",
-        discountPercent: (product as any).discountPercent?.toString() || "",
-        tag: product.tag || "",
-        isRecommended: (product as any).isRecommended || false,
+        discountPercent: discountValue?.toString() || "",
+        tag: tagValue,
+        isRecommended: isRecommendedValue,
       });
       // Set image preview for edit mode
-      if (product.image) {
-        setImagePreview(product.image);
+      if (imageValue) {
+        setImagePreview(imageValue);
       }
     } else if (!product && open) {
       setFormData({
