@@ -76,12 +76,12 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Badges */}
       <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
         {product.tag && (
-          <span className="rounded-full bg-primary-gradient px-3 py-1 text-sm md:text-xs font-bold text-text-inverse">
+          <span className="rounded-full bg-primary-gradient px-3 py-1 text-sm md:text-xs font-bold text-color-inverse">
             {product.tag}
           </span>
         )}
         {product.originalPrice && (
-          <span className="rounded-full bg-destructive px-3 py-1 text-sm md:text-xs font-bold text-destructive-foreground">
+          <span className="rounded-full bg-destructive px-3 py-1 text-sm md:text-xs font-bold text-color-white">
             -{Math.round((1 - product.price / product.originalPrice) * 100)}%
           </span>
         )}
@@ -90,7 +90,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       {/* Quick View Button - Always visible on mobile, hover on desktop */}
       <button
         onClick={() => onViewDetails(product)}
-        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-foreground opacity-100 md:opacity-0 shadow-lg backdrop-blur-sm transition-all md:group-hover:opacity-100 hover:bg-primary hover:text-primary-foreground cursor-pointer"
+        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-color-default opacity-100 md:opacity-0 shadow-lg backdrop-blur-sm transition-all md:group-hover:opacity-100 hover:bg-primary hover:text-color-white cursor-pointer"
       >
         <Eye className="h-5 w-5" />
       </button>
@@ -112,7 +112,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
         />
         {!product.inStock && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/80">
-            <span className="rounded-full bg-destructive px-4 py-2 text-sm md:text-xs font-bold text-destructive-foreground">
+            <span className="rounded-full bg-destructive px-4 py-2 text-sm md:text-xs font-bold text-color-white">
               {t('outOfStock')}
             </span>
           </div>
@@ -121,26 +121,26 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
       {/* Content */}
       <div className="p-3 sm:p-4">
-        <p className="text-xs md:text-[10px] text-muted-foreground capitalize">{product?.category}</p>
-        <h3 className="mt-1 line-clamp-1 font-display text-base sm:text-base md:text-lg font-bold text-tertiary-text">
+        <p className="text-xs md:text-[10px] text-color-muted capitalize">{product?.category}</p>
+        <h3 className="mt-1 line-clamp-1 font-display text-base sm:text-base md:text-lg font-bold text-color-tertiary">
           {language === 'en' ? product?.name : product?.nameNe}
         </h3>
-        <p className="mt-1 text-sm sm:text-sm text-muted-foreground">
+        <p className="mt-1 text-sm sm:text-sm text-color-muted">
           {product?.volume} • {product?.alcoholContent || product?.alcohol}
         </p>
 
         {/* Price */}
         <div className="mt-2 sm:mt-3 flex items-center gap-1 sm:gap-2 flex-wrap">
-          <span className="text-lg sm:text-lg md:text-xl font-bold text-primary">
+          <span className="text-lg sm:text-lg md:text-xl font-bold text-color-accent">
             Rs. {((product?.price || 0) * quantity).toLocaleString()}
           </span>
           {product?.originalPrice && (
-            <span className="text-sm sm:text-sm text-muted-foreground line-through">
+            <span className="text-sm sm:text-sm text-color-muted line-through">
               Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
             </span>
           )}
           {quantity > 1 && (
-              <span className="text-xs sm:text-xs text-muted-foreground">
+              <span className="text-xs sm:text-xs text-color-muted">
                 (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
               </span>
           )}
