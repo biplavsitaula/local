@@ -124,7 +124,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               </div>
               <button
                 onClick={handleBackToLogin}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold cursor-pointer"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold cursor-pointer border-2 border-white/30 hover:border-white/50 hover:opacity-90"
               >
                 {t("backToLogin")}
               </button>
@@ -177,8 +177,8 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               <div className="mt-4 text-center">
                 <button
                   onClick={handleBackToLogin}
-                  className="text-xs sm:text-sm text-color-accent hover:text-color-secondary cursor-pointer"
-                >
+                  className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-card-custom border-border text-center text-sm sm:text-base cursor-pointer"
+                  >
                   {t("backToLogin")}
                 </button>
               </div>

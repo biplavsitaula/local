@@ -14,12 +14,12 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Dark background */}
-      <div className="absolute inset-0 bg-overlay backdrop-blur-sm" />
+      {/* Galaxy background */}
+      <div className="absolute inset-0 bg-card" />
 
-      {/* Modal with glowing orange border */}
+      {/* Modal with galaxy theme and glowing orange border */}
       <div className="relative z-10 w-full max-w-lg mx-auto">
-        <div className="relative rounded-2xl bg-modal p-8 md:p-12 text-center border-2 border-color-primary shadow-[0_0_40px_rgba(255,140,0,0.3)]">
+        <div className="relative rounded-2xl  p-8 md:p-12 text-center border-2 border-color-primary shadow-[0_0_40px_rgba(255,140,0,0.3)] overflow-hidden">
           {/* Logo with flame animation from bottom to top */}
           <div className="flex justify-center mb-4">
             <AnimatedLogo width={120} height={80} />
