@@ -80,10 +80,10 @@ const RegisterPageContent = () => {
         <div className="bg-card rounded-xl sm:rounded-2xl border border-border p-4 sm:p-6 md:p-8 shadow-xl">
           {/* Tabs */}
           <div className="flex gap-2 mb-4 sm:mb-6">
-            <Link href="/login" className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground font-medium text-center text-sm sm:text-base hover:bg-muted transition-colors">
+            <Link href="/login" className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-default-custom font-medium text-center text-sm sm:text-base transition-colors">
               {t('login')}
             </Link>
-            <button className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base">
+            <button className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-primary-custom font-medium text-sm sm:text-base">
               {language === "en" ? "Register" : "दर्ता"}
             </button>
           </div>
@@ -204,16 +204,16 @@ const RegisterPageContent = () => {
                 id="terms"
                 checked={formData.agreeToTerms}
                 onChange={(e) => setFormData({ ...formData, agreeToTerms: e.target.checked })}
-                className="mt-0.5 sm:mt-1 w-4 h-4 rounded border-border text-primary-text focus:ring-primary-border shrink-0"
+                className="mt-0.5 sm:mt-1 w-4 h-4 rounded border-border text-color-accent focus:ring-primary-border shrink-0"
                 required
               />
               <label htmlFor="terms" className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
                 {t('iAgreeTo')}{" "}
-                <Link href="/terms" className="text-primary-text hover:text-secondary-text">
+                <Link href="/terms" className="text-color-accent hover:text-color-secondary">
                   {t('termsOfService')}
                 </Link>{" "}
                 {t('and')}{" "}
-                <Link href="/privacy" className="text-primary-text hover:text-secondary-text">
+                <Link href="/privacy" className="text-color-accent hover:text-color-secondary">
                   {t('privacyPolicy')}
                 </Link>
               </label>
@@ -230,7 +230,7 @@ const RegisterPageContent = () => {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
@@ -258,11 +258,11 @@ const RegisterPageContent = () => {
 
           {/* Social Login */}
           <div className="grid grid-cols-2 gap-2 sm:gap-4">
-            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
+            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-default-custom transition-colors text-sm sm:text-base cursor-pointer">
               <span className="text-lg sm:text-xl">G</span>
               <span className="font-medium">{t('google')}</span>
             </button>
-            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-card border border-border text-foreground hover:bg-muted transition-colors text-sm sm:text-base cursor-pointer">
+            <button className="flex items-center justify-center gap-1.5 sm:gap-2 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-default-custom transition-colors text-sm sm:text-base cursor-pointer">
               <span className="text-lg sm:text-xl">f</span>
               <span className="font-medium">{t('facebook')}</span>
             </button>
@@ -270,8 +270,8 @@ const RegisterPageContent = () => {
         </div>
 
         {/* Back to Home */}
-        <div className="text-center mt-6 border-2 p-2 border-primary-text hover:border-ternary-text w-50 mx-auto">
-          <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+        <div className="text-center mt-6 p-2 mx-auto">
+          <Link href="/" className="btn-outline-to-primary-custom px-4 py-2 rounded-lg transition-colors">
             ← {t('backToHome' )}
           </Link>
         </div>

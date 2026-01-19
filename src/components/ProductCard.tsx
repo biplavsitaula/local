@@ -121,7 +121,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
 
       {/* Content */}
       <div className="p-3 sm:p-4">
-        <p className="text-xs md:text-[10px] text-color-muted capitalize">{product?.category}</p>
+        <p className="text-xs md:text-[12px] text-color-muted capitalize">{product?.category}</p>
         <h3 className="mt-1 line-clamp-1 font-display text-base sm:text-base md:text-lg font-bold text-color-tertiary">
           {language === 'en' ? product?.name : product?.nameNe}
         </h3>

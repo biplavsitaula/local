@@ -425,7 +425,7 @@ return (
 
               {/* Hierarchical Category Selector */}
               <section className="container mx-auto px-4">
-                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
+                <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary mb-4">
                   {t("browseByCategory")}
                 </h2>
                 <HierarchicalCategorySelector

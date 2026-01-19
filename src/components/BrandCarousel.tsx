@@ -135,9 +135,7 @@ export default function BrandCarousel() {
         {/* Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2
-            className={`text-lg sm:text-xl md:text-2xl font-display font-bold ${
-              theme === "dark" ? "text-foreground" : "text-gray-900"
-            }`}
+            className={`text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary`}
           >
             Brands
           </h2>

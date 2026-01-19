@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { authService } from "@/services/auth.service";
 import { Mail, Loader2, X, CheckCircle } from "lucide-react";
@@ -18,6 +19,13 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we're on the client before using createPortal
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
 
   // Reset form state when modal opens
   useEffect(() => {
@@ -29,7 +37,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     }
   }, [open]);
 
-  if (!open) return null;
+  if (!open || !mounted) return null;
 
   const handleClose = () => {
     setEmail("");
@@ -69,9 +77,9 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     }
   };
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-start sm:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
-      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto">
+  const modalContent = (
+    <div className="fixed inset-0 z-[999999] flex items-start sm:items-center justify-center bg-background/90 backdrop-blur-sm p-2 sm:p-4 overflow-y-auto">
+      <div className="relative w-full max-w-md bg-card rounded-xl sm:rounded-2xl border border-border shadow-2xl my-2 sm:my-8 max-h-[98vh] overflow-y-auto z-[999999]">
         {/* Close Button */}
         <button
           onClick={handleClose}
@@ -93,7 +101,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 className="sm:w-[100px] sm:h-[80px]"
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-display font-bold text-foreground mb-1 sm:mb-2">
+            <h1 className="text-xl sm:text-2xl font-display font-bold text-primary-gradient mb-1 sm:mb-2">
               {t("forgotPasswordTitle")}
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground">
@@ -116,7 +124,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               </div>
               <button
                 onClick={handleBackToLogin}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold"
+                className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold cursor-pointer"
               >
                 {t("backToLogin")}
               </button>
@@ -154,7 +162,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-2.5 sm:py-3 px-4 rounded-lg bg-primary-gradient text-text-inverse text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {isLoading ? (
                     <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />
@@ -169,7 +177,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               <div className="mt-4 text-center">
                 <button
                   onClick={handleBackToLogin}
-                  className="text-xs sm:text-sm text-primary-text hover:text-secondary-text"
+                  className="text-xs sm:text-sm text-color-accent hover:text-color-secondary cursor-pointer"
                 >
                   {t("backToLogin")}
                 </button>
@@ -180,6 +188,9 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
       </div>
     </div>
   );
+
+  // Use createPortal to render modal at document body level
+  return createPortal(modalContent, document.body);
 };
 
 export default ForgotPasswordModal;

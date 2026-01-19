@@ -163,7 +163,8 @@
        ======================================== */
     
     /* PRIMARY - Flame gradient (darker for light mode) */
-    --gradient-text-primary: linear-gradient(to right, hsl(25 90% 45%), hsl(15 85% 42%), hsl(5 80% 40%), hsl(0 72% 38%));
+    /* --gradient-text-primary: linear-gradient(to right, hsl(25 90% 45%), hsl(15 85% 42%), hsl(5 80% 40%), hsl(0 72% 38%)); */
+    --gradient-text-primary: linear-gradient(to right, hsl(25 90% 45%), hsl(34, 89%, 48%), hsl(5, 71%, 41%), hsl(0, 67%, 35%));
     --color-text-primary-hover: hsl(25 95% 40%);
     --color-glow-primary: hsl(25 90% 45% / 0.5);
     --color-border-primary: hsl(25 95% 50%);
@@ -309,7 +310,8 @@
        ======================================== */
     
     /* PRIMARY - Flame gradient (brighter for dark mode) */
-    --gradient-text-primary: linear-gradient(to right, hsl(5 85% 50%), hsl(0 80% 48%), hsl(25 95% 60%), hsl(15 90% 55%));
+    /* --gradient-text-primary: linear-gradient(to right, hsl(5 85% 50%), hsl(0 80% 48%), hsl(25 95% 60%), hsl(15 90% 55%)); */
+    --gradient-text-primary: linear-gradient(to right, hsl(39, 93%, 50%), hsl(34, 90%, 48%), hsl(17, 88%, 47%), hsl(15, 90%, 50%));
     --color-text-primary-hover: hsl(25 100% 65%);
     --color-glow-primary: hsl(25 95% 60% / 0.6);
     --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%));
@@ -317,7 +319,8 @@
     --color-btn-primary-text: hsl(0 0% 100%);
     
     /* SECONDARY - Rich golden for dark mode */
-    --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%));
+    /* --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%)); */
+    --gradient-text-secondary: linear-gradient(to right, hsl(34, 85%, 47%), hsl(41, 94%, 49%), hsl(25 80% 55%), hsl(20 75% 52%));
     --color-text-secondary-hover: hsl(35 95% 70%);
     --color-border-secondary-hover: hsl(30 85% 55%);
     --gradient-btn-secondary: linear-gradient(to right, hsl(30 80% 55%), hsl(25 75% 57%), hsl(20 70% 55%));

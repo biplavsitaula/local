@@ -4,7 +4,6 @@
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { useCart } from '@/contexts/CartContext';
-import { useTheme } from '@/contexts/ThemeContext';
 import { Product } from '@/types';
 import { Search, SlidersHorizontal, Grid3X3, List, X, ChevronDown, Loader2, LayoutGrid } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -24,12 +23,10 @@ const ITEMS_PER_PAGE = 10;
 const ProductsPageContent: React.FC = () => {
  const { t, language } = useLanguage();
  const { addToCart } = useCart();
- const { theme } = useTheme();
  const [products, setProducts] = useState<Product[]>([]);
  const [loading, setLoading] = useState(true);
  const [loadingMore, setLoadingMore] = useState(false);
  const [error, setError] = useState<string | null>(null);
- const [mounted, setMounted] = useState(false);
  const [page, setPage] = useState(1);
  const [hasMore, setHasMore] = useState(true);
  const [totalProducts, setTotalProducts] = useState(0);
@@ -178,13 +175,6 @@ const ProductsPageContent: React.FC = () => {
  };
 
 
- // Prevent hydration mismatch
- useEffect(() => {
-   setMounted(true);
- }, []);
-
- // Use default theme during SSR to prevent hydration mismatch
- const currentTheme = mounted ? theme : 'dark';
  console.log("products", products);
 
  const filteredProducts = useMemo(() => {
@@ -273,11 +263,7 @@ const ProductsPageContent: React.FC = () => {
 
  const hasActiveFilters = searchQuery || selectedFilter.category || selectedFilter.originType || selectedFilter.subCategory || priceRange[0] > 0 || priceRange[1] < 10000000;
  return (
-   <div className={`min-h-screen transition-colors ${
-     currentTheme === 'dark'
-       ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
-       : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
-   }`}>
+   <div className="min-h-screen bg-background">
      <Header
        searchQuery={searchQuery}
        onSearchChange={setSearchQuery}
@@ -289,12 +275,10 @@ const ProductsPageContent: React.FC = () => {
        <div className="">
          {/* Page Header */}
          <div className="mb-6 sm:mb-8">
-           <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold font-display mb-1 sm:mb-2 ${
-             currentTheme === 'dark' ? 'text-primary-gradient' : 'text-gray-900'
-           }`}>
+           <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold font-display mb-1 sm:mb-2 text-primary-gradient">
              {t('allProducts')}
            </h1>
-           <p className={`text-sm sm:text-base ${currentTheme === 'dark' ? 'text-muted-foreground' : 'text-gray-600'}`}>
+           <p className="text-sm sm:text-base text-muted-foreground">
              {t('discoverCollection')}
            </p>
          </div>

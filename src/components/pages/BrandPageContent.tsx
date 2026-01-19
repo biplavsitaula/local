@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { Search, Loader2, Package } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
-import { useTheme } from "@/contexts/ThemeContext";
 import { productsService, BrandData } from "@/services/products.service";
 import { Input } from "@/components/ui/input";
 import Header from "@/components/Header";
@@ -31,7 +30,6 @@ const getBrandColor = (index: number) => {
 };
 
 export default function BrandPageContent() {
-  const { theme } = useTheme();
   const [brands, setBrands] = useState<BrandData[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
@@ -62,40 +60,20 @@ export default function BrandPageContent() {
   );
 
   return (
-    <div
-      className={`min-h-screen flex flex-col ${
-        theme === "dark" ? "bg-background" : "bg-gray-50"
-      }`}
-    >
+    <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
       <Header searchQuery="" onSearchChange={() => {}} hideSearch />
 
       {/* Page Title Section */}
-      <div
-        className={`border-b ${
-          theme === "dark"
-            ? "bg-card/50 border-border"
-            : "bg-white border-gray-200"
-        }`}
-      >
+      <div className="border-b bg-card/50 border-border">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h1
-                className={`text-2xl md:text-3xl font-display font-bold ${
-                  theme === "dark" ? "text-foreground" : "text-gray-900"
-                }`}
-              >
+              <h1 className="text-2xl md:text-3xl font-display font-bold text-primary-gradient">
                 All Brands
               </h1>
-              <p
-                className={`text-sm mt-1 ${
-                  theme === "dark" ? "text-muted-foreground" : "text-gray-500"
-                }`}
-              >
-                {brands.length} brands                {brands.length} brands
-
-                 {/* • {totalProducts} products */}
+              <p className="text-sm mt-1 text-muted-foreground">
+                {brands.length} brands
               </p>
             </div>
 
@@ -144,22 +122,12 @@ export default function BrandPageContent() {
                 <Link
                   key={brand._id || `brand-${index}`}
                   href={`/products?brand=${encodeURIComponent(brand.name)}`}
-                  className={`group relative rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg border border-border ${
-                    theme === "dark"
-                      ? "bg-card border border-border hover:border-flame-orange/50"
-                      : "bg-white border border-gray-200 hover:border-orange-300 shadow-sm"
-                  }`}
+                  className="group relative rounded-2xl overflow-hidden transition-all hover:scale-[1.02] hover:shadow-lg bg-card border border-border hover:border-flame-orange/50"
                 >
                   {/* Brand Logo/Image Section */}
                   <div
-                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b ${
-                      hasLogo
-                        ? theme === "dark"
-                          ? "bg-card"
-                          : "bg-white"
-                        : colors.bg
-                    } ${
-                      theme === "dark" ? "border-border" : "border-gray-200"
+                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border ${
+                      hasLogo ? "bg-card" : colors.bg
                     }`}
                   >
                     {hasLogo ? (
@@ -183,45 +151,23 @@ export default function BrandPageContent() {
 
                   {/* Brand Info */}
                   <div className="p-4 sm:p-5">
-                    <h3
-                      className={`text-lg font-bold mb-1 group-hover:text-flame-orange transition-colors ${
-                        theme === "dark" ? "text-foreground" : "text-gray-900"
-                      }`}
-                    >
+                    <h3 className="text-lg font-bold mb-1 group-hover:text-flame-orange transition-colors text-foreground">
                       {brand.name}
                     </h3>
 
                     {brand.description ? (
-                      <p
-                        className={`text-sm line-clamp-2 ${
-                          theme === "dark"
-                            ? "text-muted-foreground"
-                            : "text-gray-500"
-                        }`}
-                      >
+                      <p className="text-sm line-clamp-2 text-muted-foreground">
                         {brand.description}
                       </p>
                     ) : (
-                      <p
-                        className={`text-sm italic ${
-                          theme === "dark"
-                            ? "text-muted-foreground/60"
-                            : "text-gray-400"
-                        }`}
-                      >
+                      <p className="text-sm italic text-muted-foreground/60">
                         Explore {brand.name} products
                       </p>
                     )}
 
                     {/* View Products Link */}
-                    <div
-                      className={`mt-3 pt-3 border-t flex items-center justify-center ${
-                        theme === "dark" ? "border-border" : "border-gray-100"
-                      }`}
-                    >
-                      <span
-                        className={`text-sm font-medium text-flame-orange px-4 py-2 border border-flame-orange/50 hover:border-flame-orange hover:bg-flame-orange/10 rounded-lg transition-all`}
-                      >
+                    <div className="mt-3 pt-3 border-t flex items-center justify-center border-border">
+                      <span className="text-sm font-medium btn-outline-to-primary-custom px-4 py-2 rounded-lg transition-all">
                         View Products →
                       </span>
                     </div>
