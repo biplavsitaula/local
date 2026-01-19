@@ -227,7 +227,7 @@ const Footer: React.FC = () => {
               onSubmit={handleNewsletterSubmit}
               className="flex gap-2"
             >
-              <div className="border-2 border-ternary-text rounded-md">
+              <div className="border-2 border-color-primary rounded-md">
               <Input
                 type="email"
                 placeholder="Your email"

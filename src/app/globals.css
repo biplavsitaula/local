@@ -246,6 +246,10 @@
     
     --color-primary: hsl(25 95% 53%);
     --color-primary-foreground: hsl(0 0% 100%);
+
+    --color-primary-btn: hsl(25 95% 53%);
+    --color-primary-hover: hsl(25 95% 48%);
+    --color-primary-border: hsl(25 95% 53%);
     
     --color-secondary: hsl(260 30% 15%);
     --color-secondary-foreground: hsl(0 0% 95%);
@@ -317,6 +321,8 @@
     --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%));
     --gradient-btn-primary-hover: linear-gradient(to right, hsl(0 72% 55%), hsl(20 95% 60%), hsl(35 100% 62%), hsl(25 95% 58%));
     --color-btn-primary-text: hsl(0 0% 100%);
+    --color-primary-btn: hsl(25 95% 53%);
+    --color-primary-border: hsl(25 95% 53%);
     
     /* SECONDARY - Rich golden for dark mode */
     /* --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%)); */
@@ -504,7 +510,7 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-  }
+  }  
   
   .text-primary-gradient-glow {
     background: var(--gradient-text-primary);
@@ -512,6 +518,14 @@
     -webkit-text-fill-color: transparent;
     background-clip: text;
     filter: drop-shadow(0 0 10px rgba(255, 140, 0, 0.4));
+  }
+
+  .text-primary-btn-border {
+    color: var(--color-primary-btn);
+  }
+
+  .text-primary-btn:hover {
+    color: var(--color-primary-hover);
   }
   
   .hover\:text-primary-hover:hover {
