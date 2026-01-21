@@ -337,13 +337,13 @@
     /* --gradient-text-primary: linear-gradient(to right, hsl(5 85% 50%), hsl(0 80% 48%), hsl(25 95% 60%), hsl(15 90% 55%)); */
     /* --gradient-text-primary: linear-gradient(to right, hsl(39, 93%, 50%), hsl(34, 90%, 48%), hsl(17, 88%, 47%), hsl(15, 90%, 50%)); */
     --gradient-text-primary: linear-gradient(
-      to right, 
-      hsl(43, 79%, 60%),  /* Goldenrod (Deep base) */
-      hsl(46, 64%, 52%),  /* Metallic Gold (Mid) */
-      hsl(34, 65%, 72%),  /* Pale Gold (Highlight) */
-      hsl(51, 100%, 50%), /* Bright Gold (Shimmer) */
-      hsl(43, 74%, 49%)   /* Back to Deep base for depth */
-    );
+  to bottom, 
+  hsl(43, 80%, 75%) 0%,    /* Light highlight at the very top */
+  hsl(45, 90%, 55%) 40%,   /* Rich yellow-gold */
+  hsl(35, 90%, 55%) 50%,   /* Deep bronze "cut" (creates the metallic edge) */
+  hsl(48, 100%, 65%) 55%,  /* Brightest shimmer reflection */
+  hsl(43, 85%, 45%) 100%   /* Warm golden base at the bottom */
+);
     --color-text-primary-hover: hsl(25 100% 65%);
     --color-glow-primary: hsl(25 95% 60% / 0.6);
     /* --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%)); */
@@ -363,14 +363,14 @@
     /* SECONDARY - Rich golden for dark mode */
     /* --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%)); */
     /* --gradient-text-secondary: linear-gradient(to right, hsl(34, 85%, 47%), hsl(41, 94%, 49%), hsl(25 80% 55%), hsl(20 75% 52%)); */
-    --gradient-text-secondary: linear-gradient(
-      to right, 
-      hsl(43, 91%, 65%),  /* Light Goldenrod (Soft Base) */
-      hsl(46, 77%, 71%),  /* Pale Metallic (Soft Mid) */
-      hsl(34, 100%, 85%), /* Bright Cream (High Highlight) */
-      hsl(51, 90%, 78%),  /* Soft Shimmer Gold */
-      hsl(43, 70%, 65%)   /* Back to Soft Base */
-    );
+--gradient-text-secondary: linear-gradient(
+  to bottom,
+  hsl(51, 90%, 70%) 0%,     /* Bright top edge */
+  hsl(48, 85%, 50%) 45%,    /* Warm mid-gold */
+  hsl(35, 75%, 55%) 50%,    /* Deep "reflective" shadow */
+  hsl(48, 100%, 65%) 55%,   /* Brilliant shimmer highlight */
+  hsl(43, 85%, 45%) 100%    /* Rich golden base */
+);
     --color-text-secondary-hover: hsl(35 95% 70%);
     --color-border-secondary-hover: hsl(30 85% 55%);
     --gradient-btn-secondary: linear-gradient(to right, hsl(30 80% 55%), hsl(25 75% 57%), hsl(20 70% 55%));

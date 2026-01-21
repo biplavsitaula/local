@@ -316,8 +316,8 @@ const handleCloseSeasonalSection = () => {
 return (
   <div className={`min-h-screen text-foreground transition-colors ${
     theme === 'dark'
-      ? 'bg-gradient-to-b from-background via-galaxy-dark to-background'
-      : 'bg-gradient-to-b from-gray-50 via-white to-gray-50'
+      ? 'bg-background'
+      : 'bg-gray-50'
   }`}>
             <Header
               searchQuery={searchQuery}
