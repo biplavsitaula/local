@@ -111,7 +111,7 @@ const HeroSection: React.FC = () => {
               <Button
                 size="lg"
                 variant="outline"
-                className="btn-outline-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg hover: border-color-primary"
+                className="btn-default-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg hover: border-color-primary"
               >
                 Categories
               </Button>

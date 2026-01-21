@@ -387,11 +387,11 @@
     /* DEFAULT - Neutral grays for dark mode */
     --color-text-default: hsl(0 0% 85%);
     --color-text-default-hover: hsl(0 0% 95%);
-    --color-border-default: hsl(0 0% 30%);
-    --color-border-default-hover: hsl(0 0% 45%);
-    --color-btn-default-bg: hsl(0 0% 20%);
-    --color-btn-default-bg-hover: hsl(0 0% 30%);
-    --color-btn-default-text: hsl(0 0% 90%);
+    --color-border-default: hsl(270, 86%, 25%);
+    --color-border-default-hover: hsl(270, 60%, 23%);
+    --color-btn-default-bg: hsl(273, 82%, 11%);
+    --color-btn-default-bg-hover: hsl(268, 58%, 6%);
+    --color-btn-default-text: hsl(0 0% 95%);
     
     /* MUTED - Grayish tones for dark mode */
     --color-text-muted-hover: hsl(0 0% 65%);
