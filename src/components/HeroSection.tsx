@@ -38,7 +38,7 @@ const HeroSection: React.FC = () => {
             <br />
             <span className="bg-gradient-to-b from-amber-400 via-yellow-500 to-amber-300 bg-clip-text text-transparent">Beverages</span>
           </h1> */}
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight text-primary-gradient"> Premium Spirits & Fine Beverages</h1>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight text-primary-gradient"> Premium Spirits <span className="font-sans">&</span> Fine Beverages</h1>
 
           {/* Flame Transition Effect */}
           {/* <div className="relative flex items-center justify-center py-1 pointer-events-none">

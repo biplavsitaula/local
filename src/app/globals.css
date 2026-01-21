@@ -134,6 +134,10 @@
     --color-bg-overlay: hsl(0 0% 0% / 0.8);
     --color-bg-modal: hsl(0 0% 100%);
     
+    /* Purple card background (lighter for light mode) */
+    --color-card-purple: hsl(270 20% 97%);
+    --color-card-purple-hover: hsl(270 25% 94%);
+    
     --color-border-primary: hsl(25 95% 53%);
     --color-border-primary-hover: hsl(45 93% 47%);
     --color-border-secondary: hsl(0 0% 80%);
@@ -285,6 +289,11 @@
     --color-bg-overlay: hsl(0 0% 0% / 0.95);
     --color-bg-modal: hsl(0 0% 0% / 0.9);
     
+    /* Purple card background */
+    --color-card-purple: hsl(270, 53%, 7%);
+
+    --color-card-purple-hover: hsl(272, 63%, 5%);
+    
     /* Dark mode text colors - Golden/Flame tones */
     --color-text-primary: hsl(45 100% 96%);
     --color-text-secondary: hsl(38 85% 70%);
@@ -346,35 +355,25 @@
 );
     --color-text-primary-hover: hsl(25 100% 65%);
     --color-glow-primary: hsl(25 95% 60% / 0.6);
-    /* --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%)); */
-    --gradient-btn-primary: linear-gradient(
-      to right, 
-      hsl(51, 88%, 60%), /* Golden Yellow */
-      hsl(46, 83%, 50%), /* Amber Orange */
-      hsl(33, 100%, 50%), /* Vivid Orange */
-      hsl(16, 66%, 48%), /* Sunset Red */
-      hsl(0, 68%, 42%)    /* Deep Red */
-  );
+    --gradient-btn-primary: linear-gradient(to right, hsl(0 72% 50%), hsl(20 95% 55%), hsl(35 100% 58%), hsl(25 95% 53%));
     --gradient-btn-primary-hover: linear-gradient(to right, hsl(0 72% 55%), hsl(20 95% 60%), hsl(35 100% 62%), hsl(25 95% 58%));
     --color-btn-primary-text: hsl(0 0% 100%);
-    --color-primary-btn: hsl(25 95% 53%);
-    --color-primary-border: hsl(25 95% 53%);
     
     /* SECONDARY - Rich golden for dark mode */
     /* --gradient-text-secondary: linear-gradient(to right, hsl(4, 76%, 43%), hsl(19, 91%, 47%), hsl(25 80% 55%), hsl(20 75% 52%)); */
     /* --gradient-text-secondary: linear-gradient(to right, hsl(34, 85%, 47%), hsl(41, 94%, 49%), hsl(25 80% 55%), hsl(20 75% 52%)); */
---gradient-text-secondary: linear-gradient(
-  to bottom,
-  hsl(51, 90%, 70%) 0%,     /* Bright top edge */
-  hsl(48, 85%, 50%) 45%,    /* Warm mid-gold */
-  hsl(35, 75%, 55%) 50%,    /* Deep "reflective" shadow */
-  hsl(48, 100%, 65%) 55%,   /* Brilliant shimmer highlight */
-  hsl(43, 85%, 45%) 100%    /* Rich golden base */
-);
+    --gradient-text-secondary: linear-gradient(
+      to bottom,
+      hsl(51, 90%, 70%) 0%,     /* Bright top edge */
+      hsl(48, 85%, 50%) 45%,    /* Warm mid-gold */
+      hsl(35, 75%, 55%) 50%,    /* Deep "reflective" shadow */
+      hsl(48, 100%, 65%) 55%,   /* Brilliant shimmer highlight */
+      hsl(43, 85%, 45%) 100%    /* Rich golden base */
+    );
     --color-text-secondary-hover: hsl(35 95% 70%);
     --color-border-secondary-hover: hsl(30 85% 55%);
-    --gradient-btn-secondary: linear-gradient(to right, hsl(30 80% 55%), hsl(25 75% 57%), hsl(20 70% 55%));
-    --gradient-btn-secondary-hover: linear-gradient(to right, hsl(30 85% 60%), hsl(25 80% 62%), hsl(20 75% 60%));
+    --gradient-btn-secondary: linear-gradient(to right, hsl(20 90% 50%), hsl(10 80% 45%), hsl(0 70% 40%));
+    --gradient-btn-secondary-hover: linear-gradient(to right, hsl(20 90% 55%), hsl(10 80% 50%), hsl(0 70% 45%));
     --color-btn-secondary-text: hsl(0 0% 100%);
     
     /* TERTIARY - Warm amber for dark mode */
@@ -419,6 +418,10 @@
 
     /* Primary text color - dimmer golden */
     --color-primary-text: hsl(40 85% 58%);
+
+    --gradient-btn-secondary: linear-gradient(to right, hsl(20 90% 50%), hsl(10 80% 45%), hsl(0 70% 40%));
+    --gradient-btn-secondary-hover: linear-gradient(to right, hsl(20 90% 55%), hsl(10 80% 50%), hsl(0 70% 45%));
+
   }
 }
 
@@ -810,6 +813,16 @@
     background-color: var(--color-bg-modal);
   }
 
+  /* Purple card background */
+  .bg-card-purple {
+    background-color: var(--color-card-purple);
+  }
+
+  .bg-card-purple:hover,
+  .hover\:bg-card-purple-hover:hover {
+    background-color: var(--color-card-purple-hover);
+  }
+
   /* Semantic border utilities */
   .border-primary-border {
     border-color: var(--color-border-primary);
@@ -1028,11 +1041,11 @@
 
   
   .bg-primary-gradient {
-    background: var(--gradient-primary);
+    background: linear-gradient(to right, hsl(45 95% 55%), hsl(35 95% 50%), hsl(25 90% 50%));
   }
   
   .bg-primary-gradient-hover:hover {
-    background: var(--gradient-primary-hover);
+    background: linear-gradient(to right, hsl(45 95% 60%), hsl(35 95% 55%), hsl(25 90% 55%));
   }
 
   .glass {

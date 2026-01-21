@@ -114,7 +114,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           <div className="flex gap-2 mb-4 sm:mb-6">
             <button 
             // className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
-            className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-primary-custom text-text-inverse font-medium text-sm sm:text-base"
+            className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
             >
               {t('login')}
             </button>
@@ -199,7 +199,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-text-inverse text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+              className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-secondary-custom text-sm sm:text-base font-semibold flex items-center justify-center gap-2 hover:shadow-primary-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isLoading ? (
                 <Loader2 className="w-4 h-4 sm:w-5 sm:h-5 animate-spin" />

@@ -11,6 +11,20 @@ import { IProductDetailModalProps } from '@/interface/IProductDetailModalProps';
 import Image from 'next/image';
 import { useProductDetail } from './hooks/useProductDetail';
 
+const DEFAULT_IMAGE = '/assets/liquor1.jpeg';
+
+const isExternalUrl = (url: string): boolean => {
+  return url.startsWith('http://') || url.startsWith('https://');
+};
+
+const getValidImageUrl = (product: { image?: string; imageUrl?: string } | null): string => {
+  const imageUrl = product?.image || product?.imageUrl;
+  if (!imageUrl) return DEFAULT_IMAGE;
+  if (isExternalUrl(imageUrl)) return imageUrl;
+  if (imageUrl.startsWith('/')) return imageUrl;
+  return DEFAULT_IMAGE;
+};
+
 const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
   product,
   isOpen,
@@ -27,7 +41,7 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-3xl bg-card border-border/50 p-0 overflow-hidden">
+      <DialogContent className="max-w-3xl bg-card-purple border-border/50 p-0 overflow-hidden">
         <div className="grid md:grid-cols-2 gap-0">
           {/* Image Section */}
           <div className="relative bg-secondary/30 p-6 flex items-center justify-center min-h-[300px] md:min-h-[400px]">
@@ -42,11 +56,18 @@ const ProductDetailModal: React.FC<IProductDetailModalProps> = ({
             <div className="absolute bottom-3 right-3 w-6 h-6 border-r-2 border-b-2 border-flame-orange/50 rounded-br" />
 
             <Image
-              src={product?.image || "/assets/liquor1.jpeg"}
-              alt={product?.name}
+              src={getValidImageUrl(product)}
+              alt={product?.name || 'Product image'}
+              width={320}
+              height={320}
               className="max-w-full max-h-[320px] object-contain drop-shadow-2xl"
               style={{
                 filter: 'drop-shadow(0 20px 40px rgba(0,0,0,0.4))',
+              }}
+              unoptimized={isExternalUrl(getValidImageUrl(product))}
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.src = DEFAULT_IMAGE;
               }}
             />
           </div>

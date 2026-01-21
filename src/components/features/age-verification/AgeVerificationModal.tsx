@@ -32,11 +32,11 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
 
           {/* Tagline with microphone icons */}
           <div className="flex items-center justify-center gap-2 mb-8">
-            <Mic className="w-4 h-4 text-color-accent" />
+            {/* <Mic className="w-4 h-4 text-color-accent" /> */}
             <span className="text-sm text-color-white font-light">
               {t("premiumLiquorStore")}
             </span>
-            <Mic className="w-4 h-4 text-color-accent" />
+            {/* <Mic className="w-4 h-4 text-color-accent" /> */}
           </div>
 
           {/* Age Verification Heading */}

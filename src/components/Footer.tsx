@@ -76,7 +76,7 @@ const Footer: React.FC = () => {
   };
 
   return (
-    <footer className="border-t transition-colors bg-card border-border">
+    <footer className="border-t transition-colors bg-card-purple border-border">
       <div className="container mx-auto px-4 py-8 sm:py-12">
         <div className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-5 gap-6 sm:gap-8">
           {/* Brand */}
