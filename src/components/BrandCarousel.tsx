@@ -133,7 +133,7 @@ export default function BrandCarousel() {
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-4 sm:mb-6">
+        {/* <div className="flex items-center justify-between mb-4 sm:mb-6">
           <h2
             className={`text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary`}
           >
@@ -150,7 +150,7 @@ export default function BrandCarousel() {
             View All
             <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
           </Link>
-        </div>
+        </div> */}
 
         {/* Brands Grid */}
         <div className="relative">
@@ -161,23 +161,23 @@ export default function BrandCarousel() {
                 onClick={prevPage}
                 className={`absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${
                   theme === "dark"
-                    ? "bg-card border border-border hover:bg-secondary"
+                    ? "border-primary-text hover:text-ternary-text"
                     : "bg-white border border-gray-200 hover:bg-gray-50"
                 }`}
                 aria-label="Previous brands"
               >
-                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5" />
+                <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 border-primary-text hover:text-ternary-text" />
               </button>
               <button
                 onClick={nextPage}
                 className={`absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${
                   theme === "dark"
-                    ? "bg-card border border-border hover:bg-secondary"
+                    ? "border-primary-text hover:text-ternary-text"
                     : "bg-white border border-gray-200 hover:bg-gray-50"
                 }`}
                 aria-label="Next brands"
               >
-                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 hover:text-ternary-text" />
+                <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-text" />
               </button>
             </>
           )}

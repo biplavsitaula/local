@@ -331,7 +331,23 @@ return (
               <ImageCarousel />
 
               {/* Brands Section */}
-              <BrandCarousel />
+                 <section className="container mx-auto px-4">
+                <div className="flex items-center justify-between mb-4 sm:mb-6">
+                  <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
+                    {t("brand")}
+                  </h2>
+                  <Link
+                    href="/brand"
+                    className="view-all-link gap-1 sm:gap-2 text-xs sm:text-sm p-1.5 sm:p-2 rounded-lg sm:rounded-xl"
+                  >
+                    {t("viewAll")}
+                    <ArrowRight className="w-3 h-3 sm:w-4 sm:h-4" />
+                  </Link>
+                </div>
+              
+                <BrandCarousel />
+
+              </section>
             
               {/* Recent Arrivals Section */}
               <section className="container mx-auto px-4">

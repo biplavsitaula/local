@@ -364,9 +364,9 @@
     /* --gradient-text-secondary: linear-gradient(to right, hsl(34, 85%, 47%), hsl(41, 94%, 49%), hsl(25 80% 55%), hsl(20 75% 52%)); */
     --gradient-text-secondary: linear-gradient(
       to bottom,
-      hsl(51, 90%, 70%) 0%,     /* Bright top edge */
-      hsl(48, 85%, 50%) 45%,    /* Warm mid-gold */
-      hsl(35, 75%, 55%) 50%,    /* Deep "reflective" shadow */
+      hsl(39, 89%, 51%) 0%,     /* Bright top edge */
+      hsl(39, 88%, 46%) 45%,    /* Warm mid-gold */
+      hsl(54, 93%, 49%) 50%,    /* Deep "reflective" shadow */
       hsl(48, 100%, 65%) 55%,   /* Brilliant shimmer highlight */
       hsl(43, 85%, 45%) 100%    /* Rich golden base */
     );

@@ -58,13 +58,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
               onClick={onVerified}
-              className="flex-1 btn-primary-custom font-bold py-6 text-lg rounded-xl shadow-lg cursor-pointer"
+              className="flex-1 btn-primary-custom font-bold py-4 sm:py-6 text-lg rounded-xl shadow-lg cursor-pointer"
             >
               {t("ageYes")}
             </button>
             <button
               onClick={onDenied}
-              className="flex-1 btn-default-custom font-bold py-6 text-lg rounded-xl cursor-pointer"
+              className="flex-1 btn-default-custom font-bold py-4 sm:py-6 text-lg rounded-xl cursor-pointer"
             >
               {t("ageNo")}
             </button>

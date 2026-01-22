@@ -422,7 +422,7 @@ const Header: React.FC<IHeaderProps> = ({
                                <Button
                                  variant="outline"
                                  size="icon"
-                                 className="h-7 w-7 border-border"
+                                 className="h-7 w-7 border-border text-foreground hover:bg-muted cursor-pointer"
                                  onClick={() =>
                                    updateQuantity(
                                      item?.product?.id,
@@ -438,7 +438,7 @@ const Header: React.FC<IHeaderProps> = ({
                                <Button
                                  variant="outline"
                                  size="icon"
-                                 className="h-7 w-7 border-border"
+                                 className="h-7 w-7 border-border text-foreground hover:bg-muted cursor-pointer"
                                  onClick={() =>
                                    updateQuantity(
                                      item?.product?.id,
