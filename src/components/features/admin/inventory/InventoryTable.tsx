@@ -26,7 +26,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Pagination } from "@/components/ui/pagination";
 import { cn } from "@/lib/utils";
+
+const ITEMS_PER_PAGE = 25;
 
 interface InventoryTableProps {
   productId?: string;
@@ -55,6 +58,7 @@ export function InventoryTable({ productId }: InventoryTableProps) {
 
   const [sortKey, setSortKey] = useState<SortKey>("createdAt");
   const [sortDir, setSortDir] = useState<SortDir>("desc");
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchTransactions = async () => {
     try {
@@ -155,6 +159,20 @@ export function InventoryTable({ productId }: InventoryTableProps) {
 
     return filtered;
   }, [transactions, searchQuery, filters.productName, sortDir, sortKey]);
+
+  // Paginate the results
+  const paginatedRows = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    const endIndex = startIndex + ITEMS_PER_PAGE;
+    return filteredAndSortedTransactions.slice(startIndex, endIndex);
+  }, [filteredAndSortedTransactions, currentPage]);
+
+  const totalPages = Math.ceil(filteredAndSortedTransactions.length / ITEMS_PER_PAGE);
+
+  // Reset to page 1 when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery, filters.type, filters.productName, sortKey, sortDir]);
 
   const clearFilters = () => {
     setFilters({
@@ -358,9 +376,9 @@ export function InventoryTable({ productId }: InventoryTableProps) {
             </tr>
           </thead>
           <tbody>
-            {filteredAndSortedTransactions.length === 0 ? (
+            {paginatedRows.length === 0 ? (
               <tr>
-                <td colSpan={8} className="p-8 text-center">
+                <td colSpan={9} className="p-8 text-center">
                   <div className="flex flex-col items-center gap-2">
                     <Package className="h-10 w-10 text-muted-foreground" />
                     <p className="text-muted-foreground">
@@ -370,7 +388,7 @@ export function InventoryTable({ productId }: InventoryTableProps) {
                 </td>
               </tr>
             ) : (
-              filteredAndSortedTransactions.map((transaction) => (
+              paginatedRows.map((transaction) => (
                 <tr
                   key={transaction._id}
                   className="border-b border-border last:border-b-0 hover:bg-secondary/30 transition-colors"
@@ -452,11 +470,29 @@ export function InventoryTable({ productId }: InventoryTableProps) {
         </table>
       </div>
 
-      {/* Footer */}
+      {/* Footer with Pagination */}
+      {totalPages > 1 && (
+        <div className="border-t border-border p-4">
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={(page) => {
+              setCurrentPage(page);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            itemsPerPage={ITEMS_PER_PAGE}
+            totalItems={filteredAndSortedTransactions.length}
+          />
+        </div>
+      )}
+      
+      {/* Summary Footer */}
       <div className="p-4 border-t border-border bg-secondary/20">
         <p className="text-sm text-muted-foreground">
-          Showing {filteredAndSortedTransactions.length} of{" "}
-          {transactions.length} transactions
+          Showing {paginatedRows.length} of {filteredAndSortedTransactions.length} filtered transactions
+          {filteredAndSortedTransactions.length !== transactions.length && (
+            <span> (from {transactions.length} total)</span>
+          )}
         </p>
       </div>
     </div>
