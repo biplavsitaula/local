@@ -187,6 +187,14 @@ const Footer: React.FC = () => {
                   {t('contactUs')}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/returnPolicy"
+                  className="text-xs sm:text-sm underline transition-colors text-muted-foreground hover:text-primary-text"
+                >
+                  {language === 'en' ? 'Return Policy' : 'फिर्ता नीति'}
+                </Link>
+              </li>
             </ul>
           </div>
 

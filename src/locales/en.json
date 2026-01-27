@@ -294,6 +294,24 @@
   "messageFailedToSend": "Failed to send message. Please try again.",
   "kathmanduNepal": "Kathmandu, Nepal",
   "thamelAddress": "Thamel, Kathmandu 44600",
-  "brand": "Brands"
+  "brand": "Brands",
+  "returnPolicy": "Return Policy",
+  "returnPolicyLastUpdated": "Last updated: January 2026",
+  "returnPolicyIntro": "At Flame Beverage, we are committed to ensuring your complete satisfaction with every purchase. We understand that sometimes products may arrive damaged or not meet your expectations. This return policy outlines the conditions and process for returning products purchased from our store.",
+  "returnWindow": "Return Window",
+  "returnWindowDesc": "Products may be returned within 24 hours of delivery. Returns requested after this period will not be accepted. Please inspect your order immediately upon receipt.",
+  "eligibleForReturn": "Eligible for Return",
+  "eligibleForReturnDesc": "• Damaged or broken bottles upon delivery\n• Wrong product delivered\n• Expired products\n• Products with quality issues (cork damage, contamination)\n• Sealed products in original packaging",
+  "notEligibleForReturn": "Not Eligible for Return",
+  "notEligibleForReturnDesc": "• Opened or unsealed bottles\n• Products without original packaging\n• Products damaged due to customer mishandling\n• Products stored improperly by customer\n• Change of mind purchases\n• Products purchased during clearance sales",
+  "returnProcess": "Return Process",
+  "returnProcessDesc": "1. Contact our customer service within 24 hours of delivery\n2. Provide your order number and reason for return\n3. Submit photos of the product and packaging\n4. Wait for return authorization from our team\n5. Our delivery team will collect the product\n6. Refund will be processed within 5-7 business days",
+  "refundPolicy": "Refund Policy",
+  "refundPolicyDesc": "• Full refund for eligible returns\n• Refunds are processed to the original payment method\n• Cash on delivery orders will receive bank transfer refunds\n• Shipping charges are non-refundable unless the error was on our part\n• Partial refunds may apply for partially damaged orders",
+  "importantNotes": "Important Notes",
+  "importantNotesDesc": "• All alcoholic beverages must be returned sealed\n• Age verification may be required during return collection\n• We reserve the right to refuse returns that don't meet our criteria\n• Promotional items and gift sets may have different return policies\n• Keep your receipt and order confirmation for all returns",
+  "needHelpWithReturn": "Need Help with a Return?",
+  "needHelpWithReturnDesc": "Contact our customer service team at +977 9800000000 or email us at info@flamebeverage.com. We're here to help!",
+  "returnPolicyAcknowledgment": "By making a purchase from Flame Beverage, you acknowledge that you have read, understood, and agree to this return policy. We reserve the right to modify this policy at any time without prior notice."
 }
 
