@@ -8,13 +8,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { 
   MapPin, Phone, Mail, Clock, Send, Loader2, CheckCircle, 
-  MessageSquare, Building2, Facebook, Instagram, Twitter 
+  MessageSquare, Building2, Facebook, Instagram, Twitter,
+  Star, ThumbsUp
 } from "lucide-react";
 import emailjs from "@emailjs/browser";
 import { toast } from "sonner";
 
 const ContactUsPageContent = () => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
   const [searchQuery, setSearchQuery] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
@@ -25,6 +26,18 @@ const ContactUsPageContent = () => {
     subject: "",
     message: "",
   });
+
+  // Feedback state
+  const [feedbackSubmitting, setFeedbackSubmitting] = useState(false);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [feedbackData, setFeedbackData] = useState({
+    name: "",
+    email: "",
+    rating: 0,
+    feedbackType: "",
+    feedback: "",
+  });
+  const [hoveredRating, setHoveredRating] = useState(0);
 
   const handleCheckout = () => {};
 
@@ -85,6 +98,61 @@ const ContactUsPageContent = () => {
       toast.error(t("messageFailedToSend"));
     } finally {
       setIsSubmitting(false);
+    }
+  };
+
+  const handleFeedbackSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!feedbackData.name || !feedbackData.email || !feedbackData.feedback || feedbackData.rating === 0) {
+      toast.error(language === 'en' ? 'Please fill all required fields and select a rating' : 'कृपया सबै आवश्यक फिल्डहरू भर्नुहोस् र रेटिङ छान्नुहोस्');
+      return;
+    }
+
+    try {
+      setFeedbackSubmitting(true);
+
+      const serviceId = "service_3hnx9qr";
+      const templateId = "template_uw796lo";
+      const publicKey = "5qzm3CpcCNMoXN2Y0";
+
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          email: "hasinadhungel11@gmail.com",
+          to_name: "Flame Beverage Support",
+          from_name: feedbackData.name,
+          from_email: feedbackData.email,
+          subject: `Customer Feedback - ${feedbackData.feedbackType || 'General'} (${feedbackData.rating}/5 Stars)`,
+          message: `
+            ⭐ CUSTOMER FEEDBACK ⭐
+            
+            Name: ${feedbackData.name}
+            Email: ${feedbackData.email}
+            Rating: ${'★'.repeat(feedbackData.rating)}${'☆'.repeat(5 - feedbackData.rating)} (${feedbackData.rating}/5)
+            Feedback Type: ${feedbackData.feedbackType || 'General'}
+
+            Feedback:
+            ${feedbackData.feedback}
+          `,
+          reply_to: feedbackData.email,
+        },
+        publicKey
+      );
+
+      setFeedbackSubmitted(true);
+      toast.success(language === 'en' ? 'Thank you for your feedback!' : 'तपाईंको प्रतिक्रियाको लागि धन्यवाद!');
+
+      // Reset form after 3 seconds
+      setTimeout(() => {
+        setFeedbackData({ name: "", email: "", rating: 0, feedbackType: "", feedback: "" });
+        setFeedbackSubmitted(false);
+      }, 3000);
+    } catch (error: any) {
+      console.error("Feedback submission error:", error);
+      toast.error(language === 'en' ? 'Failed to submit feedback. Please try again.' : 'प्रतिक्रिया पेश गर्न असफल भयो। कृपया पुनः प्रयास गर्नुहोस्।');
+    } finally {
+      setFeedbackSubmitting(false);
     }
   };
 
@@ -354,6 +422,162 @@ const ContactUsPageContent = () => {
                 </div>
               </div>
             </div>
+          </div>
+        </div>
+
+        {/* Feedback Section */}
+        <div className="mt-12 sm:mt-16">
+          <div className="text-center mb-8">
+            <div className="flex justify-center mb-4">
+              <div className="p-3 rounded-full bg-flame-orange/20">
+                <ThumbsUp className="w-6 h-6 sm:w-8 sm:h-8 text-color-secondary" />
+              </div>
+            </div>
+            <h2 className="text-xl sm:text-2xl md:text-3xl font-display font-bold text-primary-gradient mb-2">
+              {language === 'en' ? 'Share Your Feedback' : 'आफ्नो प्रतिक्रिया साझा गर्नुहोस्'}
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-xl mx-auto">
+              {language === 'en' 
+                ? 'We value your opinion! Help us improve by sharing your experience.'
+                : 'हामी तपाईंको विचारलाई मूल्यवान मान्छौं! आफ्नो अनुभव साझा गरेर हामीलाई सुधार गर्न मद्दत गर्नुहोस्।'}
+            </p>
+          </div>
+
+          <div className="max-w-2xl mx-auto p-6 sm:p-8 rounded-xl border bg-card border-border">
+            <form onSubmit={handleFeedbackSubmit} className="space-y-5">
+              {/* Name and Email */}
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
+                    {t("fullName")} *
+                  </label>
+                  <Input
+                    type="text"
+                    value={feedbackData.name}
+                    onChange={(e) => setFeedbackData({ ...feedbackData, name: e.target.value })}
+                    placeholder={t("yourName")}
+                    required
+                    disabled={feedbackSubmitting || feedbackSubmitted}
+                    className="bg-secondary/50 border-border"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-foreground">
+                    {t("emailAddress")} *
+                  </label>
+                  <Input
+                    type="email"
+                    value={feedbackData.email}
+                    onChange={(e) => setFeedbackData({ ...feedbackData, email: e.target.value })}
+                    placeholder={t("yourEmail")}
+                    required
+                    disabled={feedbackSubmitting || feedbackSubmitted}
+                    className="bg-secondary/50 border-border"
+                  />
+                </div>
+              </div>
+
+              {/* Rating */}
+              <div>
+                <label className="block text-sm font-medium mb-3 text-foreground">
+                  {language === 'en' ? 'Your Rating' : 'तपाईंको रेटिङ'} *
+                </label>
+                <div className="flex items-center gap-1">
+                  {[1, 2, 3, 4, 5].map((star) => (
+                    <button
+                      key={star}
+                      type="button"
+                      onClick={() => setFeedbackData({ ...feedbackData, rating: star })}
+                      onMouseEnter={() => setHoveredRating(star)}
+                      onMouseLeave={() => setHoveredRating(0)}
+                      disabled={feedbackSubmitting || feedbackSubmitted}
+                      className="p-1 transition-transform hover:scale-110 disabled:opacity-50 cursor-pointer"
+                    >
+                      <Star
+                        className={`w-8 h-8 sm:w-10 sm:h-10 transition-colors ${
+                          star <= (hoveredRating || feedbackData.rating)
+                            ? 'fill-flame-orange text-flame-orange'
+                            : 'text-muted-foreground'
+                        }`}
+                      />
+                    </button>
+                  ))}
+                  <span className="ml-3 text-sm text-muted-foreground">
+                    {feedbackData.rating > 0 && (
+                      <>
+                        {feedbackData.rating}/5 
+                        {feedbackData.rating === 5 && (language === 'en' ? ' - Excellent!' : ' - उत्कृष्ट!')}
+                        {feedbackData.rating === 4 && (language === 'en' ? ' - Great!' : ' - राम्रो!')}
+                        {feedbackData.rating === 3 && (language === 'en' ? ' - Good' : ' - ठीक छ')}
+                        {feedbackData.rating === 2 && (language === 'en' ? ' - Fair' : ' - औसत')}
+                        {feedbackData.rating === 1 && (language === 'en' ? ' - Poor' : ' - कमजोर')}
+                      </>
+                    )}
+                  </span>
+                </div>
+              </div>
+
+              {/* Feedback Type */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-foreground">
+                  {language === 'en' ? 'Feedback Type' : 'प्रतिक्रिया प्रकार'}
+                </label>
+                <select
+                  value={feedbackData.feedbackType}
+                  onChange={(e) => setFeedbackData({ ...feedbackData, feedbackType: e.target.value })}
+                  disabled={feedbackSubmitting || feedbackSubmitted}
+                  className="w-full h-10 px-3 rounded-md border text-sm bg-secondary/50 border-border text-foreground"
+                >
+                  <option value="">{language === 'en' ? 'Select type' : 'प्रकार छान्नुहोस्'}</option>
+                  <option value="product">{language === 'en' ? 'Product Quality' : 'उत्पादन गुणस्तर'}</option>
+                  <option value="delivery">{language === 'en' ? 'Delivery Experience' : 'डेलिभरी अनुभव'}</option>
+                  <option value="service">{language === 'en' ? 'Customer Service' : 'ग्राहक सेवा'}</option>
+                  <option value="website">{language === 'en' ? 'Website Experience' : 'वेबसाइट अनुभव'}</option>
+                  <option value="suggestion">{language === 'en' ? 'Suggestion' : 'सुझाव'}</option>
+                  <option value="other">{t("other")}</option>
+                </select>
+              </div>
+
+              {/* Feedback Text */}
+              <div>
+                <label className="block text-sm font-medium mb-2 text-foreground">
+                  {language === 'en' ? 'Your Feedback' : 'तपाईंको प्रतिक्रिया'} *
+                </label>
+                <textarea
+                  value={feedbackData.feedback}
+                  onChange={(e) => setFeedbackData({ ...feedbackData, feedback: e.target.value })}
+                  placeholder={language === 'en' ? 'Tell us about your experience...' : 'आफ्नो अनुभवको बारेमा बताउनुहोस्...'}
+                  required
+                  disabled={feedbackSubmitting || feedbackSubmitted}
+                  rows={4}
+                  className="w-full px-3 py-2 rounded-md border text-sm resize-none bg-secondary/50 border-border text-foreground placeholder:text-muted-foreground"
+                />
+              </div>
+
+              {/* Submit Button */}
+              <Button
+                type="submit"
+                disabled={feedbackSubmitting || feedbackSubmitted}
+                className="w-full py-6 text-base font-semibold btn-primary-custom text-white"
+              >
+                {feedbackSubmitting ? (
+                  <>
+                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
+                    {language === 'en' ? 'Submitting...' : 'पेश गर्दै...'}
+                  </>
+                ) : feedbackSubmitted ? (
+                  <>
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    {language === 'en' ? 'Thank You!' : 'धन्यवाद!'}
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5 mr-2" />
+                    {language === 'en' ? 'Submit Feedback' : 'प्रतिक्रिया पेश गर्नुहोस्'}
+                  </>
+                )}
+              </Button>
+            </form>
           </div>
         </div>
       </main>

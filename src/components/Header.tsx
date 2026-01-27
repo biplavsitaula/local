@@ -201,7 +201,7 @@ const Header: React.FC<IHeaderProps> = ({
   <header className={`sticky top-0 z-40 w-full border-b transition-colors ${
     theme === 'dark'
       ? 'border-border/40 bg-background'
-      : 'border-border/60 bg-white/95 shadow-sm backdrop-blur-xl'
+      : 'border-border/50 bg-background/95 shadow-sm backdrop-blur-xl'
   }`}>
     {/* Offer Banner */}
     <div

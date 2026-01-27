@@ -216,27 +216,27 @@ const RegisterModal = ({ open, onClose, onSwitchToLogin, isAdminContext = false 
               <label className="block text-xs sm:text-sm font-medium text-foreground mb-1.5 sm:mb-2">
                 {t('phoneNumber')}
               </label>
-              <div className="relative">
-                <Phone className="absolute left-2.5 sm:left-3 top-1/2 -translate-y-1/2 w-4 h-4 sm:w-5 sm:h-5 text-muted-foreground" />
-                <div className="flex">
-                  <span className="px-2.5 sm:px-3 py-2.5 sm:py-3 bg-muted border border-r-0 border-border rounded-l-lg text-foreground text-xs sm:text-sm">+977</span>
-                  <input
-                    type="tel"
-                    value={formData.phone}
-                    onChange={(e) => {
-                      const value = e.target.value.replace(/\D/g, "").slice(0, 10);
-                      setFormData({ ...formData, phone: value });
-                      setPhoneError(null);
-                    }}
-                    placeholder={t('phonePlaceholder')}
-                    className={`flex-1 pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
-                      phoneError 
-                        ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" 
-                        : "border-border focus:border-primary-border focus:ring-primary-border/20"
-                    }`}
-                    required
-                  />
-                </div>
+              <div className="flex">
+                <span className="flex items-center gap-1.5 px-2.5 sm:px-3 py-2.5 sm:py-3 bg-muted border border-r-0 border-border rounded-l-lg text-foreground text-xs sm:text-sm">
+                  <Phone className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-muted-foreground" />
+                  +977
+                </span>
+                <input
+                  type="tel"
+                  value={formData.phone}
+                  onChange={(e) => {
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 10);
+                    setFormData({ ...formData, phone: value });
+                    setPhoneError(null);
+                  }}
+                  placeholder={t('phonePlaceholder')}
+                  className={`flex-1 pl-3 sm:pl-4 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm sm:text-base bg-background border rounded-r-lg text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 ${
+                    phoneError 
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20" 
+                      : "border-border focus:border-primary-border focus:ring-primary-border/20"
+                  }`}
+                  required
+                />
               </div>
               {phoneError && (
                 <p className="mt-1.5 text-xs sm:text-sm text-red-500">{phoneError}</p>

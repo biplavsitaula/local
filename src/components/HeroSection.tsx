@@ -1,20 +1,14 @@
 import React from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
-import { useTheme } from "@/contexts/ThemeContext";
 import { Button } from "@/components/ui/button";
 import { ArrowRight, Sparkles } from "lucide-react";
 import Link from "next/link";
-import AnimatedLogo from "@/components/AnimatedLogo";
-import HeroTitle from "@/components/HeroTitle";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
-  const { theme } = useTheme();
 
   return (
-    <section className={`relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors ${
-      theme === 'dark' ? 'galaxy-bg' : 'bg-gradient-to-b from-orange-50/30 via-yellow-50/20 to-orange-50/30'
-    }`}>
+    <section className="relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors galaxy-bg">
       {/* Animated Background Elements */}
       {/* <div className="absolute inset-0 overflow-hidden">
         <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-flame-orange/10 rounded-full blur-3xl animate-pulse" />
@@ -29,7 +23,7 @@ const HeroSection: React.FC = () => {
       <div className="relative z-10 container mx-auto px-4 text-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-fade-in">
           {/* Badge */}
-          <div className="inline-flex items-center gap-2 shadow-sm px-4 py-2 rounded-full backdrop-blur-sm transition-colors bg-secondary/50 border border-color-primary text-color-white">
+          <div className="inline-flex items-center gap-2 shadow-md px-4 py-2 rounded-full backdrop-blur-sm transition-colors border bg-secondary/50 border-color-primary text-color-white">
             <Sparkles className="w-4 h-4 text-color-accent" />
             <span className="text-sm font-medium">Premium Collection 2024</span>
           </div>
@@ -137,9 +131,7 @@ const HeroSection: React.FC = () => {
       </div>
 
       {/* Bottom Gradient */}
-      <div className={`absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t ${
-        theme === 'dark' ? 'from-background' : 'from-gray-50'
-      } to-transparent`} />
+      <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-background to-transparent" />
     </section>
   );
 };
