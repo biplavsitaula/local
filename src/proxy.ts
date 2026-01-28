@@ -7,7 +7,7 @@ const protectedRoutes = [
   '/dashboard',
 ];
 
-export function middleware(request: NextRequest) {
+export default function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
   
   // Check if the current path is a protected route
@@ -26,9 +26,6 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
   
-  // Don't redirect logged-in users from login/register - let them access these pages
-  // This allows users to log out and log in as a different user
-  
   // If accessing /dashboard directly, redirect to /admin
   if (token && (pathname === '/dashboard' || pathname.startsWith('/dashboard/'))) {
     return NextResponse.redirect(new URL('/admin', request.url));
@@ -37,7 +34,7 @@ export function middleware(request: NextRequest) {
   return NextResponse.next();
 }
 
-// Configure which routes the middleware should run on
+// Configure which routes the proxy should run on
 export const config = {
   matcher: [
     // Match admin routes
@@ -47,9 +44,4 @@ export const config = {
     '/dashboard',
   ],
 };
-
-
-
-
-
 
