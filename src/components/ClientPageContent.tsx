@@ -475,7 +475,7 @@ return (
                 />
               </section>
             
-              {showSeasonalSection && !isSeasonalHidden && (
+              {showSeasonalSection && !isSeasonalHidden && seasonalTheme && (
                 <section className={`mx-auto w-full max-w-6xl min-w-0 relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors mb-4 ${
                   theme === 'dark'
                     ? 'gradient-card shadow-glow'
