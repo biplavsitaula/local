@@ -71,11 +71,12 @@ const themeConfigs: Record<SeasonalTheme, SeasonalThemeData> = {
 
 /**
  * Hook to fetch and use seasonal theme from API
- * Falls back to default theme if API is unavailable
+ * Returns isHidden=true when no theme is selected or theme is "none"/"default"
  */
 export function useSeasonalTheme() {
-  const [theme, setTheme] = useState<SeasonalThemeData>(themeConfigs.default);
+  const [theme, setTheme] = useState<SeasonalThemeData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isHidden, setIsHidden] = useState(true);
 
   useEffect(() => {
     const fetchTheme = async () => {
@@ -85,7 +86,14 @@ export function useSeasonalTheme() {
         
         if (response.success && response.data) {
           const apiData = response.data;
-          const keyname = (apiData.keyname || 'default') as SeasonalTheme;
+          const keyname = (apiData.keyname || '') as SeasonalTheme;
+          
+          // Hide if no theme, "none", or "default" is selected
+          if (!keyname || keyname === 'none' || keyname === 'default') {
+            setIsHidden(true);
+            setTheme(null);
+            return;
+          }
           
           // If API returns full theme data, use it; otherwise use keyname to get from configs
           if (apiData.title && apiData.description) {
@@ -102,19 +110,28 @@ export function useSeasonalTheme() {
               gradient: apiData.gradient || themeConfigs[keyname]?.gradient || themeConfigs.default.gradient,
               emoji: apiData.emoji,
             });
+            setIsHidden(false);
           } else {
             // API only returned keyname, use config
-            const selectedTheme = themeConfigs[keyname] || themeConfigs.default;
-            setTheme(selectedTheme);
+            const selectedTheme = themeConfigs[keyname];
+            if (selectedTheme) {
+              setTheme(selectedTheme);
+              setIsHidden(false);
+            } else {
+              setIsHidden(true);
+              setTheme(null);
+            }
           }
         } else {
-          // Fallback to default
-          setTheme(themeConfigs.default);
+          // No theme selected - hide section
+          setIsHidden(true);
+          setTheme(null);
         }
       } catch (error) {
         console.error('Error fetching seasonal theme:', error);
-        // Fallback to default theme on error
-        setTheme(themeConfigs.default);
+        // Hide section on error
+        setIsHidden(true);
+        setTheme(null);
       } finally {
         setLoading(false);
       }
@@ -123,6 +140,6 @@ export function useSeasonalTheme() {
     fetchTheme();
   }, []);
 
-  return { theme, loading };
+  return { theme, loading, isHidden };
 }
 

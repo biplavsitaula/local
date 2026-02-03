@@ -21,6 +21,7 @@ import {
   Tag,
   Images,
   Building2,
+  Palette,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/contexts/AuthContext";
@@ -42,6 +43,7 @@ const menuItems = [
   { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
   { title: "Reviews", icon: Star, path: "/admin/reviews" },
   { title: "Featured Images", icon: Images, path: "/admin/featuredImage" },
+  { title: "Seasonal Themes", icon: Palette, path: "/admin/seasonal-themes" },
 ];
 
 interface AdminSidebarProps {

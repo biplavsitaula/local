@@ -6,17 +6,17 @@ import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
 import { 
-  Save, Loader2, Plus, Trash2,
+  Save, Loader2, Plus, Trash2, Palette, ExternalLink,
   Wine, Beer, GlassWater, Martini, Grape, Cherry, Sparkles, Coffee, 
   FlameKindling, Package, Milk, Droplets, Citrus, Apple, CupSoda,
   LucideIcon
 } from 'lucide-react';
 import { settingsService } from '@/services/settings.service';
 import { seasonalThemesService, SeasonalThemeApiResponse } from '@/services/seasonal-themes.service';
-import { AddThemeModal } from '@/components/features/admin/settings/AddThemeModal';
 import { toast } from 'sonner';
 import { useRoleAccess } from '@/hooks/useRoleAccess';
 import { SuccessMsgModal } from '@/components/SuccessMsgModal';
+import Link from 'next/link';
 
 // Available icons for categories
 const categoryIcons: { name: string; icon: LucideIcon; label: string }[] = [
@@ -57,12 +57,11 @@ export default function SettingsPage() {
   });
 
   const [themes, setThemes] = useState([
+    { label: "None (Hide Seasonal Section)", value: "none" },
     { label: "Default", value: "default" },
   ]);
-  
+  const [hasThemes, setHasThemes] = useState(false);
   const [theme, setTheme] = useState("default");
-  const [addThemeModalOpen, setAddThemeModalOpen] = useState(false);
-  const [selectedTheme, setSelectedTheme] = useState<SeasonalThemeApiResponse | null>(null);
   const [categories, setCategories] = useState<{ name: string; icon: string }[]>([]);
   const [newCategory, setNewCategory] = useState("");
   const [newCategoryIcon, setNewCategoryIcon] = useState("");
@@ -124,9 +123,8 @@ export default function SettingsPage() {
           }
         }
 
-        // Update themes list
+        // Update themes list for dropdown
         if (themesResponse.success && themesResponse.data) {
-          // Filter out any API themes with "default" keyname to avoid duplicates
           const apiThemes = Array.isArray(themesResponse.data) 
             ? themesResponse.data
                 .filter((t: SeasonalThemeApiResponse) => (t.keyname || '').toLowerCase() !== 'default')
@@ -136,11 +134,17 @@ export default function SettingsPage() {
                 }))
             : [];
           
-          const themesList = [
-            { label: "Default", value: "default" },
-            ...apiThemes,
-          ];
-          setThemes(themesList);
+          // Only show theme section if there are themes available
+          setHasThemes(apiThemes.length > 0);
+          
+          if (apiThemes.length > 0) {
+            const themesList = [
+              { label: "None (Hide Seasonal Section)", value: "none" },
+              { label: "Default", value: "default" },
+              ...apiThemes,
+            ];
+            setThemes(themesList);
+          }
         }
 
         // Update categories list
@@ -387,35 +391,57 @@ export default function SettingsPage() {
             />
           </div>
         </div>
-        <div className="mt-8 space-y-4">
-          <div className="flex items-center justify-between">
-            <Label className="text-base font-medium text-foreground">Select Theme</Label>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => {
-                setSelectedTheme(null);
-                setAddThemeModalOpen(true);
-              }}
-              className="gap-2"
+        {hasThemes ? (
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium text-foreground">Select Theme</Label>
+              <Link 
+                href="/admin/seasonal-themes"
+                className="text-sm text-flame-orange hover:underline flex items-center gap-1"
+              >
+                <Palette className="h-4 w-4" />
+                Manage Themes
+                <ExternalLink className="h-3 w-3" />
+              </Link>
+            </div>
+            <select
+              value={theme}
+              onChange={(e) => setTheme(e.target.value)}
+              className="w-full rounded-lg border px-3 py-2 bg-background"
             >
-              <Plus className="h-4 w-4" />
-              Add Theme
-            </Button>
+              {themes.map((t) => (
+                <option key={t.value} value={t.value}>
+                  {t.label}
+                </option>
+              ))}
+            </select>
+            <p className="text-xs text-muted-foreground">
+              Select "None" to hide the seasonal section on the storefront. 
+              <Link href="/admin/seasonal-themes" className="text-flame-orange hover:underline ml-1">
+                Create and manage themes →
+              </Link>
+            </p>
           </div>
-          <select
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            className="w-full rounded-lg border px-3 py-2 bg-background"
-          >
-            {themes.map((t) => (
-              <option key={t.value} value={t.value}>
-                {t.label}
-              </option>
-            ))}
-          </select>
-        </div>
+        ) : (
+          <div className="mt-8 space-y-4">
+            <div className="flex items-center justify-between">
+              <Label className="text-base font-medium text-foreground">Seasonal Theme</Label>
+            </div>
+            <div className="flex items-center justify-between p-4 rounded-lg border border-border bg-secondary/30">
+              <div className="flex items-center gap-3">
+                <Palette className="h-5 w-5 text-muted-foreground" />
+                <p className="text-sm text-muted-foreground">No seasonal themes available.</p>
+              </div>
+              <Link 
+                href="/admin/seasonal-themes"
+                className="text-sm text-flame-orange hover:underline flex items-center gap-1"
+              >
+                <Plus className="h-4 w-4" />
+                Create Theme
+              </Link>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Store Information Section */}
@@ -589,38 +615,6 @@ export default function SettingsPage() {
           )}
         </Button>
       </div>
-
-      {/* Add Theme Modal */}
-      <AddThemeModal
-        open={addThemeModalOpen}
-        onOpenChange={setAddThemeModalOpen}
-        theme={selectedTheme}
-        onSuccess={async () => {
-          // Refresh themes list
-          try {
-            const themesResponse = await seasonalThemesService.getAll();
-            if (themesResponse.success && themesResponse.data) {
-              // Filter out any API themes with "default" keyname to avoid duplicates
-              const apiThemes = Array.isArray(themesResponse.data) 
-                ? themesResponse.data
-                    .filter((t: SeasonalThemeApiResponse) => (t.keyname || '').toLowerCase() !== 'default')
-                    .map((t: SeasonalThemeApiResponse) => ({
-                      label: `${t.emoji || ''} ${t.title || t.keyname}`,
-                      value: t.keyname || '',
-                    }))
-                : [];
-              
-              const themesList = [
-                { label: "Default", value: "default" },
-                ...apiThemes,
-              ];
-              setThemes(themesList);
-            }
-          } catch (error) {
-            console.error('Error refreshing themes:', error);
-          }
-        }}
-      />
 
       {/* Success Modal */}
       <SuccessMsgModal

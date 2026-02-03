@@ -58,7 +58,7 @@ const [checkoutOpen, setCheckoutOpen] = useState(false);
 // Use categories hook with subcategories
 const { categories } = useCategories({ includeAll: true, fetchSubCategories: true });
 const [showSeasonalSection, setShowSeasonalSection] = useState(true);
-const { theme: seasonalTheme } = useSeasonalTheme();
+const { theme: seasonalTheme, isHidden: isSeasonalHidden } = useSeasonalTheme();
 const { theme } = useTheme();
 const [recentArrivals, setRecentArrivals] = useState<Product[]>([]);
 const [mostRecommended, setMostRecommended] = useState<Product[]>([]);
@@ -475,7 +475,7 @@ return (
                 />
               </section>
             
-              {showSeasonalSection && (
+              {showSeasonalSection && !isSeasonalHidden && (
                 <section className={`mx-auto w-full max-w-6xl min-w-0 relative overflow-hidden rounded-3xl border ${seasonalTheme.colors.accent} p-8 px-4 md:px-8 transition-colors mb-4 ${
                   theme === 'dark'
                     ? 'gradient-card shadow-glow'
