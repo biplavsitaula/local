@@ -94,10 +94,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">
               <Image 
-                src="/assets/flame200.png" 
+                src="/assets/flameCircular800.png" 
                 alt="Flame Beverage logo" 
-                width={80} 
-                height={64}
+                width={180} 
+                height={48}
                 className="sm:w-[100px] sm:h-[80px]"
               />
             </div>

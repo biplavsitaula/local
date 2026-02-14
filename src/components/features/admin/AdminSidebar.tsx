@@ -76,7 +76,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
       <div className="p-6 border-b border-sidebar-border flex items-center justify-between">
         <div>
           <Image
-            src="/assets/flameMainLogo.png"
+            src="/assets/flameBeverage.png"
             alt="Flame Beverage logo"
             width={180}
             height={48}

@@ -231,7 +231,7 @@ const Header: React.FC<IHeaderProps> = ({
          </Link> */}
          <Link href="/" className="flex items-center gap-2 sm:gap-3 shrink-0 hover:opacity-90 transition-opacity">
            <Image 
-             src="/assets/flameMainLogo.png" 
+             src="/assets/flameBeverage.png" 
              alt="Flame Beverage logo" 
              width={180} 
              height={48}

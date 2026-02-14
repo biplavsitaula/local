@@ -25,7 +25,7 @@ const AgeDeniedScreen: React.FC<AgeDeniedScreenProps> = ({ onBack }) => {
               <ShieldX className="w-10 h-10 text-destructive" />
             </div> */}
             <Image
-              src="/assets/flame200.png"
+              src="/assets/flameCircular800.png"
               alt="Flame Beverage logo"
               width={180}
               height={48}

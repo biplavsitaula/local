@@ -36,7 +36,7 @@ const AnimatedLogo: React.FC<AnimatedLogoProps> = ({
         {/* Logo Image */}
         <div className="relative z-10 flex items-center justify-center animate-flame-pulse transition-all duration-300">
           <Image 
-            src="/assets/flame200.png" 
+            src="/assets/flameCircular800.png" 
             alt="Flame Beverage logo" 
             width={width}
             height={height}
