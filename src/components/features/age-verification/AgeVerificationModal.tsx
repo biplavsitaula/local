@@ -5,6 +5,8 @@ import { Mic } from "lucide-react";
 import { IAgeVerificationModalProps } from "@/interface/IAgeVerificationModalProps";
 import Link from "next/link";
 import AnimatedLogo from "@/components/AnimatedLogo";
+import Image from "next/image";
+import HeroTitle from "@/components/HeroTitle";
 
 const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
   onVerified,
@@ -26,12 +28,24 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           </div>
 
           {/* Brand Name */}
-          <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-primary-gradient">
+          <HeroTitle text={t("flameBeverage")} size="sm" />
+
+          {/* <h1 className="flex justify-center text-4xl mb-2 mt-2">
+            <Image
+              src="/assets/flameBeverageText.png"
+              alt="Flame Beverage logo"
+              width="180"
+              height="120"
+              className="object-contain h-auto w-auto drop-shadow-2xl transition-transform duration-300"
+              priority
+            />        
+            </h1> */}
+          {/* <h1 className="text-4xl md:text-5xl font-display font-bold mb-2 text-primary-gradient">
             {t("flameBeverage")}
-          </h1>
+          </h1> */}
 
           {/* Tagline with microphone icons */}
-          <div className="flex items-center justify-center gap-2 mb-8">
+          <div className="flex items-center justify-center gap-2 mb-4">
             {/* <Mic className="w-4 h-4 text-color-accent" /> */}
             <span className="text-sm text-color-white font-light">
               {t("premiumLiquorStore")}
@@ -45,9 +59,9 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           </h2>
 
           {/* Message */}
-          <p className="text-lg md:text-xl font-medium text-color-white mb-4">
+          {/* <p className="text-lg md:text-xl font-medium text-color-white mb-4">
             {t("ageDeniedMessage")}
-          </p>
+          </p> */}
           
           {/* Question */}
           <p className="text-base md:text-lg font-medium text-color-muted mb-10">

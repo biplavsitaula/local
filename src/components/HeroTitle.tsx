@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import React from "react";
 
 interface HeroTitleProps {
@@ -21,9 +22,21 @@ const HeroTitle: React.FC<HeroTitleProps> = ({
   };
 
   return (
-    <h1 className={`${sizeClasses[size]} font-display font-bold leading-tight ${className}`}>
-      <span className="flame-text">{text}</span>
-    </h1>
+    <>
+    <h1 className="flex justify-center text-4xl mt-2">
+            <Image
+              src="/assets/flameBeverageText.png"
+              alt="Flame Beverage logo"
+              width="180"
+              height="120"
+              className="object-contain h-auto w-auto drop-shadow-2xl transition-transform duration-300"
+              priority
+            />        
+            </h1>
+    </>
+    // <h1 className={`${sizeClasses[size]} font-display font-bold leading-tight ${className}`}>
+    //   <span className="flame-text">{text}</span>
+    // </h1>
   );
 };
 
