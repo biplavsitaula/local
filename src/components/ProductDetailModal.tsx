@@ -153,7 +153,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({ product, onClos
               <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center">
                 <MapPin className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
                 <p className="mt-1 text-[10px] sm:text-xs text-muted-foreground">{t('origin')}</p>
-                <p className="text-xs sm:text-sm font-medium text-foreground">{product?.origin || 'N/A'}</p>
+                <p className="text-xs sm:text-sm font-medium text-foreground">{product?.origin || ''}</p>
               </div>
             </div>
 
