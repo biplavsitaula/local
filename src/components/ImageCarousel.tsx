@@ -159,8 +159,8 @@ export default function ImageCarousel() {
       <div
         className={`relative w-full h-[200px] sm:h-[280px] md:h-[350px] lg:h-[400px] rounded-2xl overflow-hidden ${
           theme === "dark"
-            ? "shadow-[0_0_40px_rgba(255,107,0,0.15)]"
-            : "shadow-xl"
+            // ? "shadow-[0_0_40px_rgba(255,107,0,0.15)]"
+            // : "shadow-xl"
         }`}
       >
         {/* Slides Container */}

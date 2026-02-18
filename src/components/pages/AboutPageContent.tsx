@@ -86,7 +86,7 @@ const AboutPageContent = () => {
           <div className="grid sm:grid-cols-2 md:grid-cols-3 gap-4 sm:gap-6">
             <div className="flex items-center gap-2 sm:gap-4 justify-center">
               <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-color-secondary shrink-0" />
-              <span className="text-xs sm:text-sm md:text-base text-muted-foreground">{t("address" )}</span>
+              <span className="text-xs sm:text-sm md:text-base text-muted-foreground">{t("address" )}: Sohrakhutte, Thamel, Kathmandu</span>
             </div>
             <div className="flex items-center gap-2 sm:gap-4 justify-center">
               <Phone className="w-5 h-5 sm:w-6 sm:h-6 text-color-secondary shrink-0" />
