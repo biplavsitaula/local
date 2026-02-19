@@ -176,6 +176,7 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
               <Input
                 type="number"
                 placeholder="Min price..."
+                min={0}
                 value={filters.minPrice}
                 onChange={(e) => setFilters({ ...filters, minPrice: e.target.value })}
                 className="bg-secondary/50 border-border"
@@ -188,6 +189,7 @@ export function ProductTable({ filter, products = [], onRefresh, onFiltersChange
               <Input
                 type="number"
                 placeholder="Max price..."
+                min={0}
                 value={filters.maxPrice}
                 onChange={(e) => setFilters({ ...filters, maxPrice: e.target.value })}
                 className="bg-secondary/50 border-border"

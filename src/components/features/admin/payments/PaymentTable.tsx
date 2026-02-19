@@ -455,6 +455,7 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
                 <Input
                   type="number"
                   placeholder="Min amount..."
+                  min={0}
                   value={filters.minAmount}
                   onChange={(e) => setFilters({ ...filters, minAmount: e.target.value })}
                   className="bg-secondary/50 border-border"
@@ -467,6 +468,7 @@ export function PaymentTable({ methodFilter, searchQuery = "", onFiltersChange }
                 <Input
                   type="number"
                   placeholder="Max amount..."
+                  min={0}
                   value={filters.maxAmount}
                   onChange={(e) => setFilters({ ...filters, maxAmount: e.target.value })}
                   className="bg-secondary/50 border-border"
