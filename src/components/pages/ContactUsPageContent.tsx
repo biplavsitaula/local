@@ -59,7 +59,7 @@ const ContactUsPageContent = () => {
       setIsSubmitting(true);
 
       const serviceId = "service_3hnx9qr";
-      const templateId = "template_uw796lo";
+      const templateId = "template_7liw47r";
       const publicKey = "5qzm3CpcCNMoXN2Y0";
 
       await emailjs.send(
@@ -112,7 +112,7 @@ const ContactUsPageContent = () => {
       setFeedbackSubmitting(true);
 
       const serviceId = "service_3hnx9qr";
-      const templateId = "template_uw796lo";
+      const templateId = "template_7liw47r";
       const publicKey = "5qzm3CpcCNMoXN2Y0";
 
       await emailjs.send(
