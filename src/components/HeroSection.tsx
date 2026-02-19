@@ -6,6 +6,7 @@ import Link from "next/link";
 
 const HeroSection: React.FC = () => {
   const { t } = useLanguage();
+  const currentYear = new Date().getFullYear();
 
   return (
     <section className="relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors galaxy-bg">
@@ -25,7 +26,7 @@ const HeroSection: React.FC = () => {
           {/* Badge */}
           <div className="inline-flex items-center gap-2 shadow-md px-4 py-2 rounded-full backdrop-blur-sm transition-colors border bg-secondary/50 border-color-primary text-color-white">
             <Sparkles className="w-4 h-4 text-color-accent" />
-            <span className="text-sm font-medium">Premium Collection 2024</span>
+            <span className="text-sm font-medium">Premium Collection {currentYear}</span>
           </div>
           {/* <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-bold leading-tight">
             <span className="bg-gradient-to-b from-red-600 via-orange-500 to-amber-400 bg-clip-text text-transparent">Premium Spirits & Fine</span>

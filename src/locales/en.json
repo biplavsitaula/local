@@ -64,7 +64,7 @@
   "quickLinks": "Quick Links",
   "customerService": "Customer Service",
   "newsletter": "Newsletter",
-  "copyright": "© 2026 Flame Beverage. All rights reserved.",
+  "copyright": "Flame Beverage. All rights reserved.",
   "drinkResponsibly": "Drink responsibly",
   "moreDetails": "View details",
   "qty": "Qty",
@@ -312,6 +312,8 @@
   "importantNotesDesc": "• All alcoholic beverages must be returned sealed\n• Age verification may be required during return collection\n• We reserve the right to refuse returns that don't meet our criteria\n• Promotional items and gift sets may have different return policies\n• Keep your receipt and order confirmation for all returns",
   "needHelpWithReturn": "Need Help with a Return?",
   "needHelpWithReturnDesc": "Contact our customer service team at +977 9800000000 or email us at info@flamebeverage.com. We're here to help!",
-  "returnPolicyAcknowledgment": "By making a purchase from Flame Beverage, you acknowledge that you have read, understood, and agree to this return policy. We reserve the right to modify this policy at any time without prior notice."
+  "returnPolicyAcknowledgment": "By making a purchase from Flame Beverage, you acknowledge that you have read, understood, and agree to this return policy. We reserve the right to modify this policy at any time without prior notice.",
+  "Legal" : "Legal",
+  "PremiumBeverageDestination" :"Your premium destination for the finest spirits and beverages. Quality guaranteed."
 }
 

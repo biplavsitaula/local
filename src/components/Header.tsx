@@ -339,7 +339,7 @@ const Header: React.FC<IHeaderProps> = ({
 
 
            {/* Theme Toggle */}
-           <Button
+           {/* <Button
              variant="ghost"
              size="icon"
              onClick={toggleTheme}
@@ -355,7 +355,7 @@ const Header: React.FC<IHeaderProps> = ({
                <Moon className="w-5 h-5" />
              )}
              <span className="sr-only">Theme</span>
-           </Button>
+           </Button> */}
 
 
            {/* Cart */}

@@ -13,6 +13,7 @@ const Footer: React.FC = () => {
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
+  const currentYear = new Date().getFullYear();
 
   const handleNewsletterSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -93,7 +94,7 @@ const Footer: React.FC = () => {
             </div>
 
             <p className="text-xs sm:text-sm text-muted-foreground">
-              Your premium destination for the finest spirits and beverages. Quality guaranteed.
+              {t('PremiumBeverageDestination')}
             </p>
             <div className="flex gap-3 sm:gap-4">
               <a href="#" className="transition-colors text-muted-foreground hover:text-primary-text">
@@ -152,7 +153,7 @@ const Footer: React.FC = () => {
           {/* Legal */}
           <div className="mt-1">
             <h4 className="font-display font-semibold mb-3 sm:mb-4 text-sm sm:text-base text-color-secondary">
-              {language === 'en' ? 'Legal' : 'कानूनी'}
+              {t('Legal')}
             </h4>
             <ul className="space-y-1.5 sm:space-y-2">
               <li>
@@ -192,7 +193,7 @@ const Footer: React.FC = () => {
                   href="/returnPolicy"
                   className="text-xs sm:text-sm underline transition-colors text-muted-foreground hover:text-primary-text"
                 >
-                  {language === 'en' ? 'Return Policy' : 'फिर्ता नीति'}
+                  {t('returnPolicy')}
                 </Link>
               </li>
             </ul>
@@ -266,7 +267,7 @@ const Footer: React.FC = () => {
         {/* Bottom */}
         <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t flex flex-col md:flex-row justify-between items-center gap-3 sm:gap-4 transition-colors border-border">
           <p className="text-xs sm:text-sm text-center md:text-left text-muted-foreground">
-            {t('copyright')}
+           © {currentYear} {t('copyright')} 
           </p>
           <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
             <span className="text-primary-text">🔞</span>
