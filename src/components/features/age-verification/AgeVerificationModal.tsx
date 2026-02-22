@@ -54,7 +54,7 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           </div>
 
           {/* Age Verification Heading */}
-          <h2 className="text-2xl md:text-3xl font-display font-bold mb-4 text-primary-gradient">
+          <h2 className="text-xl md:text-2xl font-display font-bold mb-4 text-primary-gradient">
             {t("ageVerificationRequired")}
           </h2>
 
