@@ -11,7 +11,7 @@ import { ordersService, CheckoutPayload } from "@/services/orders.service";
 import Image from "next/image";
 import { Product } from "@/types";
 
-const DEFAULT_IMAGE = "/assets/liquor1.jpeg";
+const DEFAULT_IMAGE = "/assets/image_not_found.png";
 
 // Helper function to get valid image URL
 const getValidImageUrl = (product: Product | null | undefined): string => {

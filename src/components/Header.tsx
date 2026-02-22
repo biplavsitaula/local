@@ -33,8 +33,7 @@ import OfferBanner from "@/components/OfferBanner";
 import Image from "next/image";
 import { Product } from "@/types";
 
-const DEFAULT_IMAGE = "/assets/liquor1.jpeg";
-
+const DEFAULT_IMAGE = "/assets/image_not_found.png"
 // Helper function to get valid image URL
 const getValidImageUrl = (product: Product | null | undefined): string => {
   if (!product) return DEFAULT_IMAGE;

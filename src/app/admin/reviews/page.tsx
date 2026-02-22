@@ -541,7 +541,7 @@ export default function ReviewsPage() {
                <div className="w-12 h-12 rounded-full bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                  {product.image || product.imageUrl ? (
                    <Image
-                     src={product.image || product.imageUrl || '/assets/liquor1.jpeg'}
+                     src={product.image || product.imageUrl || '/assets/image_not_found.png'}
                      alt={product.name || ''}
                      width={48}
                      height={48}
@@ -662,7 +662,7 @@ export default function ReviewsPage() {
                            <div className="w-10 h-10 rounded-lg bg-secondary/50 flex items-center justify-center overflow-hidden flex-shrink-0">
                              {product.image || product.imageUrl ? (
                                <Image
-                                 src={product.image || product.imageUrl || '/assets/liquor1.jpeg'}
+                                 src={product.image || product.imageUrl || '/assets/image_not_found.png'}
                                  alt={product.name || ''}
                                  width={40}
                                  height={40}

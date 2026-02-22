@@ -176,7 +176,7 @@ export function OffersTable({ offers, onRefresh }: OffersTableProps) {
                     <td className="p-3 sm:p-4">
                       <div className="relative w-12 h-12 sm:w-16 sm:h-16 rounded-lg overflow-hidden bg-muted">
                         <Image
-                          src={offer.imageUrl || offer.image || '/assets/liquor1.jpeg'}
+                          src={offer.imageUrl || offer.image || '/assets/image_not_found.png'}
                           alt={offer.title}
                           fill
                           className="object-cover"

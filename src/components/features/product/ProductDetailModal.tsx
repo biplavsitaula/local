@@ -11,7 +11,7 @@ import { IProductDetailModalProps } from '@/interface/IProductDetailModalProps';
 import Image from 'next/image';
 import { useProductDetail } from './hooks/useProductDetail';
 
-const DEFAULT_IMAGE = '/assets/liquor1.jpeg';
+const DEFAULT_IMAGE = '/assets/image_not_found.png';
 
 const isExternalUrl = (url: string): boolean => {
   return url.startsWith('http://') || url.startsWith('https://');
