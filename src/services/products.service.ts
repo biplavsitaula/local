@@ -4,18 +4,28 @@ export interface Product {
   _id?: string;
   id?: string;
   name: string;
+  nameNe?: string;
+  type?: string; // Some APIs use 'type' instead of 'category'
   category: string;
   brand?: string;
   price: number;
   discountPercent?: number;
+  discountAmount?: number;
+  finalPrice?: number;
   stock: number;
   imageUrl?: string;
   image?: string;
   description?: string;
   rating?: number;
   sales?: number;
+  totalSold?: number;
+  reviewCount?: number;
+  alcoholPercentage?: number;
+  volume?: string;
   tag?: string;
   recommended?: boolean;
+  isRecommended?: boolean;
+  status?: string;
   createdAt?: string;
   updatedAt?: string;
 }

@@ -132,6 +132,9 @@ export async function apiGet<T>(
   params?: Record<string, any>,
   requireAuth: boolean = true
 ): Promise<ApiResponse<T>> {
+      
+  const token = tokenManager.getToken();
+
   const queryString = params
     ? '?' + new URLSearchParams(
         Object.entries(params).reduce((acc, [key, value]) => {

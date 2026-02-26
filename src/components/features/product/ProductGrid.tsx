@@ -146,12 +146,8 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   const mapApiProductToProduct = (apiProduct: any): Product => {
     // Handle API response structure: type instead of category, image instead of imageUrl
     const categoryValue = apiProduct.type || apiProduct.category || '';
-    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
-    
-    // Normalize category names
-    if (category === 'whiskey' || category === 'whisky') {
-      category = 'whisky';
-    }
+    // Keep original category name from API (capitalized)
+    const category = categoryValue || 'Other';
 
     const originalPrice = apiProduct.discountPercent
       ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
@@ -162,18 +158,18 @@ const ProductGrid: React.FC<ProductGridProps> = ({
       name: apiProduct.name || '',
       nameNe: apiProduct.nameNe || apiProduct.name || '', // Use name as fallback if nameNe not available
       category,
-      price: apiProduct.price || 0,
-      originalPrice,
+      price: apiProduct.finalPrice || apiProduct.price || 0,
+      originalPrice: apiProduct.discountPercent ? apiProduct.price : undefined,
       image: apiProduct.image || apiProduct.imageUrl || '',
       description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
       volume: apiProduct.volume || '750ml',
-      alcoholContent: apiProduct.alcoholContent || apiProduct.alcohol || '40%',
-      alcohol: apiProduct.alcohol || apiProduct.alcoholContent || '40%',
+      alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+      alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
       inStock: (apiProduct.stock || 0) > 0,
       isNew: false,
       stock: apiProduct.stock || 0,
       rating: apiProduct.rating || 0,
-      tag: apiProduct.tag,
+      tag: apiProduct.discountPercent ? `${apiProduct.discountPercent}% OFF` : apiProduct.tag,
     } as Product;
   };
 
@@ -203,8 +199,14 @@ const ProductGrid: React.FC<ProductGridProps> = ({
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         (product.nameNe && product.nameNe.toLowerCase().includes(searchQuery.toLowerCase())) ||
         (product.description && product.description.toLowerCase().includes(searchQuery.toLowerCase()));
+      
+      // Match category case-insensitively
       const matchesCategory =
-        selectedCategory === "All" || product.category === selectedCategory;
+        !selectedCategory || 
+        selectedCategory === "All" || 
+        selectedCategory === "" ||
+        product.category.toLowerCase() === selectedCategory.toLowerCase();
+      
       return matchesSearch && matchesCategory;
     });
   }, [products, searchQuery, selectedCategory]);

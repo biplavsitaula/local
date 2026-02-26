@@ -41,34 +41,28 @@ function PageContent() {
 
   // Map API product to internal Product type
   const mapApiProductToProduct = (apiProduct: ApiProduct): Product => {
-    const originalPrice = apiProduct.discountPercent
-      ? Math.round(apiProduct.price / (1 - apiProduct.discountPercent / 100))
-      : undefined;
-
     // Handle API response structure: type instead of category
     const categoryValue = apiProduct.type || apiProduct.category || '';
-    let category = categoryValue ? categoryValue.toLowerCase() : 'other';
-    if (category === 'whiskey' || category === 'whisky') {
-      category = 'whisky';
-    }
+    // Keep original category name from API (capitalized)
+    const category = categoryValue || 'Other';
 
     return {
       id: apiProduct._id || apiProduct.id || '',
       name: apiProduct.name || '',
       nameNe: apiProduct.nameNe || apiProduct.name || '',
       category,
-      price: apiProduct.price || 0,
-      originalPrice,
+      price: apiProduct.finalPrice || apiProduct.price || 0,
+      originalPrice: apiProduct.discountPercent ? apiProduct.price : undefined,
       image: apiProduct.image || apiProduct.imageUrl || '',
       description: apiProduct.description || `Premium ${categoryValue || 'Beverage'} - ${apiProduct.name || 'Product'}`,
-      volume: '750ml',
-      alcoholContent: '40%',
-      alcohol: '40%',
+      volume: apiProduct.volume || '750ml',
+      alcoholContent: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
+      alcohol: apiProduct.alcoholPercentage ? `${apiProduct.alcoholPercentage}%` : '40%',
       inStock: (apiProduct.stock || 0) > 0,
       isNew: true, // Mark as new for recent arrivals
       stock: apiProduct.stock,
       rating: apiProduct.rating,
-      tag: apiProduct.tag || 'NEW',
+      tag: apiProduct.discountPercent ? `${apiProduct.discountPercent}% OFF` : (apiProduct.tag || 'NEW'),
     } as Product;
   };
 

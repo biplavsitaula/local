@@ -7,6 +7,9 @@ export interface Notification {
   title: string;
   message: string;
   isRead: boolean;
+  priority?: 'low' | 'medium' | 'high';
+  relatedId?: any;
+  relatedModel?: 'Order' | 'Product' | 'Payment';
   createdAt: string;
   updatedAt?: string;
 }
@@ -25,6 +28,19 @@ export interface NotificationsResponse {
   unreadCount?: number;
 }
 
+export interface NotificationsApiResponse {
+  success: boolean;
+  message: string;
+  data: Notification[];
+  pagination?: {
+    page: number;
+    limit: number;
+    total: number;
+    pages: number;
+  };
+  unreadCount?: number;
+}
+
 export interface CreateNotificationData {
   type: string;
   title: string;
@@ -37,21 +53,12 @@ export interface CreateNotificationData {
 export const notificationsService = {
   /**
    * Get all notifications with filters (Admin only)
-   * Returns notifications and unreadCount
+   * API returns: { success, message, data: [...notifications], pagination, unreadCount }
    */
-  getAll: async (filters?: NotificationFilters): Promise<ApiResponse<NotificationsResponse>> => {
-    const response = await apiGet<NotificationsResponse>('/notifications', filters);
-    // Handle backward compatibility: if response.data is an array, wrap it
-    if (Array.isArray(response.data)) {
-      return {
-        ...response,
-        data: {
-          notifications: response.data as any,
-          unreadCount: 0,
-        },
-      };
-    }
-    return response;
+  getAll: async (filters?: NotificationFilters): Promise<NotificationsApiResponse> => {
+    const response = await apiGet<Notification[]>('/notifications', filters);
+    // The API returns data as array directly with unreadCount at root level
+    return response as unknown as NotificationsApiResponse;
   },
 
   /**
