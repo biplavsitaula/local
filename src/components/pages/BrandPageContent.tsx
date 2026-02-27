@@ -62,7 +62,7 @@ export default function BrandPageContent() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <Header searchQuery="" onSearchChange={() => {}} hideSearch />
+      <Header searchQuery="" onSearchChange={() => { }} hideSearch />
 
       {/* Page Title Section */}
       <div className="border-b bg-card/50 border-border">
@@ -126,9 +126,8 @@ export default function BrandPageContent() {
                 >
                   {/* Brand Logo/Image Section */}
                   <div
-                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border ${
-                      hasLogo ? "bg-card" : colors.bg
-                    }`}
+                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border ${hasLogo ? "bg-card" : colors.bg
+                      }`}
                   >
                     {hasLogo ? (
                       <div className="relative w-full h-full p-4">

@@ -16,21 +16,21 @@ const getValidImageUrl = (product: Product | null | undefined): string => {
   if (!product) {
     return DEFAULT_IMAGE;
   }
-  
+
   const imageUrl = product.image || product.imageUrl;
-  
+
   // Return default if no image
   if (!imageUrl || typeof imageUrl !== 'string' || imageUrl.trim() === '') {
     return DEFAULT_IMAGE;
   }
-  
+
   const trimmedUrl = imageUrl.trim();
-  
+
   // Check if it's a valid URL or base64
   if (trimmedUrl.startsWith('http://') || trimmedUrl.startsWith('https://') || trimmedUrl.startsWith('/') || trimmedUrl.startsWith('data:')) {
     return trimmedUrl;
   }
-  
+
   return DEFAULT_IMAGE;
 };
 
@@ -44,9 +44,10 @@ interface ProductCardProps {
   onBuyNow: (product: Product, quantity?: number) => void;
   onViewDetails: (product: Product) => void;
   onAddToCart?: (product: Product, quantity: number) => void;
+  hidePreviewIcon?: boolean;
 }
 
-const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDetails, onAddToCart }) => {
+const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDetails, onAddToCart, hidePreviewIcon }) => {
   const { language, t } = useLanguage();
   const { addToCart } = useCart();
   const [quantity, setQuantity] = useState(1);
@@ -72,9 +73,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
   };
 
   return (
-    <div 
-    onDoubleClick={() => onViewDetails(product)}
-    className="group relative overflow-hidden rounded-xl border border-border bg-card-purple transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 cursor-pointer">
+    <div
+      onDoubleClick={() => onViewDetails(product)}
+      className="group relative overflow-hidden rounded-xl border border-border bg-card-purple transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 cursor-pointer">
       {/* Badges */}
       <div className="absolute left-3 top-3 z-10 flex flex-col gap-2">
         {product.tag && (
@@ -90,12 +91,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
       </div>
 
       {/* Quick View Button - Always visible on mobile, hover on desktop */}
-      <button
-        onClick={() => onViewDetails(product)}
-        className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-color-default opacity-100 md:opacity-0 shadow-lg backdrop-blur-sm transition-all md:group-hover:opacity-100 hover:bg-primary hover:text-color-white cursor-pointer"
-      >
-        <Eye className="h-5 w-5" />
-      </button>
+      {!hidePreviewIcon && (
+        <button
+          onClick={() => onViewDetails(product)}
+          className="absolute right-3 top-3 z-10 flex h-10 w-10 items-center justify-center rounded-full bg-card/80 text-color-default opacity-100 md:opacity-0 shadow-lg backdrop-blur-sm transition-all md:group-hover:opacity-100 hover:bg-primary hover:text-color-white cursor-pointer"
+        >
+          <Eye className="h-5 w-5" />
+        </button>
+      )}
 
       {/* Image - Square */}
       <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
@@ -142,9 +145,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
             </span>
           )}
           {quantity > 1 && (
-              <span className="text-xs sm:text-xs text-color-muted">
-                (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
-              </span>
+            <span className="text-xs sm:text-xs text-color-muted">
+              (Rs. {(product?.price || 0).toLocaleString()} × {quantity})
+            </span>
           )}
         </div>
 
@@ -172,7 +175,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
                 </button>
               </div>
             </div>
-            
+
             {/* Row 2: Action Buttons */}
             <ProductActionButtons
               onAddToCart={handleAddToCart}

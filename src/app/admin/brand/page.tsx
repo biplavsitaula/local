@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Plus,
   Edit,
@@ -18,6 +18,9 @@ import { Button } from "@/components/ui/button";
 import { brandService, Brand } from "@/services/brand.service";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Pagination } from "@/components/ui/pagination";
+
+const ITEMS_PER_PAGE = 10;
 
 // Add/Edit Modal Component
 function BrandModal({
@@ -82,7 +85,7 @@ function BrandModal({
     }
 
     setUploadingImage(true);
-    
+
     try {
       // Convert to base64 for preview and storage
       const reader = new FileReader();
@@ -101,7 +104,7 @@ function BrandModal({
       toast.error('Failed to process image');
       setUploadingImage(false);
     }
-    
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -163,7 +166,7 @@ function BrandModal({
             <label className="text-sm font-medium text-foreground">
               Brand Logo
             </label>
-            
+
             {/* Hidden file input */}
             <input
               type="file"
@@ -222,7 +225,7 @@ function BrandModal({
                 </button>
               </div>
             )}
-            
+
             {/* URL Input as fallback */}
             <div className="relative">
               <Input
@@ -267,14 +270,12 @@ function BrandModal({
               onClick={() =>
                 setFormData({ ...formData, isActive: !formData.isActive })
               }
-              className={`relative w-12 h-6 rounded-full transition-colors ${
-                formData.isActive ? "bg-green-500" : "bg-muted"
-              }`}
+              className={`relative w-12 h-6 rounded-full transition-colors ${formData.isActive ? "bg-green-500" : "bg-muted"
+                }`}
             >
               <span
-                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
-                  formData.isActive ? "translate-x-7" : "translate-x-1"
-                }`}
+                className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${formData.isActive ? "translate-x-7" : "translate-x-1"
+                  }`}
               />
             </button>
           </div>
@@ -386,6 +387,7 @@ export default function BrandManagementPage() {
   const [selectedBrand, setSelectedBrand] = useState<Brand | null>(null);
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Fetch brands
   const fetchBrands = useCallback(async () => {
@@ -410,12 +412,24 @@ export default function BrandManagementPage() {
     brand.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  // Pagination logic
+  const totalPages = Math.ceil(filteredBrands.length / ITEMS_PER_PAGE);
+  const paginatedBrands = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredBrands.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredBrands, currentPage]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
   // Handle save (create or update)
   const handleSave = async (data: Partial<Brand>) => {
     try {
       setSaving(true);
       console.log("Saving brand:", data, "selectedBrand:", selectedBrand);
-      
+
       if (selectedBrand) {
         // Update existing brand
         const brandId = selectedBrand._id || selectedBrand.id;
@@ -425,7 +439,7 @@ export default function BrandManagementPage() {
           console.log("Update response:", response);
           // Update local state directly instead of re-fetching
           if (response.data) {
-            setBrands(prev => prev.map(b => 
+            setBrands(prev => prev.map(b =>
               (b._id === brandId || b.id === brandId) ? { ...b, ...response.data } : b
             ));
           }
@@ -605,77 +619,119 @@ export default function BrandManagementPage() {
           )}
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filteredBrands.map((brand, index) => (
-            <div
-              key={brand._id || brand.id || `brand-${index}`}
-              className="bg-card border border-border rounded-xl overflow-hidden hover:border-flame-orange/50 transition-colors"
-            >
-              {/* Logo */}
-              <div className="aspect-square relative bg-muted/30 p-6 flex items-center justify-center">
-                {brand.logo ? (
-                  <Image
-                    src={brand.logo}
-                    alt={brand.name}
-                    fill
-                    className="object-contain p-4"
-                    onError={(e) => {
-                      const target = e.target as HTMLImageElement;
-                      target.style.display = 'none';
-                    }}
-                  />
-                ) : (
-                  <div className="text-4xl font-bold text-muted-foreground">
-                    {brand.name.charAt(0).toUpperCase()}
-                  </div>
-                )}
-                {/* Status Badge */}
-                <span
-                  className={`absolute top-3 right-3 px-2 py-1 text-xs font-medium rounded-full ${
-                    brand.isActive !== false
-                      ? "bg-green-500/10 text-green-500"
-                      : "bg-red-500/10 text-red-500"
-                  }`}
-                >
-                  {brand.isActive !== false ? "Active" : "Inactive"}
-                </span>
-              </div>
+        <>
+          <div className="bg-card border border-border rounded-xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border bg-muted/30">
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Logo</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Name</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">Description</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Products</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border">
+                  {paginatedBrands.map((brand, index) => (
+                    <tr
+                      key={brand._id || brand.id || `brand-${index}`}
+                      className="hover:bg-muted/20 transition-colors"
+                    >
+                      {/* Logo */}
+                      <td className="px-4 py-3">
+                        <div className="w-12 h-12 relative rounded-lg bg-muted/30 flex items-center justify-center overflow-hidden border border-border/50">
+                          {brand.logo ? (
+                            <Image
+                              src={brand.logo}
+                              alt={brand.name}
+                              fill
+                              className="object-contain p-1"
+                              onError={(e) => {
+                                const target = e.target as HTMLImageElement;
+                                target.style.display = 'none';
+                              }}
+                            />
+                          ) : (
+                            <span className="text-lg font-bold text-muted-foreground">
+                              {brand.name.charAt(0).toUpperCase()}
+                            </span>
+                          )}
+                        </div>
+                      </td>
 
-              {/* Info */}
-              <div className="p-4">
-                <h3 className="font-semibold text-foreground truncate">
-                  {brand.name}
-                </h3>
-                {brand.description && (
-                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                    {brand.description}
-                  </p>
-                )}
-                <div className="flex items-center justify-between mt-3">
-                  <span className="text-sm text-muted-foreground">
-                    {brand.productCount || 0} products
-                  </span>
-                  <div className="flex gap-1">
-                    <button
-                      onClick={() => openEditModal(brand)}
-                      className="p-2 hover:bg-muted rounded-lg transition-colors"
-                      title="Edit"
-                    >
-                      <Edit className="w-4 h-4 text-muted-foreground" />
-                    </button>
-                    <button
-                      onClick={() => openDeleteModal(brand)}
-                      className="p-2 hover:bg-red-500/10 rounded-lg transition-colors"
-                      title="Delete"
-                    >
-                      <Trash2 className="w-4 h-4 text-red-500" />
-                    </button>
-                  </div>
-                </div>
-              </div>
+                      {/* Name */}
+                      <td className="px-4 py-3">
+                        <span className="font-semibold text-foreground">{brand.name}</span>
+                      </td>
+
+                      {/* Description */}
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <p className="text-sm text-muted-foreground line-clamp-1 max-w-xs">
+                          {brand.description || "—"}
+                        </p>
+                      </td>
+
+                      {/* Product Count */}
+                      <td className="px-4 py-3">
+                        <span className="text-sm text-muted-foreground">
+                          {brand.productCount || 0}
+                        </span>
+                      </td>
+
+                      {/* Status */}
+                      <td className="px-4 py-3">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${brand.isActive !== false
+                              ? "bg-green-500/10 text-green-500"
+                              : "bg-red-500/10 text-red-500"
+                            }`}
+                        >
+                          {brand.isActive !== false ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+
+                      {/* Actions */}
+                      <td className="px-4 py-3">
+                        <div className="flex gap-1 justify-end">
+                          <button
+                            onClick={() => openEditModal(brand)}
+                            className="p-2 hover:bg-muted rounded-lg transition-colors"
+                            title="Edit"
+                          >
+                            <Edit className="w-4 h-4 text-muted-foreground" />
+                          </button>
+                          <button
+                            onClick={() => openDeleteModal(brand)}
+                            className="p-2 hover:bg-red-500/10 rounded-lg transition-colors"
+                            title="Delete"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
-          ))}
-        </div>
+          </div>
+          {totalPages > 1 && (
+            <div className="border-t border-border p-4">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={(page) => {
+                  setCurrentPage(page);
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
+                itemsPerPage={ITEMS_PER_PAGE}
+                totalItems={filteredBrands.length}
+              />
+            </div>
+          )}
+        </>
       )}
 
       {/* Modals */}
@@ -700,7 +756,7 @@ export default function BrandManagementPage() {
         brandName={selectedBrand?.name || ""}
         isLoading={deleting}
       />
-    </div>
+    </div >
   );
 }
 

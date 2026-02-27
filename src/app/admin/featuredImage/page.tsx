@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useMemo } from "react";
 import {
   Plus,
   Edit,
@@ -24,6 +24,7 @@ import {
 } from "@/services/feature-images.service";
 import Image from "next/image";
 import { toast } from "sonner";
+import { Pagination } from "@/components/ui/pagination";
 
 // Add/Edit Modal Component
 function FeatureImageModal({
@@ -97,7 +98,7 @@ function FeatureImageModal({
     }
 
     setUploadingImage(true);
-    
+
     try {
       // Convert to base64 for preview and storage
       const reader = new FileReader();
@@ -116,7 +117,7 @@ function FeatureImageModal({
       toast.error('Failed to process image');
       setUploadingImage(false);
     }
-    
+
     // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -162,7 +163,7 @@ function FeatureImageModal({
             <label className="text-sm font-medium text-foreground">
               Image <span className="text-destructive">*</span>
             </label>
-            
+
             {/* Hidden file input */}
             <input
               ref={fileInputRef}
@@ -223,11 +224,10 @@ function FeatureImageModal({
             ) : (
               <div
                 onClick={() => !uploadingImage && fileInputRef.current?.click()}
-                className={`w-full h-48 rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${
-                  uploadingImage
+                className={`w-full h-48 rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${uploadingImage
                     ? "border-flame-orange/50 bg-flame-orange/5"
                     : "border-border hover:border-flame-orange/50 hover:bg-secondary/30"
-                }`}
+                  }`}
               >
                 {uploadingImage ? (
                   <>
@@ -369,14 +369,12 @@ function FeatureImageModal({
                   onClick={() =>
                     setFormData({ ...formData, isActive: !formData.isActive })
                   }
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
-                    formData.isActive ? "bg-success" : "bg-muted"
-                  }`}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${formData.isActive ? "bg-success" : "bg-muted"
+                    }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                      formData.isActive ? "translate-x-6" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${formData.isActive ? "translate-x-6" : "translate-x-1"
+                      }`}
                   />
                 </button>
                 <span className="text-sm text-foreground">
@@ -481,6 +479,8 @@ function DeleteModal({
   );
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export default function FeaturedImagesPage() {
   const [featureImages, setFeatureImages] = useState<FeatureImage[]>([]);
   const [loading, setLoading] = useState(true);
@@ -492,6 +492,9 @@ export default function FeaturedImagesPage() {
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [selectedImage, setSelectedImage] = useState<FeatureImage | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
 
   const fetchFeatureImages = useCallback(async () => {
     try {
@@ -512,11 +515,27 @@ export default function FeaturedImagesPage() {
   }, [fetchFeatureImages]);
 
   // Filter images by search
-  const filteredImages = featureImages.filter(
-    (img) =>
-      img.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      img.description?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredImages = featureImages
+    .filter(
+      (img) =>
+        img.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        img.description?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .sort((a, b) => (a.order || 0) - (b.order || 0));
+
+  // Pagination logic
+  const totalItems = filteredImages.length;
+  const calculatedTotalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+
+  const paginatedImages = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredImages.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  }, [filteredImages, currentPage]);
+
+  // Reset to page 1 when search changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   // Handle save (create/update)
   const handleSave = async (data: Partial<FeatureImage>) => {
@@ -646,13 +665,13 @@ export default function FeaturedImagesPage() {
         </div>
       </div>
 
-      {/* Images Grid */}
+      {/* Images Table */}
       <div
-        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 opacity-0 animate-fade-in"
+        className="glass-card rounded-xl border border-border/50 overflow-hidden opacity-0 animate-fade-in"
         style={{ animationDelay: "200ms" }}
       >
         {filteredImages.length === 0 ? (
-          <div className="col-span-full text-center py-16">
+          <div className="text-center py-16">
             <ImageIcon className="w-16 h-16 mx-auto text-muted-foreground/30 mb-4" />
             <h3 className="text-lg font-semibold text-foreground mb-2">
               {searchQuery ? "No images found" : "No featured images yet"}
@@ -676,120 +695,131 @@ export default function FeaturedImagesPage() {
             )}
           </div>
         ) : (
-          filteredImages
-            .sort((a, b) => (a.order || 0) - (b.order || 0))
-            .map((image, index) => (
-              <div
-                key={image._id || image.id || index}
-                className={`glass-card rounded-xl border overflow-hidden transition-all duration-300 hover:shadow-lg ${
-                  image.isActive
-                    ? "border-border/50"
-                    : "border-warning/30 opacity-70"
-                }`}
-              >
-                {/* Image Preview */}
-                <div className="relative h-40 bg-secondary/30">
-                  <Image
-                    src={image.imageUrl}
-                    alt={image.name}
-                    fill
-                    className="object-cover"
-                    onError={(e) => {
-                      (e.target as HTMLImageElement).src =
-                        "https://placehold.co/600x400/1a1a2e/ffffff?text=Image+Not+Found";
-                    }}
-                  />
-                  {/* Status Badge */}
-                  <div
-                    className={`absolute top-3 left-3 px-2 py-1 rounded-full text-xs font-medium ${
-                      image.isActive
-                        ? "bg-success/20 text-success"
-                        : "bg-warning/20 text-warning"
-                    }`}
-                  >
-                    {image.isActive ? "Active" : "Inactive"}
-                  </div>
-                  {/* Order Badge */}
-                  <div className="absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-medium bg-black/50 text-white backdrop-blur-sm">
-                    #{(image.order || 0) + 1}
-                  </div>
-                </div>
-
-                {/* Content */}
-                <div className="p-4">
-                  <h3 className="font-semibold text-foreground truncate">
-                    {image.name}
-                  </h3>
-                  {image.description && (
-                    <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                      {image.description}
-                    </p>
-                  )}
-                  {/* {image.tag && (
-                    <div className="flex items-center gap-2 mt-2">
-                      <span className="text-xs px-2 py-1 bg-flame-orange/20 text-flame-orange rounded-full">
-                        {image.tag}
-                      </span>
-                      {image.ctaLink && (
-                        <a
-                          href={image.ctaLink}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-xs text-muted-foreground hover:text-foreground flex items-center gap-1"
+          <>
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-border/50 bg-secondary/30">
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Image</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Name</th>
+                    <th className="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3 hidden md:table-cell">Description</th>
+                    <th className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Order</th>
+                    <th className="text-center text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Status</th>
+                    <th className="text-right text-xs font-semibold text-muted-foreground uppercase tracking-wider px-4 py-3">Actions</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {paginatedImages.map((image, index) => (
+                    <tr
+                      key={image._id || image.id || index}
+                      className={`hover:bg-secondary/30 transition-colors ${!image.isActive ? "opacity-60" : ""
+                        }`}
+                    >
+                      {/* Image Thumbnail */}
+                      <td className="px-4 py-3">
+                        <div className="relative w-20 h-12 rounded-lg overflow-hidden bg-secondary/30 flex-shrink-0">
+                          <Image
+                            src={image.imageUrl}
+                            alt={image.name}
+                            fill
+                            className="object-cover"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                "https://placehold.co/600x400/1a1a2e/ffffff?text=No+Image";
+                            }}
+                          />
+                        </div>
+                      </td>
+                      {/* Name */}
+                      <td className="px-4 py-3">
+                        <p className="font-semibold text-foreground text-sm truncate max-w-[200px]">
+                          {image.name}
+                        </p>
+                      </td>
+                      {/* Description */}
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <p className="text-sm text-muted-foreground truncate max-w-[250px]">
+                          {image.description || "—"}
+                        </p>
+                      </td>
+                      {/* Order */}
+                      <td className="px-4 py-3 text-center">
+                        <span className="inline-flex items-center justify-center px-2 py-1 rounded-full text-xs font-medium bg-secondary/50 text-foreground">
+                          #{(image.order || 0) + 1}
+                        </span>
+                      </td>
+                      {/* Status */}
+                      <td className="px-4 py-3 text-center">
+                        <span
+                          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${image.isActive
+                              ? "bg-success/20 text-success"
+                              : "bg-warning/20 text-warning"
+                            }`}
                         >
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      )}
-                    </div>
-                  )} */}
-
-                  {/* Actions */}
-                  <div className="flex items-center gap-2 mt-4 pt-4 border-t border-border/50">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => handleToggleActive(image)}
-                      className="flex-1 gap-2"
-                    >
-                      {image.isActive ? (
-                        <>
-                          <EyeOff className="w-4 h-4" />
-                          Hide
-                        </>
-                      ) : (
-                        <>
-                          <Eye className="w-4 h-4" />
-                          Show
-                        </>
-                      )}
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedImage(image);
-                        setEditModalOpen(true);
-                      }}
-                      className="gap-2"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Edit
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => {
-                        setSelectedImage(image);
-                        setDeleteModalOpen(true);
-                      }}
-                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
-                    >
-                      <Trash2 className="w-4 h-4" />
-                    </Button>
-                  </div>
-                </div>
+                          {image.isActive ? "Active" : "Inactive"}
+                        </span>
+                      </td>
+                      {/* Actions */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => handleToggleActive(image)}
+                            className="gap-1.5 text-xs"
+                            title={image.isActive ? "Hide" : "Show"}
+                          >
+                            {image.isActive ? (
+                              <><EyeOff className="w-4 h-4" /> Hide</>
+                            ) : (
+                              <><Eye className="w-4 h-4" /> Show</>
+                            )}
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedImage(image);
+                              setEditModalOpen(true);
+                            }}
+                            className="gap-1.5 text-xs"
+                          >
+                            <Edit className="w-4 h-4" /> Edit
+                          </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            onClick={() => {
+                              setSelectedImage(image);
+                              setDeleteModalOpen(true);
+                            }}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            {/* Pagination */}
+            {calculatedTotalPages > 1 && (
+              <div className="border-t border-border/50 px-4">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={calculatedTotalPages}
+                  onPageChange={(page) => {
+                    setCurrentPage(page);
+                    window.scrollTo({ top: 0, behavior: "smooth" });
+                  }}
+                  itemsPerPage={ITEMS_PER_PAGE}
+                  totalItems={totalItems}
+                />
               </div>
-            ))
+            )}
+          </>
         )}
       </div>
 
