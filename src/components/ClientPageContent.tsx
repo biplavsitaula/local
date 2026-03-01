@@ -185,6 +185,7 @@ function PageContent() {
       originalPrice,
       image: product.image || product.imageUrl || '',
       description: product.description || `Premium ${categoryValue || 'Beverage'} - ${product.name || 'Product'}`,
+      specification: product.specification,
       volume: product.volume || '750ml',
       alcoholContent: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
       alcohol: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',

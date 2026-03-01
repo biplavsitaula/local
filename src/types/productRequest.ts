@@ -16,6 +16,8 @@ export interface CreateProductRequest {
   rating?: number;
   itemLink?: string;
   isRecommended?: boolean;
+  description?: string;
+  specification?: string;
 }
 
 /**
@@ -36,6 +38,8 @@ export interface UpdateProductRequest {
   rating?: number;
   itemLink?: string;
   isRecommended?: boolean;
+  description?: string;
+  specification?: string;
 }
 
 /**
@@ -54,6 +58,8 @@ export interface CreateProductResponse {
     tag?: string;
     subCategory?: string;
     originType?: string;
+    description?: string;
+    specification?: string;
     __v?: number;
     createdAt?: string;
     updatedAt?: string;
@@ -76,6 +82,8 @@ export interface UpdateProductResponse {
     tag?: string;
     subCategory?: string;
     originType?: string;
+    description?: string;
+    specification?: string;
     __v?: number;
     createdAt?: string;
     updatedAt?: string;

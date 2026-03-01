@@ -26,6 +26,7 @@ const getValidImageUrl = (product: Product): string => {
 
 interface ProductDetailModalProps {
   product: Product;
+  specification?: string;
   onClose: () => void;
   onBuyNow: (product: Product, quantity?: number) => void;
   onAddToCart?: (product: Product, quantity: number) => void;
@@ -34,6 +35,7 @@ interface ProductDetailModalProps {
 
 const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
   product,
+  specification,
   onClose,
   onBuyNow,
   onAddToCart,
@@ -84,11 +86,12 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
       volume: product.volume || '750ml',
       alcoholContent: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
       alcohol: product.alcoholPercentage ? `${product.alcoholPercentage}%` : '40%',
-      inStock: (product.stock || 0) > 0,
+      inStock: product.status === 'In Stock' || (product.stock || 0) > 0,
       isNew: product.isNew || false, // Only show NEW badge if API says it's new
       stock: product.stock,
       rating: product.rating,
       tag,
+      specification: product.specification,
     } as Product;
   };
 
@@ -164,7 +167,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   };
 
-  console.log(relatedProducts, 'relatedProductsrelatedProducts')
+  console.log(product.specification, 'relatedProductsrelatedProducts', product.description)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-hidden">
       <div className="relative w-full max-w-5xl max-h-[98vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 rounded-xl sm:rounded-2xl border border-border bg-card shadow-2xl scrollbar-hide">
@@ -283,7 +286,7 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           {/* Bottom Tabs Section */}
           <div className="mt-8 sm:mt-12 border-t border-border pt-6 sm:pt-8">
             <div className="flex gap-4 sm:gap-8 border-b border-border mb-6 overflow-x-auto no-scrollbar">
-              {['description', 'specifications', 'shipping'].map((tab) => (
+              {['description', 'specification', 'shipping'].map((tab) => (
                 <button
                   key={tab}
                   onClick={() => setActiveTab(tab)}
@@ -296,10 +299,35 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
             <div className="grid lg:grid-cols-3 gap-6 sm:gap-8">
               <div className="lg:col-span-2">
-                <h3 className="text-base sm:text-lg font-bold mb-3">A Masterpiece of Blending</h3>
-                <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed">
-                  {language === 'en' ? product?.description : product?.descriptionNe || product?.description}
-                </p>
+                {activeTab === 'description' && (
+                  <div className="animate-in fade-in-50 duration-300">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">{product?.name || 'Product Details'}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {language === 'en' ? product?.description : product?.descriptionNe || product?.description}
+                    </p>
+                  </div>
+                )}
+
+                {activeTab === 'specification' && (
+                  <div className="animate-in fade-in-50 duration-300">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">Specifications</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground leading-relaxed whitespace-pre-wrap">
+                      {specification || product?.specification || 'No specifications available.'}
+                    </p>
+                  </div>
+                )}
+
+                {activeTab === 'shipping' && (
+                  <div className="animate-in fade-in-50 duration-300">
+                    <h3 className="text-base sm:text-lg font-bold mb-3">Shipping & Returns</h3>
+                    <div className="text-xs sm:text-sm text-muted-foreground leading-relaxed space-y-3">
+                      <p>• <strong>Free Delivery:</strong> On orders above Rs. 2,000</p>
+                      <p>• <strong>Standard Delivery:</strong> 1-2 business days within Kathmandu Valley</p>
+                      <p>• <strong>Express Delivery:</strong> Same day delivery (order before 2 PM)</p>
+                      <p>• <strong>Returns:</strong> Easy returns within 7 days. Product must be unsealed and in original condition.</p>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </div>

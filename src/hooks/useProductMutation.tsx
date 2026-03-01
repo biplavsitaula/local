@@ -38,14 +38,14 @@ export const useProductMutation = (): UseProductMutationReturn => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Get discount and tag values
         const discountPercent = (productData as any).discountPercent ?? productData.discountPercentage ?? 0;
         const tag = (productData as any).tag || '';
         const brand = (productData as any).brand || '';
         const subCategory = (productData as any).subCategory || '';
         const originType = (productData as any).originType || 'domestic';
-        
+
         // Map CreateProductRequest to service format - API expects 'type' not 'category'
         const serviceData: Record<string, any> = {
           name: productData.name,
@@ -55,7 +55,7 @@ export const useProductMutation = (): UseProductMutationReturn => {
           stock: productData.stock || 0,
           originType: originType,
         };
-        
+
         // Only include optional fields if they have values
         if (discountPercent > 0) serviceData.discountPercent = discountPercent;
         if (tag) serviceData.tag = tag;
@@ -63,10 +63,12 @@ export const useProductMutation = (): UseProductMutationReturn => {
         if (subCategory) serviceData.subCategory = subCategory;
         if (productData.rating !== undefined) serviceData.rating = productData.rating;
         if (productData.isRecommended) serviceData.isRecommended = productData.isRecommended;
-        
+        if (productData.description) serviceData.description = productData.description;
+        if (productData.specification) serviceData.specification = productData.specification;
+
         const response = await productsService.create(serviceData);
         const resData = response.data as any;
-        
+
         // Transform response to match CreateProductResponse
         return {
           message: response?.message || 'Product created successfully',
@@ -80,6 +82,8 @@ export const useProductMutation = (): UseProductMutationReturn => {
             originType: resData?.originType || 'domestic',
             discountPercentage: resData?.discountPercent || resData?.discountPercentage || 0,
             tag: resData?.tag || '',
+            description: resData?.description || '',
+            specification: resData?.specification || '',
             createdAt: resData?.createdAt,
             updatedAt: resData?.updatedAt,
           },
@@ -104,10 +108,10 @@ export const useProductMutation = (): UseProductMutationReturn => {
       try {
         setLoading(true);
         setError(null);
-        
+
         // Map UpdateProductRequest to service format - API expects 'type' not 'category'
         const serviceData: Record<string, any> = {};
-        
+
         if (productData.name !== undefined) serviceData.name = productData.name;
         if (productData.type !== undefined) serviceData.type = productData.type; // API uses 'type'
         if (productData.price !== undefined) serviceData.price = productData.price;
@@ -115,30 +119,32 @@ export const useProductMutation = (): UseProductMutationReturn => {
         if (productData.stock !== undefined) serviceData.stock = productData.stock;
         if (productData.rating !== undefined) serviceData.rating = productData.rating;
         if (productData.isRecommended !== undefined) serviceData.isRecommended = productData.isRecommended;
-        
+        if (productData.description !== undefined) serviceData.description = productData.description;
+        if (productData.specification !== undefined) serviceData.specification = productData.specification;
+
         // Handle both discountPercent and discountPercentage
         const discountValue = (productData as any).discountPercent ?? productData.discountPercentage;
         if (discountValue !== undefined) serviceData.discountPercent = discountValue;
-        
+
         // Handle tag
         const tagValue = (productData as any).tag;
         if (tagValue !== undefined) serviceData.tag = tagValue;
-        
+
         // Handle brand
         const brandValue = (productData as any).brand;
         if (brandValue !== undefined) serviceData.brand = brandValue;
-        
+
         // Handle subCategory
         const subCategoryValue = (productData as any).subCategory;
         if (subCategoryValue !== undefined) serviceData.subCategory = subCategoryValue;
-        
+
         // Handle originType
         const originTypeValue = (productData as any).originType;
         if (originTypeValue !== undefined) serviceData.originType = originTypeValue;
-        
+
         const response = await productsService.update(productId, serviceData);
         const resData = response.data as any;
-        
+
         // Transform response to match UpdateProductResponse
         return {
           message: response?.message || 'Product updated successfully',
@@ -152,6 +158,8 @@ export const useProductMutation = (): UseProductMutationReturn => {
             originType: resData?.originType || 'domestic',
             discountPercentage: resData?.discountPercent || resData?.discountPercentage || 0,
             tag: resData?.tag || '',
+            description: resData?.description || '',
+            specification: resData?.specification || '',
             createdAt: resData?.createdAt,
             updatedAt: resData?.updatedAt,
           },

@@ -11,6 +11,7 @@ export interface ApiProduct {
   discountAmount?: number;
   finalPrice?: number;
   stock?: number;
+  status?: string;
   rating?: number;
   tag?: string;
   brand?: string;
@@ -18,6 +19,8 @@ export interface ApiProduct {
   alcoholPercentage?: number;
   originType?: string;
   subCategory?: string;
+  description?: string;
+  specification?: string;
   isRecommended?: boolean;
   isNew?: boolean;
   __v?: number;
