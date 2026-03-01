@@ -42,7 +42,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
     return (
         <div
             onClick={() => onViewDetails(product)}
-            className="group relative flex flex-col h-full cursor-pointer bg-black overflow-hidden"
+            className="group relative flex flex-col h-full cursor-pointer bg-black overflow-hidden rounded-xl border border-border transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10"
         >
             {/* Image Container */}
             <div className="relative aspect-[3/4] w-full overflow-hidden">
@@ -71,7 +71,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
             {/* Content Overlay */}
             <div className="absolute bottom-0 left-0 right-0 p-6 flex flex-col items-center text-center">
-                <h3 className="font-serif text-xl md:text-2xl lg:text-3xl text-white font-medium tracking-tight leading-tight">
+                <h3 className="font-display text-xl md:text-2xl lg:text-3xl text-white font-medium tracking-tight leading-tight">
                     {language === "en" ? product?.name : product?.nameNe}
                 </h3>
 
