@@ -27,10 +27,10 @@ export function RecommendedProducts({ products }: RecommendedProductsProps) {
                     return (
                         <div
                             key={product._id}
-                            className="group rounded-xl overflow-hidden border border-border bg-card-purple transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10 cursor-pointer"
+                            className="group rounded-xl overflow-hidden border border-white/5 bg-bg-secondary transition-all duration-300 hover:border-flame-orange/30 hover:shadow-xl hover:shadow-flame-orange/5 cursor-pointer"
                         >
                             {/* Image */}
-                            <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: "100%" }}>
+                            <div className="relative w-full overflow-hidden bg-white/5" style={{ paddingBottom: "100%" }}>
                                 <Image
                                     src={imgUrl}
                                     alt={product.name || "Product"}

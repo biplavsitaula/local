@@ -16,6 +16,8 @@ const statusColors: Record<string, string> = {
     pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
     shipped: "bg-blue-500/15 text-blue-400 border-blue-500/30",
     cancelled: "bg-red-500/15 text-red-400 border-red-500/30",
+    rejected: "bg-red-500/15 text-red-500 border-red-500/30",
+    accepted: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
 };
 
 const DEFAULT_IMAGE = "/assets/image_not_found.png";
@@ -37,8 +39,8 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
     return (
         <div className="rounded-2xl overflow-hidden"
             style={{
-                background: "hsl(220 20% 8%)",
-                border: "1px solid hsl(0 0% 100% / 0.08)",
+                background: "var(--color-bg-secondary)",
+                border: "1px solid white/5",
             }}
         >
             <div className="overflow-x-auto">

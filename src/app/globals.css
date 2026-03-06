@@ -260,10 +260,10 @@
   }
 
   .dark {
-    --color-background: hsl(220 20% 8%);
+    --color-background: hsl(240 15% 4%);
     --color-foreground: hsl(40 20% 95%);
     
-    --color-card: hsl(260 35% 10%);
+    --color-card: hsl(240 15% 6%);
     --color-card-foreground: hsl(0 0% 95%);
     
     --color-popover: hsl(260 35% 10%);
@@ -303,17 +303,17 @@
     --color-sidebar-ring: hsl(217.2 91.2% 59.8%);
     
     /* Dark mode semantic colors */
-    --color-bg-primary: hsl(220 20% 8%);
-    --color-bg-secondary: hsl(260 35% 10%);
-    --color-bg-tertiary: hsl(260 30% 15%);
-    --color-bg-muted: hsl(260 25% 18%);
+    --color-bg-primary: hsl(240 15% 4%);
+    --color-bg-secondary: hsl(240 15% 6%);
+    --color-bg-tertiary: hsl(240 15% 8%);
+    --color-bg-muted: hsl(240 10% 10%);
     --color-bg-overlay: hsl(0 0% 0% / 0.95);
     --color-bg-modal: hsl(0 0% 0% / 0.9);
     
     /* Purple card background */
-    --color-card-purple: hsl(270, 53%, 7%);
+    --color-card-purple: hsl(245 20% 6%);
 
-    --color-card-purple-hover: hsl(272, 63%, 5%);
+    --color-card-purple-hover: hsl(245 25% 8%);
     
     /* Dark mode text colors - Golden/Flame tones */
     --color-text-primary: hsl(45 100% 96%);

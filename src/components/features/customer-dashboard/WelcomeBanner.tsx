@@ -16,7 +16,7 @@ export function WelcomeBanner({ userName, stats, loyaltyPoints }: WelcomeBannerP
     return (
         <div className="customer-welcome-banner relative overflow-hidden rounded-2xl p-6 sm:p-8"
             style={{
-                background: "linear-gradient(135deg, hsl(220 20% 10%) 0%, hsl(15 60% 15%) 50%, hsl(220 20% 10%) 100%)",
+                background: "linear-gradient(135deg, hsl(240 15% 4%) 0%, hsl(15 60% 8%) 50%, hsl(240 15% 4%) 100%)",
             }}
         >
             {/* Decorative ember dots */}

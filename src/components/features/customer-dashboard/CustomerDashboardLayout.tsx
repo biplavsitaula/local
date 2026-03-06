@@ -3,11 +3,13 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { CustomerSidebar } from "./CustomerSidebar";
+import { ReferralModal } from "./ReferralModal";
 import { useAuth } from "@/contexts/AuthContext";
 import { Loader2, Menu } from "lucide-react";
 
 export function CustomerDashboardLayout({ children }: { children: React.ReactNode }) {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const [isReferralModalOpen, setIsReferralModalOpen] = useState(false);
     const { user, isLoading, isAuthenticated } = useAuth();
     const router = useRouter();
 
@@ -20,7 +22,7 @@ export function CustomerDashboardLayout({ children }: { children: React.ReactNod
 
     if (isLoading) {
         return (
-            <div className="flex h-screen items-center justify-center bg-background">
+            <div className="dark flex h-screen items-center justify-center bg-background text-white">
                 <div className="flex flex-col items-center gap-4">
                     <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
                     <p className="text-muted-foreground">Loading your account...</p>
@@ -31,14 +33,14 @@ export function CustomerDashboardLayout({ children }: { children: React.ReactNod
 
     if (!isAuthenticated) {
         return (
-            <div className="flex h-screen items-center justify-center bg-background">
+            <div className="dark flex h-screen items-center justify-center bg-background text-white">
                 <Loader2 className="h-8 w-8 animate-spin text-flame-orange" />
             </div>
         );
     }
 
     return (
-        <div className="flex h-screen overflow-hidden bg-background">
+        <div className="dark flex h-screen overflow-hidden bg-background text-white">
             {/* Mobile Overlay */}
             {isMobileMenuOpen && (
                 <div
@@ -56,13 +58,17 @@ export function CustomerDashboardLayout({ children }: { children: React.ReactNod
                 <CustomerSidebar
                     user={user}
                     onClose={() => setIsMobileMenuOpen(false)}
+                    onOpenReferral={() => {
+                        setIsReferralModalOpen(true);
+                        setIsMobileMenuOpen(false);
+                    }}
                 />
             </div>
 
             {/* Main Content Area */}
             <div className="flex-1 flex flex-col overflow-hidden w-full">
                 {/* Mobile Header */}
-                <div className="lg:hidden flex items-center gap-3 p-4 border-b border-border bg-background">
+                <div className="lg:hidden flex items-center gap-3 p-4 border-b border-white/5 bg-background">
                     <button
                         onClick={() => setIsMobileMenuOpen(true)}
                         className="p-2 rounded-lg hover:bg-muted transition-colors cursor-pointer"
@@ -79,6 +85,11 @@ export function CustomerDashboardLayout({ children }: { children: React.ReactNod
                     </div>
                 </main>
             </div>
+
+            <ReferralModal
+                isOpen={isReferralModalOpen}
+                onClose={() => setIsReferralModalOpen(false)}
+            />
         </div>
     );
 }

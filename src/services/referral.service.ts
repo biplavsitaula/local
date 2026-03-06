@@ -67,6 +67,14 @@ export const referralService = {
     },
 
     /**
+     * Send referral invitation
+     * POST /customer/referral/invite
+     */
+    sendReferralInvite: async (data: { friendName: string; friendEmail: string }): Promise<ApiResponse<any>> => {
+        return apiPost<any>('/customer/referral/invite', data);
+    },
+
+    /**
      * List all claimed referral rewards
      * GET /customer/referral/rewards
      */

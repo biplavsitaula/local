@@ -35,11 +35,12 @@ const STATUS_TABS = [
     { key: "completed", label: "Completed" },
     { key: "cancelled", label: "Cancelled" },
     { key: "refunded", label: "Refunded" },
+    { key: "rejected", label: "Rejected" },
 ] as const;
 
 const statusColors: Record<string, string> = {
     pending: "bg-yellow-500/15 text-yellow-400 border-yellow-500/30",
-    accepted: "bg-blue-500/15 text-blue-400 border-blue-500/30",
+    accepted: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",
     processing: "bg-flame-orange/15 text-flame-orange border-flame-orange/30",
     shipped: "bg-indigo-500/15 text-indigo-400 border-indigo-500/30",
     delivered: "bg-emerald-500/15 text-emerald-400 border-emerald-500/30",

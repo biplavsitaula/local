@@ -13,11 +13,13 @@ import {
     Settings,
     LogOut,
     X,
+    Gift,
 } from "lucide-react";
 
 interface CustomerSidebarProps {
     user: User | null;
     onClose: () => void;
+    onOpenReferral?: () => void;
 }
 
 const navItems = [
@@ -29,7 +31,7 @@ const navItems = [
     { label: "Account Settings", href: "/my-account/settings", icon: Settings },
 ];
 
-export function CustomerSidebar({ user, onClose }: CustomerSidebarProps) {
+export function CustomerSidebar({ user, onClose, onOpenReferral }: CustomerSidebarProps) {
     const pathname = usePathname();
     const { logout } = useAuth();
 
@@ -49,7 +51,7 @@ export function CustomerSidebar({ user, onClose }: CustomerSidebarProps) {
     };
 
     return (
-        <aside className="customer-sidebar flex flex-col h-screen w-[260px] bg-[hsl(220,20%,8%)] border-r border-white/10">
+        <aside className="customer-sidebar flex flex-col h-screen w-[260px] bg-card border-r border-white/5">
             {/* Close button (mobile) */}
             <button
                 onClick={onClose}
@@ -85,11 +87,11 @@ export function CustomerSidebar({ user, onClose }: CustomerSidebarProps) {
                             href={item.href}
                             onClick={onClose}
                             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 group ${active
-                                    ? "bg-flame-orange/15 text-flame-orange"
-                                    : "text-white/60 hover:text-white hover:bg-white/5"
+                                ? "bg-flame-gradient text-white shadow-md shadow-flame-orange/20"
+                                : "text-white/60 hover:text-white hover:bg-white/5"
                                 }`}
                         >
-                            <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-flame-orange" : "text-white/40 group-hover:text-white/70"
+                            <item.icon className={`h-[18px] w-[18px] shrink-0 ${active ? "text-white" : "text-white/40 group-hover:text-white/70"
                                 }`} />
                             {item.label}
                         </Link>
@@ -97,8 +99,17 @@ export function CustomerSidebar({ user, onClose }: CustomerSidebarProps) {
                 })}
             </nav>
 
-            {/* Sign Out */}
-            <div className="p-3 border-t border-white/10">
+            {/* Actions */}
+            <div className="p-3 border-t border-white/10 space-y-1">
+                {/* {onOpenReferral && (
+                    <button
+                        onClick={onOpenReferral}
+                        className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-flame-orange hover:bg-white/5 transition-colors cursor-pointer"
+                    >
+                        <Gift className="h-[18px] w-[18px]" />
+                        Refer a Friend
+                    </button>
+                )} */}
                 <button
                     onClick={logout}
                     className="flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-red-400/80 hover:text-red-400 hover:bg-red-500/10 transition-colors cursor-pointer"
