@@ -255,13 +255,13 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               {/* Quantity & Actions */}
               {product.inStock !== false && (
                 <div className="mt-6 sm:mt-8 space-y-4">
-                  <div className="flex flex-col xs:flex-row items-stretch xs:items-center gap-3 sm:gap-4">
-                    <div className="flex items-center justify-between xs:justify-start rounded-lg border border-border bg-card overflow-hidden h-11 sm:h-12">
-                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-4 h-full hover:bg-muted text-foreground transition-colors"><Minus size={14} /></button>
-                      <span className="w-8 sm:w-10 text-center font-bold text-sm sm:text-base">{quantity}</span>
-                      <button onClick={() => setQuantity(quantity + 1)} className="px-4 h-full hover:bg-muted text-foreground transition-colors"><Plus size={14} /></button>
+                  <div className="flex items-center gap-2 sm:gap-4">
+                    <div className="flex items-center shrink-0 rounded-lg border border-border bg-card overflow-hidden h-11 sm:h-12">
+                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 sm:px-4 h-full hover:bg-muted text-foreground transition-colors"><Minus size={14} /></button>
+                      <span className="w-6 sm:w-10 text-center font-bold text-sm sm:text-base">{quantity}</span>
+                      <button onClick={() => setQuantity(quantity + 1)} className="px-3 sm:px-4 h-full hover:bg-muted text-foreground transition-colors"><Plus size={14} /></button>
                     </div>
-                    <div className="flex-1">
+                    <div className="flex-1 min-w-0">
                       <ProductActionButtons onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} size="md" />
                     </div>
                   </div>

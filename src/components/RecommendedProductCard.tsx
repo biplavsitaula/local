@@ -61,9 +61,9 @@ const ProductCard: React.FC<ProductCardProps> = ({
 
                 {/* Out of Stock indicator */}
                 {!product.inStock && (
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/60 backdrop-blur-[1px]">
-                        <span className="border border-white/40 px-4 py-1 text-[10px] uppercase tracking-[0.3em] text-white">
-                            Out of stock
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[1px] z-10">
+                        <span className="bg-[#8C2626] text-white px-5 py-1.5 text-sm font-medium rounded-full shadow-lg">
+                            Out of Stock
                         </span>
                     </div>
                 )}
