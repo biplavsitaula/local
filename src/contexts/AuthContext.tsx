@@ -62,16 +62,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await authService.login({ email, password });
       const { token: newToken, user: newUser } = response.data;
-      
+
       tokenManager.setToken(newToken);
       setToken(newToken);
       setUser(newUser);
-      
+
       // Redirect based on role - admin and super_admin go to dashboard
       if (isAdminRole(newUser.role)) {
         router.push('/admin');
       } else {
-        router.push('/');
+        router.push('/my-account');
       }
     } catch (error: any) {
       throw new Error(error.message || 'Login failed');
@@ -88,16 +88,16 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     try {
       const response = await authService.register(data);
       const { token: newToken, user: newUser } = response.data;
-      
+
       tokenManager.setToken(newToken);
       setToken(newToken);
       setUser(newUser);
-      
+
       // Redirect based on role - admin and super_admin go to admin panel
       if (isAdminRole(newUser.role)) {
         router.push('/admin');
       } else {
-        router.push('/');
+        router.push('/my-account');
       }
     } catch (error: any) {
       throw new Error(error.message || 'Registration failed');
