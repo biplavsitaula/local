@@ -136,18 +136,27 @@ function FeatureImageModal({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 mt-4">
       <div className="bg-card border border-border rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="sticky top-0 bg-card border-b border-border p-6 rounded-t-2xl">
-          <h2 className="text-xl font-bold text-foreground">
-            {featureImage ? "Edit Featured Image" : "Add Featured Image"}
-          </h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            {featureImage
-              ? "Update the details of this featured image"
-              : "Create a new banner for the homepage carousel"}
-          </p>
+        <div className="sticky top-0 bg-card border-b border-border p-6 rounded-t-2xl flex items-start justify-between">
+          <div>
+            <h2 className="text-xl font-bold text-foreground">
+              {featureImage ? "Edit Featured Image" : "Add Featured Image"}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1">
+              {featureImage
+                ? "Update the details of this featured image"
+                : "Create a new banner for the homepage carousel"}
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="text-muted-foreground hover:text-foreground transition-colors p-1 rounded-md hover:bg-secondary/50"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Form */}
@@ -225,8 +234,8 @@ function FeatureImageModal({
               <div
                 onClick={() => !uploadingImage && fileInputRef.current?.click()}
                 className={`w-full h-48 rounded-xl border-2 border-dashed transition-all cursor-pointer flex flex-col items-center justify-center gap-3 ${uploadingImage
-                    ? "border-flame-orange/50 bg-flame-orange/5"
-                    : "border-border hover:border-flame-orange/50 hover:bg-secondary/30"
+                  ? "border-flame-orange/50 bg-flame-orange/5"
+                  : "border-border hover:border-flame-orange/50 hover:bg-secondary/30"
                   }`}
               >
                 {uploadingImage ? (
@@ -752,8 +761,8 @@ export default function FeaturedImagesPage() {
                       <td className="px-4 py-3 text-center">
                         <span
                           className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${image.isActive
-                              ? "bg-success/20 text-success"
-                              : "bg-warning/20 text-warning"
+                            ? "bg-success/20 text-success"
+                            : "bg-warning/20 text-warning"
                             }`}
                         >
                           {image.isActive ? "Active" : "Inactive"}

@@ -37,7 +37,7 @@ const menuItems = [
   { title: "Offers", icon: Tag, path: "/admin/adminOffer" },
   { title: "Payments", icon: CreditCard, path: "/admin/payments" },
   { title: "Notifications", icon: Bell, path: "/admin/notifications" },
-  { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
+  // { title: "Analytics", icon: BarChart3, path: "/admin/analytics" },
   { title: "Stock Alerts", icon: AlertTriangle, path: "/admin/alerts" },
   { title: "Top Sellers", icon: TrendingUp, path: "/admin/top-sellers" },
   { title: "Recommended", icon: ThumbsUp, path: "/admin/recommended" },
@@ -127,7 +127,7 @@ export function AdminSidebar({ onClose }: AdminSidebarProps) {
           <Settings className="h-5 w-5" />
           <span>Settings</span>
         </NavLink>
-        <button 
+        <button
           onClick={handleLogout}
           disabled={isLoggingOut}
           className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-muted-foreground hover:bg-flame-red/10 hover:text-flame-red transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
