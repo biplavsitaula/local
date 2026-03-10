@@ -197,11 +197,11 @@ const HeroSection: React.FC = () => {
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/categories" className="w-full sm:w-auto">
+            <Link href="/categories" className="w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none tracking-widest text-xs transition-all hover:border-yellow-300 rounded-sm"
+                className="w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none tracking-widest text-xs transition-all hover:border-yellow-300 rounded-sm"
               >
                 {language === 'en' ? 'Categories' : 'कोटिहरू'}
               </Button>
