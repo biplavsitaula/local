@@ -85,7 +85,7 @@ export default function BrandCarousel() {
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (window.innerWidth < 640) {
-        setItemsPerPage(3);
+        setItemsPerPage(2);
       } else if (window.innerWidth < 768) {
         setItemsPerPage(4);
       } else if (window.innerWidth < 1024) {
