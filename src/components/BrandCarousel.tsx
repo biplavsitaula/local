@@ -85,7 +85,7 @@ export default function BrandCarousel() {
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (window.innerWidth < 640) {
-        setItemsPerPage(2);
+        setItemsPerPage(3);
       } else if (window.innerWidth < 768) {
         setItemsPerPage(4);
       } else if (window.innerWidth < 1024) {
@@ -181,7 +181,7 @@ export default function BrandCarousel() {
           )}
 
           {/* Brands Container */}
-          <div className="flex justify-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 flex-wrap sm:flex-nowrap overflow-hidden px-2 sm:px-4">
+          <div className="flex justify-center gap-4 sm:gap-8 md:gap-10 lg:gap-12 flex-wrap sm:flex-nowrap overflow-hidden px-2 sm:px-4">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
