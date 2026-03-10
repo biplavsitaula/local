@@ -60,7 +60,7 @@ export default function BrandCarousel() {
         setLoading(true);
         const response = await productsService.getBrands();
         const brandsData = response.data || [];
-        
+
         // Map API response to Brand interface
         const mappedBrands: Brand[] = brandsData.map((brand: BrandData, index: number) => ({
           id: brand._id || `brand-${index}`,
@@ -69,7 +69,7 @@ export default function BrandCarousel() {
           logo: brand.logo,
           productCount: brand.productCount,
         }));
-        
+
         setBrands(mappedBrands);
       } catch (error) {
         console.error("Failed to fetch brands:", error);
@@ -91,7 +91,7 @@ export default function BrandCarousel() {
       } else if (window.innerWidth < 1024) {
         setItemsPerPage(6);
       } else {
-        setItemsPerPage(8);
+        setItemsPerPage(6);
       }
     };
 
@@ -125,12 +125,12 @@ export default function BrandCarousel() {
 
   return (
     <section className="container mx-auto px-4">
-      <div
-        className={`relative rounded-2xl p-4 sm:p-6 ${
-          theme === "dark"
-            ? "bg-card/50 border border-border/50"
-            : "bg-white border border-gray-200 shadow-sm"
-        }`}
+      <div className="relative rounded-2xl p-4 sm:p-6"
+
+      // className={`relative rounded-2xl p-4 sm:p-6 ${theme === "dark"
+      //   ? "bg-card/50 border border-border/50"
+      //   : "bg-white border border-gray-200 shadow-sm"
+      //   }`}
       >
         {/* Header */}
         {/* <div className="flex items-center justify-between mb-4 sm:mb-6">
@@ -159,22 +159,20 @@ export default function BrandCarousel() {
             <>
               <button
                 onClick={prevPage}
-                className={`absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${
-                  theme === "dark"
-                    ? "border-primary-text hover:text-ternary-text"
-                    : "bg-white border border-gray-200 hover:bg-gray-50"
-                }`}
+                className={`absolute -left-2 sm:-left-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${theme === "dark"
+                  ? "border-primary-text hover:text-ternary-text"
+                  : "bg-white border border-gray-200 hover:bg-gray-50"
+                  }`}
                 aria-label="Previous brands"
               >
                 <ChevronLeft className="w-4 h-4 sm:w-5 sm:h-5 border-primary-text hover:text-ternary-text" />
               </button>
               <button
                 onClick={nextPage}
-                className={`absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${
-                  theme === "dark"
-                    ? "border-primary-text hover:text-ternary-text"
-                    : "bg-white border border-gray-200 hover:bg-gray-50"
-                }`}
+                className={`absolute -right-2 sm:-right-3 top-1/2 -translate-y-1/2 z-10 p-1.5 sm:p-2 rounded-full shadow-lg transition-all hidden sm:flex items-center justify-center border-2 p-1.5 sm:p-2 border-primary-text hover:border-ternary-text rounded-lg sm:rounded-xl hover:bg-text-hover ${theme === "dark"
+                  ? "border-primary-text hover:text-ternary-text"
+                  : "bg-white border border-gray-200 hover:bg-gray-50"
+                  }`}
                 aria-label="Next brands"
               >
                 <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-primary-text" />
@@ -183,7 +181,7 @@ export default function BrandCarousel() {
           )}
 
           {/* Brands Container */}
-          <div className="flex justify-center gap-3 sm:gap-4 md:gap-6 flex-wrap sm:flex-nowrap overflow-hidden px-2 sm:px-4">
+          <div className="flex justify-center gap-6 sm:gap-8 md:gap-10 lg:gap-12 flex-wrap sm:flex-nowrap overflow-hidden px-2 sm:px-4">
             {loading ? (
               <div className="flex items-center justify-center py-8">
                 <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
@@ -203,40 +201,34 @@ export default function BrandCarousel() {
                     href={`/products?brand=${encodeURIComponent(brand.name)}`}
                     className="group flex flex-col items-center gap-2 transition-transform hover:scale-105"
                   >
-                    <div
-                      className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all ${
-                        theme === "dark"
-                          ? "border-border/50 group-hover:border-flame-orange/50"
-                          : "border-gray-200 group-hover:border-orange-300"
-                      } ${hasLogo ? (theme === "dark" ? "bg-card" : "bg-white") : colors.bg}`}
-                    >
-                      {hasLogo ? (
-                        <div className="relative w-full h-full">
-                          <Image
-                            src={brand.logo!}
-                            alt={brand.name}
-                            fill
-                            className="object-cover"
-                            unoptimized={brand.logo!.startsWith('data:')}
-                          />
-                        </div>
-                      ) : (
+                    {hasLogo ? (
+                      <div className="relative w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 flex items-center justify-center">
+                        <Image
+                          src={brand.logo!}
+                          alt={brand.name}
+                          fill
+                          className="object-contain"
+                          unoptimized={brand.logo!.startsWith('data:')}
+                        />
+                      </div>
+                    ) : (
+                      <div
+                        className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-xl flex items-center justify-center transition-all ${colors.bg}`}
+                      >
                         <span
                           className={`text-xs sm:text-sm md:text-base font-bold text-center leading-tight px-1 ${colors.text}`}
                         >
                           {brand.name}
                         </span>
-                      )}
-                    </div>
-                    <span className={`text-[10px] sm:text-xs md:text-sm text-center max-w-[90px] sm:max-w-[100px] truncate ${
-                      theme === "dark" ? "text-muted-foreground" : "text-gray-500"
-                    }`}>
+                      </div>
+                    )}
+                    <span className={`text-[10px] sm:text-xs md:text-sm text-center max-w-[90px] sm:max-w-[100px] truncate ${theme === "dark" ? "text-muted-foreground" : "text-gray-500"
+                      }`}>
                       {brand.name}
                     </span>
                     {brand.productCount > 0 && (
-                      <span className={`text-[10px] sm:text-xs -mt-1 ${
-                        theme === "dark" ? "text-muted-foreground/70" : "text-gray-400"
-                      }`}>
+                      <span className={`text-[10px] sm:text-xs -mt-1 ${theme === "dark" ? "text-muted-foreground/70" : "text-gray-400"
+                        }`}>
                         {brand.productCount} {brand.productCount === 1 ? "item" : "items"}
                       </span>
                     )}
@@ -254,15 +246,14 @@ export default function BrandCarousel() {
               <button
                 key={index}
                 onClick={() => setCurrentPage(index)}
-                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all ${
-                  currentPage === index
-                    ? theme === "dark"
-                      ? "bg-flame-orange w-4 sm:w-6"
-                      : "bg-orange-500 w-4 sm:w-6"
-                    : theme === "dark"
+                className={`w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full transition-all ${currentPage === index
+                  ? theme === "dark"
+                    ? "bg-flame-orange w-4 sm:w-6"
+                    : "bg-orange-500 w-4 sm:w-6"
+                  : theme === "dark"
                     ? "bg-muted-foreground/30 hover:bg-muted-foreground/50"
                     : "bg-gray-300 hover:bg-gray-400"
-                }`}
+                  }`}
                 aria-label={`Go to page ${index + 1}`}
               />
             ))}

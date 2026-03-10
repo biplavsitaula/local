@@ -169,7 +169,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold leading-[1.1]">
+          <h1 className="text-4xl sm:text-6xl md:text-6xl lg:text-6xl font-serif font-bold leading-[1.1]">
             <span className="bg-gradient-to-b from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">
               {language === 'en' ? 'Premium Spirits' : 'प्रिमियम स्पिरिट्स'}
             </span>
@@ -180,7 +180,7 @@ const HeroSection: React.FC = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl max-w-xl text-gray-300 font-light leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl max-w-xl text-gray-300 font-light leading-relaxed">
             {language === 'en'
               ? 'Discover our exclusive collection of world class liquors'
               : 'विश्व स्तरीय मदिराको हाम्रो विशेष संग्रह पत्ता लगाउनुहोस्।'}
@@ -191,17 +191,17 @@ const HeroSection: React.FC = () => {
             <Link href="/products">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-10 py-7 rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
+                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-6 py-4 sm:px-8 sm:py-5 md:px-10 md:py-6 text-sm sm:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
               >
                 {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/categories">
+            <Link href="/categories" className="w-full sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border-white/20 bg-transparent backdrop-blur-sm text-white hover:bg-white hover:text-black font-bold px-10 py-7 rounded-none uppercase tracking-widest text-xs transition-all"
+                className="w-full sm:w-auto border-white/20 bg-transparent backdrop-blur-sm text-white hover:bg-white hover:text-black font-bold px-6 py-4 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none uppercase tracking-widest text-xs transition-all"
               >
                 {language === 'en' ? 'Categories' : 'कोटिहरू'}
               </Button>
@@ -209,17 +209,17 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="flex gap-12 pt-12 border-t border-white/10 w-fit">
+          <div className="flex gap-6 sm:gap-12 pt-12 border-t border-white/10 w-fit">
             <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">500+</p>
-              <p className="text-xs uppercase tracking-widest text-gray-500">Products</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">500+</p>
+              <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gray-500">Products</p>
             </div>
             <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">1hr</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">1hr</p>
               <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Delivery</p>
             </div>
             <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">10k+</p>
+              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">10k+</p>
               <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Customers</p>
             </div>
           </div>

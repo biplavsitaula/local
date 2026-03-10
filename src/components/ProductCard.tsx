@@ -100,8 +100,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, onBuyNow, onViewDeta
         </button>
       )}
 
-      {/* Image - Square */}
-      <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '100%' }}>
+      {/* Image */}
+      <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '75%' }}>
         <Image
           src={getValidImageUrl(product)}
           alt={product?.name || 'Product image'}
