@@ -451,7 +451,7 @@ function PageContent() {
         </section>
 
         {/* Products Section */}
-        <section className="container mx-auto px-4">
+        <section className="container mx-auto px-4 mb-2">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
               {t("allProducts")}

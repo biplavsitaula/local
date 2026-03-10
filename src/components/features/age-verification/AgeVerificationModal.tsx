@@ -62,7 +62,7 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           {/* <p className="text-lg md:text-xl font-medium text-color-white mb-4">
             {t("ageDeniedMessage")}
           </p> */}
-          
+
           {/* Question */}
           <p className="text-base md:text-lg font-medium text-color-muted mb-10">
             {t("ageQuestion")}
@@ -72,13 +72,13 @@ const AgeVerificationModal: React.FC<IAgeVerificationModalProps> = ({
           <div className="flex flex-col sm:flex-row gap-4 mb-8">
             <button
               onClick={onVerified}
-              className="flex-1 btn-secondary-custom font-bold py-4 sm:py-6 text-lg rounded-xl shadow-lg cursor-pointer"
+              className="flex-1 btn-secondary-custom font-bold py-4 sm:py-6 md:py-4 md:text-base text-lg rounded-xl shadow-lg cursor-pointer"
             >
               {t("ageYes")}
             </button>
             <button
               onClick={onDenied}
-              className="flex-1 btn-default-custom font-bold py-4 sm:py-6 text-lg rounded-xl cursor-pointer"
+              className="flex-1 btn-default-custom font-bold py-4 sm:py-6 md:py-4 md:text-base text-lg rounded-xl cursor-pointer"
             >
               {t("ageNo")}
             </button>
