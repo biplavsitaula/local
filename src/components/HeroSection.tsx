@@ -201,7 +201,7 @@ const HeroSection: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-6 py-4 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none tracking-widest text-xs transition-all hover:border-yellow-300 rounded-sm"
+                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none tracking-widest text-xs transition-all hover:border-yellow-300 rounded-sm"
               >
                 {language === 'en' ? 'Categories' : 'कोटिहरू'}
               </Button>
