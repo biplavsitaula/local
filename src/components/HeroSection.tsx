@@ -135,7 +135,7 @@ const HeroSection: React.FC = () => {
 
   // --- Cinematic carousel: slides available ---
   return (
-    <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
+    <section className="relative min-h-[65vh] sm:min-h-[75vh] md:min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
       {/* Background carousel images */}
       <div className="absolute inset-0 z-0">
         {slides.map((slide, index) => (
@@ -148,11 +148,13 @@ const HeroSection: React.FC = () => {
               src={slide.imageUrl}
               alt={slide.name || "Hero Background"}
               fill
-              className="object-cover transition-transform duration-[10000ms] ease-linear"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+              className="object-cover object-top sm:object-center transition-transform duration-[10000ms] ease-linear"
               style={{ transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)' }}
               priority={index === 0}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20 sm:via-black/40 sm:to-transparent backdrop-blur-[1px]" />
+            {/* Dark overlay — stronger on mobile so text/dots stay readable */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 sm:bg-none sm:bg-gradient-to-r sm:from-black/80 sm:via-black/40 sm:to-transparent backdrop-blur-[1px]" />
           </div>
         ))}
       </div>
