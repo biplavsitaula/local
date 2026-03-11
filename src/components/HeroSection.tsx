@@ -135,7 +135,7 @@ const HeroSection: React.FC = () => {
 
   // --- Cinematic carousel: slides available ---
   return (
-    <section className="relative min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
+    <section className="relative min-h-[60vh] sm:min-h-[75vh] md:min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
       {/* Background carousel images */}
       <div className="absolute inset-0 z-0">
         {slides.map((slide, index) => (
@@ -152,14 +152,14 @@ const HeroSection: React.FC = () => {
               style={{ transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)' }}
               priority={index === 0}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent backdrop-blur-[1px]" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-black/20 sm:via-black/40 sm:to-transparent backdrop-blur-[1px]" />
           </div>
         ))}
       </div>
 
       {/* Content - Left Aligned */}
-      <div className="relative z-20 container mx-auto px-6 md:px-12 lg:px-20">
-        <div className="max-w-3xl space-y-8 animate-fade-in text-left">
+      <div className="relative z-20 container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 py-16 sm:py-0">
+        <div className="max-w-3xl space-y-4 sm:space-y-6 md:space-y-8 animate-fade-in text-left">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 shadow-md px-4 py-2 rounded-full backdrop-blur-md border border-amber-500/30 bg-black/40 text-white">
             <Sparkles className="w-4 h-4 text-amber-500" />
@@ -169,7 +169,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl sm:text-6xl md:text-6xl lg:text-6xl font-serif font-bold leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-bold leading-[1.1]">
             <span className="bg-gradient-to-b from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">
               {language === 'en' ? 'Premium Spirits' : 'प्रिमियम स्पिरिट्स'}
             </span>
@@ -180,18 +180,18 @@ const HeroSection: React.FC = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-base sm:text-lg md:text-xl max-w-xl text-gray-300 font-light leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg max-w-xl text-gray-300 font-light leading-relaxed">
             {language === 'en'
               ? 'Discover our exclusive collection of world class liquors'
               : 'विश्व स्तरीय मदिराको हाम्रो विशेष संग्रह पत्ता लगाउनुहोस्।'}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-start items-center pt-4">
+          <div className="flex flex-row sm:flex-row flex-wrap gap-3 sm:gap-4 justify-start items-center pt-2 sm:pt-4">
             <Link href="/products">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-6 py-4 sm:px-8 sm:py-5 md:px-10 md:py-6 text-sm sm:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
+                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-5 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-xs sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
               >
                 {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
@@ -201,7 +201,7 @@ const HeroSection: React.FC = () => {
               <Button
                 variant="outline"
                 size="lg"
-                className="w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-none tracking-widest text-xs transition-all hover:border-yellow-300 rounded-sm"
+                className="w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-sm tracking-widest text-xs transition-all hover:border-yellow-300"
               >
                 {language === 'en' ? 'Categories' : 'कोटिहरू'}
               </Button>
@@ -209,7 +209,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="flex gap-6 sm:gap-12 pt-12 border-t border-white/10 w-fit">
+          <div className="flex gap-5 sm:gap-12 pt-6 sm:pt-10 md:pt-12 border-t border-white/10 w-fit">
             <div className="text-left">
               <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">500+</p>
               <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gray-500">Products</p>
@@ -228,7 +228,7 @@ const HeroSection: React.FC = () => {
 
       {/* Slide Progress Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-row items-center gap-3">
+        <div className="absolute bottom-5 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-row items-center gap-3">
           {slides.map((_, i) => (
             <button
               key={i}

@@ -176,7 +176,7 @@ const LoginPageContent = () => {
     //   </div>
     // </div>
     <>
-    <LoginModal open={true} onClose={() => {}} />
+    <LoginModal open={true} onClose={() => router.push('/')} />
     </>
   );
 };
