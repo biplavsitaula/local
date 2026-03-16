@@ -452,10 +452,39 @@ const ProductsPageContent: React.FC = () => {
 
         {/* Loading State */}
          {loading && (
-           <div className="flex flex-col items-center justify-center py-16">
-             <Loader2 className="h-12 w-12 animate-spin text-primary mb-4" />
-             <p className="text-muted-foreground">{t('loadingProducts')}</p>
-           </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
+                {/* Image Skeleton */}
+                <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '75%' }}></div>
+                
+                {/* Content Skeleton */}
+                <div className="p-3 sm:p-4 space-y-3">
+                  <div className="h-3 w-1/4 bg-muted rounded"></div>
+                  <div className="h-5 w-3/4 bg-muted rounded"></div>
+                  <div className="h-3 w-1/2 bg-muted rounded"></div>
+                  
+                  {/* Price */}
+                  <div className="mt-4 flex gap-2">
+                    <div className="h-6 w-1/3 bg-muted rounded"></div>
+                    <div className="h-6 w-1/4 bg-muted rounded"></div>
+                  </div>
+                  
+                  {/* Quantity and Actions */}
+                  <div className="mt-4 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <div className="h-4 w-12 bg-muted rounded"></div>
+                      <div className="h-8 w-24 bg-muted rounded"></div>
+                    </div>
+                    <div className="flex gap-2">
+                      <div className="h-10 flex-1 bg-muted rounded"></div>
+                      <div className="h-10 flex-1 bg-muted rounded"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
          )}
 
 
@@ -515,7 +544,6 @@ const ProductsPageContent: React.FC = () => {
                  >
                    {loadingMore ? (
                      <>
-                       <Loader2 className="h-5 w-5 animate-spin" />
                        Loading...
                      </>
                    ) : (

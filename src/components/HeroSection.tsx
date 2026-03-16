@@ -51,11 +51,47 @@ const HeroSection: React.FC = () => {
     return () => clearInterval(interval);
   }, [nextSlide, slides.length]);
 
-  // --- Loading state: show a minimal spinner ---
+  // --- Loading state: show a skeleton of the hero ---
   if (loading) {
     return (
-      <section className="relative min-h-[90vh] w-full flex items-center justify-center bg-black overflow-hidden">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      <section className="relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors bg-card animate-pulse min-h-[65vh] sm:min-h-[75vh] md:min-h-[90vh]">
+        <div className="relative z-10 container mx-auto px-4 text-center flex flex-col items-center justify-center h-full mt-24 sm:mt-32">
+          <div className="max-w-4xl w-full mx-auto space-y-8 flex flex-col items-center">
+            {/* Badge Skeleton */}
+            <div className="h-8 w-48 bg-muted rounded-full"></div>
+
+            {/* Title Skeleton */}
+            <div className="space-y-4 w-full max-w-2xl flex flex-col items-center">
+              <div className="h-12 sm:h-16 w-3/4 bg-muted rounded-lg"></div>
+              <div className="h-12 sm:h-16 w-1/2 bg-muted rounded-lg"></div>
+            </div>
+
+            {/* Subtitle Skeleton */}
+            <div className="h-6 w-2/3 max-w-xl bg-muted rounded"></div>
+
+            {/* CTA Buttons Skeleton */}
+            <div className="flex flex-col sm:flex-row w-full gap-3 sm:gap-4 justify-center items-center pt-4">
+              <div className="h-14 w-full sm:w-[200px] bg-muted rounded-lg"></div>
+              <div className="h-14 w-full sm:w-[200px] bg-muted rounded-lg"></div>
+            </div>
+
+            {/* Stats Skeleton */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 w-full max-w-xl mx-auto">
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     );
   }

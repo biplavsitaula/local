@@ -94,8 +94,28 @@ export default function BrandPageContent() {
       {/* Content */}
       <div className="flex-1 container mx-auto px-4 py-6 sm:py-8">
         {loading ? (
-          <div className="flex items-center justify-center py-20">
-            <Loader2 className="w-8 h-8 animate-spin text-flame-orange" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+              <div
+                key={i}
+                className="group relative rounded-2xl overflow-hidden bg-card border border-border animate-pulse"
+              >
+                {/* Brand Logo/Image Skeleton */}
+                <div className="relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border bg-muted"></div>
+                
+                {/* Brand Info Skeleton */}
+                <div className="p-4 sm:p-5">
+                  <div className="h-5 bg-muted rounded w-1/2 mb-3"></div>
+                  <div className="h-4 bg-muted rounded w-full mb-1"></div>
+                  <div className="h-4 bg-muted rounded w-2/3 mb-4"></div>
+                  
+                  {/* View Products Link Skeleton */}
+                  <div className="mt-3 pt-3 border-t flex items-center justify-center border-border">
+                    <div className="h-8 bg-muted rounded-lg w-32"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
           </div>
         ) : filteredBrands.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20">
@@ -126,16 +146,16 @@ export default function BrandPageContent() {
                 >
                   {/* Brand Logo/Image Section */}
                   <div
-                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border ${hasLogo ? "bg-card" : colors.bg
+                    className={`relative h-40 sm:h-48 flex items-center justify-center overflow-hidden border-b border-border ${hasLogo ? "bg-white dark:bg-card" : colors.bg
                       }`}
                   >
                     {hasLogo ? (
-                      <div className="relative w-full h-full p-4">
+                      <div className="relative w-28 h-28 sm:w-32 sm:h-32">
                         <Image
                           src={brand.logo!}
                           alt={brand.name}
                           fill
-                          className="object-contain group-hover:scale-105 transition-transform duration-300"
+                          className="object-contain group-hover:scale-105 transition-transform duration-300 drop-shadow-sm"
                           unoptimized={brand.logo!.startsWith("data:")}
                         />
                       </div>

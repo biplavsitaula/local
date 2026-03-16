@@ -119,9 +119,21 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
           : 'bg-white/95'
       }`}>
         <div className="relative container mx-auto px-4 py-2 sm:py-3">
-          <div className="flex items-center justify-center gap-2">
-            <Loader2 className="h-4 w-4 animate-spin text-primary" />
-            <span className="text-xs text-muted-foreground">{t('loading')}</span>
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+            {[1, 2, 3, 4].map((i) => (
+              <div
+                key={i}
+                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden animate-pulse ${
+                  theme === 'dark' ? 'bg-card/80 border-border/50' : 'bg-gray-100 border-gray-200'
+                }`}
+              >
+                <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-2xl bg-muted shrink-0" />
+                <div className="flex flex-col gap-1 w-24">
+                  <div className="h-3 bg-muted rounded w-full" />
+                  <div className="h-2 bg-muted rounded w-1/2" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </div>
