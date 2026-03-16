@@ -87,22 +87,22 @@ const HeroSection: React.FC = () => {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
-              <Link href="/products">
+            <div className="flex flex-col sm:flex-row w-full gap-3 sm:gap-4 justify-center items-center pt-4">
+              <Link href="/products" className="w-[200px] sm:w-auto">
                 <Button
                   size="lg"
                   variant="default"
-                  className="btn-primary-custom font-semibold px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg group"
+                  className="w-full sm:w-auto btn-primary-custom font-semibold px-4 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg group"
                 >
                   {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
                   <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
               </Link>
-              <Link href="/categories">
+              <Link href="/categories" className="w-[200px] sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="btn-default-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg border-color-primary"
+                  className="w-full sm:w-auto btn-default-custom px-4 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg border-color-primary"
                 >
                   {language === 'en' ? 'Categories' : 'कोटिहरू'}
                 </Button>
@@ -189,21 +189,21 @@ const HeroSection: React.FC = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-row sm:flex-row flex-wrap gap-3 sm:gap-4 justify-start items-center pt-2 sm:pt-4">
-            <Link href="/products">
+          <div className="flex flex-col sm:flex-row w-auto gap-3 sm:gap-4 justify-center sm:justify-start items-center pt-2 sm:pt-4">
+            <Link href="/products" className="w-[200px] sm:w-auto">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-5 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-xs sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-4 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-xs sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
               >
                 {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
                 <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </Link>
-            <Link href="/categories" className="w-auto">
+            <Link href="/categories" className="w-[200px] sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-2 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-sm tracking-widest text-xs transition-all hover:border-yellow-300"
+                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-lg tracking-widest text-xs sm:text-sm md:text-base transition-all hover:border-yellow-300"
               >
                 {language === 'en' ? 'Categories' : 'कोटिहरू'}
               </Button>

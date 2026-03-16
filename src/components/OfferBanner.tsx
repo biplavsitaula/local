@@ -184,7 +184,7 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
                 
                 {/* Text */}
                 <div className="flex flex-col min-w-0">
-                  <p className={`text-[10px] sm:text-xs font-medium leading-tight truncate ${
+                  <p className={`text-[10px] sm:text-xs font-medium leading-[1.3] line-clamp-2 ${
                     theme === 'dark' ? 'text-foreground' : 'text-gray-800'
                   }`}>
                     {offer.title}
