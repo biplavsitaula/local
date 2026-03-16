@@ -3,6 +3,7 @@ import { Product } from "@/types";
 import { Loader2, AlertCircle } from "lucide-react";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import ProductCard from "@/components/ProductCard";
+import HomeProductCard from "@/components/HomeProductCard";
 import { useProductGrid } from "./hooks/useProductGrid";
 
 
@@ -15,6 +16,7 @@ interface ProductGridProps {
   selectedSubCategory?: string;
   onCheckout?: () => void;
   limit?: number;
+  cardVariant?: "default" | "home";
 }
 
 
@@ -27,6 +29,7 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   selectedSubCategory,
   onCheckout,
   limit,
+  cardVariant = "default",
 }) => {
   const {
     selectedProduct,
@@ -49,16 +52,11 @@ const ProductGrid: React.FC<ProductGridProps> = ({
   });
 
 
-
-
   const handleBuyNow = (product: Product, quantity?: number) => {
     if (onCheckout) {
       onCheckout();
     }
   };
-
-
-
 
   return (
     <>
@@ -97,12 +95,21 @@ const ProductGrid: React.FC<ProductGridProps> = ({
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
               {filteredProducts.map((product, index) => (
-                <ProductCard
-                  key={product.id || `product-${index}`}
-                  product={product}
-                  onBuyNow={handleBuyNow}
-                  onViewDetails={handleViewDetails}
-                />
+                cardVariant === "home" ? (
+                  <HomeProductCard
+                    key={product.id || `product-${index}`}
+                    product={product}
+                    onBuyNow={handleBuyNow}
+                    onViewDetails={handleViewDetails}
+                  />
+                ) : (
+                  <ProductCard
+                    key={product.id || `product-${index}`}
+                    product={product}
+                    onBuyNow={handleBuyNow}
+                    onViewDetails={handleViewDetails}
+                  />
+                )
               ))}
             </div>
 

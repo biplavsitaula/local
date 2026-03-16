@@ -471,6 +471,7 @@ function PageContent() {
             selectedSubCategory={selectedFilter.subCategory}
             onCheckout={() => setCheckoutOpen(true)}
             limit={selectedFilter.category ? undefined : 10}
+            cardVariant="home"
           />
         </section>
 
