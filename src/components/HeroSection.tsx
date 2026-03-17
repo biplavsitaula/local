@@ -132,7 +132,7 @@ const HeroSection: React.FC = () => {
 
             {/* CTA Buttons */}
             <div className="flex flex-row w-full gap-2 sm:gap-4 justify-center items-center pt-4">
-              <Link href="/products" className="flex-1 sm:w-auto">
+              <Link href="/products" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
                   variant="default"
@@ -142,7 +142,7 @@ const HeroSection: React.FC = () => {
                   <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                 </Button>
               </Link>
-              <Link href="/categories" className="flex-1 sm:w-auto">
+              <Link href="/categories" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
                   variant="outline"
