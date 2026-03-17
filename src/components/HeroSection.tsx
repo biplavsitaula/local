@@ -8,10 +8,18 @@ import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { featureImagesService, FeatureImage } from "@/services/feature-images.service";
+import AnimatedStats from "@/components/AnimatedStats";
 
 const HeroSection: React.FC = () => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
+
+  const heroStats = [
+    { value: "10+", label: t("yearsExperience") },
+    { value: "5000+", label: t("happyCustomers") },
+    { value: "500+", label: t("products") },
+    { value: "24/7", label: t("support") },
+  ];
   const currentYear = new Date().getFullYear();
 
   // --- Carousel & Data Logic ---
@@ -146,20 +154,7 @@ const HeroSection: React.FC = () => {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 max-w-xl mx-auto">
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">500+</p>
-                <p className="text-xs sm:text-sm text-color-muted">Products</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">1hr</p>
-                <p className="text-xs sm:text-sm text-color-muted">Delivery</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">10k+</p>
-                <p className="text-xs sm:text-sm text-color-muted">Customers</p>
-              </div>
-            </div>
+            <AnimatedStats stats={heroStats} variant="hero-gradient" />
           </div>
         </div>
 
@@ -247,20 +242,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Stats */}
-          <div className="flex gap-5 sm:gap-12 pt-6 sm:pt-10 md:pt-12 border-t border-white/10 w-fit">
-            <div className="text-left">
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">500+</p>
-              <p className="text-[10px] sm:text-xs uppercase tracking-widest text-gray-500">Products</p>
-            </div>
-            <div className="text-left">
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">1hr</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Delivery</p>
-            </div>
-            <div className="text-left">
-              <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-500">10k+</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Customers</p>
-            </div>
-          </div>
+          <AnimatedStats stats={heroStats} variant="hero-dark" />
         </div>
       </div>
 
