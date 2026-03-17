@@ -35,6 +35,7 @@ export function useOrderTable({
     paymentMethod: '',
   });
   const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<'accept' | 'reject' | null>(null);
   const { canEdit } = useRoleAccess();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
@@ -92,6 +93,16 @@ export function useOrderTable({
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = [...orders];
 
+    // Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.billNumber.toLowerCase().includes(searchLower) ||
+        order.customerName.toLowerCase().includes(searchLower) ||
+        order.location.toLowerCase().includes(searchLower)
+      );
+    }
+
     // Apply filters
     if (filters.billNumber) {
       filtered = filtered.filter(order => 
@@ -128,7 +139,7 @@ export function useOrderTable({
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filtered.slice(startIndex, endIndex);
-  }, [orders, sortDir, sortKey, filters, currentPage, itemsPerPage]);
+  }, [orders, debouncedSearch, sortDir, sortKey, filters, currentPage, itemsPerPage]);
 
   const clearFilters = () => {
     setFilters({
@@ -166,6 +177,7 @@ export function useOrderTable({
   const performAcceptOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
+      setProcessingAction('accept');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.acceptOrder(orderId);
       
@@ -189,6 +201,7 @@ export function useOrderTable({
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setProcessingAction(null);
       setPendingOrder(null);
     }
   };
@@ -207,6 +220,7 @@ export function useOrderTable({
   const performRejectOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
+      setProcessingAction('reject');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.rejectOrder(orderId);
       
@@ -230,6 +244,7 @@ export function useOrderTable({
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setProcessingAction(null);
       setPendingOrder(null);
     }
   };
@@ -682,6 +697,15 @@ export function useOrderTable({
   // Calculate total filtered items for pagination
   const totalFiltered = useMemo(() => {
     let filtered = [...orders];
+    // Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.billNumber.toLowerCase().includes(searchLower) ||
+        order.customerName.toLowerCase().includes(searchLower) ||
+        order.location.toLowerCase().includes(searchLower)
+      );
+    }
     if (filters.billNumber) {
       filtered = filtered.filter(order => 
         order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
@@ -693,7 +717,7 @@ export function useOrderTable({
       );
     }
     return filtered;
-  }, [orders, filters.billNumber, filters.location]);
+  }, [orders, debouncedSearch, filters.billNumber, filters.location]);
 
   const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
 
@@ -713,6 +737,7 @@ export function useOrderTable({
     totalPages,
     canEdit,
     processingOrderId,
+    processingAction,
     
     // Modal states
     confirmModalOpen,

@@ -41,6 +41,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
     totalPages,
     canEdit,
     processingOrderId,
+    processingAction,
     confirmModalOpen,
     setConfirmModalOpen,
     confirmAction,
@@ -291,7 +292,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                                   title={canEdit ? "Accept order" : "Only super admin can accept orders"}
                                   type="button"
                                 >
-                                  {processingOrderId === order.id ? (
+                                  {processingOrderId === order.id && processingAction === 'accept' ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
                                     <CheckCircle className="h-4 w-4" />
@@ -318,7 +319,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                                   title={canEdit ? "Reject order" : "Only super admin can reject orders"}
                                   type="button"
                                 >
-                                  {processingOrderId === order.id ? (
+                                  {processingOrderId === order.id && processingAction === 'reject' ? (
                                     <Loader2 className="h-4 w-4 animate-spin" />
                                   ) : (
                                     <XCircle className="h-4 w-4" />
