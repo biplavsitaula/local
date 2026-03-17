@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { Search, Plus, Loader2, AlertCircle } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -21,9 +21,7 @@ export default function AdminOffersPage() {
       setLoading(true);
       setError(null);
 
-      const response = await offersService.getAllAdmin({
-        search: debouncedSearch || undefined,
-      });
+      const response = await offersService.getAllAdmin();
 
       if (response.success) {
         setOffers(response.data || []);
@@ -38,11 +36,23 @@ export default function AdminOffersPage() {
     } finally {
       setLoading(false);
     }
-  }, [debouncedSearch]);
+  }, []);
 
   useEffect(() => {
     fetchOffers();
   }, [fetchOffers]);
+
+  // Client-side search filtering (same pattern as Payments component)
+  const filteredOffers = useMemo(() => {
+    if (!debouncedSearch) return offers;
+    const query = debouncedSearch.toLowerCase();
+    return offers.filter((offer) => {
+      const title = (offer.title || '').toLowerCase();
+      const description = (offer.description || '').toLowerCase();
+      const category = (offer.category || '').toLowerCase();
+      return title.includes(query) || description.includes(query) || category.includes(query);
+    });
+  }, [offers, debouncedSearch]);
 
   const handleAddSuccess = () => {
     fetchOffers();
@@ -113,7 +123,7 @@ export default function AdminOffersPage() {
 
       {/* Offers Table */}
       <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
-        <OffersTable offers={offers} onRefresh={handleRefresh} />
+        <OffersTable offers={filteredOffers} onRefresh={handleRefresh} />
       </div>
 
       {/* Add Offer Modal */}
@@ -125,6 +135,3 @@ export default function AdminOffersPage() {
     </div>
   );
 }
-
-
-
