@@ -61,7 +61,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
     }
 
     setIsLoading(true);
-    
+
     try {
       await login(formData.email, formData.password);
       handleClose();
@@ -93,10 +93,10 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
           {/* Logo and Title */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">
-              <Image 
-                src="/assets/flameCircular800.png" 
-                alt="Flame Beverage logo" 
-                width={180} 
+              <Image
+                src="/assets/flameCircular800.png"
+                alt="Flame Beverage logo"
+                width={180}
                 height={48}
                 className="sm:w-[100px] sm:h-[80px]"
               />
@@ -112,13 +112,13 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
 
           {/* Tabs */}
           <div className="flex gap-2 mb-4 sm:mb-6">
-            <button 
-            // className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
-            className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
+            <button
+              // className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
+              className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg bg-primary-gradient text-text-inverse font-medium text-sm sm:text-base"
             >
               {t('login')}
             </button>
-            <button 
+            <button
               onClick={onSwitchToRegister}
               className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-card-custom border-border text-center text-sm sm:text-base cursor-pointer"
             >
@@ -208,7 +208,7 @@ const LoginModal = ({ open, onClose, onSwitchToRegister, redirectUrl }: LoginMod
                 // <Image src="/assets/flame200.png" alt="Flame Beverage logo" width={20} height={20} />
                 <></>
               )}
-              {isLoading 
+              {isLoading
                 ? t('loggingIn')
                 : t('login')
               }

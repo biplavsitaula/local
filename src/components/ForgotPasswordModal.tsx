@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { authService } from "@/services/auth.service";
-import { Mail, Loader2, X, CheckCircle } from "lucide-react";
+import { Mail, Loader2, X, CheckCircle, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
 interface ForgotPasswordModalProps {
@@ -57,7 +57,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    
+
     try {
       const response = await authService.forgotPassword(email);
       if (response.success) {
@@ -66,11 +66,11 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
         setError(response.message || "Failed to send reset link. Please try again.");
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          "Failed to send reset link. Please try again.";
+      const errorMessage = err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.message ||
+        err?.message ||
+        "Failed to send reset link. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -93,10 +93,10 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
           {/* Logo and Title */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">
-              <Image 
-                src="/assets/flame200.png" 
-                alt="Flame Beverage logo" 
-                width={80} 
+              <Image
+                src="/assets/flame200.png"
+                alt="Flame Beverage logo"
+                width={80}
                 height={64}
                 className="sm:w-[100px] sm:h-[80px]"
               />
@@ -174,12 +174,13 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               </form>
 
               {/* Back to Login */}
-              <div className="mt-4 text-center">
+              <div className="mt-4">
                 <button
                   onClick={handleBackToLogin}
-                  className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-card-custom border-border text-center text-sm sm:text-base cursor-pointer"
-                  >
-                  {t("backToLogin")}
+                  className="relative w-full flex items-center justify-center py-2 px-4 rounded-lg btn-card-custom border-border text-sm cursor-pointer"
+                >
+                  <ArrowLeft className="absolute left-4 h-4 w-4" />
+                  <span>{t("backToLogin")}</span>
                 </button>
               </div>
             </>

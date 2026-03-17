@@ -167,10 +167,9 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
 
   };
 
-  console.log(product.specification, 'relatedProductsrelatedProducts', product.description)
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-hidden">
-      <div className="relative w-full max-w-5xl max-h-[98vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 rounded-xl sm:rounded-2xl border border-border bg-card shadow-2xl scrollbar-hide">
+      <div className="relative w-full max-w-5xl max-h-[90vh] overflow-y-auto animate-in fade-in-0 zoom-in-95 rounded-xl sm:rounded-2xl border border-border bg-card shadow-2xl scrollbar-hide">
 
         {/* Sticky Close Button */}
         <button
@@ -181,15 +180,15 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
         </button>
 
         <div className="p-4 sm:p-6 md:p-8">
-          <div className="grid gap-6 md:gap-8 lg:grid-cols-2">
+          <div className="grid gap-6 md:gap-8 lg:grid-cols-2 items-start">
 
-            {/* Image Section */}
-            <div className="space-y-4">
-              <div className="relative aspect-square w-full overflow-hidden rounded-lg sm:rounded-xl bg-muted border border-border">
+            {/* Image Section - Self-stretches to match height if needed, using sticky to stay in view */}
+            <div className="flex flex-col gap-4 lg:sticky lg:top-0 h-full">
+              <div className="relative w-full flex-grow min-h-[300px] overflow-hidden rounded-lg sm:rounded-xl bg-card border border-border flex items-center justify-center p-6">
                 <Image
                   src={getValidImageUrl(product)}
                   alt={product?.name || 'Product'}
-                  className="h-full w-full object-contain p-4"
+                  className="max-h-full max-w-full object-contain"
                   fill
                   priority
                   sizes="(max-width: 768px) 100vw, 50vw"
@@ -203,63 +202,67 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
               {/* Thumbnails */}
               <div className="flex gap-2 overflow-x-auto pb-2 no-scrollbar">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-lg border border-border bg-muted/30 overflow-hidden opacity-60 hover:opacity-100 cursor-pointer transition-opacity">
-                    <Image src={getValidImageUrl(product)} alt="thumb" width={64} height={64} className="object-contain p-2" />
+                  <div key={i} className="flex-shrink-0 w-16 h-16 rounded-lg border border-border bg-card overflow-hidden opacity-60 hover:opacity-100 cursor-pointer transition-opacity relative">
+                    <Image src={getValidImageUrl(product)} alt="thumb" fill className="object-contain p-2" />
                   </div>
                 ))}
               </div>
             </div>
 
             {/* Details Section */}
-            <div className="flex flex-col">
-              <div className="flex items-center gap-2 mb-1">
-                <div className="flex text-amber-500 text-[10px] sm:text-xs">★★★★★</div>
-                <span className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-tighter">128 Reviews</span>
+            <div className="flex flex-col h-full">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-1 text-amber-500 text-xs sm:text-sm font-semibold">
+                  <span>★</span>
+                  <span>{product?.rating || 5}</span>
+                </div>
+                <span className="text-[10px] sm:text-xs text-muted-foreground uppercase tracking-wider font-medium">
+                  ({Math.floor(Math.random() * 200 + 50)} Reviews)
+                </span>
               </div>
 
-              <p className="text-[10px] sm:text-xs uppercase tracking-widest text-primary font-bold">{product?.category}</p>
-              <h2 className="mt-1 font-display text-xl sm:text-3xl md:text-4xl font-bold text-tertiary-text leading-tight">
+              <p className="text-[9px] sm:text-[10px] uppercase tracking-widest text-primary font-bold mb-1">{product?.category}</p>
+              <p className="font-display text-lg sm:text-xl md:text-2xl font-bold text-foreground leading-tight">
                 {language === 'en' ? product?.name : product?.nameNe}
-              </h2>
+              </p>
 
-              <div className="mt-3 sm:mt-4 flex items-baseline gap-2 sm:gap-3 flex-wrap">
-                <span className="text-2xl sm:text-3xl font-bold text-primary">
+              <div className="mt-2 flex items-baseline gap-3 flex-wrap border-b border-border/50 pb-6">
+                <span className="text-lg sm:text-xl font-bold text-primary">
                   Rs. {((product?.price || 0) * quantity).toLocaleString()}
                 </span>
                 {product?.originalPrice && (
-                  <span className="text-base sm:text-lg text-muted-foreground line-through italic">
+                  <span className="text-xs sm:text-sm text-muted-foreground line-through font-medium">
                     Rs. {((product?.originalPrice || 0) * quantity).toLocaleString()}
                   </span>
                 )}
               </div>
 
-              {/* Product Info Grid */}
-              <div className="mt-5 sm:mt-6 grid grid-cols-3 gap-2 sm:gap-4">
-                <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center border border-border/50">
-                  <Wine className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  <p className="mt-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase">{t('volume')}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground">{product?.volume}</p>
+              <div className="mt-5 grid grid-cols-3 gap-2 sm:gap-3">
+                <div className="rounded-lg bg-muted/50 p-2 text-center border border-border/50">
+                  <Wine className="mx-auto h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                  <p className="mt-1 text-[8px] sm:text-[9px] text-muted-foreground uppercase">{t('volume')}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-foreground">{product?.volume}</p>
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center border border-border/50">
-                  <Percent className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  <p className="mt-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase">{t('alcoholContent')}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground">{product?.alcoholContent || product?.alcohol}</p>
+                <div className="rounded-lg bg-muted/50 p-2 text-center border border-border/50">
+                  <Percent className="mx-auto h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                  <p className="mt-1 text-[8px] sm:text-[9px] text-muted-foreground uppercase">{t('alcoholContent')}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-foreground">{product?.alcoholContent || product?.alcohol}</p>
                 </div>
-                <div className="rounded-lg bg-muted/50 p-2 sm:p-3 text-center border border-border/50">
-                  <MapPin className="mx-auto h-4 w-4 sm:h-5 sm:w-5 text-primary" />
-                  <p className="mt-1 text-[9px] sm:text-[10px] text-muted-foreground uppercase">{t('origin')}</p>
-                  <p className="text-xs sm:text-sm font-bold text-foreground truncate">{product?.origin || 'Imported'}</p>
+                <div className="rounded-lg bg-muted/50 p-2 text-center border border-border/50">
+                  <MapPin className="mx-auto h-3 w-3 sm:h-4 sm:w-4 text-primary" />
+                  <p className="mt-1 text-[8px] sm:text-[9px] text-muted-foreground uppercase">{t('origin')}</p>
+                  <p className="text-[10px] sm:text-xs font-bold text-foreground truncate">{product?.origin || 'Imported'}</p>
                 </div>
               </div>
 
               {/* Quantity & Actions */}
               {product.inStock !== false && (
-                <div className="mt-6 sm:mt-8 space-y-4">
-                  <div className="flex items-center gap-2 sm:gap-4">
-                    <div className="flex items-center shrink-0 rounded-lg border border-border bg-card overflow-hidden h-11 sm:h-12">
-                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-3 sm:px-4 h-full hover:bg-muted text-foreground transition-colors"><Minus size={14} /></button>
-                      <span className="w-6 sm:w-10 text-center font-bold text-sm sm:text-base">{quantity}</span>
-                      <button onClick={() => setQuantity(quantity + 1)} className="px-3 sm:px-4 h-full hover:bg-muted text-foreground transition-colors"><Plus size={14} /></button>
+                <div className="mt-6 space-y-4 flex-grow">
+                  <div className="flex items-center gap-2 sm:gap-3">
+                    <div className="flex items-center shrink-0 rounded-lg border border-border bg-card overflow-hidden h-9 sm:h-10">
+                      <button onClick={() => setQuantity(Math.max(1, quantity - 1))} className="px-2 sm:px-3 h-full hover:bg-muted text-foreground transition-colors"><Minus size={12} /></button>
+                      <span className="w-6 sm:w-8 text-center font-bold text-xs sm:text-sm">{quantity}</span>
+                      <button onClick={() => setQuantity(quantity + 1)} className="px-2 sm:px-3 h-full hover:bg-muted text-foreground transition-colors"><Plus size={12} /></button>
                     </div>
                     <div className="flex-1 min-w-0">
                       <ProductActionButtons onAddToCart={handleAddToCart} onBuyNow={handleBuyNow} size="md" />
@@ -333,9 +336,9 @@ const ProductDetailModal: React.FC<ProductDetailModalProps> = ({
           </div>
 
           {/* NEW: Related Products Section */}
-          <div className="mt-12 sm:mt-16 border-t border-border pt-8 sm:pt-10">
-            <div className="flex items-center justify-between mb-6 sm:mb-8 px-1">
-              <h3 className="text-lg sm:text-xl font-bold text-foreground">You Might Also Like</h3>
+          <div className="mt-10 sm:mt-12 border-t border-border pt-6 sm:pt-8">
+            <div className="flex items-center justify-between mb-4 sm:mb-6 px-1">
+              <h3 className="text-base sm:text-lg font-bold text-foreground">You Might Also Like</h3>
               <Link
                 href="/products"
                 className="view-all-link gap-1 sm:gap-2 text-xs sm:text-sm p-1.5 sm:p-2 rounded-lg sm:rounded-xl"
