@@ -12,8 +12,8 @@ import ProductCard from "@/components/ProductCard";
 import ProductDetailModal from "@/components/ProductDetailModal";
 import CheckoutModal from "@/components/CheckoutModal";
 import CartNotification from "@/components/CartNotification";
-import { 
-  Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle, 
+import {
+  Percent, Clock, Truck, Gift, Sparkles, Loader2, AlertCircle,
   Tag, Zap, Star, Heart, ShoppingBag, Award, Crown, Flame,
   Package, BadgePercent, PartyPopper, Ticket, Trophy,
   LucideIcon
@@ -70,7 +70,7 @@ const OffersPageContent = () => {
   const [notificationProduct, setNotificationProduct] = useState<Product | null>(null);
   const [notificationQuantity, setNotificationQuantity] = useState(1);
   const [buyNowItem, setBuyNowItem] = useState<{ product: Product; quantity: number } | null>(null);
-  
+
   // Offers state
   const [offers, setOffers] = useState<Offer[]>([]);
   const [offersLoading, setOffersLoading] = useState(true);
@@ -125,21 +125,21 @@ const OffersPageContent = () => {
         setLoading(true);
       }
       setError(null);
-      
+
       const response = await productsService.getAll({
         page: pageNum,
         limit: ITEMS_PER_PAGE,
         search: searchQuery || undefined,
       });
-      
+
       const mappedProducts = (response.data || []).map(mapApiProductToProduct);
-      
+
       if (append) {
         setProducts(prev => [...prev, ...mappedProducts]);
       } else {
         setProducts(mappedProducts);
       }
-      
+
       // Check if there are more products to load
       const pagination = (response as any).pagination;
       if (pagination) {
@@ -172,9 +172,9 @@ const OffersPageContent = () => {
       try {
         setOffersLoading(true);
         setOffersError(null);
-        
+
         const response = await offersService.getAll();
-        
+
         if (response.success) {
           // Filter only active offers and sort by order
           const activeOffers = (response.data || [])
@@ -211,7 +211,7 @@ const OffersPageContent = () => {
     }
     return false;
   });
-  
+
   // Search is handled by API, so we just use discounted products
   // No need for additional client-side search filtering
   const filteredProducts = discountedProducts;
@@ -235,17 +235,17 @@ const OffersPageContent = () => {
       // Return a default gradient based on index
       return defaultGradients[index % defaultGradients.length];
     }
-    
+
     // If it's a hex color, create a gradient from it
     if (color.startsWith('#')) {
       return `from-[${color}] to-[${color}]/80`;
     }
-    
+
     // If it already looks like a gradient class, use it
     if (color.includes('from-') || color.includes('to-')) {
       return color;
     }
-    
+
     // Otherwise, try to use it as a Tailwind color
     return `from-${color}-500 to-${color}-600`;
   };
@@ -265,14 +265,14 @@ const OffersPageContent = () => {
   const handleCheckout = () => {
     setCheckoutOpen(true);
   };
-  
+
   return (
     <div className="min-h-screen bg-background">
       <Header searchQuery={searchQuery} onSearchChange={setSearchQuery} onCheckout={handleCheckout} />
-      
+
       <main className="container mx-auto px-4 py-6">
         <h1 className="text-2xl sm:text-3xl md:text-4xl font-display font-bold text-primary-gradient text-center mb-6 sm:mb-8">
-          {t("specialOffers" )}
+          {t("specialOffers")}
         </h1>
 
         {/* Offer Cards */}
@@ -300,60 +300,50 @@ const OffersPageContent = () => {
               const isImage = isImageUrl(offer.icon);
               const Icon = !isImage ? getIconComponent(offer.icon) : null;
               const gradientColor = getGradientColor(offer.color, index);
-              
+
               return (
                 <div
                   key={offer._id || offer.id || index}
-                  className={`relative p-2 sm:p-4 md:p-6 rounded-lg sm:rounded-xl bg-gradient-to-br ${gradientColor} text-white overflow-hidden group hover:scale-105 transition-transform duration-300`}
-                  style={offer.color?.startsWith('#') ? { 
-                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}dd)` 
+                  className={`relative p-3 sm:p-4 md:p-5 rounded-xl sm:rounded-2xl bg-gradient-to-br ${gradientColor} text-white overflow-hidden group hover:scale-[1.03] hover:shadow-xl transition-all duration-300 cursor-pointer`}
+                  style={offer.color?.startsWith('#') ? {
+                    background: `linear-gradient(135deg, ${offer.color}, ${offer.color}cc)`
                   } : undefined}
                 >
-                  <div className="absolute -right-4 -top-4 opacity-20">
+                  {/* Decorative background icon */}
+                  <div className="absolute -right-3 -bottom-3 opacity-10 group-hover:opacity-15 transition-opacity duration-300">
                     {isImage ? (
-                      <img 
-                        src={offer.icon} 
-                        alt="" 
-                        className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24 object-contain"
-                      />
+                      <img src={offer.icon} alt="" className="w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28 object-contain" />
                     ) : Icon && (
-                      <Icon className="w-12 sm:w-16 md:w-24 h-12 sm:h-16 md:h-24" />
+                      <Icon className="w-20 sm:w-24 md:w-28 h-20 sm:h-24 md:h-28" />
                     )}
                   </div>
-                  {isImage ? (
-                    <img 
-                      src={offer.icon} 
-                      alt={offer.title} 
-                      className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4 object-contain"
-                    />
-                  ) : Icon && (
-                    <Icon className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10 mb-1.5 sm:mb-2 md:mb-4" />
-                  )}
-                  <h3 className="text-xs sm:text-sm md:text-xl font-bold mb-0.5 sm:mb-1 md:mb-2">
-                    {offer.title}
-                    {(offer.discountPercent !== undefined && offer.discountPercent > 0) && (
-                      <span className="ml-1 sm:ml-2 text-yellow-200">
-                        - {offer.discountPercent}% OFF
-                      </span>
-                    )}
-                    {(offer.discountAmount !== undefined && offer.discountAmount > 0 && !offer.discountPercent) && (
-                      <span className="ml-1 sm:ml-2 text-yellow-200">
-                        - Rs. {offer.discountAmount} OFF
-                      </span>
-                    )}
-                  </h3>
-                  {offer.description && (
-                    <p className="text-white/80 text-[10px] sm:text-xs md:text-base leading-tight">
-                      {offer.description}
-                    </p>
-                  )}
-                  {((offer.discountPercent !== undefined && offer.discountPercent > 0) || (offer.discountAmount !== undefined && offer.discountAmount > 0)) && (
-                    <div className="mt-1 sm:mt-2">
-                      <span className="inline-block bg-white/20 backdrop-blur-sm px-1.5 sm:px-2 py-0.5 sm:py-1 rounded text-[10px] sm:text-xs md:text-sm font-semibold">
-                        {offer.discountPercent && offer.discountPercent > 0 ? `${offer.discountPercent}% OFF` : `Rs. ${offer.discountAmount} OFF`}
-                      </span>
+
+                  {/* Shine effect on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out" />
+
+                  {/* Icon + Text inline */}
+                  <div className="relative z-10 flex items-start gap-2.5 sm:gap-3">
+                    {/* Icon container */}
+                    <div className="shrink-0 w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center group-hover:bg-white/30 transition-colors duration-300 shadow-sm">
+                      {isImage ? (
+                        <img src={offer.icon} alt={offer.title} className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6 object-contain" />
+                      ) : Icon && (
+                        <Icon className="w-4 h-4 sm:w-5 sm:h-5 md:w-6 md:h-6" />
+                      )}
                     </div>
-                  )}
+
+                    {/* Text content */}
+                    <div className="flex-1 min-w-0">
+                      <h3 className="text-xs sm:text-sm md:text-base font-bold leading-tight">
+                        {offer.title}
+                      </h3>
+                      {((offer.discountPercent !== undefined && offer.discountPercent > 0) || (offer.discountAmount !== undefined && offer.discountAmount > 0)) && (
+                        <span className="inline-block mt-1 sm:mt-1.5 bg-white/20 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] sm:text-xs font-semibold text-yellow-100 shadow-sm">
+                          {offer.discountPercent && offer.discountPercent > 0 ? `${offer.discountPercent}% OFF` : `Rs. ${offer.discountAmount} OFF`}
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
               );
             })}
@@ -370,7 +360,7 @@ const OffersPageContent = () => {
           <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <Percent className="w-6 h-6 sm:w-7 sm:h-7 md:w-8 md:h-8 text-color-secondary" />
             <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
-              {t("productsOnSale" )}
+              {t("productsOnSale")}
             </h2>
           </div>
 
@@ -381,19 +371,19 @@ const OffersPageContent = () => {
                 <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
                   {/* Image Skeleton */}
                   <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '75%' }}></div>
-                  
+
                   {/* Content Skeleton */}
                   <div className="p-3 sm:p-4 space-y-3">
                     <div className="h-3 w-1/4 bg-muted rounded"></div>
                     <div className="h-5 w-3/4 bg-muted rounded"></div>
                     <div className="h-3 w-1/2 bg-muted rounded"></div>
-                    
+
                     {/* Price */}
                     <div className="mt-4 flex gap-2">
                       <div className="h-6 w-1/3 bg-muted rounded"></div>
                       <div className="h-6 w-1/4 bg-muted rounded"></div>
                     </div>
-                    
+
                     {/* Quantity and Actions */}
                     <div className="mt-4 space-y-2">
                       <div className="flex items-center gap-2">
@@ -482,9 +472,9 @@ const OffersPageContent = () => {
                 <div className="text-center py-12 bg-card rounded-xl">
                   <Percent className="w-16 h-16 text-muted-foreground mx-auto mb-4" />
                   <p className="text-muted-foreground text-lg">
-                    {searchQuery.trim() 
+                    {searchQuery.trim()
                       ? (language === "en" ? `No products found for "${searchQuery}"` : `"${searchQuery}" को लागि कुनै उत्पादन फेला परेन`)
-                      : t("noProductsOnSale" )}
+                      : t("noProductsOnSale")}
                   </p>
                 </div>
               )}

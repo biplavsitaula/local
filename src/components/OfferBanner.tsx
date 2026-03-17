@@ -4,8 +4,8 @@ import React, { useState, useEffect } from "react";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { useTheme } from "@/contexts/ThemeContext";
 import { offersService, Offer } from "@/services/offers.service";
-import { 
-  Clock, Package, Truck, Gift, Tag, Zap, Star, Heart, 
+import {
+  Clock, Package, Truck, Gift, Tag, Zap, Star, Heart,
   Percent, ShoppingBag, Award, Crown, Flame, Loader2,
   Sparkles, BadgePercent, PartyPopper, Ticket, Trophy,
   LucideIcon
@@ -59,7 +59,7 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
       try {
         setLoading(true);
         const response = await offersService.getAll();
-        
+
         if (response.success) {
           // Filter only active offers and sort by order, limit to 4
           const activeOffers = (response.data || [])
@@ -100,12 +100,12 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
     if (!color || color.trim() === '') {
       return defaultGradients[index % defaultGradients.length];
     }
-    
+
     // If it already looks like a gradient class, use it
     if (color.includes('from-') || color.includes('to-')) {
       return color;
     }
-    
+
     // Otherwise, try to use it as a Tailwind color
     return `from-${color}-500 to-${color}-600`;
   };
@@ -113,19 +113,17 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
   // Show loading skeleton
   if (loading) {
     return (
-      <div className={`relative overflow-hidden ${
-        theme === 'dark'
-          ? 'bg-background'
-          : 'bg-white/95'
-      }`}>
+      <div className={`relative overflow-hidden ${theme === 'dark'
+        ? 'bg-background'
+        : 'bg-white/95'
+        }`}>
         <div className="relative container mx-auto px-4 py-2 sm:py-3">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
             {[1, 2, 3, 4].map((i) => (
               <div
                 key={i}
-                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden animate-pulse ${
-                  theme === 'dark' ? 'bg-card/80 border-border/50' : 'bg-gray-100 border-gray-200'
-                }`}
+                className={`flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden animate-pulse ${theme === 'dark' ? 'bg-card/80 border-border/50' : 'bg-gray-100 border-gray-200'
+                  }`}
               >
                 <div className="w-7 h-7 sm:w-9 sm:h-9 rounded-2xl bg-muted shrink-0" />
                 <div className="flex flex-col gap-1 w-24">
@@ -144,61 +142,58 @@ const OfferBanner: React.FC<OfferBannerProps> = ({ show = true }) => {
   if (offers.length === 0) return null;
 
   return (
-    <div className={`relative overflow-hidden ${
-      theme === 'dark'
-        ? 'bg-background'
-        : 'bg-white/95'
-    }`}>
+    <div className={`relative overflow-hidden ${theme === 'dark'
+      ? 'bg-background'
+      : 'bg-white/95'
+      }`}>
       <div className="relative container mx-auto px-4 py-2 sm:py-3">
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
           {offers.map((offer, index) => {
             const isImage = isImageUrl(offer.icon);
             const IconComponent = !isImage ? getIconComponent(offer.icon) : null;
             const gradientColor = getGradientColor(offer.color, index);
-            
+
             return (
               <div
                 key={offer._id || offer.id || index}
-                className={`group relative flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden border-1 border-text-primary ${
-                  theme === 'dark'
-                    ? 'bg-card/80 border-border/50 hover:border-primary/60 hover:bg-card/90 card-glow hover:shadow-xl hover:shadow-primary/20'
-                    : 'bg-white/95 border-orange-200/60 hover:border-orange-400/80 hover:bg-white shadow-sm hover:shadow-lg hover:shadow-orange-200/50'
-                }`}
-                style={offer.color?.startsWith('#') ? { 
+                className={`group relative flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-3xl border-2 transition-all duration-300 overflow-hidden border-1 border-text-primary ${theme === 'dark'
+                  ? 'bg-card/80 border-border/50 hover:border-primary/60 hover:bg-card/90 card-glow hover:shadow-xl hover:shadow-primary/20'
+                  : 'bg-white/95 border-orange-200/60 hover:border-orange-400/80 hover:bg-white shadow-sm hover:shadow-lg hover:shadow-orange-200/50'
+                  }`}
+                style={offer.color?.startsWith('#') ? {
                   borderColor: `${offer.color}40`
                 } : undefined}
               >
                 {/* Decorative curved accent */}
-                <div 
+                <div
                   className={`absolute top-0 right-0 w-16 h-16 bg-gradient-to-br ${gradientColor} opacity-0 group-hover:opacity-10 rounded-full blur-2xl transition-opacity duration-300`}
-                  style={offer.color?.startsWith('#') ? { 
-                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}80)` 
+                  style={offer.color?.startsWith('#') ? {
+                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}80)`
                   } : undefined}
                 />
-                
+
                 {/* Icon with curved border */}
-                <div 
+                <div
                   className={`relative w-7 h-7 sm:w-9 sm:h-9 rounded-2xl bg-gradient-to-br ${gradientColor} flex items-center justify-center shrink-0 shadow-md group-hover:shadow-lg group-hover:scale-105 transition-all duration-300 z-10`}
-                  style={offer.color?.startsWith('#') ? { 
-                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}cc)` 
+                  style={offer.color?.startsWith('#') ? {
+                    background: `linear-gradient(to bottom right, ${offer.color}, ${offer.color}cc)`
                   } : undefined}
                 >
                   {isImage ? (
-                    <img 
-                      src={offer.icon} 
-                      alt={offer.title} 
+                    <img
+                      src={offer.icon}
+                      alt={offer.title}
                       className="w-3.5 h-3.5 sm:w-5 sm:h-5 object-contain"
                     />
                   ) : IconComponent && (
                     <IconComponent className="w-3.5 h-3.5 sm:w-5 sm:h-5 text-white drop-shadow-sm" />
                   )}
                 </div>
-                
+
                 {/* Text */}
                 <div className="flex flex-col min-w-0">
-                  <p className={`text-[10px] sm:text-xs font-medium leading-[1.3] line-clamp-2 ${
-                    theme === 'dark' ? 'text-foreground' : 'text-gray-800'
-                  }`}>
+                  <p className={`text-[10px] sm:text-xs font-medium leading-[1.3] line-clamp-2 ${theme === 'dark' ? 'text-foreground' : 'text-gray-800'
+                    }`}>
                     {offer.title}
                   </p>
                   {offer.discountPercent && (
