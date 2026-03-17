@@ -290,11 +290,13 @@ export function useOrderTable({
       }
 
       const orderItems = fullOrder.items || [];
-      const total = orderItems.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 0), 0);
-      const customerPhone = fullOrder.customer?.phone || order.customerPhone || 'N/A';
+      const subtotal = fullOrder.subtotal || orderItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+      const deliveryFee = fullOrder.deliveryFee || 0;
+      const totalAmount = fullOrder.totalAmount || (subtotal + deliveryFee);
+      const customerPhone = fullOrder.customer?.mobile || fullOrder.customer?.phone || order.customerPhone || 'N/A';
       const customerPan = fullOrder.customer?.pan || 'N/A';
-      const customerName = fullOrder.customer?.name || fullOrder.customerName || order.customerName || 'N/A';
-      const customerLocation = fullOrder.customer?.address || fullOrder.location || order.location || 'N/A';
+      const customerName = fullOrder.customer?.fullName || fullOrder.customer?.name || fullOrder.customerName || order.customerName || 'N/A';
+      const customerLocation = fullOrder.customer?.location || fullOrder.customer?.address || fullOrder.location || order.location || 'N/A';
       const paymentLabel = getPaymentMethodLabel(fullOrder.paymentMethod || order.paymentMethod);
       const printDate = new Date(order.createdAt);
       const formattedDate = printDate.toLocaleDateString('en-US', {
@@ -499,10 +501,10 @@ export function useOrderTable({
               <tbody>
                 ${orderItems.length > 0 ? orderItems.map((item: any) => `
                   <tr>
-                    <td>${item.name || 'Unknown Product'}</td>
+                    <td>${item.name || item.productId?.name || 'Unknown Product'}</td>
                     <td>${item.quantity || 0}</td>
                     <td>Rs ${(item.price || 0).toFixed(2)}</td>
-                    <td>Rs ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
+                    <td>Rs ${(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
                   </tr>
                 `).join('') : `
                   <tr>
@@ -513,7 +515,9 @@ export function useOrderTable({
             </table>
             
             <div class="total-section">
-              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
+              <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Subtotal: Rs ${subtotal.toFixed(2)}</div>
+              ${deliveryFee > 0 ? `<div style="font-size: 14px; color: #666; margin-bottom: 5px;">Delivery Fee: Rs ${deliveryFee.toFixed(2)}</div>` : ''}
+              <div class="total-amount">Total Amount: Rs ${totalAmount.toFixed(2)}</div>
             </div>
             
             <div class="footer">
@@ -536,11 +540,13 @@ export function useOrderTable({
       console.error('Failed to fetch order details:', err);
       // Fallback: use whatever data we have from the order prop
       const fallbackItems = order.items || [];
-      const fallbackTotal = fallbackItems.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 0), 0) || order.totalAmount || 0;
-      const fallbackPhone = order.customer?.phone || 'N/A';
+      const fallbackSubtotal = order.subtotal || fallbackItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+      const fallbackDeliveryFee = order.deliveryFee || 0;
+      const fallbackTotal = order.totalAmount || (fallbackSubtotal + fallbackDeliveryFee);
+      const fallbackPhone = order.customer?.mobile || order.customer?.phone || 'N/A';
       const fallbackPan = order.customer?.pan || 'N/A';
-      const fallbackName = order.customer?.name || order.customerName || 'N/A';
-      const fallbackLocation = order.customer?.address || order.location || 'N/A';
+      const fallbackName = order.customer?.fullName || order.customer?.name || order.customerName || 'N/A';
+      const fallbackLocation = order.customer?.location || order.customer?.address || order.location || 'N/A';
       const fallbackPayment = getPaymentMethodLabel(order.paymentMethod);
       const printDate = new Date(order.createdAt);
       const formattedDate = printDate.toLocaleDateString('en-US', {
@@ -625,16 +631,18 @@ export function useOrderTable({
               <tbody>
                 ${fallbackItems.length > 0 ? fallbackItems.map((item: any) => `
                   <tr>
-                    <td>${item.name || 'Unknown Product'}</td>
+                    <td>${item.name || item.productId?.name || 'Unknown Product'}</td>
                     <td>${item.quantity || 0}</td>
                     <td>Rs ${(item.price || 0).toFixed(2)}</td>
-                    <td>Rs ${((item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
+                    <td>Rs ${(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
                   </tr>
                 `).join('') : `<tr><td colspan="4" style="text-align: center; color: #999;">No items available</td></tr>`}
               </tbody>
             </table>
             
             <div class="total-section">
+              <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Subtotal: Rs ${fallbackSubtotal.toFixed(2)}</div>
+              ${fallbackDeliveryFee > 0 ? `<div style="font-size: 14px; color: #666; margin-bottom: 5px;">Delivery Fee: Rs ${fallbackDeliveryFee.toFixed(2)}</div>` : ''}
               <div class="total-amount">Total Amount: Rs ${fallbackTotal.toFixed(2)}</div>
             </div>
             

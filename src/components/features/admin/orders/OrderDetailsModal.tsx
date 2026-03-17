@@ -16,13 +16,16 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
 
   // Use actual items from the order, or empty array as fallback
   const orderItems = order.items || [];
-  const total = orderItems.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 0), 0) || order.totalAmount || 0;
+  const subtotal = order.subtotal || orderItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+  const deliveryFee = order.deliveryFee || 0;
+  const totalAmount = order.totalAmount || (subtotal + deliveryFee);
 
   // Get customer details from the nested customer object or top-level fields
-  const customerName = order.customer?.name || order.customerName || 'N/A';
-  const customerPhone = order.customer?.phone || 'N/A';
+  const customerName = order.customer?.fullName || order.customer?.name || order.customerName || 'N/A';
+  const customerPhone = order.customer?.mobile || order.customer?.phone || 'N/A';
+  const customerEmail = order.customer?.email || 'N/A';
   const customerPan = order.customer?.pan || 'N/A';
-  const customerLocation = order.customer?.address || order.location || 'N/A';
+  const customerLocation = order.customer?.location || order.customer?.address || order.location || 'N/A';
 
   const getPaymentMethodLabel = (method: string) => {
     switch (method?.toLowerCase()) {
@@ -96,6 +99,12 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                   <span className="text-muted-foreground">Mobile: </span>
                   <span className="text-foreground">{customerPhone}</span>
                 </div>
+                {customerEmail !== 'N/A' && (
+                  <div>
+                    <span className="text-muted-foreground">Email: </span>
+                    <span className="text-foreground">{customerEmail}</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-muted-foreground">Location: </span>
                   <span className="text-foreground">{customerLocation}</span>
@@ -142,10 +151,10 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                   {orderItems.length > 0 ? (
                     orderItems.map((item: any, index: number) => (
                       <tr key={index} className="border-b border-border/30">
-                        <td className="p-3 text-sm text-foreground">{item.name || 'Unknown Product'}</td>
+                        <td className="p-3 text-sm text-foreground">{item.name || item.productId?.name || 'Unknown Product'}</td>
                         <td className="p-3 text-sm text-center text-foreground">{item.quantity || 0}</td>
                         <td className="p-3 text-sm text-right text-foreground">{(item.price || 0).toFixed(2)}</td>
-                        <td className="p-3 text-sm text-right text-foreground">{((item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
+                        <td className="p-3 text-sm text-right text-foreground">{(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
                       </tr>
                     ))
                   ) : (
@@ -154,11 +163,29 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                     </tr>
                   )}
                   <tr>
+                    <td colSpan={3} className="p-3 text-right text-sm text-muted-foreground">
+                      Subtotal:
+                    </td>
+                    <td className="p-3 text-right text-sm text-foreground">
+                      Rs {subtotal.toFixed(2)}
+                    </td>
+                  </tr>
+                  {deliveryFee > 0 && (
+                    <tr>
+                      <td colSpan={3} className="p-3 text-right text-sm text-muted-foreground">
+                        Delivery Fee:
+                      </td>
+                      <td className="p-3 text-right text-sm text-foreground">
+                        Rs {deliveryFee.toFixed(2)}
+                      </td>
+                    </tr>
+                  )}
+                  <tr>
                     <td colSpan={3} className="p-3 text-right text-sm font-semibold text-foreground">
                       Total:
                     </td>
                     <td className="p-3 text-right text-lg font-bold text-[#f97316]">
-                      Rs {total.toFixed(2)}
+                      Rs {totalAmount.toFixed(2)}
                     </td>
                   </tr>
                 </tbody>
