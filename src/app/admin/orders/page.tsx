@@ -20,7 +20,7 @@ const Orders = () => {
     paymentMethod?: string;
   }>({});
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -29,6 +29,7 @@ const Orders = () => {
   // Use ref to track filters without causing re-renders
   const filtersRef = useRef(orderFilters);
   filtersRef.current = orderFilters;
+  const hasFetchedOnce = useRef(false);
 
   // Check if any filter is active
   const hasActiveFilters = !!(orderFilters.search || orderFilters.status || orderFilters.paymentMethod);
@@ -64,7 +65,10 @@ const Orders = () => {
   // Fetch orders with server-side pagination - no dependencies on orderFilters object
   const fetchOrders = useCallback(async (page: number = 1, isFiltering: boolean = false) => {
     try {
-      setLoading(true);
+      // Only show full-page loading on initial load
+      if (!hasFetchedOnce.current) {
+        setInitialLoading(true);
+      }
       setError(null);
       
       // Use ref to get current filters without dependency
@@ -88,7 +92,8 @@ const Orders = () => {
       setError(err.message || 'Failed to load orders');
       setOrders([]);
     } finally {
-      setLoading(false);
+      setInitialLoading(false);
+      hasFetchedOnce.current = true;
     }
   }, []); // Empty dependency array - uses ref for filters
 
@@ -109,8 +114,8 @@ const Orders = () => {
     if (hasActiveFilters) {
       setCurrentPage(1);
       fetchOrders(1, true);
-    } else {
-      // Reset to page 1 and fetch without filters
+    } else if (hasFetchedOnce.current) {
+      // Reset to page 1 and fetch without filters (only after initial load)
       setCurrentPage(1);
       fetchOrders(1, false);
     }
@@ -180,7 +185,7 @@ const Orders = () => {
     ? Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) 
     : totalPages;
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">
