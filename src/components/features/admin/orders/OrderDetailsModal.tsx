@@ -4,43 +4,35 @@ import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { Printer } from 'lucide-react';
 import { Order } from '@/hooks/useOrderStore';
 
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
-
 interface OrderDetailsModalProps {
-  order: Order | null;
+  order: any | null;
   isOpen: boolean;
   onClose: () => void;
-  onPrint: (order: Order) => void;
+  onPrint: (order: any) => void;
 }
-
-// Mock order items - in a real app, this would come from the order data
-const getOrderItems = (order: Order): OrderItem[] => {
-  // For now, return mock items based on the order
-  // In a real implementation, order.items would be part of the Order interface
-  if (order.billNumber === 'FB-2024-003') {
-    return [
-      { name: 'Macallan 18 Year', quantity: 1, price: 349.99 },
-      { name: 'Hennessy XO', quantity: 1, price: 229.99 },
-    ];
-  }
-  // Default mock items - split total amount proportionally
-  const item1Price = Math.round((order.totalAmount * 0.6) * 100) / 100;
-  const item2Price = Math.round((order.totalAmount * 0.4) * 100) / 100;
-  return [
-    { name: 'Premium Whiskey', quantity: 1, price: item1Price },
-    { name: 'Premium Brandy', quantity: 1, price: item2Price },
-  ];
-};
 
 export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDetailsModalProps) {
   if (!order) return null;
 
-  const orderItems = getOrderItems(order);
-  const total = orderItems.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  // Use actual items from the order, or empty array as fallback
+  const orderItems = order.items || [];
+  const total = orderItems.reduce((sum: number, item: any) => sum + (item.price || 0) * (item.quantity || 0), 0) || order.totalAmount || 0;
+
+  // Get customer details from the nested customer object or top-level fields
+  const customerName = order.customer?.name || order.customerName || 'N/A';
+  const customerPhone = order.customer?.phone || 'N/A';
+  const customerPan = order.customer?.pan || 'N/A';
+  const customerLocation = order.customer?.address || order.location || 'N/A';
+
+  const getPaymentMethodLabel = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'qr': return 'QR Payment';
+      case 'cod': return 'Cash on Delivery';
+      case 'online': return 'Online Payment';
+      case 'card': return 'Card Payment';
+      default: return method || 'N/A';
+    }
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -92,19 +84,21 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Name: </span>
-                  <span className="text-foreground">{order.customerName}</span>
+                  <span className="text-foreground">{customerName}</span>
                 </div>
-                <div>
-                  <span className="text-muted-foreground">PAN: </span>
-                  <span className="text-foreground">KLMNO9012P</span>
-                </div>
+                {customerPan !== 'N/A' && (
+                  <div>
+                    <span className="text-muted-foreground">PAN: </span>
+                    <span className="text-foreground">{customerPan}</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-muted-foreground">Mobile: </span>
-                  <span className="text-foreground">+977-9861234567</span>
+                  <span className="text-foreground">{customerPhone}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Location: </span>
-                  <span className="text-foreground">{order.location}</span>
+                  <span className="text-foreground">{customerLocation}</span>
                 </div>
               </div>
             </div>
@@ -115,13 +109,13 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Status: </span>
-                  <span className={`px-3 py-1 rounded-full text-xs font-medium {getStatusColor(order.status)}`}>
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Payment: </span>
-                  <span className="text-foreground">{order.paymentMethod === 'qr' ? 'QR Payment' : 'Cash on Delivery'}</span>
+                  <span className="text-foreground">{getPaymentMethodLabel(order.paymentMethod)}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Date: </span>
@@ -145,14 +139,20 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                   </tr>
                 </thead>
                 <tbody>
-                  {orderItems.map((item, index) => (
-                    <tr key={index} className="border-b border-border/30">
-                      <td className="p-3 text-sm text-foreground">{item.name}</td>
-                      <td className="p-3 text-sm text-center text-foreground">{item.quantity}</td>
-                      <td className="p-3 text-sm text-right text-foreground">{item.price.toFixed(2)}</td>
-                      <td className="p-3 text-sm text-right text-foreground">{(item.price * item.quantity).toFixed(2)}</td>
+                  {orderItems.length > 0 ? (
+                    orderItems.map((item: any, index: number) => (
+                      <tr key={index} className="border-b border-border/30">
+                        <td className="p-3 text-sm text-foreground">{item.name || 'Unknown Product'}</td>
+                        <td className="p-3 text-sm text-center text-foreground">{item.quantity || 0}</td>
+                        <td className="p-3 text-sm text-right text-foreground">{(item.price || 0).toFixed(2)}</td>
+                        <td className="p-3 text-sm text-right text-foreground">{((item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="p-3 text-sm text-center text-muted-foreground">No items found</td>
                     </tr>
-                  ))}
+                  )}
                   <tr>
                     <td colSpan={3} className="p-3 text-right text-sm font-semibold text-foreground">
                       Total:
@@ -187,4 +187,5 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
     </Dialog>
   );
 }
+
 

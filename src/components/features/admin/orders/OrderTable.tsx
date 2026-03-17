@@ -95,20 +95,6 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
     </th>
   );
 
-  // Mock order items - in a real app, this would come from the order data
-  const getOrderItems = (order: Order) => {
-    if (order.billNumber === 'FB-2024-003') {
-      return [
-        { name: 'Macallan 18 Year', quantity: 1, price: 349.99 },
-        { name: 'Hennessy XO', quantity: 1, price: 229.99 },
-      ];
-    }
-    // Default mock items
-    return [
-      { name: 'Premium Whiskey', quantity: 1, price: order.totalAmount * 0.6 },
-      { name: 'Premium Brandy', quantity: 1, price: order.totalAmount * 0.4 },
-    ];
-  };
 
 
   return (

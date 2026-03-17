@@ -183,9 +183,15 @@ export default function BrandCarousel() {
           {/* Brands Container */}
           <div className="flex justify-center gap-4 sm:gap-8 md:gap-10 lg:gap-12 flex-wrap sm:flex-nowrap overflow-hidden px-2 sm:px-4">
             {loading ? (
-              <div className="flex items-center justify-center py-8">
-                <Loader2 className="w-6 h-6 animate-spin text-muted-foreground" />
-              </div>
+              <>
+                {Array.from({ length: itemsPerPage }).map((_, i) => (
+                  <div key={i} className="flex flex-col items-center gap-2">
+                    <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-xl animate-pulse ${theme === 'dark' ? 'bg-muted/40' : 'bg-gray-200'}`} />
+                    <div className={`h-3 w-14 sm:w-16 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/30' : 'bg-gray-200'}`} />
+                    <div className={`h-2.5 w-10 sm:w-12 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/20' : 'bg-gray-100'}`} />
+                  </div>
+                ))}
+              </>
             ) : brands.length === 0 ? (
               <div className="flex items-center justify-center py-8 text-muted-foreground">
                 No brands available
