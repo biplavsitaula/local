@@ -149,7 +149,7 @@ const AnimatedStats: React.FC<AnimatedStatsProps> = ({
   // Default layout classes based on variant
   let defaultClass = "";
   if (variant === "hero-dark") {
-    defaultClass = "flex flex-wrap gap-5 sm:gap-12 pt-6 sm:pt-10 md:pt-12 border-t border-white/10 w-fit";
+    defaultClass = "grid grid-cols-2 sm:flex sm:flex-wrap gap-y-6 gap-x-4 sm:gap-12 pt-6 sm:pt-10 md:pt-12 border-t border-white/10 w-full sm:w-fit";
   } else if (variant === "hero-gradient") {
     defaultClass = "grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-6 pt-8 sm:pt-12 max-w-2xl mx-auto";
   } else {

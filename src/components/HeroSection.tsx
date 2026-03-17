@@ -78,9 +78,9 @@ const HeroSection: React.FC = () => {
             <div className="h-6 w-2/3 max-w-xl bg-muted rounded"></div>
 
             {/* CTA Buttons Skeleton */}
-            <div className="flex flex-col sm:flex-row w-full gap-3 sm:gap-4 justify-center items-center pt-4">
-              <div className="h-14 w-full sm:w-[200px] bg-muted rounded-lg"></div>
-              <div className="h-14 w-full sm:w-[200px] bg-muted rounded-lg"></div>
+            <div className="flex flex-row w-full gap-2 sm:gap-4 justify-center items-center pt-4">
+              <div className="h-14 flex-1 sm:w-[200px] bg-muted rounded-lg"></div>
+              <div className="h-14 flex-1 sm:w-[200px] bg-muted rounded-lg"></div>
             </div>
 
             {/* Stats Skeleton */}
@@ -131,24 +131,24 @@ const HeroSection: React.FC = () => {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row w-full gap-3 sm:gap-4 justify-center items-center pt-4">
-              <Link href="/products" className="w-[200px] sm:w-auto">
+            <div className="flex flex-row w-full gap-2 sm:gap-4 justify-center items-center pt-4">
+              <Link href="/products" className="flex-1 sm:w-auto">
                 <Button
                   size="lg"
                   variant="default"
-                  className="w-full sm:w-auto btn-primary-custom font-semibold px-4 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg group"
+                  className="w-full sm:w-auto btn-primary-custom font-semibold px-2 sm:px-8 py-4 sm:py-6 text-[10px] sm:text-base md:text-lg group"
                 >
-                  {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}</span>
+                  <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                 </Button>
               </Link>
-              <Link href="/categories" className="w-[200px] sm:w-auto">
+              <Link href="/categories" className="flex-1 sm:w-auto">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="w-full sm:w-auto btn-default-custom px-4 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg border-color-primary"
+                  className="w-full sm:w-auto btn-default-custom px-2 sm:px-8 py-4 sm:py-6 text-[10px] sm:text-base md:text-lg border-color-primary"
                 >
-                  {language === 'en' ? 'Categories' : 'कोटिहरू'}
+                  <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Categories' : 'कोटिहरू'}</span>
                 </Button>
               </Link>
             </div>
@@ -220,23 +220,23 @@ const HeroSection: React.FC = () => {
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row w-auto gap-3 sm:gap-4 justify-center sm:justify-start items-center pt-2 sm:pt-4">
-            <Link href="/products" className="w-[200px] sm:w-auto">
+          <div className="flex flex-row w-full sm:w-auto gap-2 sm:gap-4 justify-center sm:justify-start items-center pt-2 sm:pt-4">
+            <Link href="/products" className="flex-1 sm:flex-none sm:w-auto">
               <Button
                 size="lg"
-                className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-4 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-xs sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-2 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-[10px] sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
               >
-                {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
-                <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}</span>
+                <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
-            <Link href="/categories" className="w-[200px] sm:w-auto">
+            <Link href="/categories" className="flex-1 sm:flex-none sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-4 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-lg tracking-widest text-xs sm:text-sm md:text-base transition-all hover:border-yellow-300"
+                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-2 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-lg tracking-widest text-[10px] sm:text-sm md:text-base transition-all hover:border-yellow-300"
               >
-                {language === 'en' ? 'Categories' : 'कोटिहरू'}
+                <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Categories' : 'कोटिहरू'}</span>
               </Button>
             </Link>
           </div>
