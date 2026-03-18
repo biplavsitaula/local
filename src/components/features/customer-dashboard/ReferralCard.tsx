@@ -63,7 +63,12 @@ export function ReferralCard() {
             setReward(res.reward);
             setState("success");
         } catch (err: any) {
-            setErrorMsg(err?.message || "Unable to claim reward. Please try again.");
+            const backendMsg = err?.message || "";
+            if (backendMsg.includes("Not eligible") || backendMsg.includes("already claimed")) {
+                setErrorMsg("No eligible referrals yet. Invite a friend and wait for their first delivery!");
+            } else {
+                setErrorMsg(backendMsg || "Unable to claim reward. Please try again.");
+            }
             setState("error");
         }
     };
