@@ -52,8 +52,9 @@ export const referralService = {
      * Claim a referral reward
      * POST /customer/referral/claim
      */
-    claimReward: async (referralId?: string): Promise<ClaimRewardResponse> => {
-        const body = referralId ? { referralId } : {};
+    claimReward: async (userId: string, referralId?: string): Promise<ClaimRewardResponse> => {
+        const body: Record<string, string> = { userId };
+        if (referralId) body.referralId = referralId;
         const res = await apiPost<ClaimRewardResponse>('/customer/referral/claim', body);
         return res as unknown as ClaimRewardResponse;
     },
