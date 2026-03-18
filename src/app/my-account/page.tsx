@@ -19,21 +19,30 @@ export default function MyAccountPage() {
     const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
-        const fetchDashboard = async () => {
+        const fetchDashboard = async (silent = false) => {
             try {
-                setLoading(true);
-                setError(null);
+                if (!silent) setLoading(true);
+                if (!silent) setError(null);
                 const res = await customerDashboardService.getDashboard();
                 setDashboard(res.data);
             } catch (err: any) {
-                setError(err?.message || "Failed to load dashboard data");
+                if (!silent) setError(err?.message || "Failed to load dashboard data");
                 console.error("Dashboard error:", err);
             } finally {
-                setLoading(false);
+                if (!silent) setLoading(false);
             }
         };
 
         fetchDashboard();
+
+        const handleReferralSuccess = () => {
+            fetchDashboard(true);
+        };
+        window.addEventListener("referralSuccess", handleReferralSuccess);
+
+        return () => {
+            window.removeEventListener("referralSuccess", handleReferralSuccess);
+        };
     }, []);
 
     if (loading) {
