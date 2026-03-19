@@ -37,6 +37,21 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     }
   }, [open]);
 
+  // Reset form after success with a delay
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (success) {
+      timer = setTimeout(() => {
+        setSuccess(false);
+        setEmail("");
+      }, 5000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [success]);
+
+
   if (!open || !mounted) return null;
 
   const handleClose = () => {
@@ -122,12 +137,15 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                   </p>
                 </div>
               </div>
-              <button
-                onClick={handleBackToLogin}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold cursor-pointer border-2 border-white/30 hover:border-white/50 hover:opacity-90"
-              >
-                {t("backToLogin")}
-              </button>
+              <div className="flex justify-start">
+                <button
+                  onClick={handleBackToLogin}
+                  className="w-fit py-1.5 sm:py-2 px-3 rounded-lg btn-primary-custom text-xs sm:text-sm font-semibold cursor-pointer border-2 border-white/30 hover:border-white/50 hover:opacity-90 flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="leading-none">{t("backToLogin")}</span>
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -174,13 +192,13 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               </form>
 
               {/* Back to Login */}
-              <div className="mt-4">
+              <div className="mt-4 flex justify-start">
                 <button
                   onClick={handleBackToLogin}
-                  className="relative w-full flex items-center justify-center py-2 px-4 rounded-lg btn-card-custom border-border text-sm cursor-pointer"
+                  className="w-fit flex items-center gap-2 py-1.5 sm:py-2 px-3 rounded-lg btn-card-custom border border-border text-xs sm:text-sm font-medium cursor-pointer transition-colors hover:bg-muted"
                 >
-                  <ArrowLeft className="absolute left-4 h-4 w-4" />
-                  <span>{t("backToLogin")}</span>
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="leading-none">{t("backToLogin")}</span>
                 </button>
               </div>
             </>

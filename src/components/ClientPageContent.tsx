@@ -34,6 +34,7 @@ import { productsService, Product as ApiProduct } from "@/services/products.serv
 import { ordersService } from "@/services/orders.service";
 import { useCategories, CategoryFilter } from "@/hooks/useCategories";
 import RecommendedProductCard from "@/components/RecommendedProductCard";
+import PromotionalBanner from "@/components/PromotionalBanner";
 
 // Storage key for tracked orders (must match CheckoutModal)
 const TRACKED_ORDERS_KEY = 'flame_tracked_orders';
@@ -646,6 +647,9 @@ function PageContent() {
           orderStatus={orderStatusModal.status}
         />
       )}
+
+      {/* Promotional Banner (Floating) */}
+      <PromotionalBanner />
     </div>
   );
 }
