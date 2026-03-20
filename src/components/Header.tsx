@@ -303,6 +303,20 @@ const Header: React.FC<IHeaderProps> = ({
            >
              {t("offers")}
            </Link>
+           <Link
+             href="/blog"
+             className={`text-sm font-medium transition-colors ${
+               pathname === '/blog'
+                 ? theme === 'dark'
+                   ? 'text-primary-text font-semibold'
+                   : 'text-orange-600 font-semibold'
+                 : theme === 'dark'
+                   ? 'text-foreground hover:text-primary-text'
+                   : 'text-gray-700 hover:text-orange-600'
+             }`}
+           >
+             {t("blog")}
+           </Link>
          </nav>
 
         {/* Actions */}
@@ -559,6 +573,21 @@ const Header: React.FC<IHeaderProps> = ({
                }`}
              >
                {t("offers")}
+             </Link>
+             <Link
+               href="/blog"
+               onClick={() => setIsMenuOpen(false)}
+               className={`text-sm font-medium transition-colors py-2 ${
+                 pathname === '/blog'
+                   ? theme === 'dark'
+                     ? 'text-primary-text font-semibold'
+                     : 'text-orange-600 font-semibold'
+                   : theme === 'dark'
+                     ? 'text-foreground hover:text-primary-text'
+                     : 'text-gray-700 hover:text-orange-600'
+               }`}
+             >
+               {t("blog")}
              </Link>
             <button
               onClick={() => {

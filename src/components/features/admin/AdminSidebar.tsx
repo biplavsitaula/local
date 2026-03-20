@@ -44,6 +44,7 @@ const menuItems = [
   { title: "Reviews", icon: Star, path: "/admin/reviews" },
   { title: "Featured Images", icon: Images, path: "/admin/featuredImage" },
   { title: "Seasonal Themes", icon: Palette, path: "/admin/seasonal-themes" },
+  { title: "Mixology Blogs", icon: Flame, path: "/admin/blog" },
 ];
 
 interface AdminSidebarProps {
