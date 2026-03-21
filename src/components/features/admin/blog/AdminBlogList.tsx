@@ -3,8 +3,10 @@
 import React, { useState, useEffect } from 'react';
 import { Blog, blogService } from '@/services/blog.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus } from 'lucide-react';
+import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus, AlertCircle } from 'lucide-react';
 import { toast } from 'sonner';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const AdminBlogList: React.FC = () => {
     const { user } = useAuth();
@@ -199,118 +201,130 @@ const AdminBlogList: React.FC = () => {
     };
 
     return (
-        <div className="p-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 mb-10">
+        <div className="space-y-8 p-6">
+            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                    <h1 className="text-3xl font-black text-white italic tracking-tight">MANAGE MIXOLOGY</h1>
-                    <p className="text-gray-500 text-sm font-light mt-1 uppercase tracking-widest">Recipe Moderation & Control</p>
+                    <h1 className="text-3xl font-display font-bold text-foreground">Blog Management</h1>
+                    <p className="text-muted-foreground mt-1">Manage and moderate blog posts and recipes.</p>
                 </div>
                 
-                <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
-                    <button 
-                        onClick={handleAddClick}
-                        className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
-                    >
-                        <Plus size={18} />
-                        Create Recipe
-                    </button>
+                <Button 
+                    onClick={handleAddClick}
+                    className="bg-primary hover:bg-primary/90 text-white gap-2"
+                >
+                    <Plus size={18} />
+                    Create Recipe
+                </Button>
+            </div>
 
-                    <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
-                        <input 
-                            type="text" 
-                            placeholder="Search by title or category..."
-                            className="bg-[#0a0a0a] border border-white/5 rounded-xl py-3 pl-12 pr-4 text-sm focus:outline-none focus:border-primary w-full md:w-72 transition-all"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    
-                    <select 
-                        className="bg-[#0a0a0a] border border-white/5 rounded-xl py-3 px-6 text-sm focus:outline-none focus:border-primary font-bold uppercase tracking-widest text-gray-400 appearance-none cursor-pointer pr-10"
-                        value={statusFilter}
-                        onChange={(e) => setStatusFilter(e.target.value as any)}
-                        style={{backgroundImage: 'url("data:image/svg+xml,%3Csvg xmlns=\'http://www.w3.org/2000/svg\' fill=\'none\' viewBox=\'0\' stroke=\'currentColor\'%3E%3Cpath stroke-linecap=\'round\' stroke-linejoin=\'round\' stroke-width=\'2\' d=\'M19 9l-7 7-7-7\'/%3E%3C/svg%3E")'}}
-                    >
-                        <option value="all">Status: All</option>
-                        <option value="pending">Status: Pending</option>
-                        <option value="approved">Status: Approved</option>
-                    </select>
+            <div className="flex flex-col md:flex-row gap-4">
+                <div className="relative flex-1">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input 
+                        placeholder="Search by title or category..."
+                        className="pl-10 bg-secondary/50 border-border"
+                        value={searchQuery}
+                        onChange={(e) => setSearchQuery(e.target.value)}
+                    />
                 </div>
+                
+                <select 
+                    className="bg-secondary/50 border border-border rounded-md py-2 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground min-w-[150px] appearance-none cursor-pointer"
+                    value={statusFilter}
+                    onChange={(e) => setStatusFilter(e.target.value as any)}
+                >
+                    <option value="all">All Status</option>
+                    <option value="pending">Pending</option>
+                    <option value="approved">Approved</option>
+                </select>
             </div>
 
             {loading ? (
-                <div className="flex flex-col items-center justify-center py-32 bg-[#0a0a0a]/50 border border-white/5 rounded-[2rem]">
-                    <Loader2 className="animate-spin text-primary mb-4" size={48} />
-                    <p className="text-[10px] font-black uppercase tracking-[0.4em] text-gray-600 animate-pulse">Scanning Archive...</p>
+                <div className="flex items-center justify-center min-h-[400px]">
+                    <div className="flex flex-col items-center gap-4">
+                        <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                        <p className="text-muted-foreground">Loading blogs...</p>
+                    </div>
                 </div>
             ) : (
-                <div className="bg-[#0a0a0a] border border-white/5 rounded-[2rem] overflow-hidden shadow-2xl">
+                <div className="glass-card rounded-xl border border-border/50 overflow-hidden shadow-2xl">
                     <div className="overflow-x-auto">
-                        <table className="w-full text-left text-sm border-collapse">
-                            <thead className="bg-white/[0.02] border-b border-white/5 text-gray-500 uppercase text-[10px] font-black tracking-[0.3em]">
-                                <tr>
-                                    <th className="px-8 py-6">Composition Title</th>
-                                    <th className="px-8 py-6">Contributor</th>
-                                    <th className="px-8 py-6">Genre</th>
-                                    <th className="px-8 py-6">Current Status</th>
-                                    <th className="px-8 py-6">Date Added</th>
-                                    <th className="px-8 py-6 text-right">Moderation</th>
+                        <table className="w-full text-left text-sm border-separate border-spacing-0">
+                            <thead>
+                                <tr className="border-b border-border/50 bg-secondary/30">
+                                    <th className="p-4 text-sm font-semibold text-foreground">Composition Title</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground">Contributor</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground">Genre</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground">Current Status</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground">Date Added</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground text-right">Moderation</th>
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-white/5">
+                            <tbody className="divide-y divide-border/30">
                                 {blogs.length > 0 ? blogs.map(blog => {
                                     const author = typeof blog.authorId === 'object' ? blog.authorId.fullName : 'Unknown Contributor';
                                     return (
-                                        <tr key={blog._id} className="hover:bg-white/[0.01] transition-all group">
-                                            <td className="px-8 py-6">
-                                                <div className="flex items-center gap-4">
-                                                    <div className="w-10 h-10 rounded-lg bg-white/5 overflow-hidden flex-shrink-0 border border-white/5">
+                                        <tr key={blog._id} className="hover:bg-muted/30 transition-colors group border-b border-border/30">
+                                            <td className="p-4">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-10 h-10 rounded-lg bg-secondary/50 overflow-hidden flex-shrink-0 border border-border/50">
                                                         <img 
                                                             src={blog.image || "/assets/image_not_found.png"} 
                                                             alt="" 
-                                                            className="w-full h-full object-cover opacity-50 group-hover:opacity-100 transition-opacity"
+                                                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                                                         />
                                                     </div>
-                                                    <span className="font-bold text-white tracking-tight text-base">{blog.title}</span>
+                                                    <span className="font-medium text-foreground">{blog.title}</span>
                                                 </div>
                                             </td>
-                                            <td className="px-8 py-6 text-gray-400 font-light">{author}</td>
-                                            <td className="px-8 py-6">
-                                                <span className="bg-white/5 border border-white/5 px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest text-gray-500 group-hover:text-primary transition-colors">{blog.category}</span>
+                                            <td className="p-4 text-muted-foreground">{author}</td>
+                                            <td className="p-4">
+                                                <span className="bg-secondary/50 px-2 py-1 rounded-full text-[10px] font-medium text-foreground capitalize border border-border/50">
+                                                    {blog.category}
+                                                </span>
                                             </td>
-                                            <td className="px-8 py-6">
+                                            <td className="p-4">
                                                 {blog.isApproved ? (
-                                                    <div className="flex items-center gap-2 text-green-500 text-[10px] font-black uppercase tracking-widest">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_rgba(34,197,94,0.6)]" /> Approved
-                                                    </div>
+                                                    <span className="text-[10px] px-2 py-1 rounded-full bg-success/20 text-success font-medium">
+                                                        Approved
+                                                    </span>
                                                 ) : (
-                                                    <div className="flex items-center gap-2 text-amber-500 text-[10px] font-black uppercase tracking-widest">
-                                                        <div className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.6)]" /> Pending review
-                                                    </div>
+                                                    <span className="text-[10px] px-2 py-1 rounded-full bg-warning/20 text-warning font-medium">
+                                                        Pending
+                                                    </span>
                                                 )}
                                             </td>
-                                            <td className="px-8 py-6 text-gray-600 text-xs">
+                                            <td className="p-4 text-muted-foreground text-xs">
                                                 {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '---'}
                                             </td>
-                                            <td className="px-8 py-6 text-right">
-                                                <div className="flex justify-end gap-3 opacity-40 group-hover:opacity-100 transition-opacity">
-                                                    <a href={`/blog/${blog._id}`} target="_blank" rel="noopener noreferrer" className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-gray-400 hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all">
+                                            <td className="p-4 text-right">
+                                                <div className="flex justify-end gap-2">
+                                                    <a href={`/blog/${blog._id}`} target="_blank" rel="noopener noreferrer" 
+                                                       className="p-2 hover:bg-secondary/50 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                                                       title="View Blog">
                                                         <Eye size={18} />
                                                     </a>
-                                                    <button onClick={() => handleEditClick(blog)} className="w-10 h-10 rounded-xl bg-blue-900/10 border border-blue-500/10 text-blue-500 flex items-center justify-center hover:bg-blue-500 hover:text-white transition-all cursor-pointer">
+                                                    <button onClick={() => handleEditClick(blog)} 
+                                                            className="p-2 hover:bg-secondary/50 rounded-lg transition-colors text-muted-foreground hover:text-foreground"
+                                                            title="Edit Blog">
                                                         <Edit size={18} />
                                                     </button>
                                                     {!blog.isApproved ? (
-                                                        <button onClick={() => handleApprove(blog._id!, true)} className="w-10 h-10 rounded-xl bg-green-900/10 border border-green-500/10 text-green-500 flex items-center justify-center hover:bg-green-500 hover:text-white transition-all cursor-pointer">
+                                                        <button onClick={() => handleApprove(blog._id!, true)} 
+                                                                className="p-2 hover:bg-success/10 rounded-lg transition-colors text-success"
+                                                                title="Approve Blog">
                                                             <Check size={18} />
                                                         </button>
                                                     ) : (
-                                                        <button onClick={() => handleApprove(blog._id!, false)} className="w-10 h-10 rounded-xl bg-amber-900/10 border border-amber-500/10 text-amber-500 flex items-center justify-center hover:bg-amber-500 hover:text-white transition-all cursor-pointer">
+                                                        <button onClick={() => handleApprove(blog._id!, false)} 
+                                                                className="p-2 hover:bg-warning/10 rounded-lg transition-colors text-warning"
+                                                                title="Reject Blog">
                                                             <X size={18} />
                                                         </button>
                                                     )}
-                                                    <button onClick={() => handleDelete(blog._id!)} className="w-10 h-10 rounded-xl bg-red-900/10 border border-red-500/10 text-red-500 flex items-center justify-center hover:bg-red-500 hover:text-white transition-all cursor-pointer">
+                                                    <button onClick={() => handleDelete(blog._id!)} 
+                                                            className="p-2 hover:bg-destructive/10 rounded-lg transition-colors text-destructive"
+                                                            title="Delete Blog">
                                                         <Trash2 size={18} />
                                                     </button>
                                                 </div>
@@ -319,9 +333,8 @@ const AdminBlogList: React.FC = () => {
                                     );
                                 }) : (
                                     <tr>
-                                        <td colSpan={6} className="px-8 py-32 text-center">
-                                            <div className="text-gray-600 text-[10px] font-black uppercase tracking-[0.4em] mb-4">No Data in Archive</div>
-                                            <button onClick={() => {setStatusFilter('all'); setSearchQuery('');}} className="text-primary hover:underline text-[10px] font-black uppercase tracking-widest">Clear Constraints</button>
+                                        <td colSpan={6} className="p-8 text-center text-muted-foreground">
+                                            No blogs found
                                         </td>
                                     </tr>
                                 )}
@@ -333,61 +346,61 @@ const AdminBlogList: React.FC = () => {
 
             {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
-                    <div className="bg-[#16161e] border border-white/10 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
-                        <div className="sticky top-0 bg-[#16161e] border-b border-white/10 p-6 flex justify-between items-center z-10">
+                    <div className="bg-background border border-border rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl glass-card">
+                        <div className="sticky top-0 bg-background/80 backdrop-blur-md border-b border-border p-6 flex justify-between items-center z-10">
                             <div>
-                                <h2 className="text-xl font-bold text-white tracking-tight">{modalMode === 'edit' ? 'Edit Recipe' : 'Create Recipe'}</h2>
-                                <p className="text-xs text-gray-500 mt-1">{modalMode === 'edit' ? 'Update composition details' : 'Add new composition'}</p>
+                                <h2 className="text-xl font-bold text-foreground tracking-tight">{modalMode === 'edit' ? 'Edit Recipe' : 'Create Recipe'}</h2>
+                                <p className="text-xs text-muted-foreground mt-1">{modalMode === 'edit' ? 'Update composition details' : 'Add new composition'}</p>
                             </div>
-                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 transition-colors">
+                            <Button variant="ghost" size="icon" onClick={() => setIsModalOpen(false)} className="text-muted-foreground">
                                 <X size={16} />
-                            </button>
+                            </Button>
                         </div>
                         
                         <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-300 mb-2">Title *</label>
-                                    <input 
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Title *</label>
+                                    <Input 
                                         type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
-                                        className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm text-gray-200"
+                                        className="bg-secondary/30 border-border"
                                     />
                                 </div>
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-300 mb-2">Category</label>
-                                    <input 
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Category</label>
+                                    <Input 
                                         type="text" value={formData.category} onChange={e => setFormData({...formData, category: e.target.value})}
-                                        className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm text-gray-200"
+                                        className="bg-secondary/30 border-border"
                                         placeholder="e.g. Cocktail, Mocktail"
                                     />
                                 </div>
                             </div>
                             
                             <div>
-                                <label className="block text-xs font-semibold text-gray-300 mb-2">Full Instructions *</label>
+                                <label className="block text-xs font-semibold text-muted-foreground mb-2">Full Instructions *</label>
                                 <textarea 
                                     required rows={6} value={formData.instructions} onChange={e => setFormData({...formData, instructions: e.target.value})}
-                                    className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm text-gray-200 resize-y"
+                                    className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary transition-colors text-sm text-foreground resize-y"
                                 />
                             </div>
 
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-300 mb-2">Ingredients</label>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Ingredients</label>
                                     <div className="flex gap-2">
-                                        <input 
+                                        <Input 
                                             type="text" value={currentIngredient} onChange={e => setCurrentIngredient(e.target.value)} onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), handleAddIngredient())}
-                                            className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm text-gray-200"
+                                            className="bg-secondary/30 border-border"
                                             placeholder="Add ingredient..."
                                         />
-                                        <button type="button" onClick={handleAddIngredient} className="bg-white/10 hover:bg-white/20 px-4 rounded-lg font-medium text-sm transition-colors text-white">Add</button>
+                                        <Button type="button" onClick={handleAddIngredient} variant="secondary">Add</Button>
                                     </div>
                                     {ingredients.length > 0 && (
                                         <div className="mt-3 space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar">
                                             {ingredients.map((ing, idx) => (
-                                                <div key={idx} className="flex items-center justify-between bg-[#0a0a0f] border border-white/5 rounded px-3 py-2 text-sm text-gray-300 group">
+                                                <div key={idx} className="flex items-center justify-between bg-secondary/30 border border-border/50 rounded px-3 py-2 text-sm text-muted-foreground group">
                                                     <span>{ing}</span>
-                                                    <button type="button" onClick={() => handleRemoveIngredient(idx)} className="text-gray-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all"><X size={14} /></button>
+                                                    <button type="button" onClick={() => handleRemoveIngredient(idx)} className="text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"><X size={14} /></button>
                                                 </div>
                                             ))}
                                         </div>
@@ -395,38 +408,38 @@ const AdminBlogList: React.FC = () => {
                                 </div>
 
                                 <div>
-                                    <label className="block text-xs font-semibold text-gray-300 mb-2">Image</label>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Image</label>
                                     {imagePreview && (
-                                        <div className="relative w-full h-32 rounded-lg border border-white/10 overflow-hidden bg-[#0a0a0f] mb-3 flex items-center justify-center group">
+                                        <div className="relative w-full h-32 rounded-lg border border-border overflow-hidden bg-secondary/30 mb-3 flex items-center justify-center group">
                                             <img src={imagePreview} alt="Preview" className="max-w-full max-h-full object-contain" />
-                                            <button type="button" className="absolute top-2 right-2 p-1.5 bg-red-500/80 hover:bg-red-500 rounded-md transition-colors opacity-0 group-hover:opacity-100" onClick={handleRemoveImage}>
+                                            <button type="button" className="absolute top-2 right-2 p-1.5 bg-destructive/80 hover:bg-destructive rounded-md transition-colors opacity-0 group-hover:opacity-100" onClick={handleRemoveImage}>
                                                 <X size={14} className="text-white" />
                                             </button>
                                         </div>
                                     )}
                                     <div className="flex gap-2 relative">
-                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500"><ImageIcon size={16} /></div>
-                                        <input 
+                                        <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-muted-foreground"><ImageIcon size={16} /></div>
+                                        <Input 
                                             type="url" placeholder="Image URL..." value={imagePreview?.startsWith('data:') ? '' : formData.image}
                                             onChange={e => { setFormData({...formData, image: e.target.value}); setImagePreview(e.target.value || null); }}
                                             disabled={Boolean(imagePreview?.startsWith('data:'))}
-                                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg pl-10 pr-4 py-3 focus:outline-none focus:border-primary transition-colors text-sm text-gray-200 disabled:opacity-50"
+                                            className="pl-10 bg-secondary/30 border-border"
                                         />
                                         <input ref={fileInputRef} type="file" accept="image/*" onChange={handleFileSelect} className="hidden" />
-                                        <button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImage} className="bg-white/5 border border-white/10 hover:bg-white/10 text-gray-300 px-4 rounded-lg flex items-center justify-center transition-colors min-w-[50px]">
+                                        <Button type="button" onClick={() => fileInputRef.current?.click()} disabled={uploadingImage} variant="outline" size="icon" className="min-w-[40px]">
                                             {uploadingImage ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
-                                        </button>
+                                        </Button>
                                     </div>
                                 </div>
                             </div>
                             
-                            <div className="pt-6 border-t border-white/10 flex justify-end gap-3 sticky bottom-0 bg-[#16161e] pb-2">
-                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg font-medium text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                            <div className="pt-6 border-t border-border flex justify-end gap-3 sticky bottom-0 bg-background pb-2">
+                                <Button type="button" variant="ghost" onClick={() => setIsModalOpen(false)} className="text-muted-foreground hover:text-foreground">
                                     Cancel
-                                </button>
-                                <button type="submit" disabled={editLoading} className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
-                                    {editLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : (modalMode === 'edit' ? 'Save Changes' : 'Create Recipe')}
-                                </button>
+                                </Button>
+                                <Button type="submit" disabled={editLoading} className="bg-primary hover:bg-primary/90 text-white min-w-[120px]">
+                                    {editLoading ? <><Loader2 size={16} className="animate-spin mr-2" /> Saving...</> : (modalMode === 'edit' ? 'Save Changes' : 'Create Recipe')}
+                                </Button>
                             </div>
                         </form>
                     </div>
