@@ -2,10 +2,12 @@
 
 import React, { useState, useEffect } from 'react';
 import { Blog, blogService } from '@/services/blog.service';
+import { useAuth } from '@/contexts/AuthContext';
 import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminBlogList: React.FC = () => {
+    const { user } = useAuth();
     const [blogs, setBlogs] = useState<Blog[]>([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
@@ -175,7 +177,8 @@ const AdminBlogList: React.FC = () => {
                 category: formData.category || 'Cocktail',
                 instructions: formData.instructions,
                 ingredients: finalIngredients,
-                image: formData.image
+                image: formData.image,
+                authorId: user?._id || user?.id
             };
             
             if (modalMode === 'edit' && editingBlog?._id) {
