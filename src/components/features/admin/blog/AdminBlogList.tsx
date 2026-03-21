@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { Blog, blogService } from '@/services/blog.service';
 import { useAuth } from '@/contexts/AuthContext';
-import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus, AlertCircle } from 'lucide-react';
+import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus, AlertCircle, ArrowUpDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
@@ -14,6 +14,8 @@ const AdminBlogList: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved'>('all');
+    const [sortKey, setSortKey] = useState<'title' | 'category' | 'createdAt'>('createdAt');
+    const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc');
 
     // Modal State
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -44,7 +46,18 @@ const AdminBlogList: React.FC = () => {
             }
             
             const response = await blogService.getAll(filters);
-            setBlogs(response.data);
+            let data = response.data || [];
+            
+            // Local Sorting
+            data = data.sort((a: any, b: any) => {
+                const dir = sortDir === 'asc' ? 1 : -1;
+                if (sortKey === 'title') return dir * (a.title || '').localeCompare(b.title || '');
+                if (sortKey === 'category') return dir * (a.category || '').localeCompare(b.category || '');
+                if (sortKey === 'createdAt') return dir * (new Date(a.createdAt || 0).getTime() - new Date(b.createdAt || 0).getTime());
+                return 0;
+            });
+
+            setBlogs(data);
         } catch (error: any) {
             toast.error(error.message || "Failed to fetch blogs");
         } finally {
@@ -57,7 +70,7 @@ const AdminBlogList: React.FC = () => {
             fetchBlogs();
         }, 500);
         return () => clearTimeout(timer);
-    }, [statusFilter, searchQuery]);
+    }, [statusFilter, searchQuery, sortKey, sortDir]);
 
     const handleApprove = async (id: string, approve: boolean) => {
         try {
@@ -200,24 +213,33 @@ const AdminBlogList: React.FC = () => {
         }
     };
 
+    const handleSort = (key: typeof sortKey) => {
+        if (key === sortKey) {
+            setSortDir(sortDir === 'asc' ? 'desc' : 'asc');
+        } else {
+            setSortKey(key);
+            setSortDir('asc');
+        }
+    };
+
     return (
-        <div className="space-y-8 p-6">
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+        <div className="space-y-6 p-4 md:p-6">
+            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                 <div>
-                    <h1 className="text-3xl font-display font-bold text-foreground">Blog Management</h1>
-                    <p className="text-muted-foreground mt-1">Manage and moderate blog posts and recipes.</p>
+                    <h1 className="text-2xl md:text-3xl font-display font-bold text-foreground">Blog Management</h1>
+                    <p className="text-sm text-muted-foreground mt-1">Manage and moderate blog posts and recipes.</p>
                 </div>
                 
                 <Button 
                     onClick={handleAddClick}
-                    className="bg-primary hover:bg-primary/90 text-white gap-2"
+                    className="bg-primary hover:bg-primary/90 text-white gap-2 w-full sm:w-auto"
                 >
                     <Plus size={18} />
                     Create Recipe
                 </Button>
             </div>
 
-            <div className="flex flex-col md:flex-row gap-4">
+            <div className="flex flex-col sm:flex-row gap-3">
                 <div className="relative flex-1">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                     <Input 
@@ -228,15 +250,17 @@ const AdminBlogList: React.FC = () => {
                     />
                 </div>
                 
-                <select 
-                    className="bg-secondary/50 border border-border rounded-md py-2 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground min-w-[150px] appearance-none cursor-pointer"
-                    value={statusFilter}
-                    onChange={(e) => setStatusFilter(e.target.value as any)}
-                >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="approved">Approved</option>
-                </select>
+                <div className="flex gap-2 w-full sm:w-auto">
+                    <select 
+                        className="flex-1 sm:flex-none bg-secondary/50 border border-border rounded-md py-2 px-4 text-sm focus:outline-none focus:ring-1 focus:ring-primary text-foreground min-w-[140px] appearance-none cursor-pointer"
+                        value={statusFilter}
+                        onChange={(e) => setStatusFilter(e.target.value as any)}
+                    >
+                        <option value="all">All Status</option>
+                        <option value="pending">Pending</option>
+                        <option value="approved">Approved</option>
+                    </select>
+                </div>
             </div>
 
             {loading ? (
@@ -252,11 +276,26 @@ const AdminBlogList: React.FC = () => {
                         <table className="w-full text-left text-sm border-separate border-spacing-0">
                             <thead>
                                 <tr className="border-b border-border/50 bg-secondary/30">
-                                    <th className="p-4 text-sm font-semibold text-foreground">Composition Title</th>
-                                    <th className="p-4 text-sm font-semibold text-foreground">Contributor</th>
-                                    <th className="p-4 text-sm font-semibold text-foreground">Genre</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground">
+                                        <button onClick={() => handleSort('title')} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                            Composition Title
+                                            <ArrowUpDown className="h-3 w-3 opacity-50" />
+                                        </button>
+                                    </th>
+                                    <th className="p-4 text-sm font-semibold text-foreground hidden lg:table-cell">Contributor</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground hidden sm:table-cell">
+                                        <button onClick={() => handleSort('category')} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                            Genre
+                                            <ArrowUpDown className="h-3 w-3 opacity-50" />
+                                        </button>
+                                    </th>
                                     <th className="p-4 text-sm font-semibold text-foreground">Current Status</th>
-                                    <th className="p-4 text-sm font-semibold text-foreground">Date Added</th>
+                                    <th className="p-4 text-sm font-semibold text-foreground hidden md:table-cell">
+                                        <button onClick={() => handleSort('createdAt')} className="flex items-center gap-2 hover:text-primary transition-colors">
+                                            Date Added
+                                            <ArrowUpDown className="h-3 w-3 opacity-50" />
+                                        </button>
+                                    </th>
                                     <th className="p-4 text-sm font-semibold text-foreground text-right">Moderation</th>
                                 </tr>
                             </thead>
@@ -277,8 +316,8 @@ const AdminBlogList: React.FC = () => {
                                                     <span className="font-medium text-foreground">{blog.title}</span>
                                                 </div>
                                             </td>
-                                            <td className="p-4 text-muted-foreground">{author}</td>
-                                            <td className="p-4">
+                                            <td className="p-4 text-muted-foreground hidden lg:table-cell">{author}</td>
+                                            <td className="p-4 hidden sm:table-cell">
                                                 <span className="bg-secondary/50 px-2 py-1 rounded-full text-[10px] font-medium text-foreground capitalize border border-border/50">
                                                     {blog.category}
                                                 </span>
@@ -294,7 +333,7 @@ const AdminBlogList: React.FC = () => {
                                                     </span>
                                                 )}
                                             </td>
-                                            <td className="p-4 text-muted-foreground text-xs">
+                                            <td className="p-4 text-muted-foreground text-xs hidden md:table-cell">
                                                 {blog.createdAt ? new Date(blog.createdAt).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }) : '---'}
                                             </td>
                                             <td className="p-4 text-right">
@@ -357,8 +396,8 @@ const AdminBlogList: React.FC = () => {
                             </Button>
                         </div>
                         
-                        <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <form onSubmit={handleFormSubmit} className="p-4 md:p-6 space-y-6">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6">
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-2">Title *</label>
                                     <Input 
@@ -384,7 +423,7 @@ const AdminBlogList: React.FC = () => {
                                 />
                             </div>
 
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-6 items-start">
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-2">Ingredients</label>
                                     <div className="flex gap-2">
