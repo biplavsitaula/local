@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Blog, blogService } from '@/services/blog.service';
-import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload } from 'lucide-react';
+import { Loader2, Check, X, Trash2, Eye, Filter, Search, Clock, Edit, Image as ImageIcon, Upload, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 
 const AdminBlogList: React.FC = () => {
@@ -11,8 +11,9 @@ const AdminBlogList: React.FC = () => {
     const [searchQuery, setSearchQuery] = useState('');
     const [statusFilter, setStatusFilter] = useState<'all' | 'pending' | 'approved'>('all');
 
-    // Edit Modal State
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    // Modal State
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalMode, setModalMode] = useState<'add' | 'edit'>('add');
     const [editingBlog, setEditingBlog] = useState<Blog | null>(null);
     const [editLoading, setEditLoading] = useState(false);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -76,6 +77,7 @@ const AdminBlogList: React.FC = () => {
     };
 
     const handleEditClick = (blog: Blog) => {
+        setModalMode('edit');
         setEditingBlog(blog);
         setFormData({
             title: blog.title || '',
@@ -86,7 +88,22 @@ const AdminBlogList: React.FC = () => {
         setIngredients(blog.ingredients || []);
         setCurrentIngredient('');
         setImagePreview(blog.image || null);
-        setIsEditModalOpen(true);
+        setIsModalOpen(true);
+    };
+
+    const handleAddClick = () => {
+        setModalMode('add');
+        setEditingBlog(null);
+        setFormData({
+            title: '',
+            category: 'Cocktail',
+            instructions: '',
+            image: ''
+        });
+        setIngredients([]);
+        setCurrentIngredient('');
+        setImagePreview(null);
+        setIsModalOpen(true);
     };
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -138,9 +155,8 @@ const AdminBlogList: React.FC = () => {
         setIngredients(ingredients.filter((_, i) => i !== index));
     };
 
-    const handleEditSubmit = async (e: React.FormEvent) => {
+    const handleFormSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!editingBlog?._id) return;
 
         if (!formData.title || !formData.instructions) {
             toast.error("Please fill in all required fields.");
@@ -156,17 +172,24 @@ const AdminBlogList: React.FC = () => {
         try {
             const payload = {
                 title: formData.title,
-                category: formData.category,
+                category: formData.category || 'Cocktail',
                 instructions: formData.instructions,
                 ingredients: finalIngredients,
                 image: formData.image
             };
-            await blogService.update(editingBlog._id, payload);
-            toast.success("Blog updated successfully!");
-            setIsEditModalOpen(false);
+            
+            if (modalMode === 'edit' && editingBlog?._id) {
+                await blogService.update(editingBlog._id, payload);
+                toast.success("Blog updated successfully!");
+            } else {
+                await blogService.create(payload);
+                toast.success("Blog created successfully!");
+            }
+            
+            setIsModalOpen(false);
             fetchBlogs();
         } catch (err: any) {
-            toast.error(err?.message || "Failed to update blog");
+            toast.error(err?.message || `Failed to ${modalMode} blog`);
         } finally {
             setEditLoading(false);
         }
@@ -181,6 +204,14 @@ const AdminBlogList: React.FC = () => {
                 </div>
                 
                 <div className="flex flex-col md:flex-row gap-4 w-full md:w-auto">
+                    <button 
+                        onClick={handleAddClick}
+                        className="bg-primary hover:bg-primary/90 text-white px-6 py-3 rounded-xl font-bold text-sm transition-colors flex items-center justify-center gap-2 whitespace-nowrap"
+                    >
+                        <Plus size={18} />
+                        Create Recipe
+                    </button>
+
                     <div className="relative">
                         <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500" size={16} />
                         <input 
@@ -297,20 +328,20 @@ const AdminBlogList: React.FC = () => {
                 </div>
             )}
 
-            {isEditModalOpen && (
+            {isModalOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm">
                     <div className="bg-[#16161e] border border-white/10 rounded-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto shadow-2xl">
                         <div className="sticky top-0 bg-[#16161e] border-b border-white/10 p-6 flex justify-between items-center z-10">
                             <div>
-                                <h2 className="text-xl font-bold text-white tracking-tight">Edit Recipe</h2>
-                                <p className="text-xs text-gray-500 mt-1">Update composition detials</p>
+                                <h2 className="text-xl font-bold text-white tracking-tight">{modalMode === 'edit' ? 'Edit Recipe' : 'Create Recipe'}</h2>
+                                <p className="text-xs text-gray-500 mt-1">{modalMode === 'edit' ? 'Update composition details' : 'Add new composition'}</p>
                             </div>
-                            <button onClick={() => setIsEditModalOpen(false)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 transition-colors">
+                            <button onClick={() => setIsModalOpen(false)} className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/10 flex items-center justify-center text-gray-400 transition-colors">
                                 <X size={16} />
                             </button>
                         </div>
                         
-                        <form onSubmit={handleEditSubmit} className="p-6 space-y-6">
+                        <form onSubmit={handleFormSubmit} className="p-6 space-y-6">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <div>
                                     <label className="block text-xs font-semibold text-gray-300 mb-2">Title *</label>
@@ -387,11 +418,11 @@ const AdminBlogList: React.FC = () => {
                             </div>
                             
                             <div className="pt-6 border-t border-white/10 flex justify-end gap-3 sticky bottom-0 bg-[#16161e] pb-2">
-                                <button type="button" onClick={() => setIsEditModalOpen(false)} className="px-5 py-2.5 rounded-lg font-medium text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
+                                <button type="button" onClick={() => setIsModalOpen(false)} className="px-5 py-2.5 rounded-lg font-medium text-sm text-gray-400 hover:text-white hover:bg-white/5 transition-colors">
                                     Cancel
                                 </button>
                                 <button type="submit" disabled={editLoading} className="bg-primary hover:bg-primary/90 text-white px-6 py-2.5 rounded-lg font-medium text-sm transition-colors flex items-center gap-2">
-                                    {editLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : 'Save Changes'}
+                                    {editLoading ? <><Loader2 size={16} className="animate-spin" /> Saving...</> : (modalMode === 'edit' ? 'Save Changes' : 'Create Recipe')}
                                 </button>
                             </div>
                         </form>
