@@ -47,7 +47,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             {blog.title}
           </h3>
 
-          <p className="text-sm text-color-muted line-clamp-2 leading-relaxed font-light">
+          <p className="text-sm text-color-muted line-clamp-2 leading-relaxed font-light text-justify flex-grow">
             {blog.instructions}
           </p>
 
