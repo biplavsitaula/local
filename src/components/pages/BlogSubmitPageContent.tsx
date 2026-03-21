@@ -8,9 +8,12 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
+import { useAuth } from '@/contexts/AuthContext';
+
 const BlogSubmitPageContent: React.FC = () => {
     const { t } = useLanguage();
     const router = useRouter();
+    const { user } = useAuth();
     const [isLoading, setIsLoading] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [imagePreview, setImagePreview] = useState<string | null>(null);
@@ -116,7 +119,8 @@ const BlogSubmitPageContent: React.FC = () => {
                 ingredients: finalIngredients,
                 image: formData.image,
                 category: 'Cocktail', // Default since UI doesn't explicitly have it
-                tags: []
+                tags: [],
+                authorId: user?._id
             };
 
             await blogService.create(payload);
