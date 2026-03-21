@@ -11,6 +11,7 @@ export interface Blog {
         fullName: string;
         email: string;
     } | string;
+    authorName?: string;
     category: string;
     tags: string[];
     isApproved: boolean;

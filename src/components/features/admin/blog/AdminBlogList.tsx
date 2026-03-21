@@ -30,7 +30,8 @@ const AdminBlogList: React.FC = () => {
         title: '',
         category: '',
         instructions: '',
-        image: ''
+        image: '',
+        authorName: ''
     });
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -100,7 +101,8 @@ const AdminBlogList: React.FC = () => {
             title: blog.title || '',
             category: blog.category || 'Cocktail',
             instructions: blog.instructions || '',
-            image: blog.image || ''
+            image: blog.image || '',
+            authorName: blog.authorName || ''
         });
         setIngredients(blog.ingredients || []);
         setCurrentIngredient('');
@@ -115,7 +117,8 @@ const AdminBlogList: React.FC = () => {
             title: '',
             category: 'Cocktail',
             instructions: '',
-            image: ''
+            image: '',
+            authorName: ''
         });
         setIngredients([]);
         setCurrentIngredient('');
@@ -193,6 +196,7 @@ const AdminBlogList: React.FC = () => {
                 instructions: formData.instructions,
                 ingredients: finalIngredients,
                 image: formData.image,
+                authorName: formData.authorName,
                 authorId: user?._id || user?.id
             };
             
@@ -301,7 +305,7 @@ const AdminBlogList: React.FC = () => {
                             </thead>
                             <tbody className="divide-y divide-border/30">
                                 {blogs.length > 0 ? blogs.map(blog => {
-                                    const author = typeof blog.authorId === 'object' ? blog.authorId.fullName : 'Unknown Contributor';
+                                    const author = blog.authorName || (typeof blog.authorId === 'object' ? blog.authorId.fullName : 'Unknown Contributor');
                                     return (
                                         <tr key={blog._id} className="hover:bg-muted/30 transition-colors group border-b border-border/30">
                                             <td className="p-4">
@@ -403,6 +407,14 @@ const AdminBlogList: React.FC = () => {
                                     <Input 
                                         type="text" required value={formData.title} onChange={e => setFormData({...formData, title: e.target.value})}
                                         className="bg-secondary/30 border-border"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Author Name</label>
+                                    <Input 
+                                        type="text" value={formData.authorName} onChange={e => setFormData({...formData, authorName: e.target.value})}
+                                        className="bg-secondary/30 border-border"
+                                        placeholder="Enter author name"
                                     />
                                 </div>
                                 <div>
