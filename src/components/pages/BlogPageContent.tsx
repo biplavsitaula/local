@@ -81,7 +81,7 @@ const BlogPageContent: React.FC = () => {
         <div className="min-h-screen bg-[#050505] text-white">
             <Header searchQuery="" onSearchChange={handleSearchChange} />
 
-            <main className="container mx-auto px-4 py-12">
+            <main className="container mx-auto px-4 py-6 md:py-12">
                 {/* Header Section */}
                 <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-12 gap-6">
                     <div className="flex flex-col gap-2">
@@ -179,7 +179,7 @@ const BlogPageContent: React.FC = () => {
                                 <button
                                     onClick={handleLoadMore}
                                     disabled={loadingMore}
-                                    className="px-16 py-5 border border-white/10 rounded-2xl text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-white/5 hover:text-white transition-all disabled:opacity-50 cursor-pointer flex items-center gap-4 mx-auto group"
+                                    className="w-full sm:w-auto px-8 sm:px-16 py-5 border border-white/10 rounded-2xl text-gray-400 font-bold uppercase tracking-[0.3em] text-[10px] hover:bg-white/5 hover:text-white transition-all disabled:opacity-50 cursor-pointer flex justify-center items-center gap-4 mx-auto group"
                                 >
                                     {loadingMore ? <Loader2 className="animate-spin" size={18} /> : (
                                         <>DISCOVER MORE <Plus size={16} className="group-hover:rotate-90 transition-transform" /></>
@@ -189,9 +189,9 @@ const BlogPageContent: React.FC = () => {
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-40 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                        <div className="mb-6 text-7xl opacity-10 italic font-black tracking-tighter uppercase">No Mixes Found</div>
-                        <p className="text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed">We couldn't find any blogs matching your criteria. Try adjusting your search or category filters.</p>
+                    <div className="text-center py-20 px-4 sm:py-40 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
+                        <div className="mb-6 text-5xl md:text-7xl opacity-10 italic font-black tracking-tighter uppercase">No Mixes Found</div>
+                        <p className="text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed px-4">We couldn't find any blogs matching your criteria. Try adjusting your search or category filters.</p>
                         <button
                             onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
                             className="bg-white/10 px-10 py-4 rounded-2xl text-white font-bold text-xs uppercase tracking-[0.2em] hover:bg-white/20 transition-all cursor-pointer"

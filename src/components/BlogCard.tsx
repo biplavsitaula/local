@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Blog } from "@/services/blog.service";
-import { Calendar, User } from "lucide-react";
+import { Calendar, User, ArrowRight } from "lucide-react";
 
 const DEFAULT_IMAGE = "/assets/image_not_found.png";
 
@@ -17,10 +17,10 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
   const authorName = typeof blog.authorId === "object" ? blog.authorId.fullName : "Anonymous";
   const formattedDate = blog.createdAt
     ? new Date(blog.createdAt).toLocaleDateString("en-US", {
-        month: "short",
-        day: "numeric",
-        year: "numeric",
-      })
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    })
     : "Unknown Date";
 
   return (
@@ -52,7 +52,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
           </p>
 
           <div className="mt-4 flex items-center justify-between text-xs sm:text-xs text-color-muted font-medium">
-             <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5">
               <User size={14} className="text-color-muted" />
               <span>{authorName}</span>
             </div>
@@ -62,9 +62,9 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-border">
+          <div className="flex mt-4 pt-4 border-t border-border">
             <div className="inline-flex items-center gap-1 text-sm font-bold text-color-accent hover:text-primary transition-colors">
-              Read More <span className="text-lg">→</span>
+              Read More <ArrowRight size={16} />
             </div>
           </div>
         </div>
