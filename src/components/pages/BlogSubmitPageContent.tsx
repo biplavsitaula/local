@@ -1,12 +1,10 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { blogService } from '@/services/blog.service';
-import { Flame, Plus, X, Loader2, ArrowLeft, Image as ImageIcon, Send } from 'lucide-react';
+import { X, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import Link from 'next/link';
 import { toast } from 'sonner';
 
@@ -14,226 +12,319 @@ const BlogSubmitPageContent: React.FC = () => {
     const { t } = useLanguage();
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
-    const [error, setError] = useState<string | null>(null);
-    
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [uploadingImage, setUploadingImage] = useState(false);
+
+    // Ingredients state array
+    const [ingredients, setIngredients] = useState<string[]>([]);
+    const [currentIngredient, setCurrentIngredient] = useState('');
+
     const [formData, setFormData] = useState({
         title: '',
-        category: 'Cocktail',
-        ingredients: [''],
+        authorName: '',
+        shortDescription: '',
         instructions: '',
-        image: '',
-        tags: ''
+        image: ''
     });
 
-    const categories = ['Cocktail', 'Mocktail', 'Whiskey Mix', 'Gin Mix', 'Vodka Mix', 'Others'];
+    const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
 
-    const handleAddIngredient = () => {
-        setFormData(prev => ({ ...prev, ingredients: [...prev.ingredients, ''] }));
+        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp'];
+        if (!allowedTypes.includes(file.type)) {
+            toast.error('Please select a valid image file (JPEG, PNG, GIF, or WebP)');
+            return;
+        }
+
+        const maxSize = 5 * 1024 * 1024; // 5MB
+        if (file.size > maxSize) {
+            toast.error('Image size must be less than 5MB');
+            return;
+        }
+
+        setUploadingImage(true);
+
+        try {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                setImagePreview(base64String);
+                setFormData(prev => ({ ...prev, image: base64String }));
+                setUploadingImage(false);
+            };
+            reader.onerror = () => {
+                toast.error('Failed to read image file');
+                setUploadingImage(false);
+            };
+            reader.readAsDataURL(file);
+        } catch (err) {
+            toast.error('Failed to process image');
+            setUploadingImage(false);
+        }
+
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
     };
 
-    const handleIngredientChange = (index: number, value: string) => {
-        const newIngredients = [...formData.ingredients];
-        newIngredients[index] = value;
-        setFormData(prev => ({ ...prev, ingredients: newIngredients }));
+    const handleRemoveImage = () => {
+        setImagePreview(null);
+        setFormData(prev => ({ ...prev, image: '' }));
+        if (fileInputRef.current) {
+            fileInputRef.current.value = '';
+        }
+    };
+
+    const handleAddIngredient = () => {
+        if (currentIngredient.trim()) {
+            setIngredients([...ingredients, currentIngredient.trim()]);
+            setCurrentIngredient('');
+        }
     };
 
     const handleRemoveIngredient = (index: number) => {
-        if (formData.ingredients.length === 1) return;
-        const newIngredients = formData.ingredients.filter((_, i) => i !== index);
-        setFormData(prev => ({ ...prev, ingredients: newIngredients }));
+        setIngredients(ingredients.filter((_, i) => i !== index));
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        setError(null);
-        
-        // Basic validation
-        if (!formData.title || formData.ingredients.some(ing => !ing.trim()) || !formData.instructions) {
-            setError("Please fill in all required fields.");
+
+        // Validation
+        if (!formData.title || !formData.shortDescription || !formData.instructions) {
+            toast.error("Please fill in all required fields.");
+            return;
+        }
+
+        // If they typed an ingredient but didn't hit Add, include it
+        const finalIngredients = [...ingredients];
+        if (currentIngredient.trim()) {
+            finalIngredients.push(currentIngredient.trim());
+        }
+
+        if (finalIngredients.length === 0) {
+            toast.error("Please add at least one ingredient.");
             return;
         }
 
         setIsLoading(true);
         try {
             const payload = {
-                ...formData,
-                tags: formData.tags.split(',').map(tag => tag.trim()).filter(tag => tag !== ''),
-                ingredients: formData.ingredients.filter(ing => ing.trim() !== '')
+                title: formData.title,
+                instructions: formData.shortDescription + '\n\n' + formData.instructions,
+                ingredients: finalIngredients,
+                image: formData.image,
+                category: 'Cocktail', // Default since UI doesn't explicitly have it
+                tags: []
             };
 
             await blogService.create(payload);
-            toast.success("Blog submitted successfully! It will be visible after admin approval.");
+            toast.success("Blog submitted successfully!");
             router.push('/blog');
         } catch (err: any) {
-            setError(err?.message || "Failed to submit blog. Please check if you are logged in.");
+            toast.error(err?.message || "Failed to submit blog. Please check if you are logged in.");
         } finally {
             setIsLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen bg-[#050505] text-white">
-            <Header searchQuery="" onSearchChange={() => {}} hideSearch={true} />
-
-            <main className="container mx-auto px-4 py-16 md:py-24">
-                <div className="max-w-4xl mx-auto">
-                    {/* Header */}
-                    <div className="mb-12">
-                        <Link href="/blog" className="inline-flex items-center gap-2 text-primary hover:text-white transition-colors uppercase tracking-[0.2em] text-[10px] font-bold mb-6 group">
-                            <ArrowLeft size={14} className="group-hover:-translate-x-1 transition-transform" />
-                            Return to Blog
-                        </Link>
-                        <h1 className="text-4xl md:text-6xl font-display font-black tracking-tighter italic mb-4">
-                            SHARE YOUR <span className="bg-gradient-to-r from-primary to-orange-500 bg-clip-text text-transparent">MIXOLOGY</span>
+        <div className="min-h-screen bg-[#0d0d12] text-white p-4 md:p-12 font-sans flex flex-col items-center">
+            {/* Top Header */}
+            <div className="w-full max-w-[1000px] flex items-center justify-between mb-8">
+                <div>
+                    <div className="flex items-center gap-2 mb-1">
+                        <span className="text-2xl">🍹</span>
+                        <h1 className="text-2xl md:text-3xl font-bold text-white font-serif tracking-wide">
+                            Blog
                         </h1>
-                        <p className="text-gray-500 font-light text-lg">
-                            Contribute your unique spirits recipes to the Flame community.
-                        </p>
+                    </div>
+                    <p className="text-gray-400 text-sm">
+                        Discover & share liquor-mixing recipes
+                    </p>
+                </div>
+                <Link href="/blog">
+                    <button className="flex items-center gap-2 bg-[#ff7b42] hover:bg-[#e66a35] text-black px-4 md:px-5 py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer">
+                        <X size={16} strokeWidth={2.5} />
+                    </button>
+                </Link>
+            </div>
+
+            {/* Main Form Container */}
+            <div className="w-full max-w-[1000px] bg-[#16161e] border border-white/5 rounded-xl p-6 md:p-8 shadow-2xl">
+                <h2 className="text-lg md:text-xl font-bold mb-8 text-white">
+                    Create Recipe
+                </h2>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    {/* Row 1: Title & Author */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-300 mb-2">Title *</label>
+                            <input
+                                type="text"
+                                required
+                                placeholder="e.g., Classic Mojito"
+                                value={formData.title}
+                                onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-300 mb-2">Author Name *</label>
+                            <input
+                                type="text"
+                                required
+                                placeholder="Your name"
+                                value={formData.authorName}
+                                onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
+                            />
+                        </div>
                     </div>
 
-                    <form onSubmit={handleSubmit} className="space-y-12">
-                        {/* Title & Category */}
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            <div className="md:col-span-2">
-                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-4">RECIPE TITLE *</label>
-                                <input 
-                                    type="text"
-                                    required
-                                    placeholder="Enter a catchy name for your mix..."
-                                    value={formData.title}
-                                    onChange={(e) => setFormData({...formData, title: e.target.value})}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 focus:outline-none focus:border-primary/50 transition-all text-xl font-bold placeholder:font-light"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-4">CATEGORY</label>
-                                <div className="relative">
-                                    <select 
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({...formData, category: e.target.value})}
-                                        className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 focus:outline-none focus:border-primary/50 transition-all font-bold appearance-none cursor-pointer"
-                                    >
-                                        {categories.map(cat => <option key={cat} value={cat} className="bg-[#111]">{cat}</option>)}
-                                    </select>
-                                    <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none opacity-40">▼</div>
-                                </div>
-                            </div>
-                        </div>
+                    {/* Row 2: Short Description */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-2">Short Description *</label>
+                        <textarea
+                            required
+                            rows={3}
+                            placeholder="Brief description of the cocktail..."
+                            value={formData.shortDescription}
+                            onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
+                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 resize-none"
+                        />
+                    </div>
 
-                        {/* Ingredients */}
-                        <div className="bg-[#0a0a0a] border border-white/5 rounded-[3rem] p-10 md:p-14 shadow-2xl">
-                            <label className="block text-[11px] uppercase tracking-[0.4em] text-primary font-black mb-10 flex items-center gap-4">
-                                <div className="w-8 h-px bg-primary/30" /> INGREDIENTS *
-                            </label>
-                            <div className="space-y-5">
-                                {formData.ingredients.map((ing, i) => (
-                                    <div key={i} className="flex gap-4 items-center group">
-                                        <div className="w-10 h-10 rounded-xl bg-white/5 border border-white/5 flex items-center justify-center text-[10px] font-black text-white/20 italic group-focus-within:text-primary group-focus-within:border-primary/20 transition-all">0{i+1}</div>
-                                        <input 
-                                            type="text"
-                                            required
-                                            placeholder="e.g. 60ml London Dry Gin"
-                                            value={ing}
-                                            onChange={(e) => handleIngredientChange(i, e.target.value)}
-                                            className="flex-1 bg-white/5 border border-white/5 rounded-2xl px-6 py-5 focus:outline-none focus:border-primary/30 transition-all text-base font-light"
-                                        />
-                                        {formData.ingredients.length > 1 && (
-                                            <button 
-                                                type="button" 
-                                                onClick={() => handleRemoveIngredient(i)}
-                                                className="w-12 h-12 rounded-2xl flex items-center justify-center text-gray-600 hover:text-primary hover:bg-primary/10 transition-all cursor-pointer border border-transparent hover:border-primary/20"
-                                            >
-                                                <X size={20} />
-                                            </button>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                            <button 
-                                type="button" 
-                                onClick={handleAddIngredient}
-                                className="mt-10 flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.2em] text-primary hover:text-white transition-all cursor-pointer group"
-                            >
-                                <div className="w-8 h-8 rounded-full border border-primary/30 flex items-center justify-center group-hover:border-white transition-all">
-                                    <Plus size={16} className="group-hover:rotate-90 transition-transform" />
-                                </div>
-                                Add Another Ingredient
-                            </button>
-                        </div>
+                    {/* Row 3: Full Instructions */}
+                    <div>
+                        <label className="block text-xs font-semibold text-gray-300 mb-2">Full Instructions *</label>
+                        <textarea
+                            required
+                            rows={5}
+                            placeholder="Step-by-step mixing instructions..."
+                            value={formData.instructions}
+                            onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 resize-none"
+                        />
+                    </div>
 
-                        {/* Instructions */}
+                    {/* Row 4: Ingredients & Image */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
                         <div>
-                            <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-6">PREPARATION METHOD *</label>
-                            <textarea 
-                                required
-                                rows={10}
-                                placeholder="Describe the steps to prepare your mixology... (e.g. Fill a shaker with ice, add spirits...)"
-                                value={formData.instructions}
-                                onChange={(e) => setFormData({...formData, instructions: e.target.value})}
-                                className="w-full bg-white/5 border border-white/10 rounded-[3rem] p-10 focus:outline-none focus:border-primary/50 transition-all text-gray-300 font-light leading-relaxed text-xl"
-                            ></textarea>
-                            <p className="mt-5 text-[10px] text-gray-600 uppercase tracking-widest italic font-medium">Tip: Use line breaks for separate steps to make it easier to read.</p>
-                        </div>
-
-                        {/* Optional Fields: Image & Tags */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-4 flex items-center gap-2">
-                                    <ImageIcon size={12} /> IMAGE URL
-                                </label>
-                                <input 
-                                    type="url"
-                                    placeholder="https://example.com/drink-photo.jpg"
-                                    value={formData.image}
-                                    onChange={(e) => setFormData({...formData, image: e.target.value})}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 focus:outline-none focus:border-primary/50 transition-all text-sm font-light"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-[10px] uppercase tracking-[0.3em] font-black text-white/40 mb-4">TAGS (COMMA SEPARATED)</label>
-                                <input 
+                            <label className="block text-xs font-semibold text-gray-300 mb-2">Ingredients *</label>
+                            <div className="flex gap-3">
+                                <input
                                     type="text"
-                                    placeholder="classic, summer, refreshing, spicy..."
-                                    value={formData.tags}
-                                    onChange={(e) => setFormData({...formData, tags: e.target.value})}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl p-6 focus:outline-none focus:border-primary/50 transition-all text-sm font-light"
+                                    placeholder="e.g., 2 oz White Rum"
+                                    value={currentIngredient}
+                                    onChange={(e) => setCurrentIngredient(e.target.value)}
+                                    className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
                                 />
+                                <button
+                                    type="button"
+                                    onClick={handleAddIngredient}
+                                    className="bg-[#ffaa66] hover:bg-[#ff994d] text-black px-6 rounded-lg font-medium text-sm transition-colors cursor-pointer"
+                                >
+                                    Add
+                                </button>
+                            </div>
+
+                            {/* Render added ingredients */}
+                            {ingredients.length > 0 && (
+                                <div className="mt-3 space-y-2">
+                                    {ingredients.map((ing, idx) => (
+                                        <div key={idx} className="flex items-center justify-between bg-[#1a1a24] border border-white/5 rounded px-3 py-2 text-sm text-gray-300">
+                                            <span>{ing}</span>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleRemoveIngredient(idx)}
+                                                className="text-gray-500 hover:text-red-400 transition-colors"
+                                            >
+                                                <X size={14} />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-gray-300 mb-2">Image (Upload or URL)</label>
+                            
+                            {imagePreview && (
+                                <div className="relative w-full h-32 rounded-lg border border-white/10 overflow-hidden bg-[#050505] mb-2 flex items-center justify-center">
+                                    <img
+                                        src={imagePreview}
+                                        alt="Preview"
+                                        className="max-w-full max-h-full object-contain"
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 rounded-md transition-colors"
+                                        onClick={handleRemoveImage}
+                                    >
+                                        <X size={14} className="text-white" />
+                                    </button>
+                                </div>
+                            )}
+
+                            <div className="flex gap-2 relative">
+                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500 z-10">
+                                    <ImageIcon size={16} />
+                                </div>
+                                <input
+                                    type="url"
+                                    placeholder="https://example.com/image.jpg"
+                                    value={imagePreview?.startsWith('data:') ? '' : formData.image}
+                                    onChange={(e) => {
+                                        setFormData({ ...formData, image: e.target.value });
+                                        setImagePreview(e.target.value || null);
+                                    }}
+                                    disabled={Boolean(imagePreview?.startsWith('data:'))}
+                                    className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 disabled:opacity-50"
+                                />
+                                <input
+                                    ref={fileInputRef}
+                                    type="file"
+                                    accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                                    onChange={handleFileSelect}
+                                    className="hidden"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={() => fileInputRef.current?.click()}
+                                    disabled={uploadingImage}
+                                    className="bg-[#1a1a24] border border-white/10 hover:border-white/30 text-gray-300 px-4 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 min-w-[52px]"
+                                    title="Upload image from computer"
+                                >
+                                    {uploadingImage ? (
+                                        <Loader2 size={18} className="animate-spin text-[#ff7b42]" />
+                                    ) : (
+                                        <Upload size={18} />
+                                    )}
+                                </button>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Error Display */}
-                        {error && (
-                            <div className="p-8 rounded-[2rem] bg-primary/10 border border-primary/20 text-primary text-sm font-bold animate-in fade-in slide-in-from-top-4 flex items-center gap-4">
-                                <span className="text-2xl">!</span>
-                                {error}
-                            </div>
-                        )}
-
-                        {/* Submit Button */}
-                        <div className="pt-12 flex flex-col md:flex-row gap-8 items-center border-t border-white/5">
-                            <button 
-                                type="submit"
-                                disabled={isLoading}
-                                className="w-full md:w-auto flex items-center justify-center gap-5 bg-gradient-to-r from-primary to-orange-600 px-14 py-7 rounded-[2rem] text-white font-black text-sm uppercase tracking-[0.4em] hover:scale-[1.03] active:scale-95 transition-all shadow-[0_20px_50px_rgba(255,80,80,0.3)] disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer group"
-                            >
-                                {isLoading ? <Loader2 className="animate-spin" size={24} /> : (
-                                    <>SUBMIT RECIPE <Send size={22} className="group-hover:translate-x-2 group-hover:-translate-y-2 transition-transform duration-500" /></>
-                                )}
+                    {/* Submit */}
+                    <div className="flex justify-between pt-6">
+                        <button
+                            type="submit"
+                            disabled={isLoading}
+                            className="bg-[#ff7b42] hover:bg-[#e66a35] text-black px-8 py-3 rounded-lg font-bold text-sm transition-colors disabled:opacity-50 cursor-pointer"
+                        >
+                            {isLoading ? 'Publishing...' : 'Publish Recipe'}
+                        </button>
+                        <Link href="/blog">
+                            <button className="flex items-center gap-2 bg-[#ff7b42] hover:bg-[#e66a35] text-black px-4 md:px-5 py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer">
+                                Cancel
                             </button>
-                            <div className="max-w-xs md:text-left text-center">
-                                <p className="text-[10px] text-gray-500 uppercase tracking-widest font-black mb-1">
-                                    FLAME COMMUNITY GUIDELINES
-                                </p>
-                                <p className="text-[10px] text-gray-600 font-bold uppercase tracking-wider">
-                                    Submissions are reviewed for quality and appropriateness before going public.
-                                </p>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </main>
-
-            <Footer />
+                        </Link>
+                    </div>
+                </form>
+            </div>
         </div>
     );
 };

@@ -25,14 +25,14 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
 
   return (
     <Link href={`/blog/${blog._id}`}>
-      <div className="group relative flex flex-col h-full cursor-pointer overflow-hidden rounded-2xl border border-white/5 transition-all duration-500 hover:shadow-[0_20px_50px_rgba(255,80,80,0.15)] bg-[#0d0d0d]">
+      <div className="group relative flex flex-col h-full cursor-pointer overflow-hidden rounded-xl border border-border bg-card-purple transition-all duration-300 hover:border-primary/50 hover:shadow-xl hover:shadow-primary/10">
         {/* Image Container */}
-        <div className="relative aspect-[16/10] w-full overflow-hidden">
+        <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
           <Image
             src={imageUrl}
             alt={blog.title}
             fill
-            className="object-cover transition-transform duration-700 ease-in-out group-hover:scale-105"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={(e) => {
               const target = e.target as HTMLImageElement;
@@ -42,28 +42,28 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
         </div>
 
         {/* Content */}
-        <div className="p-5 flex flex-col gap-3 flex-grow bg-[#0d0d0d]">
-          <h3 className="text-xl font-bold text-white transition-colors duration-300">
+        <div className="p-4 sm:p-5 flex flex-col gap-3 flex-grow">
+          <h3 className="line-clamp-2 font-display text-lg sm:text-lg md:text-xl font-bold text-color-tertiary transition-colors duration-300">
             {blog.title}
           </h3>
 
-          <p className="text-sm text-gray-400 line-clamp-2 leading-relaxed font-light">
+          <p className="text-sm text-color-muted line-clamp-2 leading-relaxed font-light">
             {blog.instructions}
           </p>
 
-          <div className="mt-4 flex items-center justify-between text-[12px] text-gray-500 font-medium">
-             <div className="flex items-center gap-2">
-              <User size={14} className="text-gray-500" />
+          <div className="mt-4 flex items-center justify-between text-xs sm:text-xs text-color-muted font-medium">
+             <div className="flex items-center gap-1.5">
+              <User size={14} className="text-color-muted" />
               <span>{authorName}</span>
             </div>
-            <div className="flex items-center gap-2">
-              <Calendar size={14} className="text-gray-500" />
+            <div className="flex items-center gap-1.5">
+              <Calendar size={14} className="text-color-muted" />
               <span>{formattedDate}</span>
             </div>
           </div>
 
-          <div className="mt-4 pt-4 border-t border-white/5">
-            <div className="inline-flex items-center gap-1 text-sm font-bold text-[#f97316] hover:text-[#ea580c] transition-colors">
+          <div className="mt-4 pt-4 border-t border-border">
+            <div className="inline-flex items-center gap-1 text-sm font-bold text-color-accent hover:text-primary transition-colors">
               Read More <span className="text-lg">→</span>
             </div>
           </div>

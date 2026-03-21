@@ -66,7 +66,8 @@ const BlogPageContent: React.FC = () => {
             fetchBlogs(1, false);
         }, 300); // Debounce search
         return () => clearTimeout(timer);
-    }, [searchQuery, selectedCategory, fetchBlogs]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchQuery, selectedCategory]);
 
     const handleLoadMore = () => {
         const nextPage = page + 1;
@@ -74,9 +75,11 @@ const BlogPageContent: React.FC = () => {
         fetchBlogs(nextPage, true);
     };
 
+    const handleSearchChange = useCallback(() => {}, []);
+
     return (
         <div className="min-h-screen bg-[#050505] text-white">
-            <Header searchQuery="" onSearchChange={() => { }} />
+            <Header searchQuery="" onSearchChange={handleSearchChange} />
 
             <main className="container mx-auto px-4 py-12">
                 {/* Header Section */}
@@ -134,9 +137,27 @@ const BlogPageContent: React.FC = () => {
 
                 {/* Grid */}
                 {loading && page === 1 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10 animate-pulse">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
                         {[1, 2, 3, 4, 5, 6].map(i => (
-                            <div key={i} className="bg-white/5 rounded-3xl aspect-[4/5]" />
+                            <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
+                                {/* Image placeholder */}
+                                <div className="aspect-[16/10] w-full bg-muted" />
+                                {/* Content placeholder */}
+                                <div className="p-5 flex flex-col gap-3">
+                                    <div className="h-5 w-3/4 bg-muted rounded" />
+                                    <div className="space-y-2">
+                                        <div className="h-3 w-full bg-muted rounded" />
+                                        <div className="h-3 w-5/6 bg-muted rounded" />
+                                    </div>
+                                    <div className="mt-4 flex items-center justify-between">
+                                        <div className="h-3 w-24 bg-muted rounded" />
+                                        <div className="h-3 w-20 bg-muted rounded" />
+                                    </div>
+                                    <div className="mt-4 pt-4 border-t border-border">
+                                        <div className="h-4 w-24 bg-muted rounded" />
+                                    </div>
+                                </div>
+                            </div>
                         ))}
                     </div>
                 ) : error ? (
