@@ -3,7 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { useLanguage } from '@/contexts/LanguageContext';
 import { blogService } from '@/services/blog.service';
-import { X, Image as ImageIcon, Upload, Loader2 } from 'lucide-react';
+import { X, Image as ImageIcon, Upload, Loader2, Martini } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { toast } from 'sonner';
@@ -134,102 +134,107 @@ const BlogSubmitPageContent: React.FC = () => {
     };
 
     return (
-        <div className="min-h-screen bg-[#0d0d12] text-white p-4 md:p-12 font-sans flex flex-col items-center">
+        <div className="min-h-screen bg-background text-foreground p-4 md:p-12 font-sans flex flex-col items-center">
             {/* Top Header */}
-            <div className="w-full max-w-[1000px] flex items-center justify-between mb-8">
+            <div className="w-full max-w-[1000px] flex items-center justify-between mb-12">
                 <div>
-                    <div className="flex items-center gap-2 mb-1">
-                        <span className="text-2xl">🍹</span>
-                        <h1 className="text-2xl md:text-3xl font-bold text-white font-serif tracking-wide">
-                            Blog
+                    <div className="flex items-center gap-3 mb-2">
+                        <div className="p-2 bg-primary/10 rounded-xl">
+                            <Martini className="w-8 h-8 text-primary" />
+                        </div>
+                        <h1 className="text-4xl md:text-5xl font-display font-bold text-white tracking-tight">
+                            {t("blog")}
                         </h1>
                     </div>
-                    <p className="text-gray-400 text-sm">
+                    <p className="text-gray-400 text-lg font-light">
                         Discover & share liquor-mixing recipes
                     </p>
                 </div>
                 <Link href="/blog">
-                    <button className="flex items-center gap-2 bg-[#ff7b42] hover:bg-[#e66a35] text-black px-4 md:px-5 py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer">
-                        <X size={16} strokeWidth={2.5} />
+                    <button className="flex items-center gap-2 bg-white/5 hover:bg-white/10 border border-white/10 text-white px-5 py-3 rounded-2xl font-bold text-sm transition-all hover:scale-105 active:scale-95 cursor-pointer backdrop-blur-md">
+                        <X size={20} />
                     </button>
                 </Link>
             </div>
 
             {/* Main Form Container */}
-            <div className="w-full max-w-[1000px] bg-[#16161e] border border-white/5 rounded-xl p-6 md:p-8 shadow-2xl">
-                <h2 className="text-lg md:text-xl font-bold mb-8 text-white">
-                    Create Recipe
-                </h2>
+            <div className="w-full max-w-[1000px] bg-white/[0.02] backdrop-blur-3xl border border-white/10 rounded-[2.5rem] p-8 md:p-12 shadow-2xl shadow-primary/5">
+                <div className="flex items-center gap-4 mb-10">
+                    <div className="h-8 w-1.5 bg-gradient-to-b from-primary to-flame-red rounded-full" />
+                    <h2 className="text-2xl md:text-3xl font-display font-bold text-white">
+                        Create Recipe
+                    </h2>
+                </div>
 
-                <form onSubmit={handleSubmit} className="space-y-6">
+                <form onSubmit={handleSubmit} className="space-y-10">
                     {/* Row 1: Title & Author */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-300 mb-2">Title *</label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div className="space-y-3">
+                            <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Title *</label>
                             <input
                                 type="text"
                                 required
                                 placeholder="e.g., Classic Mojito"
                                 value={formData.title}
                                 onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-base text-white placeholder:text-gray-700"
                             />
                         </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-300 mb-2">Author Name *</label>
+                        <div className="space-y-3">
+                            <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Author Name *</label>
                             <input
                                 type="text"
                                 required
                                 placeholder="Your name"
                                 value={formData.authorName}
                                 onChange={(e) => setFormData({ ...formData, authorName: e.target.value })}
-                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
+                                className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-base text-white placeholder:text-gray-700"
                             />
                         </div>
                     </div>
 
                     {/* Row 2: Short Description */}
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-2">Short Description *</label>
+                    <div className="space-y-3">
+                        <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Short Description *</label>
                         <textarea
                             required
                             rows={3}
                             placeholder="Brief description of the cocktail..."
                             value={formData.shortDescription}
                             onChange={(e) => setFormData({ ...formData, shortDescription: e.target.value })}
-                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 resize-none"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-base text-white placeholder:text-gray-700 resize-none min-h-[120px]"
                         />
                     </div>
 
                     {/* Row 3: Full Instructions */}
-                    <div>
-                        <label className="block text-xs font-semibold text-gray-300 mb-2">Full Instructions *</label>
+                    <div className="space-y-3">
+                        <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Full Instructions *</label>
                         <textarea
                             required
                             rows={5}
                             placeholder="Step-by-step mixing instructions..."
                             value={formData.instructions}
                             onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
-                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 resize-none"
+                            className="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 focus:ring-4 focus:ring-primary/10 transition-all text-base text-white placeholder:text-gray-700 resize-none min-h-[200px]"
                         />
                     </div>
 
                     {/* Row 4: Ingredients & Image */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-300 mb-2">Ingredients *</label>
-                            <div className="flex gap-3">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10 items-start">
+                        <div className="space-y-4">
+                            <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Ingredients *</label>
+                            <div className="flex gap-4">
                                 <input
                                     type="text"
                                     placeholder="e.g., 2 oz White Rum"
                                     value={currentIngredient}
                                     onChange={(e) => setCurrentIngredient(e.target.value)}
-                                    className="flex-1 bg-[#0a0a0f] border border-white/10 rounded-lg px-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600"
+                                    className="flex-1 bg-white/5 border border-white/10 rounded-2xl px-6 py-4 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700"
                                 />
                                 <button
                                     type="button"
                                     onClick={handleAddIngredient}
-                                    className="bg-[#ffaa66] hover:bg-[#ff994d] text-black px-6 rounded-lg font-medium text-sm transition-colors cursor-pointer"
+                                    className="bg-primary/20 hover:bg-primary/30 text-primary border border-primary/30 px-8 rounded-2xl font-black text-xs uppercase tracking-widest transition-all hover:scale-105 active:scale-95 cursor-pointer"
                                 >
                                     Add
                                 </button>
@@ -237,14 +242,14 @@ const BlogSubmitPageContent: React.FC = () => {
 
                             {/* Render added ingredients */}
                             {ingredients.length > 0 && (
-                                <div className="mt-3 space-y-2">
+                                <div className="mt-6 flex flex-wrap gap-2">
                                     {ingredients.map((ing, idx) => (
-                                        <div key={idx} className="flex items-center justify-between bg-[#1a1a24] border border-white/5 rounded px-3 py-2 text-sm text-gray-300">
+                                        <div key={idx} className="group flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm text-gray-300 transition-all hover:border-primary/30 hover:bg-primary/5">
                                             <span>{ing}</span>
                                             <button
                                                 type="button"
                                                 onClick={() => handleRemoveIngredient(idx)}
-                                                className="text-gray-500 hover:text-red-400 transition-colors"
+                                                className="text-gray-600 hover:text-red-400 transition-colors"
                                             >
                                                 <X size={14} />
                                             </button>
@@ -253,40 +258,60 @@ const BlogSubmitPageContent: React.FC = () => {
                                 </div>
                             )}
                         </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-gray-300 mb-2">Image (Upload or URL)</label>
+                        <div className="space-y-4">
+                            <label className="block text-[10px] uppercase tracking-[0.2em] font-black text-gray-500 ml-4">Image (Upload or URL)</label>
                             
                             {imagePreview && (
-                                <div className="relative w-full h-32 rounded-lg border border-white/10 overflow-hidden bg-[#050505] mb-2 flex items-center justify-center">
+                                <div className="relative group w-full h-48 rounded-2xl border border-white/10 overflow-hidden bg-black/40 mb-4 flex items-center justify-center">
                                     <img
                                         src={imagePreview}
                                         alt="Preview"
-                                        className="max-w-full max-h-full object-contain"
+                                        className="max-w-full max-h-full object-contain transition-transform group-hover:scale-105"
                                     />
-                                    <button
-                                        type="button"
-                                        className="absolute top-2 right-2 p-1.5 bg-red-500 hover:bg-red-600 rounded-md transition-colors"
-                                        onClick={handleRemoveImage}
-                                    >
-                                        <X size={14} className="text-white" />
-                                    </button>
+                                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                        <button
+                                            type="button"
+                                            className="p-3 bg-red-500/80 hover:bg-red-500 text-white rounded-full transition-all hover:scale-110"
+                                            onClick={handleRemoveImage}
+                                        >
+                                            <X size={20} />
+                                        </button>
+                                    </div>
                                 </div>
                             )}
 
-                            <div className="flex gap-2 relative">
-                                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-gray-500 z-10">
-                                    <ImageIcon size={16} />
+                            {!imagePreview && (
+                                <div 
+                                    onClick={() => !uploadingImage && fileInputRef.current?.click()}
+                                    className={`w-full h-48 rounded-2xl border-2 border-dashed border-white/10 bg-white/[0.02] flex flex-col items-center justify-center gap-4 transition-all group mb-4 ${uploadingImage ? 'cursor-wait' : 'cursor-pointer hover:border-primary/30 hover:bg-primary/[0.02]'}`}
+                                >
+                                    <div className={`p-4 bg-white/5 rounded-2xl transition-colors ${!uploadingImage && 'group-hover:bg-primary/10'}`}>
+                                        {uploadingImage ? (
+                                            <Loader2 size={24} className="animate-spin text-primary" />
+                                        ) : (
+                                            <Upload size={24} className="text-gray-500 group-hover:text-primary transition-colors" />
+                                        )}
+                                    </div>
+                                    <p className="text-sm text-gray-500 group-hover:text-gray-400">
+                                        {uploadingImage ? 'Processing image...' : 'Click to upload or drag image'}
+                                    </p>
+                                </div>
+                            )}
+
+                            <div className="flex gap-3 relative">
+                                <div className="absolute inset-y-0 left-0 pl-6 flex items-center pointer-events-none text-gray-500 z-10 transition-colors group-focus-within:text-primary">
+                                    <ImageIcon size={18} />
                                 </div>
                                 <input
                                     type="url"
-                                    placeholder="https://example.com/image.jpg"
+                                    placeholder="Or paste image URL here..."
                                     value={imagePreview?.startsWith('data:') ? '' : formData.image}
                                     onChange={(e) => {
                                         setFormData({ ...formData, image: e.target.value });
                                         setImagePreview(e.target.value || null);
                                     }}
                                     disabled={Boolean(imagePreview?.startsWith('data:'))}
-                                    className="w-full bg-[#0a0a0f] border border-white/10 rounded-lg pl-10 pr-4 py-3.5 focus:outline-none focus:border-white/30 transition-colors text-sm text-gray-200 placeholder:text-gray-600 disabled:opacity-50"
+                                    className="w-full bg-white/5 border border-white/10 rounded-2xl pl-14 pr-6 py-4 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700 disabled:opacity-50"
                                 />
                                 <input
                                     ref={fileInputRef}
@@ -295,37 +320,29 @@ const BlogSubmitPageContent: React.FC = () => {
                                     onChange={handleFileSelect}
                                     className="hidden"
                                 />
-                                <button
-                                    type="button"
-                                    onClick={() => fileInputRef.current?.click()}
-                                    disabled={uploadingImage}
-                                    className="bg-[#1a1a24] border border-white/10 hover:border-white/30 text-gray-300 px-4 rounded-lg flex items-center justify-center transition-colors disabled:opacity-50 min-w-[52px]"
-                                    title="Upload image from computer"
-                                >
-                                    {uploadingImage ? (
-                                        <Loader2 size={18} className="animate-spin text-[#ff7b42]" />
-                                    ) : (
-                                        <Upload size={18} />
-                                    )}
-                                </button>
                             </div>
                         </div>
                     </div>
 
                     {/* Submit */}
-                    <div className="flex justify-between pt-6">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-6 pt-10 border-t border-white/5">
+                        <Link href="/blog" className="order-2 sm:order-1">
+                            <button className="text-gray-500 hover:text-white font-bold text-xs uppercase tracking-widest transition-colors py-2 px-4">
+                                Cancel & Return
+                            </button>
+                        </Link>
                         <button
                             type="submit"
                             disabled={isLoading}
-                            className="bg-[#ff7b42] hover:bg-[#e66a35] text-black px-8 py-3 rounded-lg font-bold text-sm transition-colors disabled:opacity-50 cursor-pointer"
+                            className="w-full sm:w-auto order-1 sm:order-2 bg-gradient-to-br from-primary via-flame-orange to-flame-red text-white px-12 py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 cursor-pointer"
                         >
-                            {isLoading ? 'Publishing...' : 'Publish Recipe'}
+                            {isLoading ? (
+                                <div className="flex items-center gap-3">
+                                    <Loader2 className="animate-spin" size={18} />
+                                    <span>Publishing...</span>
+                                </div>
+                            ) : 'Publish Recipe'}
                         </button>
-                        <Link href="/blog">
-                            <button className="flex items-center gap-2 bg-[#ff7b42] hover:bg-[#e66a35] text-black px-4 md:px-5 py-2 rounded-lg font-bold text-sm transition-colors cursor-pointer">
-                                Cancel
-                            </button>
-                        </Link>
                     </div>
                 </form>
             </div>
