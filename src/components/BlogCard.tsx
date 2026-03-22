@@ -32,7 +32,7 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             src={imageUrl}
             alt={blog.title}
             fill
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover object-top transition-all duration-500"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             onError={(e) => {
               const target = e.target as HTMLImageElement;

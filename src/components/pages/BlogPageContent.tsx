@@ -75,7 +75,7 @@ const BlogPageContent: React.FC = () => {
         fetchBlogs(nextPage, true);
     };
 
-    const handleSearchChange = useCallback(() => {}, []);
+    const handleSearchChange = useCallback(() => { }, []);
 
     return (
         <div className="min-h-screen bg-[#050505] text-white">
