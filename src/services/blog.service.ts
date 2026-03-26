@@ -71,4 +71,16 @@ export const blogService = {
     approve: async (id: string, isApprovedStatus: boolean): Promise<ApiResponse<Blog>> => {
         return apiPatch<Blog>(`/blogs/${id}/approve`, { isApproved: isApprovedStatus });
     },
+
+    /**
+     * Get related recipes by category (Public endpoint)
+     */
+    getRelated: async (category: string, excludeId: string, limit: number = 8): Promise<ApiResponse<Blog[]>> => {
+        return apiGet<Blog[]>('/blogs', {
+            category,
+            isApproved: true,
+            limit,
+            page: 1,
+        }, false);
+    },
 };
