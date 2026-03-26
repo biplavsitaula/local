@@ -31,7 +31,12 @@ const AdminBlogList: React.FC = () => {
         category: '',
         instructions: '',
         image: '',
-        authorName: ''
+        authorName: '',
+        timeTaken: '',
+        difficulty: 'Easy' as 'Easy' | 'Medium' | 'Hard',
+        calories: 0,
+        servings: 1,
+        tips: ''
     });
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -102,7 +107,12 @@ const AdminBlogList: React.FC = () => {
             category: blog.category || 'Cocktail',
             instructions: blog.instructions || '',
             image: blog.image || '',
-            authorName: blog.authorName || ''
+            authorName: blog.authorName || '',
+            timeTaken: blog.timeTaken || '',
+            difficulty: blog.difficulty || 'Easy',
+            calories: blog.calories || 0,
+            servings: blog.servings || 1,
+            tips: blog.tips || ''
         });
         setIngredients(blog.ingredients || []);
         setCurrentIngredient('');
@@ -118,7 +128,12 @@ const AdminBlogList: React.FC = () => {
             category: 'Cocktail',
             instructions: '',
             image: '',
-            authorName: ''
+            authorName: '',
+            timeTaken: '',
+            difficulty: 'Easy',
+            calories: 0,
+            servings: 1,
+            tips: ''
         });
         setIngredients([]);
         setCurrentIngredient('');
@@ -197,7 +212,12 @@ const AdminBlogList: React.FC = () => {
                 ingredients: finalIngredients,
                 image: formData.image,
                 authorName: formData.authorName,
-                authorId: user?._id || user?.id
+                authorId: user?._id || user?.id,
+                timeTaken: formData.timeTaken,
+                difficulty: formData.difficulty,
+                calories: Number(formData.calories),
+                servings: Number(formData.servings),
+                tips: formData.tips
             };
             
             if (modalMode === 'edit' && editingBlog?._id) {
@@ -427,11 +447,58 @@ const AdminBlogList: React.FC = () => {
                                 </div>
                             </div>
                             
+                            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+                                <div>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Time Taken</label>
+                                    <Input 
+                                        type="text" value={formData.timeTaken} onChange={e => setFormData({...formData, timeTaken: e.target.value})}
+                                        className="bg-secondary/30 border-border"
+                                        placeholder="e.g. 5–10 minutes"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Difficulty</label>
+                                    <select 
+                                        value={formData.difficulty} onChange={e => setFormData({...formData, difficulty: e.target.value as any})}
+                                        className="w-full bg-secondary/30 border border-border rounded-lg px-3 py-2 text-sm text-foreground focus:outline-none focus:ring-1 focus:ring-primary appearance-none cursor-pointer"
+                                    >
+                                        <option value="Easy">Easy</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Hard">Hard</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Total Calories</label>
+                                    <Input 
+                                        type="number" value={formData.calories} onChange={e => setFormData({...formData, calories: Number(e.target.value)})}
+                                        className="bg-secondary/30 border-border"
+                                        placeholder="180"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-muted-foreground mb-2">Servings</label>
+                                    <Input 
+                                        type="number" value={formData.servings} onChange={e => setFormData({...formData, servings: Number(e.target.value)})}
+                                        className="bg-secondary/30 border-border"
+                                        placeholder="1, 2, 4"
+                                    />
+                                </div>
+                            </div>
+
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-2">Full Instructions *</label>
                                 <textarea 
                                     required rows={6} value={formData.instructions} onChange={e => setFormData({...formData, instructions: e.target.value})}
                                     className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary transition-colors text-sm text-foreground resize-y"
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-semibold text-muted-foreground mb-2">Mixologist Tips</label>
+                                <textarea 
+                                    rows={3} value={formData.tips} onChange={e => setFormData({...formData, tips: e.target.value})}
+                                    className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary transition-colors text-sm text-foreground resize-y"
+                                    placeholder="Add expert tips or recommendations..."
                                 />
                             </div>
 

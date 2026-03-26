@@ -15,6 +15,11 @@ export interface Blog {
     category: string;
     tags: string[];
     isApproved: boolean;
+    timeTaken?: string;
+    difficulty?: 'Easy' | 'Medium' | 'Hard';
+    calories?: number;
+    servings?: number;
+    tips?: string;
     createdAt?: string;
     updatedAt?: string;
 }
