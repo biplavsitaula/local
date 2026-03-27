@@ -1,30 +1,15 @@
 "use client";
 
-import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { Printer } from "lucide-react";
-import { Order } from "@/hooks/useOrderStore";
-
-interface OrderItem {
-  name: string;
-  quantity: number;
-  price: number;
-}
+import { Dialog, DialogContent } from '@/components/ui/dialog';
+import { Printer } from 'lucide-react';
+import { Order } from '@/hooks/useOrderStore';
 
 interface OrderDetailsModalProps {
-  order: Order | null;
+  order: any | null;
   isOpen: boolean;
   onClose: () => void;
-  onPrint: (order: Order) => void;
+  onPrint: (order: any) => void;
 }
-
-// Mock order items - in a real app, this would come from the order data
-const getOrderItems = (order: Order): OrderItem[] => {
-  const items=order.items.map((el:any)=>{
-    return{name: el.name, quantity: el.quantity, price: el.price}
-  })
-
-  return items
-};
 
 export function OrderDetailsModal({
   order,
@@ -34,12 +19,28 @@ export function OrderDetailsModal({
 }: OrderDetailsModalProps) {
   if (!order) return null;
 
-  const orderItems = getOrderItems(order);
-  console.log(orderItems)
-  const total = orderItems.reduce(
-    (sum, item) => sum + item.price * item.quantity,
-    0,
-  );
+  // Use actual items from the order, or empty array as fallback
+  const orderItems = order.items || [];
+  const subtotal = order.subtotal || orderItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+  const deliveryFee = order.deliveryFee || 0;
+  const totalAmount = order.totalAmount || (subtotal + deliveryFee);
+
+  // Get customer details from the nested customer object or top-level fields
+  const customerName = order.customer?.fullName || order.customer?.name || order.customerName || 'N/A';
+  const customerPhone = order.customer?.mobile || order.customer?.phone || 'N/A';
+  const customerEmail = order.customer?.email || 'N/A';
+  const customerPan = order.customer?.pan || 'N/A';
+  const customerLocation = order.customer?.location || order.customer?.address || order.location || 'N/A';
+
+  const getPaymentMethodLabel = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'qr': return 'QR Payment';
+      case 'cod': return 'Cash on Delivery';
+      case 'online': return 'Online Payment';
+      case 'card': return 'Card Payment';
+      default: return method || 'N/A';
+    }
+  };
 
   const formatDate = (dateString: string) => {
     try {
@@ -100,19 +101,27 @@ export function OrderDetailsModal({
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Name: </span>
-                  <span className="text-foreground">{order.customerName}</span>
+                  <span className="text-foreground">{customerName}</span>
                 </div>
-                <div>
-                  <span className="text-muted-foreground">PAN: </span>
-                  <span className="text-foreground">KLMNO9012P</span>
-                </div>
+                {customerPan !== 'N/A' && (
+                  <div>
+                    <span className="text-muted-foreground">PAN: </span>
+                    <span className="text-foreground">{customerPan}</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-muted-foreground">Mobile: </span>
-                  <span className="text-foreground">+977-9861234567</span>
+                  <span className="text-foreground">{customerPhone}</span>
                 </div>
+                {customerEmail !== 'N/A' && (
+                  <div>
+                    <span className="text-muted-foreground">Email: </span>
+                    <span className="text-foreground">{customerEmail}</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-muted-foreground">Location: </span>
-                  <span className="text-foreground">{order.location}</span>
+                  <span className="text-foreground">{customerLocation}</span>
                 </div>
               </div>
             </div>
@@ -125,19 +134,13 @@ export function OrderDetailsModal({
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Status: </span>
-                  <span
-                    className={`px-3 py-1 rounded-full text-xs font-medium {getStatusColor(order.status)}`}
-                  >
+                  <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(order.status)}`}>
                     {order.status}
                   </span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Payment: </span>
-                  <span className="text-foreground">
-                    {order.paymentMethod === "qr"
-                      ? "QR Payment"
-                      : "Cash on Delivery"}
-                  </span>
+                  <span className="text-foreground">{getPaymentMethodLabel(order.paymentMethod)}</span>
                 </div>
                 <div>
                   <span className="text-muted-foreground">Date: </span>
@@ -173,22 +176,38 @@ export function OrderDetailsModal({
                   </tr>
                 </thead>
                 <tbody>
-                  {orderItems.map((item, index) => (
-                    <tr key={index} className="border-b border-border/30">
-                      <td className="p-3 text-sm text-foreground">
-                        {item.name}
+                  {orderItems.length > 0 ? (
+                    orderItems.map((item: any, index: number) => (
+                      <tr key={index} className="border-b border-border/30">
+                        <td className="p-3 text-sm text-foreground">{item.name || item.productId?.name || 'Unknown Product'}</td>
+                        <td className="p-3 text-sm text-center text-foreground">{item.quantity || 0}</td>
+                        <td className="p-3 text-sm text-right text-foreground">{(item.price || 0).toFixed(2)}</td>
+                        <td className="p-3 text-sm text-right text-foreground">{(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={4} className="p-3 text-sm text-center text-muted-foreground">No items found</td>
+                    </tr>
+                  )}
+                  <tr>
+                    <td colSpan={3} className="p-3 text-right text-sm text-muted-foreground">
+                      Subtotal:
+                    </td>
+                    <td className="p-3 text-right text-sm text-foreground">
+                      Rs {subtotal.toFixed(2)}
+                    </td>
+                  </tr>
+                  {deliveryFee > 0 && (
+                    <tr>
+                      <td colSpan={3} className="p-3 text-right text-sm text-muted-foreground">
+                        Delivery Fee:
                       </td>
-                      <td className="p-3 text-sm text-center text-foreground">
-                        {item.quantity}
-                      </td>
-                      <td className="p-3 text-sm text-right text-foreground">
-                        {item.price.toFixed(2)}
-                      </td>
-                      <td className="p-3 text-sm text-right text-foreground">
-                        {(item.price * item.quantity).toFixed(2)}
+                      <td className="p-3 text-right text-sm text-foreground">
+                        Rs {deliveryFee.toFixed(2)}
                       </td>
                     </tr>
-                  ))}
+                  )}
                   <tr>
                     <td
                       colSpan={3}
@@ -197,7 +216,7 @@ export function OrderDetailsModal({
                       Total:
                     </td>
                     <td className="p-3 text-right text-lg font-bold text-[#f97316]">
-                      Rs {total.toFixed(2)}
+                      Rs {totalAmount.toFixed(2)}
                     </td>
                   </tr>
                 </tbody>
@@ -226,3 +245,5 @@ export function OrderDetailsModal({
     </Dialog>
   );
 }
+
+

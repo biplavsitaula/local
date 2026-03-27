@@ -48,6 +48,10 @@ export function ReferralModal({ isOpen, onClose, referralCode = "SPIRITS2026" }:
         try {
             await referralService.sendReferralInvite({ friendName, friendEmail });
             setStatus("success");
+            
+            // Dispatch a custom event to notify listeners (e.g. MyAccountPage) to update their state
+            window.dispatchEvent(new CustomEvent("referralSuccess"));
+            
             setFriendName("");
             setFriendEmail("");
             setTimeout(() => {

@@ -34,9 +34,8 @@ export function useOrderTable({
     location: "",
     paymentMethod: "",
   });
-  const [processingOrderId, setProcessingOrderId] = useState<string | null>(
-    null,
-  );
+  const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
+  const [processingAction, setProcessingAction] = useState<'accept' | 'reject' | null>(null);
   const { canEdit } = useRoleAccess();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
@@ -99,6 +98,16 @@ export function useOrderTable({
   const filteredAndSortedOrders = useMemo(() => {
     let filtered = [...orders];
 
+    // Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.billNumber.toLowerCase().includes(searchLower) ||
+        order.customerName.toLowerCase().includes(searchLower) ||
+        order.location.toLowerCase().includes(searchLower)
+      );
+    }
+
     // Apply filters
     if (filters.billNumber) {
       filtered = filtered.filter((order) =>
@@ -137,7 +146,7 @@ export function useOrderTable({
     const startIndex = (currentPage - 1) * itemsPerPage;
     const endIndex = startIndex + itemsPerPage;
     return filtered.slice(startIndex, endIndex);
-  }, [orders, sortDir, sortKey, filters, currentPage, itemsPerPage]);
+  }, [orders, debouncedSearch, sortDir, sortKey, filters, currentPage, itemsPerPage]);
 
   const clearFilters = () => {
     setFilters({
@@ -181,6 +190,7 @@ export function useOrderTable({
   const performAcceptOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
+      setProcessingAction('accept');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.acceptOrder(orderId);
 
@@ -207,6 +217,7 @@ export function useOrderTable({
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setProcessingAction(null);
       setPendingOrder(null);
     }
   };
@@ -227,6 +238,7 @@ export function useOrderTable({
   const performRejectOrder = async (order: Order) => {
     try {
       setProcessingOrderId(order.id);
+      setProcessingAction('reject');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.rejectOrder(orderId);
 
@@ -253,12 +265,20 @@ export function useOrderTable({
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
+      setProcessingAction(null);
       setPendingOrder(null);
     }
   };
 
-  const handleView = (order: Order) => {
-    setSelectedOrder(order);
+  const handleView = async (order: Order) => {
+    try {
+      const orderResponse = await ordersService.getByBillNumber(order.billNumber);
+      const fullOrder = orderResponse.data;
+      setSelectedOrder(fullOrder as any);
+    } catch (err) {
+      console.error('Failed to fetch full order details:', err);
+      setSelectedOrder(order);
+    }
     setIsModalOpen(true);
   };
 
@@ -280,37 +300,40 @@ export function useOrderTable({
     }
   };
 
-  const getOrderItems = (order: Order) => {
-    if (order.billNumber === "FB-2024-003") {
-      return [
-        { name: "Macallan 18 Year", quantity: 1, price: 349.99 },
-        { name: "Hennessy XO", quantity: 1, price: 229.99 },
-      ];
+  const getPaymentMethodLabel = (method: string) => {
+    switch (method?.toLowerCase()) {
+      case 'qr': return 'QR Payment';
+      case 'cod': return 'Cash on Delivery';
+      case 'online': return 'Online Payment';
+      case 'card': return 'Card Payment';
+      default: return method || 'N/A';
     }
-    return [
-      { name: "Premium Whiskey", quantity: 1, price: order.totalAmount * 0.6 },
-      { name: "Premium Brandy", quantity: 1, price: order.totalAmount * 0.4 },
-    ];
   };
 
-  const handlePrint = async (order: Order) => {
+  const handlePrint = async (order: any) => {
     try {
-      const orderResponse = await ordersService.getByBillNumber(
-        order.billNumber,
-      );
-      const fullOrder = orderResponse.data;
-
-      const printWindow = window.open("", "_blank");
+      let fullOrder = order;
+      // If order doesn't already have items (e.g. from table row), fetch full data
+      if (!order.items || order.items.length === 0) {
+        const orderResponse = await ordersService.getByBillNumber(order.billNumber);
+        fullOrder = orderResponse.data;
+      }
+      
+      const printWindow = window.open('', '_blank');
       if (!printWindow) {
         alert("Please allow popups to print order");
         return;
       }
 
-      const orderItems = fullOrder.items || getOrderItems(order);
-      const total = orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
+      const orderItems = fullOrder.items || [];
+      const subtotal = fullOrder.subtotal || orderItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+      const deliveryFee = fullOrder.deliveryFee || 0;
+      const totalAmount = fullOrder.totalAmount || (subtotal + deliveryFee);
+      const customerPhone = fullOrder.customer?.mobile || fullOrder.customer?.phone || order.customerPhone || 'N/A';
+      const customerPan = fullOrder.customer?.pan || 'N/A';
+      const customerName = fullOrder.customer?.fullName || fullOrder.customer?.name || fullOrder.customerName || order.customerName || 'N/A';
+      const customerLocation = fullOrder.customer?.location || fullOrder.customer?.address || fullOrder.location || order.location || 'N/A';
+      const paymentLabel = getPaymentMethodLabel(fullOrder.paymentMethod || order.paymentMethod);
       const printDate = new Date(order.createdAt);
       const formattedDate = printDate.toLocaleDateString("en-US", {
         month: "2-digit",
@@ -469,19 +492,19 @@ export function useOrderTable({
                 <h3>Customer Details</h3>
                 <div class="detail-item">
                   <span class="detail-label">Name:</span>
-                  <span class="detail-value">${order.customerName}</span>
+                  <span class="detail-value">${customerName}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">PAN:</span>
-                  <span class="detail-value">KLMNO9012P</span>
+                  <span class="detail-value">${customerPan}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Mobile:</span>
-                  <span class="detail-value">+977-9861234567</span>
+                  <span class="detail-value">${customerPhone}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Location:</span>
-                  <span class="detail-value">${order.location}</span>
+                  <span class="detail-value">${customerLocation}</span>
                 </div>
               </div>
               
@@ -489,15 +512,15 @@ export function useOrderTable({
                 <h3>Order Details</h3>
                 <div class="detail-item">
                   <span class="detail-label">Order ID:</span>
-                  <span class="detail-value">${order.id.split("-")[1] || "3"}</span>
+                  <span class="detail-value">${fullOrder._id || fullOrder.id || order.id || 'N/A'}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Status:</span>
-                  <span class="detail-value">${order.status}</span>
+                  <span class="detail-value">${fullOrder.status || order.status}</span>
                 </div>
                 <div class="detail-item">
                   <span class="detail-label">Payment:</span>
-                  <span class="detail-value">${order.paymentMethod === "qr" ? "QR Payment" : "Cash on Delivery"}</span>
+                  <span class="detail-value">${paymentLabel}</span>
                 </div>
               </div>
             </div>
@@ -512,23 +535,25 @@ export function useOrderTable({
                 </tr>
               </thead>
               <tbody>
-                ${orderItems
-                  .map(
-                    (item) => `
+                ${orderItems.length > 0 ? orderItems.map((item: any) => `
                   <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>Rs ${item.price.toFixed(2)}</td>
-                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
+                    <td>${item.name || item.productId?.name || 'Unknown Product'}</td>
+                    <td>${item.quantity || 0}</td>
+                    <td>Rs ${(item.price || 0).toFixed(2)}</td>
+                    <td>Rs ${(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
                   </tr>
-                `,
-                  )
-                  .join("")}
+                `).join('') : `
+                  <tr>
+                    <td colspan="4" style="text-align: center; color: #999;">No items found</td>
+                  </tr>
+                `}
               </tbody>
             </table>
             
             <div class="total-section">
-              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
+              <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Subtotal: Rs ${subtotal.toFixed(2)}</div>
+              ${deliveryFee > 0 ? `<div style="font-size: 14px; color: #666; margin-bottom: 5px;">Delivery Fee: Rs ${deliveryFee.toFixed(2)}</div>` : ''}
+              <div class="total-amount">Total Amount: Rs ${totalAmount.toFixed(2)}</div>
             </div>
             
             <div class="footer">
@@ -548,12 +573,17 @@ export function useOrderTable({
         printWindow.print();
       }, 250);
     } catch (err: any) {
-      console.error("Failed to fetch order details:", err);
-      const orderItems = getOrderItems(order);
-      const total = orderItems.reduce(
-        (sum, item) => sum + item.price * item.quantity,
-        0,
-      );
+      console.error('Failed to fetch order details:', err);
+      // Fallback: use whatever data we have from the order prop
+      const fallbackItems = order.items || [];
+      const fallbackSubtotal = order.subtotal || fallbackItems.reduce((sum: number, item: any) => sum + (item.total || (item.price || 0) * (item.quantity || 0)), 0);
+      const fallbackDeliveryFee = order.deliveryFee || 0;
+      const fallbackTotal = order.totalAmount || (fallbackSubtotal + fallbackDeliveryFee);
+      const fallbackPhone = order.customer?.mobile || order.customer?.phone || 'N/A';
+      const fallbackPan = order.customer?.pan || 'N/A';
+      const fallbackName = order.customer?.fullName || order.customer?.name || order.customerName || 'N/A';
+      const fallbackLocation = order.customer?.location || order.customer?.address || order.location || 'N/A';
+      const fallbackPayment = getPaymentMethodLabel(order.paymentMethod);
       const printDate = new Date(order.createdAt);
       const formattedDate = printDate.toLocaleDateString("en-US", {
         month: "2-digit",
@@ -577,134 +607,37 @@ export function useOrderTable({
               body { margin: 0; padding: 20px; }
               @page { margin: 0; }
             }
-            * {
-              margin: 0;
-              padding: 0;
-              box-sizing: border-box;
-            }
+            * { margin: 0; padding: 0; box-sizing: border-box; }
             body {
               font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-              padding: 40px;
-              color: #333;
-              background: #fff;
-              line-height: 1.6;
+              padding: 40px; color: #333; background: #fff; line-height: 1.6;
             }
-            .invoice-container {
-              max-width: 800px;
-              margin: 0 auto;
-              background: #fff;
-            }
-            .header {
-              text-align: center;
-              margin-bottom: 40px;
-            }
-            .logo {
-              font-size: 48px;
-              margin-bottom: 10px;
-            }
-            .company-name {
-              font-size: 32px;
-              font-weight: bold;
-              color: #f97316;
-              margin-bottom: 5px;
-              letter-spacing: 2px;
-            }
-            .company-subtitle {
-              font-size: 14px;
-              color: #666;
-              margin-bottom: 20px;
-            }
-            .bill-info {
-              display: flex;
-              justify-content: center;
-              gap: 30px;
-              margin-top: 15px;
-              font-size: 14px;
-            }
-            .details-section {
-              display: grid;
-              grid-template-columns: 1fr 1fr;
-              gap: 40px;
-              margin-bottom: 40px;
-            }
-            .detail-box h3 {
-              font-size: 16px;
-              font-weight: 600;
-              color: #333;
-              margin-bottom: 15px;
-              padding-bottom: 8px;
-              border-bottom: 1px solid #e5e5e5;
-            }
-            .detail-item {
-              margin-bottom: 10px;
-              font-size: 14px;
-            }
-            .detail-label {
-              font-weight: 600;
-              color: #666;
-              display: inline-block;
-              min-width: 80px;
-            }
-            .detail-value {
-              color: #333;
-            }
-            .products-table {
-              width: 100%;
-              border-collapse: collapse;
-              margin-bottom: 30px;
-            }
-            .products-table thead {
-              background: #f97316;
-              color: #fff;
-            }
-            .products-table th {
-              padding: 12px;
-              text-align: left;
-              font-weight: 600;
-              font-size: 14px;
-            }
-            .products-table th:last-child,
-            .products-table td:last-child {
-              text-align: right;
-            }
-            .products-table td {
-              padding: 12px;
-              border-bottom: 1px solid #e5e5e5;
-              font-size: 14px;
-            }
-            .products-table tbody tr:last-child td {
-              border-bottom: none;
-            }
-            .total-section {
-              text-align: right;
-              margin-bottom: 40px;
-            }
-            .total-amount {
-              font-size: 20px;
-              font-weight: bold;
-              color: #f97316;
-            }
-            .footer {
-              text-align: center;
-              margin-top: 50px;
-              padding-top: 30px;
-              border-top: 1px solid #e5e5e5;
-            }
-            .footer p {
-              margin-bottom: 8px;
-              color: #666;
-              font-size: 14px;
-            }
-            .footer a {
-              color: #f97316;
-              text-decoration: none;
-            }
+            .invoice-container { max-width: 800px; margin: 0 auto; background: #fff; }
+            .header { text-align: center; margin-bottom: 40px; }
+            .company-name { font-size: 32px; font-weight: bold; color: #f97316; margin-bottom: 5px; letter-spacing: 2px; }
+            .company-subtitle { font-size: 14px; color: #666; margin-bottom: 20px; }
+            .bill-info { display: flex; justify-content: center; gap: 30px; margin-top: 15px; font-size: 14px; }
+            .details-section { display: grid; grid-template-columns: 1fr 1fr; gap: 40px; margin-bottom: 40px; }
+            .detail-box h3 { font-size: 16px; font-weight: 600; color: #333; margin-bottom: 15px; padding-bottom: 8px; border-bottom: 1px solid #e5e5e5; }
+            .detail-item { margin-bottom: 10px; font-size: 14px; }
+            .detail-label { font-weight: 600; color: #666; display: inline-block; min-width: 80px; }
+            .detail-value { color: #333; }
+            .products-table { width: 100%; border-collapse: collapse; margin-bottom: 30px; }
+            .products-table thead { background: #f97316; color: #fff; }
+            .products-table th { padding: 12px; text-align: left; font-weight: 600; font-size: 14px; }
+            .products-table th:last-child, .products-table td:last-child { text-align: right; }
+            .products-table td { padding: 12px; border-bottom: 1px solid #e5e5e5; font-size: 14px; }
+            .total-section { text-align: right; margin-bottom: 40px; }
+            .total-amount { font-size: 20px; font-weight: bold; color: #f97316; }
+            .footer { text-align: center; margin-top: 50px; padding-top: 30px; border-top: 1px solid #e5e5e5; }
+            .footer p { margin-bottom: 8px; color: #666; font-size: 14px; }
+            .footer a { color: #f97316; text-decoration: none; }
           </style>
         </head>
         <body>
           <div class="invoice-container">
             <div class="header">
-              <div class="logo">🔥</div>
+              <div style="font-size: 48px; margin-bottom: 10px;">🔥</div>
               <div class="company-name">FLAME BEVERAGE</div>
               <div class="company-subtitle">Premium Liquor Store</div>
               <div class="bill-info">
@@ -716,68 +649,37 @@ export function useOrderTable({
             <div class="details-section">
               <div class="detail-box">
                 <h3>Customer Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Name:</span>
-                  <span class="detail-value">${order.customerName}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">PAN:</span>
-                  <span class="detail-value">KLMNO9012P</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Mobile:</span>
-                  <span class="detail-value">+977-9861234567</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Location:</span>
-                  <span class="detail-value">${order.location}</span>
-                </div>
+                <div class="detail-item"><span class="detail-label">Name:</span><span class="detail-value">${fallbackName}</span></div>
+                <div class="detail-item"><span class="detail-label">PAN:</span><span class="detail-value">${fallbackPan}</span></div>
+                <div class="detail-item"><span class="detail-label">Mobile:</span><span class="detail-value">${fallbackPhone}</span></div>
+                <div class="detail-item"><span class="detail-label">Location:</span><span class="detail-value">${fallbackLocation}</span></div>
               </div>
-              
               <div class="detail-box">
                 <h3>Order Details</h3>
-                <div class="detail-item">
-                  <span class="detail-label">Order ID:</span>
-                  <span class="detail-value">${order.id.split("-")[1] || "3"}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Status:</span>
-                  <span class="detail-value">${order.status}</span>
-                </div>
-                <div class="detail-item">
-                  <span class="detail-label">Payment:</span>
-                  <span class="detail-value">${order.paymentMethod === "qr" ? "QR Payment" : "Cash on Delivery"}</span>
-                </div>
+                <div class="detail-item"><span class="detail-label">Order ID:</span><span class="detail-value">${order._id || order.id || 'N/A'}</span></div>
+                <div class="detail-item"><span class="detail-label">Status:</span><span class="detail-value">${order.status}</span></div>
+                <div class="detail-item"><span class="detail-label">Payment:</span><span class="detail-value">${fallbackPayment}</span></div>
               </div>
             </div>
             
             <table class="products-table">
-              <thead>
-                <tr>
-                  <th>Product</th>
-                  <th>Qty</th>
-                  <th>Price</th>
-                  <th>Total</th>
-                </tr>
-              </thead>
+              <thead><tr><th>Product</th><th>Qty</th><th>Price</th><th>Total</th></tr></thead>
               <tbody>
-                ${orderItems
-                  .map(
-                    (item) => `
+                ${fallbackItems.length > 0 ? fallbackItems.map((item: any) => `
                   <tr>
-                    <td>${item.name}</td>
-                    <td>${item.quantity}</td>
-                    <td>Rs ${item.price.toFixed(2)}</td>
-                    <td>Rs ${(item.price * item.quantity).toFixed(2)}</td>
+                    <td>${item.name || item.productId?.name || 'Unknown Product'}</td>
+                    <td>${item.quantity || 0}</td>
+                    <td>Rs ${(item.price || 0).toFixed(2)}</td>
+                    <td>Rs ${(item.total || (item.price || 0) * (item.quantity || 0)).toFixed(2)}</td>
                   </tr>
-                `,
-                  )
-                  .join("")}
+                `).join('') : `<tr><td colspan="4" style="text-align: center; color: #999;">No items available</td></tr>`}
               </tbody>
             </table>
             
             <div class="total-section">
-              <div class="total-amount">Total Amount: Rs ${total.toFixed(2)}</div>
+              <div style="font-size: 14px; color: #666; margin-bottom: 5px;">Subtotal: Rs ${fallbackSubtotal.toFixed(2)}</div>
+              ${fallbackDeliveryFee > 0 ? `<div style="font-size: 14px; color: #666; margin-bottom: 5px;">Delivery Fee: Rs ${fallbackDeliveryFee.toFixed(2)}</div>` : ''}
+              <div class="total-amount">Total Amount: Rs ${fallbackTotal.toFixed(2)}</div>
             </div>
             
             <div class="footer">
@@ -819,6 +721,15 @@ export function useOrderTable({
   // Calculate total filtered items for pagination
   const totalFiltered = useMemo(() => {
     let filtered = [...orders];
+    // Apply search filter
+    if (debouncedSearch) {
+      const searchLower = debouncedSearch.toLowerCase();
+      filtered = filtered.filter(order =>
+        order.billNumber.toLowerCase().includes(searchLower) ||
+        order.customerName.toLowerCase().includes(searchLower) ||
+        order.location.toLowerCase().includes(searchLower)
+      );
+    }
     if (filters.billNumber) {
       filtered = filtered.filter((order) =>
         order.billNumber
@@ -832,7 +743,7 @@ export function useOrderTable({
       );
     }
     return filtered;
-  }, [orders, filters.billNumber, filters.location]);
+  }, [orders, debouncedSearch, filters.billNumber, filters.location]);
 
   const totalPages = Math.ceil(totalFiltered.length / itemsPerPage);
 
@@ -852,7 +763,8 @@ export function useOrderTable({
     totalPages,
     canEdit,
     processingOrderId,
-
+    processingAction,
+    
     // Modal states
     confirmModalOpen,
     setConfirmModalOpen,

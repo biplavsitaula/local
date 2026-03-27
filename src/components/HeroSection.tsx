@@ -8,10 +8,18 @@ import { ArrowRight, Loader2, Sparkles } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { featureImagesService, FeatureImage } from "@/services/feature-images.service";
+import AnimatedStats from "@/components/AnimatedStats";
 
 const HeroSection: React.FC = () => {
   const { t, language } = useLanguage();
   const { theme } = useTheme();
+
+  const heroStats = [
+    { value: "10+", label: t("yearsExperience") },
+    { value: "5000+", label: t("happyCustomers") },
+    { value: "500+", label: t("products") },
+    { value: "24/7", label: t("support") },
+  ];
   const currentYear = new Date().getFullYear();
 
   // --- Carousel & Data Logic ---
@@ -51,11 +59,47 @@ const HeroSection: React.FC = () => {
     return () => clearInterval(interval);
   }, [nextSlide, slides.length]);
 
-  // --- Loading state: show a minimal spinner ---
+  // --- Loading state: show a skeleton of the hero ---
   if (loading) {
     return (
-      <section className="relative min-h-[90vh] w-full flex items-center justify-center bg-black overflow-hidden">
-        <Loader2 className="w-8 h-8 animate-spin text-amber-500" />
+      <section className="relative pt-8 pb-4 sm:pt-6 sm:pb-6 overflow-hidden transition-colors bg-card animate-pulse min-h-[65vh] sm:min-h-[75vh] md:min-h-[90vh]">
+        <div className="relative z-10 container mx-auto px-4 text-center flex flex-col items-center justify-center h-full mt-24 sm:mt-32">
+          <div className="max-w-4xl w-full mx-auto space-y-8 flex flex-col items-center">
+            {/* Badge Skeleton */}
+            <div className="h-8 w-48 bg-muted rounded-full"></div>
+
+            {/* Title Skeleton */}
+            <div className="space-y-4 w-full max-w-2xl flex flex-col items-center">
+              <div className="h-12 sm:h-16 w-3/4 bg-muted rounded-lg"></div>
+              <div className="h-12 sm:h-16 w-1/2 bg-muted rounded-lg"></div>
+            </div>
+
+            {/* Subtitle Skeleton */}
+            <div className="h-6 w-2/3 max-w-xl bg-muted rounded"></div>
+
+            {/* CTA Buttons Skeleton */}
+            <div className="flex flex-row w-full gap-2 sm:gap-4 justify-center items-center pt-4">
+              <div className="h-14 flex-1 sm:w-[200px] bg-muted rounded-lg"></div>
+              <div className="h-14 flex-1 sm:w-[200px] bg-muted rounded-lg"></div>
+            </div>
+
+            {/* Stats Skeleton */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 w-full max-w-xl mx-auto">
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+              <div className="flex flex-col items-center gap-2">
+                <div className="h-8 w-16 bg-muted rounded"></div>
+                <div className="h-4 w-20 bg-muted rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
       </section>
     );
   }
@@ -87,43 +131,30 @@ const HeroSection: React.FC = () => {
             </p>
 
             {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center pt-4">
-              <Link href="/products">
+            <div className="flex flex-row w-full gap-2 sm:gap-4 justify-center items-center pt-4">
+              <Link href="/products" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
                   variant="default"
-                  className="btn-primary-custom font-semibold px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg group"
+                  className="w-full sm:w-auto btn-primary-custom font-semibold px-2 sm:px-8 py-4 sm:py-6 text-[10px] sm:text-base md:text-lg group"
                 >
-                  {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
-                  <ArrowRight className="ml-2 w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
+                  <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}</span>
+                  <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
                 </Button>
               </Link>
-              <Link href="/categories">
+              <Link href="/categories" className="flex-1 sm:flex-none">
                 <Button
                   size="lg"
                   variant="outline"
-                  className="btn-default-custom px-6 sm:px-8 py-4 sm:py-6 text-sm sm:text-base md:text-lg border-color-primary"
+                  className="w-full sm:w-auto btn-default-custom px-2 sm:px-8 py-4 sm:py-6 text-[10px] sm:text-base md:text-lg border-color-primary"
                 >
-                  {language === 'en' ? 'Categories' : 'कोटिहरू'}
+                  <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Categories' : 'कोटिहरू'}</span>
                 </Button>
               </Link>
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-3 gap-3 sm:gap-6 pt-8 sm:pt-12 max-w-xl mx-auto">
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">500+</p>
-                <p className="text-xs sm:text-sm text-color-muted">Products</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">1hr</p>
-                <p className="text-xs sm:text-sm text-color-muted">Delivery</p>
-              </div>
-              <div className="text-center">
-                <p className="text-xl sm:text-2xl md:text-3xl font-bold text-primary-gradient">10k+</p>
-                <p className="text-xs sm:text-sm text-color-muted">Customers</p>
-              </div>
-            </div>
+            <AnimatedStats stats={heroStats} variant="hero-gradient" />
           </div>
         </div>
 
@@ -135,7 +166,7 @@ const HeroSection: React.FC = () => {
 
   // --- Cinematic carousel: slides available ---
   return (
-    <section className="relative min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
+    <section className="relative min-h-[65vh] sm:min-h-[75vh] md:min-h-[90vh] w-full flex items-center bg-black overflow-hidden">
       {/* Background carousel images */}
       <div className="absolute inset-0 z-0">
         {slides.map((slide, index) => (
@@ -148,18 +179,20 @@ const HeroSection: React.FC = () => {
               src={slide.imageUrl}
               alt={slide.name || "Hero Background"}
               fill
-              className="object-cover transition-transform duration-[10000ms] ease-linear"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 100vw, 100vw"
+              className="object-cover object-top sm:object-center transition-transform duration-[10000ms] ease-linear"
               style={{ transform: index === currentSlide ? 'scale(1.05)' : 'scale(1)' }}
               priority={index === 0}
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent backdrop-blur-[1px]" />
+            {/* Dark overlay — stronger on mobile so text/dots stay readable */}
+            <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/50 to-black/70 sm:bg-none sm:bg-gradient-to-r sm:from-black/80 sm:via-black/40 sm:to-transparent backdrop-blur-[1px]" />
           </div>
         ))}
       </div>
 
       {/* Content - Left Aligned */}
-      <div className="relative z-20 container mx-auto px-6 md:px-12 lg:px-20">
-        <div className="max-w-3xl space-y-8 animate-fade-in text-left">
+      <div className="relative z-20 container mx-auto px-4 sm:px-6 md:px-12 lg:px-20 py-16 sm:py-0">
+        <div className="max-w-3xl space-y-4 sm:space-y-6 md:space-y-8 animate-fade-in text-left">
           {/* Badge */}
           <div className="inline-flex items-center gap-2 shadow-md px-4 py-2 rounded-full backdrop-blur-md border border-amber-500/30 bg-black/40 text-white">
             <Sparkles className="w-4 h-4 text-amber-500" />
@@ -169,7 +202,7 @@ const HeroSection: React.FC = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-serif font-bold leading-[1.1]">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-6xl font-serif font-bold leading-[1.1]">
             <span className="bg-gradient-to-b from-amber-200 via-amber-400 to-amber-600 bg-clip-text text-transparent">
               {language === 'en' ? 'Premium Spirits' : 'प्रिमियम स्पिरिट्स'}
             </span>
@@ -180,55 +213,42 @@ const HeroSection: React.FC = () => {
           </h1>
 
           {/* Subtitle */}
-          <p className="text-lg md:text-xl max-w-xl text-gray-300 font-light leading-relaxed">
+          <p className="text-sm sm:text-base md:text-lg max-w-xl text-gray-300 font-light leading-relaxed">
             {language === 'en'
               ? 'Discover our exclusive collection of world class liquors'
               : 'विश्व स्तरीय मदिराको हाम्रो विशेष संग्रह पत्ता लगाउनुहोस्।'}
           </p>
 
           {/* CTA Buttons */}
-          <div className="flex flex-col sm:flex-row gap-4 justify-start items-center pt-4">
-            <Link href="/products">
+          <div className="flex flex-row w-full sm:w-auto gap-2 sm:gap-4 justify-center sm:justify-start items-center pt-2 sm:pt-4">
+            <Link href="/products" className="flex-1 sm:flex-none sm:w-auto">
               <Button
                 size="lg"
-                className="bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-10 py-7 rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
+                className="w-full sm:w-auto bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold px-2 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 text-[10px] sm:text-sm md:text-base rounded-lg shadow-lg shadow-orange-900/20 transition-all group border-none"
               >
-                {language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}
-                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Explore Collection' : 'संग्रह अन्वेषण'}</span>
+                <ArrowRight className="ml-1 sm:ml-2 w-3 h-3 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform shrink-0" />
               </Button>
             </Link>
-            <Link href="/categories">
+            <Link href="/categories" className="flex-1 sm:flex-none sm:w-auto">
               <Button
                 variant="outline"
                 size="lg"
-                className="w-full sm:w-auto border-white/20 bg-transparent backdrop-blur-sm text-white hover:bg-white hover:text-black font-bold px-10 py-7 rounded-none uppercase tracking-widest text-xs transition-all"
+                className="w-full sm:w-auto border border-orange-500 bg-transparent backdrop-blur-sm text-white hover:bg-orange-500 hover:text-white font-bold px-2 py-3 sm:px-8 sm:py-5 md:px-10 md:py-6 rounded-lg tracking-widest text-[10px] sm:text-sm md:text-base transition-all hover:border-yellow-300"
               >
-                {language === 'en' ? 'Categories' : 'कोटिहरू'}
+                <span className="truncate leading-tight whitespace-normal">{language === 'en' ? 'Categories' : 'कोटिहरू'}</span>
               </Button>
             </Link>
           </div>
 
           {/* Stats */}
-          <div className="flex gap-12 pt-12 border-t border-white/10 w-fit">
-            <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">500+</p>
-              <p className="text-xs uppercase tracking-widest text-gray-500">Products</p>
-            </div>
-            <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">1hr</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Delivery</p>
-            </div>
-            <div className="text-left">
-              <p className="text-2xl md:text-3xl font-bold text-amber-500">10k+</p>
-              <p className="text-[10px] uppercase tracking-[0.2em] text-gray-500">Customers</p>
-            </div>
-          </div>
+          <AnimatedStats stats={heroStats} variant="hero-dark" />
         </div>
       </div>
 
       {/* Slide Progress Dots */}
       {slides.length > 1 && (
-        <div className="absolute bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-row items-center gap-3">
+        <div className="absolute bottom-5 sm:bottom-8 md:bottom-10 left-1/2 -translate-x-1/2 z-30 flex flex-row items-center gap-3">
           {slides.map((_, i) => (
             <button
               key={i}

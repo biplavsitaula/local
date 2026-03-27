@@ -1,9 +1,10 @@
 "use client";
 
-import React from "react";
+import React, { useState } from "react";
 import { DashboardOrder } from "@/services/customer-dashboard.service";
 import { Eye } from "lucide-react";
 import Image from "next/image";
+import { Pagination } from "@/components/ui/pagination";
 
 interface RecentOrdersTableProps {
     orders: DashboardOrder[];
@@ -23,6 +24,15 @@ const statusColors: Record<string, string> = {
 const DEFAULT_IMAGE = "/assets/image_not_found.png";
 
 export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 5;
+
+    const totalPages = Math.ceil(orders.length / itemsPerPage);
+    const paginatedOrders = orders.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+    );
+
     const formatDate = (dateStr: string) => {
         const date = new Date(dateStr);
         return date.toLocaleDateString("en-US", {
@@ -75,7 +85,7 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                                 </td>
                             </tr>
                         ) : (
-                            orders.map((order) => (
+                            paginatedOrders.map((order) => (
                                 <tr
                                     key={order._id}
                                     className="border-b border-white/5 last:border-0 hover:bg-white/[0.02] transition-colors"
@@ -156,6 +166,21 @@ export function RecentOrdersTable({ orders }: RecentOrdersTableProps) {
                     </tbody>
                 </table>
             </div>
+
+            {/* Pagination Controls */}
+            {orders.length > itemsPerPage && (
+                <div className="p-4 border-t border-white/8 bg-white/[0.02]">
+                    <Pagination
+                        currentPage={currentPage}
+                        totalPages={totalPages}
+                        onPageChange={(page) => {
+                            setCurrentPage(page);
+                        }}
+                        itemsPerPage={itemsPerPage}
+                        totalItems={orders.length}
+                    />
+                </div>
+            )}
         </div>
     );
 }

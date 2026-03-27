@@ -551,18 +551,24 @@ export default function FeaturedImagesPage() {
     try {
       setIsSaving(true);
       if (selectedImage) {
-        await featureImagesService.update(
-          selectedImage._id || selectedImage.id || "",
-          data
+        const imageId = selectedImage._id || selectedImage.id || "";
+        const response = await featureImagesService.update(imageId, data);
+        // Update local state directly instead of refetching
+        setFeatureImages((prev) =>
+          prev.map((img) =>
+            (img._id || img.id) === imageId
+              ? { ...img, ...data, ...(response.data || {}) }
+              : img
+          )
         );
         toast.success("Featured image updated successfully");
       } else {
         await featureImagesService.create(data as any);
         toast.success("Featured image created successfully");
+        fetchFeatureImages();
       }
       setEditModalOpen(false);
       setSelectedImage(null);
-      fetchFeatureImages();
     } catch (err: any) {
       toast.error(err.message || "Failed to save feature image");
     } finally {
@@ -575,13 +581,15 @@ export default function FeaturedImagesPage() {
     if (!selectedImage) return;
     try {
       setIsSaving(true);
-      await featureImagesService.delete(
-        selectedImage._id || selectedImage.id || ""
+      const imageId = selectedImage._id || selectedImage.id || "";
+      await featureImagesService.delete(imageId);
+      // Remove from local state directly
+      setFeatureImages((prev) =>
+        prev.filter((img) => (img._id || img.id) !== imageId)
       );
       toast.success("Featured image deleted successfully");
       setDeleteModalOpen(false);
       setSelectedImage(null);
-      fetchFeatureImages();
     } catch (err: any) {
       toast.error(err.message || "Failed to delete feature image");
     } finally {
@@ -591,15 +599,31 @@ export default function FeaturedImagesPage() {
 
   // Toggle active status
   const handleToggleActive = async (image: FeatureImage) => {
+    const imageId = image._id || image.id || "";
+    // Optimistically update local state
+    setFeatureImages((prev) =>
+      prev.map((img) =>
+        (img._id || img.id) === imageId
+          ? { ...img, isActive: !img.isActive }
+          : img
+      )
+    );
     try {
-      await featureImagesService.update(image._id || image.id || "", {
+      await featureImagesService.update(imageId, {
         isActive: !image.isActive,
       });
       toast.success(
         image.isActive ? "Image hidden from carousel" : "Image shown in carousel"
       );
-      fetchFeatureImages();
     } catch (err: any) {
+      // Revert on failure
+      setFeatureImages((prev) =>
+        prev.map((img) =>
+          (img._id || img.id) === imageId
+            ? { ...img, isActive: image.isActive }
+            : img
+        )
+      );
       toast.error(err.message || "Failed to update status");
     }
   };

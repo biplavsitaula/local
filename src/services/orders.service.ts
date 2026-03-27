@@ -195,6 +195,13 @@ export const ordersService = {
       throw error;
     }
   },
+
+  /**
+   * Get total order count for a user (Authenticated)
+   */
+  getUserOrderCount: async (): Promise<ApiResponse<{ count: number }>> => {
+    return apiGet<{ count: number }>('/orders/user/count');
+  },
 };
 
 

@@ -110,6 +110,38 @@ const CheckoutModal = ({ open, onClose, buyNowItem }: IPaymentCheckbox) => {
       showReject: boolean;
     };
   } | null>(null);
+  const [orderCount, setOrderCount] = useState<number | null>(null);
+
+  // Fetch order count for delivery discount logic
+  useEffect(() => {
+    const fetchCount = async () => {
+      if (open && isAuthenticated) {
+        try {
+          const res = await ordersService.getUserOrderCount();
+          if (res.success) {
+            setOrderCount(res.data.count);
+          }
+        } catch (err) {
+          console.error("Error fetching order count in checkout:", err);
+        }
+      }
+    };
+    fetchCount();
+  }, [open, isAuthenticated]);
+
+  const subtotal = total;
+  
+  // Apply promotional delivery fee logic
+  const deliveryFee = useMemo(() => {
+    // If not authenticated, assume it's the first order for promotional purposes
+    if (!isAuthenticated) return 0;
+    
+    if (orderCount === 0) return 0; // First order free
+    if (orderCount === 1) return 250; // Second order 50% off
+    return subtotal >= 2000 ? 0 : 500; // Normal logic
+  }, [orderCount, subtotal, isAuthenticated]);
+
+  const finalTotal = subtotal + deliveryFee;
 
   if (!open) return null;
 
@@ -218,10 +250,6 @@ const CheckoutModal = ({ open, onClose, buyNowItem }: IPaymentCheckbox) => {
       setIsProcessing(false);
     }
   };
-
-  const subtotal = total;
-  const deliveryFee = total >= 2000 ? 0 : 500;
-  const finalTotal = subtotal + deliveryFee;
 
   return (
     <div className="fixed inset-0 z-50 flex items-start md:items-center justify-center bg-background/80 backdrop-blur-sm p-2 sm:p-4 overflow-auto">

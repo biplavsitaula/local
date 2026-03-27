@@ -34,6 +34,7 @@ import { productsService, Product as ApiProduct } from "@/services/products.serv
 import { ordersService } from "@/services/orders.service";
 import { useCategories, CategoryFilter } from "@/hooks/useCategories";
 import RecommendedProductCard from "@/components/RecommendedProductCard";
+import PromotionalBanner from "@/components/PromotionalBanner";
 
 // Storage key for tracked orders (must match CheckoutModal)
 const TRACKED_ORDERS_KEY = 'flame_tracked_orders';
@@ -366,8 +367,38 @@ function PageContent() {
           </div>
 
           {loadingRecent ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
+                  {/* Image Skeleton */}
+                  <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '75%' }}></div>
+                  
+                  {/* Content Skeleton */}
+                  <div className="p-3 sm:p-4 space-y-3">
+                    <div className="h-3 w-1/4 bg-muted rounded"></div>
+                    <div className="h-5 w-3/4 bg-muted rounded"></div>
+                    <div className="h-3 w-1/2 bg-muted rounded"></div>
+                    
+                    {/* Price */}
+                    <div className="mt-4 flex gap-2">
+                      <div className="h-6 w-1/3 bg-muted rounded"></div>
+                      <div className="h-6 w-1/4 bg-muted rounded"></div>
+                    </div>
+                    
+                    {/* Quantity and Actions */}
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-12 bg-muted rounded"></div>
+                        <div className="h-8 w-24 bg-muted rounded"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 bg-muted rounded"></div>
+                        <div className="h-10 flex-1 bg-muted rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredRecentArrivals.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -411,8 +442,38 @@ function PageContent() {
           </div>
 
           {loadingRecommended ? (
-            <div className="flex items-center justify-center py-16">
-              <Loader2 className="h-8 w-8 animate-spin text-primary" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+              {[1, 2, 3, 4].map((i) => (
+                <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
+                  {/* Image Skeleton */}
+                  <div className="relative w-full overflow-hidden bg-muted" style={{ paddingBottom: '75%' }}></div>
+                  
+                  {/* Content Skeleton */}
+                  <div className="p-3 sm:p-4 space-y-3">
+                    <div className="h-3 w-1/4 bg-muted rounded"></div>
+                    <div className="h-5 w-3/4 bg-muted rounded"></div>
+                    <div className="h-3 w-1/2 bg-muted rounded"></div>
+                    
+                    {/* Price */}
+                    <div className="mt-4 flex gap-2">
+                      <div className="h-6 w-1/3 bg-muted rounded"></div>
+                      <div className="h-6 w-1/4 bg-muted rounded"></div>
+                    </div>
+                    
+                    {/* Quantity and Actions */}
+                    <div className="mt-4 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <div className="h-4 w-12 bg-muted rounded"></div>
+                        <div className="h-8 w-24 bg-muted rounded"></div>
+                      </div>
+                      <div className="flex gap-2">
+                        <div className="h-10 flex-1 bg-muted rounded"></div>
+                        <div className="h-10 flex-1 bg-muted rounded"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
             </div>
           ) : filteredMostRecommended.length > 0 ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -451,7 +512,7 @@ function PageContent() {
         </section>
 
         {/* Products Section */}
-        <section className="container mx-auto px-4">
+        <section className="container mx-auto px-4 mb-2">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
             <h2 className="text-lg sm:text-xl md:text-2xl font-display font-bold text-color-secondary">
               {t("allProducts")}
@@ -471,6 +532,7 @@ function PageContent() {
             selectedSubCategory={selectedFilter.subCategory}
             onCheckout={() => setCheckoutOpen(true)}
             limit={selectedFilter.category ? undefined : 10}
+            cardVariant="home"
           />
         </section>
 
@@ -585,6 +647,9 @@ function PageContent() {
           orderStatus={orderStatusModal.status}
         />
       )}
+
+      {/* Promotional Banner (Floating) */}
+      <PromotionalBanner />
     </div>
   );
 }
@@ -621,9 +686,7 @@ export function ClientPageContent() {
   // Don't render anything until mounted to prevent flicker
   if (!mounted) {
     return (
-      <div className="fixed inset-0 bg-black flex items-center justify-center">
-        <div className="w-16 h-16 border-4 border-color-primary border-t-transparent rounded-full animate-spin" />
-      </div>
+      <div className="min-h-screen bg-background" />
     );
   }
 

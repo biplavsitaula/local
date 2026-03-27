@@ -20,7 +20,7 @@ const Orders = () => {
     paymentMethod?: string;
   }>({});
   const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [initialLoading, setInitialLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -29,6 +29,7 @@ const Orders = () => {
   // Use ref to track filters without causing re-renders
   const filtersRef = useRef(orderFilters);
   filtersRef.current = orderFilters;
+  const hasFetchedOnce = useRef(false);
 
   // Check if any filter is active
   const hasActiveFilters = !!(
@@ -74,41 +75,39 @@ const Orders = () => {
   };
 
   // Fetch orders with server-side pagination - no dependencies on orderFilters object
-  const fetchOrders = useCallback(
-    async (page: number = 1, isFiltering: boolean = false) => {
-      try {
-        setLoading(true);
-        setError(null);
-
-        // Use ref to get current filters without dependency
-        const currentFilters = filtersRef.current;
-
-        // When filters are active, fetch all to filter/search client-side
-        // Otherwise, use server-side pagination
-        const response = await ordersService.getAll({
-          limit: isFiltering ? 1000 : ITEMS_PER_PAGE,
-          page: isFiltering ? 1 : page,
-          search: currentFilters.search || undefined,
-          status: currentFilters.status || undefined,
-          paymentMethod: currentFilters.paymentMethod || undefined,
-        });
-
-        const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
-        setOrders(mappedOrders);
-        setTotalPages(
-          response.pagination?.pages ||
-            Math.ceil(mappedOrders.length / ITEMS_PER_PAGE),
-        );
-        setTotalItems(response.pagination?.total || mappedOrders.length);
-      } catch (err: any) {
-        setError(err.message || "Failed to load orders");
-        setOrders([]);
-      } finally {
-        setLoading(false);
+  const fetchOrders = useCallback(async (page: number = 1, isFiltering: boolean = false) => {
+    try {
+      // Only show full-page loading on initial load
+      if (!hasFetchedOnce.current) {
+        setInitialLoading(true);
       }
-    },
-    [],
-  ); // Empty dependency array - uses ref for filters
+      setError(null);
+      
+      // Use ref to get current filters without dependency
+      const currentFilters = filtersRef.current;
+      
+      // When filters are active, fetch all to filter/search client-side
+      // Otherwise, use server-side pagination
+      const response = await ordersService.getAll({
+        limit: isFiltering ? 1000 : ITEMS_PER_PAGE,
+        page: isFiltering ? 1 : page,
+        search: currentFilters.search || undefined,
+        status: currentFilters.status || undefined,
+        paymentMethod: currentFilters.paymentMethod || undefined,
+      });
+      
+      const mappedOrders = (response.data || []).map(mapApiOrderToOrder);
+      setOrders(mappedOrders);
+      setTotalPages(response.pagination?.pages || Math.ceil(mappedOrders.length / ITEMS_PER_PAGE));
+      setTotalItems(response.pagination?.total || mappedOrders.length);
+    } catch (err: any) {
+      setError(err.message || 'Failed to load orders');
+      setOrders([]);
+    } finally {
+      setInitialLoading(false);
+      hasFetchedOnce.current = true;
+    }
+  }, []); // Empty dependency array - uses ref for filters
 
   // Initial fetch
   useEffect(() => {
@@ -127,8 +126,8 @@ const Orders = () => {
     if (hasActiveFilters) {
       setCurrentPage(1);
       fetchOrders(1, true);
-    } else {
-      // Reset to page 1 and fetch without filters
+    } else if (hasFetchedOnce.current) {
+      // Reset to page 1 and fetch without filters (only after initial load)
       setCurrentPage(1);
       fetchOrders(1, false);
     }
@@ -213,7 +212,7 @@ const Orders = () => {
     ? Math.ceil(filteredOrders.length / ITEMS_PER_PAGE)
     : totalPages;
 
-  if (loading) {
+  if (initialLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="flex flex-col items-center gap-4">

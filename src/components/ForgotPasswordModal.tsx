@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { createPortal } from "react-dom";
 import { useLanguage } from "@/contexts/LanguageContext";
 import { authService } from "@/services/auth.service";
-import { Mail, Loader2, X, CheckCircle } from "lucide-react";
+import { Mail, Loader2, X, CheckCircle, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 
 interface ForgotPasswordModalProps {
@@ -37,6 +37,21 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     }
   }, [open]);
 
+  // Reset form after success with a delay
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (success) {
+      timer = setTimeout(() => {
+        setSuccess(false);
+        setEmail("");
+      }, 5000);
+    }
+    return () => {
+      if (timer) clearTimeout(timer);
+    };
+  }, [success]);
+
+
   if (!open || !mounted) return null;
 
   const handleClose = () => {
@@ -57,7 +72,7 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
     e.preventDefault();
     setError(null);
     setIsLoading(true);
-    
+
     try {
       const response = await authService.forgotPassword(email);
       if (response.success) {
@@ -66,11 +81,11 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
         setError(response.message || "Failed to send reset link. Please try again.");
       }
     } catch (err: any) {
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          "Failed to send reset link. Please try again.";
+      const errorMessage = err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.message ||
+        err?.message ||
+        "Failed to send reset link. Please try again.";
       setError(errorMessage);
     } finally {
       setIsLoading(false);
@@ -93,10 +108,10 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
           {/* Logo and Title */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-3 sm:mb-4">
-              <Image 
-                src="/assets/flame200.png" 
-                alt="Flame Beverage logo" 
-                width={80} 
+              <Image
+                src="/assets/flame200.png"
+                alt="Flame Beverage logo"
+                width={80}
                 height={64}
                 className="sm:w-[100px] sm:h-[80px]"
               />
@@ -122,12 +137,15 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
                   </p>
                 </div>
               </div>
-              <button
-                onClick={handleBackToLogin}
-                className="w-full py-2.5 sm:py-3 px-4 rounded-lg btn-primary-custom text-sm sm:text-base font-semibold cursor-pointer border-2 border-white/30 hover:border-white/50 hover:opacity-90"
-              >
-                {t("backToLogin")}
-              </button>
+              <div className="flex justify-start">
+                <button
+                  onClick={handleBackToLogin}
+                  className="w-fit py-1.5 sm:py-2 px-3 rounded-lg btn-primary-custom text-xs sm:text-sm font-semibold cursor-pointer border-2 border-white/30 hover:border-white/50 hover:opacity-90 flex items-center gap-2"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="leading-none">{t("backToLogin")}</span>
+                </button>
+              </div>
             </div>
           ) : (
             <>
@@ -174,12 +192,13 @@ const ForgotPasswordModal = ({ open, onClose, onSwitchToLogin }: ForgotPasswordM
               </form>
 
               {/* Back to Login */}
-              <div className="mt-4 text-center">
+              <div className="mt-4 flex justify-start">
                 <button
                   onClick={handleBackToLogin}
-                  className="flex-1 py-2.5 sm:py-3 px-3 sm:px-4 rounded-lg btn-card-custom border-border text-center text-sm sm:text-base cursor-pointer"
-                  >
-                  {t("backToLogin")}
+                  className="w-fit flex items-center gap-2 py-1.5 sm:py-2 px-3 rounded-lg btn-card-custom border border-border text-xs sm:text-sm font-medium cursor-pointer transition-colors hover:bg-muted"
+                >
+                  <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
+                  <span className="leading-none">{t("backToLogin")}</span>
                 </button>
               </div>
             </>

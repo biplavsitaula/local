@@ -5,6 +5,7 @@ import { useLanguage } from "@/contexts/LanguageContext";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Flame, Users, Award, MapPin, Phone, Mail } from "lucide-react";
+import AnimatedStats from "@/components/AnimatedStats";
 
 const AboutPageContent = () => {
   const { t } = useLanguage();
@@ -40,17 +41,7 @@ const AboutPageContent = () => {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-8 sm:mb-12 md:mb-16">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              className="bg-card rounded-lg sm:rounded-xl p-4 sm:p-6 text-center border border-border hover:border-golden transition-colors"
-            >
-              <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-ternary-text mb-1 sm:mb-2">{stat.value}</div>
-              <div className="text-xs sm:text-sm md:text-base text-muted-foreground">{stat.label}</div>
-            </div>
-          ))}
-        </div>
+        <AnimatedStats stats={stats} variant="card" />
 
         {/* Mission & Vision */}
         <div className="grid md:grid-cols-2 gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-12 md:mb-16">

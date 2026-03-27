@@ -116,7 +116,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       tokenManager.removeToken();
       setToken(null);
       setUser(null);
-      router.push('/login');
+      router.push('/');
     }
   };
 

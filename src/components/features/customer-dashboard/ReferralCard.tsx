@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { Gift, Loader2, CheckCircle2, Copy, Check, AlertCircle, X } from "lucide-react";
 import { referralService, ReferralReward } from "@/services/referral.service";
+import { customerDashboardService } from "@/services/customer-dashboard.service";
 import { ReferralModal } from "./ReferralModal";
 
 type CardState = "idle" | "loading" | "success" | "error";
@@ -56,11 +57,18 @@ export function ReferralCard() {
         setState("loading");
         setErrorMsg("");
         try {
-            const res = await referralService.claimReward();
+            const dashboard = await customerDashboardService.getDashboard();
+            const userId = dashboard.data.userId._id;
+            const res = await referralService.claimReward(userId);
             setReward(res.reward);
             setState("success");
         } catch (err: any) {
-            setErrorMsg(err?.message || "Unable to claim reward. Please try again.");
+            const backendMsg = err?.message || "";
+            if (backendMsg.includes("Not eligible") || backendMsg.includes("already claimed")) {
+                setErrorMsg("No eligible referrals yet. Invite a friend and wait for their first delivery!");
+            } else {
+                setErrorMsg(backendMsg || "Unable to claim reward. Please try again.");
+            }
             setState("error");
         }
     };
