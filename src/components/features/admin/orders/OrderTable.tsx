@@ -1,16 +1,33 @@
 "use client";
 
-import { ArrowUpDown, Eye, Printer, Loader2, AlertCircle, Filter, X, Search, CheckCircle, XCircle } from 'lucide-react';
-import { OrderDetailsModal } from './OrderDetailsModal';
-import { Order } from '@/hooks/useOrderStore';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { useDebounce } from '@/hooks/useDebounce';
-import { Pagination } from '@/components/ui/pagination';
-import { ConfirmModal } from '@/components/ConfirmModal';
-import { SuccessMsgModal } from '@/components/SuccessMsgModal';
-import { useOrderTable } from './hooks/useOrderTable';
+import {
+  ArrowUpDown,
+  Eye,
+  Printer,
+  Loader2,
+  AlertCircle,
+  Filter,
+  X,
+  Search,
+  CheckCircle,
+  XCircle,
+} from "lucide-react";
+import { OrderDetailsModal } from "./OrderDetailsModal";
+import { Order } from "@/hooks/useOrderStore";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Pagination } from "@/components/ui/pagination";
+import { ConfirmModal } from "@/components/ConfirmModal";
+import { SuccessMsgModal } from "@/components/SuccessMsgModal";
+import { useOrderTable } from "./hooks/useOrderTable";
 
 interface OrderTableProps {
   orders: Order[];
@@ -25,7 +42,12 @@ interface OrderTableProps {
   onOrderUpdate?: () => void;
 }
 
-export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onOrderUpdate }: OrderTableProps) {
+export function OrderTable({
+  orders: propOrders,
+  allOrders,
+  onFiltersChange,
+  onOrderUpdate,
+}: OrderTableProps) {
   const {
     searchInput,
     setSearchInput,
@@ -73,20 +95,31 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
 
   const debouncedSearch = useDebounce(searchInput, 300);
 
-  type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
+  type SortKey =
+    | "billNumber"
+    | "customerName"
+    | "location"
+    | "totalAmount"
+    | "status";
 
   const renderSortableTh = (label: string, columnKey: SortKey) => (
     <th
       className="text-left p-4 text-sm font-semibold text-foreground"
       aria-sort={
-        sortKey === columnKey ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'none'
+        sortKey === columnKey
+          ? sortDir === "asc"
+            ? "ascending"
+            : "descending"
+          : "none"
       }
     >
       <button
         type="button"
         onClick={() => handleSort(columnKey)}
         className={`inline-flex items-center gap-2 transition-colors ${
-          sortKey === columnKey ? 'text-flame-orange' : 'hover:text-flame-orange'
+          sortKey === columnKey
+            ? "text-flame-orange"
+            : "hover:text-flame-orange"
         }`}
       >
         <span>{label}</span>
@@ -95,20 +128,6 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
     </th>
   );
 
-  // Mock order items - in a real app, this would come from the order data
-  const getOrderItems = (order: Order) => {
-    if (order.billNumber === 'FB-2024-003') {
-      return [
-        { name: 'Macallan 18 Year', quantity: 1, price: 349.99 },
-        { name: 'Hennessy XO', quantity: 1, price: 229.99 },
-      ];
-    }
-    // Default mock items
-    return [
-      { name: 'Premium Whiskey', quantity: 1, price: order.totalAmount * 0.6 },
-      { name: 'Premium Brandy', quantity: 1, price: order.totalAmount * 0.4 },
-    ];
-  };
 
 
   return (
@@ -143,7 +162,9 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
         {showFilters && (
           <div className="glass-card rounded-xl p-4 border border-border/50 space-y-4">
             <div className="flex items-center justify-between mb-2">
-              <h3 className="text-sm font-semibold text-foreground">Filter Orders</h3>
+              <h3 className="text-sm font-semibold text-foreground">
+                Filter Orders
+              </h3>
               <div className="flex items-center gap-2">
                 {hasActiveFilters && (
                   <Button
@@ -169,10 +190,17 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
               {/* Status Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-foreground">Status</label>
+                <label className="text-xs font-medium text-foreground">
+                  Status
+                </label>
                 <Select
-                  value={filters.status || 'all'}
-                  onValueChange={(value) => setFilters({ ...filters, status: value === 'all' ? '' : value })}
+                  value={filters.status || "all"}
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      status: value === "all" ? "" : value,
+                    })
+                  }
                 >
                   <SelectTrigger className="bg-secondary/50 border-border">
                     <SelectValue placeholder="All statuses" />
@@ -190,32 +218,47 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
 
               {/* Bill Number Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-foreground">Bill Number</label>
+                <label className="text-xs font-medium text-foreground">
+                  Bill Number
+                </label>
                 <Input
                   placeholder="Filter by bill number..."
                   value={filters.billNumber}
-                  onChange={(e) => setFilters({ ...filters, billNumber: e.target.value })}
+                  onChange={(e) =>
+                    setFilters({ ...filters, billNumber: e.target.value })
+                  }
                   className="bg-secondary/50 border-border"
                 />
               </div>
 
               {/* Location Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-foreground">Location</label>
+                <label className="text-xs font-medium text-foreground">
+                  Location
+                </label>
                 <Input
                   placeholder="Filter by location..."
                   value={filters.location}
-                  onChange={(e) => setFilters({ ...filters, location: e.target.value })}
+                  onChange={(e) =>
+                    setFilters({ ...filters, location: e.target.value })
+                  }
                   className="bg-secondary/50 border-border"
                 />
               </div>
 
               {/* Payment Method Filter */}
               <div className="space-y-2">
-                <label className="text-xs font-medium text-foreground">Payment Method</label>
+                <label className="text-xs font-medium text-foreground">
+                  Payment Method
+                </label>
                 <Select
-                  value={filters.paymentMethod || 'all'}
-                  onValueChange={(value) => setFilters({ ...filters, paymentMethod: value === 'all' ? '' : value })}
+                  value={filters.paymentMethod || "all"}
+                  onValueChange={(value) =>
+                    setFilters({
+                      ...filters,
+                      paymentMethod: value === "all" ? "" : value,
+                    })
+                  }
                 >
                   <SelectTrigger className="bg-secondary/50 border-border">
                     <SelectValue placeholder="All methods" />
@@ -238,48 +281,78 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
           <table className="w-full">
             <thead>
               <tr className="border-b border-border/50">
-                {renderSortableTh('Bill Number', 'billNumber')}
-                {renderSortableTh('Customer', 'customerName')}
-                {renderSortableTh('Location', 'location')}
-                {renderSortableTh('Amount', 'totalAmount')}
-                <th className="text-left p-4 text-sm font-semibold text-foreground">Payment</th>
-                {renderSortableTh('Status', 'status')}
-                <th className="text-left p-4 text-sm font-semibold text-foreground">Date</th>
-                <th className="text-right p-4 text-sm font-semibold text-foreground">Actions</th>
+                {renderSortableTh("Bill Number", "billNumber")}
+                {renderSortableTh("Customer", "customerName")}
+                {renderSortableTh("Location", "location")}
+                {renderSortableTh("Amount", "totalAmount")}
+                <th className="text-left p-4 text-sm font-semibold text-foreground">
+                  Payment
+                </th>
+                {renderSortableTh("Status", "status")}
+                <th className="text-left p-4 text-sm font-semibold text-foreground">
+                  Date
+                </th>
+                <th className="text-right p-4 text-sm font-semibold text-foreground">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
               {filteredAndSortedOrders.length > 0 ? (
                 filteredAndSortedOrders.map((order) => (
-                  <tr key={order.id} className="border-b border-border/30 hover:bg-muted/30 transition-colors">
-                    <td className="p-4 text-sm text-foreground font-medium">{order.billNumber}</td>
-                    <td className="p-4 text-sm text-foreground">{order.customerName}</td>
-                    <td className="p-4 text-sm text-muted-foreground">{order.location}</td>
+                  <tr
+                    key={order.id}
+                    className="border-b border-border/30 hover:bg-muted/30 transition-colors"
+                  >
+                    <td className="p-4 text-sm text-foreground font-medium">
+                      {order.billNumber}
+                    </td>
+                    <td className="p-4 text-sm text-foreground">
+                      {order.customerName}
+                    </td>
+                    <td className="p-4 text-sm text-muted-foreground">
+                      {order.location}
+                    </td>
                     <td className="p-4 text-sm text-foreground font-medium">
                       Rs. {order.totalAmount.toLocaleString()}
                     </td>
                     <td className="p-4">
                       <span className="text-xs px-2 py-1 rounded-full bg-secondary/50 text-foreground uppercase">
-                        {order.paymentMethod === 'qr' ? 'QR Payment' : 
-                         order.paymentMethod === 'cod' ? 'COD' : 
-                         order.paymentMethod === 'online' ? 'Online' : 
-                         order.paymentMethod}
+                        {order.paymentMethod === "qr"
+                          ? "QR Payment"
+                          : order.paymentMethod === "cod"
+                            ? "COD"
+                            : order.paymentMethod === "online"
+                              ? "Online"
+                              : order.paymentMethod}
                       </span>
                     </td>
                     <td className="p-4">
-                      <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}>
+                      <span
+                        className={`text-xs px-2 py-1 rounded-full ${getStatusColor(order.status)}`}
+                      >
                         {order.status}
                       </span>
                     </td>
-                    <td className="p-4 text-sm text-muted-foreground">{formatDate(order.createdAt)}</td>
+                    <td className="p-4 text-sm text-muted-foreground">
+                      {formatDate(order.createdAt)}
+                    </td>
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         {(() => {
-                          const statusLower = order.status?.toLowerCase() || '';
-                          const isAccepted = statusLower.includes('accepted') || statusLower === 'accepted';
-                          const isRejected = statusLower.includes('rejected') || statusLower === 'rejected' || statusLower.includes('reject');
-                          const isPending = statusLower.includes('pending') || statusLower === 'pending' || statusLower.includes('placed');
-                          
+                          const statusLower = order.status?.toLowerCase() || "";
+                          const isAccepted =
+                            statusLower.includes("accepted") ||
+                            statusLower === "accepted";
+                          const isRejected =
+                            statusLower.includes("rejected") ||
+                            statusLower === "rejected" ||
+                            statusLower.includes("reject");
+                          const isPending =
+                            statusLower.includes("pending") ||
+                            statusLower === "pending" ||
+                            statusLower.includes("placed");
+
                           // Accept/Reject icon buttons (visible for pending/placed orders, but only superadmin can use them)
                           if (isPending) {
                             return (
@@ -288,21 +361,31 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('Accept button clicked', { orderId: order.id, canEdit, processingOrderId });
+                                    console.log("Accept button clicked", {
+                                      orderId: order.id,
+                                      canEdit,
+                                      processingOrderId,
+                                    });
                                     if (processingOrderId === order.id) {
-                                      console.log('Order is already being processed');
+                                      console.log(
+                                        "Order is already being processed",
+                                      );
                                       return;
                                     }
                                     handleAcceptOrder(order);
                                   }}
                                   disabled={processingOrderId === order.id}
                                   className={`p-2 rounded-lg transition-colors relative z-10 ${
-                                    canEdit 
-                                      ? 'hover:bg-green-500/10 text-green-500 cursor-pointer active:scale-95' 
-                                      : 'opacity-50 text-green-500/50 cursor-pointer hover:opacity-70'
+                                    canEdit
+                                      ? "hover:bg-green-500/10 text-green-500 cursor-pointer active:scale-95"
+                                      : "opacity-50 text-green-500/50 cursor-pointer hover:opacity-70"
                                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                                   aria-label="Accept order"
-                                  title={canEdit ? "Accept order" : "Only super admin can accept orders"}
+                                  title={
+                                    canEdit
+                                      ? "Accept order"
+                                      : "Only super admin can accept orders"
+                                  }
                                   type="button"
                                 >
                                   {processingOrderId === order.id ? (
@@ -315,21 +398,31 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                                   onClick={(e) => {
                                     e.preventDefault();
                                     e.stopPropagation();
-                                    console.log('Reject button clicked', { orderId: order.id, canEdit, processingOrderId });
+                                    console.log("Reject button clicked", {
+                                      orderId: order.id,
+                                      canEdit,
+                                      processingOrderId,
+                                    });
                                     if (processingOrderId === order.id) {
-                                      console.log('Order is already being processed');
+                                      console.log(
+                                        "Order is already being processed",
+                                      );
                                       return;
                                     }
                                     handleRejectOrder(order);
                                   }}
                                   disabled={processingOrderId === order.id}
                                   className={`p-2 rounded-lg transition-colors relative z-10 ${
-                                    canEdit 
-                                      ? 'hover:bg-red-500/10 text-red-500 cursor-pointer active:scale-95' 
-                                      : 'opacity-50 text-red-500/50 cursor-pointer hover:opacity-70'
+                                    canEdit
+                                      ? "hover:bg-red-500/10 text-red-500 cursor-pointer active:scale-95"
+                                      : "opacity-50 text-red-500/50 cursor-pointer hover:opacity-70"
                                   } disabled:opacity-50 disabled:cursor-not-allowed`}
                                   aria-label="Reject order"
-                                  title={canEdit ? "Reject order" : "Only super admin can reject orders"}
+                                  title={
+                                    canEdit
+                                      ? "Reject order"
+                                      : "Only super admin can reject orders"
+                                  }
                                   type="button"
                                 >
                                   {processingOrderId === order.id ? (
@@ -341,7 +434,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                               </>
                             );
                           }
-                          
+
                           // Status indicators for accepted/rejected orders
                           if (isAccepted) {
                             return (
@@ -354,7 +447,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                               </button>
                             );
                           }
-                          
+
                           if (isRejected) {
                             return (
                               <button
@@ -366,7 +459,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                               </button>
                             );
                           }
-                          
+
                           return null;
                         })()}
                         <button
@@ -391,7 +484,10 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
                 ))
               ) : (
                 <tr>
-                  <td colSpan={8} className="p-8 text-center text-muted-foreground">
+                  <td
+                    colSpan={8}
+                    className="p-8 text-center text-muted-foreground"
+                  >
                     No orders found
                   </td>
                 </tr>
@@ -399,7 +495,7 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
             </tbody>
           </table>
         </div>
-        
+
         {/* Pagination */}
         {totalFiltered.length > itemsPerPage ? (
           <Pagination
@@ -407,21 +503,21 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
             totalPages={totalPages}
             onPageChange={(page) => {
               setCurrentPage(page);
-              window.scrollTo({ top: 0, behavior: 'smooth' });
+              window.scrollTo({ top: 0, behavior: "smooth" });
             }}
             itemsPerPage={itemsPerPage}
             totalItems={totalFiltered.length}
           />
         ) : null}
       </div>
-      
+
       <OrderDetailsModal
         order={selectedOrder}
         isOpen={isModalOpen}
         onClose={handleCloseModal}
         onPrint={handlePrint}
       />
-      
+
       <ConfirmModal
         open={confirmModalOpen}
         onOpenChange={setConfirmModalOpen}
@@ -434,9 +530,12 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
         message={confirmMessage}
         confirmText={confirmTitle.includes("Accept") ? "Accept" : "Reject"}
         variant={confirmTitle.includes("Reject") ? "destructive" : "default"}
-        isLoading={pendingOrder !== null && processingOrderId === (pendingOrder?.id || null)}
+        isLoading={
+          pendingOrder !== null &&
+          processingOrderId === (pendingOrder?.id || null)
+        }
       />
-      
+
       <SuccessMsgModal
         open={successModalOpen}
         onOpenChange={setSuccessModalOpen}
@@ -446,4 +545,3 @@ export function OrderTable({ orders: propOrders, allOrders, onFiltersChange, onO
     </>
   );
 }
-
