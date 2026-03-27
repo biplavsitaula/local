@@ -39,21 +39,28 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
             }}
           />
 
-          {/* Stats Overlay */}
+          {/* Stats Overlay (Left) */}
           <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-2 z-10">
             {blog.difficulty && (
               <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-white/10 shadow-lg">
-                <ChefHat size={12} className="text-[#f97316]" />
+                <ChefHat size={12} className="text-primary" />
                 <span>{blog.difficulty}</span>
               </div>
             )}
             {blog.timeTaken && (
               <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-white/10 shadow-lg">
-                <Clock size={12} className="text-[#f97316]" />
+                <Clock size={12} className="text-primary" />
                 <span>{blog.timeTaken}</span>
               </div>
             )}
           </div>
+
+          {/* Category Overlay (Right) */}
+          {blog.category && (
+            <div className="absolute top-2.5 right-2.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-white/10 shadow-lg z-10">
+              {blog.category}
+            </div>
+          )}
         </div>
 
         {/* Content */}

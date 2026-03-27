@@ -316,6 +316,11 @@ const BlogDetailPageContent: React.FC = () => {
                                 sizes="(max-width: 1024px) 100vw, 45vw"
                                 onError={() => setHeroImg("/assets/image_not_found.png")}
                             />
+                            {blog.category && (
+                                <div className="absolute top-4 right-4 bg-background/80 backdrop-blur-md text-primary text-xs font-bold px-3 py-1.5 rounded-xl border border-border shadow-xl z-10">
+                                    {blog.category}
+                                </div>
+                            )}
                         </div>
                     </div>
 

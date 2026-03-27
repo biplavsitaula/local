@@ -189,15 +189,8 @@ const BlogPageContent: React.FC = () => {
                         )}
                     </>
                 ) : (
-                    <div className="text-center py-20 px-4 sm:py-40 bg-white/5 rounded-[3rem] border border-dashed border-white/10">
-                        <div className="mb-6 text-5xl md:text-7xl opacity-10 italic font-black tracking-tighter uppercase">No Mixes Found</div>
-                        <p className="text-gray-500 font-light mb-10 max-w-md mx-auto leading-relaxed px-4">We couldn't find any blogs matching your criteria. Try adjusting your search or category filters.</p>
-                        <button
-                            onClick={() => { setSearchQuery(''); setSelectedCategory('all'); }}
-                            className="bg-white/10 px-10 py-4 rounded-2xl text-white font-bold text-xs uppercase tracking-[0.2em] hover:bg-white/20 transition-all cursor-pointer"
-                        >
-                            Reset Filters
-                        </button>
+                    <div className="text-center py-20 bg-white/5 rounded-3xl border border-white/5">
+                        <p className="text-gray-400 text-lg font-light">blog not found</p>
                     </div>
                 )}
             </main>
