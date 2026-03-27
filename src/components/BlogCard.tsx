@@ -4,7 +4,7 @@ import React from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { Blog } from "@/services/blog.service";
-import { Calendar, User, ArrowRight } from "lucide-react";
+import { Calendar, User, ArrowRight, Clock, ChefHat } from "lucide-react";
 
 const DEFAULT_IMAGE = "/assets/image_not_found.png";
 
@@ -13,7 +13,7 @@ interface BlogCardProps {
 }
 
 const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
-  const imageUrl = blog.image || DEFAULT_IMAGE;
+  const [imgSrc, setImgSrc] = React.useState(blog.image || DEFAULT_IMAGE);
   const authorName = typeof blog.authorId === "object" ? blog.authorId.fullName : "Anonymous";
   const formattedDate = blog.createdAt
     ? new Date(blog.createdAt).toLocaleDateString("en-US", {
@@ -29,42 +29,57 @@ const BlogCard: React.FC<BlogCardProps> = ({ blog }) => {
         {/* Image Container */}
         <div className="relative aspect-[16/10] w-full overflow-hidden bg-muted">
           <Image
-            src={imageUrl}
+            src={imgSrc}
             alt={blog.title}
             fill
             className="object-cover object-top transition-all duration-500"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-            onError={(e) => {
-              const target = e.target as HTMLImageElement;
-              target.src = DEFAULT_IMAGE;
+            onError={() => {
+              setImgSrc(DEFAULT_IMAGE);
             }}
           />
+
+          {/* Stats Overlay */}
+          <div className="absolute top-2.5 left-2.5 flex flex-wrap gap-2 z-10">
+            {blog.difficulty && (
+              <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-white/10 shadow-lg">
+                <ChefHat size={12} className="text-[#f97316]" />
+                <span>{blog.difficulty}</span>
+              </div>
+            )}
+            {blog.timeTaken && (
+              <div className="flex items-center gap-1.5 bg-black/60 backdrop-blur-md text-white text-[10px] font-bold px-2 py-1 rounded-lg border border-white/10 shadow-lg">
+                <Clock size={12} className="text-[#f97316]" />
+                <span>{blog.timeTaken}</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Content */}
-        <div className="p-4 sm:p-5 flex flex-col gap-3 flex-grow">
-          <h3 className="line-clamp-2 font-display text-lg sm:text-lg md:text-xl font-bold text-color-tertiary transition-colors duration-300">
+        <div className="p-3 sm:p-4 flex flex-col gap-2.5 flex-grow">
+          <h3 className="line-clamp-2 font-display text-base sm:text-lg font-bold text-color-tertiary transition-colors duration-300">
             {blog.title}
           </h3>
 
-          <p className="text-sm text-color-muted line-clamp-2 leading-relaxed font-light text-justify flex-grow">
+          <p className="text-xs sm:text-sm text-color-muted line-clamp-2 leading-relaxed font-light text-justify flex-grow">
             {blog.instructions}
           </p>
 
-          <div className="mt-4 flex items-center justify-between text-xs sm:text-xs text-color-muted font-medium">
+          <div className="mt-3 flex items-center justify-between text-[10px] sm:text-xs text-color-muted font-medium">
             <div className="flex items-center gap-1.5">
-              <User size={14} className="text-color-muted" />
+              <User size={12} className="text-color-muted" />
               <span>{authorName}</span>
             </div>
             <div className="flex items-center gap-1.5">
-              <Calendar size={14} className="text-color-muted" />
+              <Calendar size={12} className="text-color-muted" />
               <span>{formattedDate}</span>
             </div>
           </div>
 
-          <div className="flex mt-4 pt-4 border-t border-border">
-            <div className="inline-flex items-center gap-1 text-sm font-bold text-color-accent hover:text-primary transition-colors">
-              Read More <ArrowRight size={16} />
+          <div className="flex mt-3 pt-3 border-t border-border">
+            <div className="inline-flex items-center gap-1 text-xs sm:text-sm font-bold text-color-accent hover:text-primary transition-colors">
+              Read More <ArrowRight size={14} />
             </div>
           </div>
         </div>

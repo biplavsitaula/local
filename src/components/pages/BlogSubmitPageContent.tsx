@@ -28,7 +28,12 @@ const BlogSubmitPageContent: React.FC = () => {
         authorName: '',
         shortDescription: '',
         instructions: '',
-        image: ''
+        image: '',
+        timeTaken: '',
+        difficulty: 'Easy' as 'Easy' | 'Medium' | 'Hard',
+        totalCalories: '',
+        servings: '',
+        mixologistTips: ''
     });
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,12 +120,18 @@ const BlogSubmitPageContent: React.FC = () => {
         try {
             const payload = {
                 title: formData.title,
+                authorName: formData.authorName,
                 instructions: formData.shortDescription + '\n\n' + formData.instructions,
                 ingredients: finalIngredients,
                 image: formData.image,
                 category: 'Cocktail', // Default since UI doesn't explicitly have it
                 tags: [],
-                authorId: user?._id
+                authorId: user?._id,
+                timeTaken: formData.timeTaken,
+                difficulty: formData.difficulty,
+                totalCalories: formData.totalCalories ? parseInt(formData.totalCalories) : undefined,
+                servings: formData.servings ? parseInt(formData.servings) : undefined,
+                mixologistTips: formData.mixologistTips
             };
 
             await blogService.create(payload);
@@ -213,6 +224,64 @@ const BlogSubmitPageContent: React.FC = () => {
                             placeholder="Step-by-step mixing instructions..."
                             value={formData.instructions}
                             onChange={(e) => setFormData({ ...formData, instructions: e.target.value })}
+                            className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3.5 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700 resize-none"
+                        />
+                    </div>
+
+                    {/* Row 4: Additional Stats (Time, Difficulty, Calories, Servings) */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                        <div className="space-y-3">
+                            <label className="block text-xs font-semibold text-gray-400">Time Taken</label>
+                            <input
+                                type="text"
+                                placeholder="e.g., 5-10 minutes"
+                                value={formData.timeTaken}
+                                onChange={(e) => setFormData({ ...formData, timeTaken: e.target.value })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="block text-xs font-semibold text-gray-400">Difficulty</label>
+                            <select
+                                value={formData.difficulty}
+                                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as any })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/50 transition-all text-base text-white appearance-none cursor-pointer"
+                            >
+                                <option value="Easy">Easy</option>
+                                <option value="Medium">Medium</option>
+                                <option value="Hard">Hard</option>
+                            </select>
+                        </div>
+                        <div className="space-y-3">
+                            <label className="block text-xs font-semibold text-gray-400">Total Calories</label>
+                            <input
+                                type="number"
+                                placeholder="e.g., 180"
+                                value={formData.totalCalories}
+                                onChange={(e) => setFormData({ ...formData, totalCalories: e.target.value })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700"
+                            />
+                        </div>
+                        <div className="space-y-3">
+                            <label className="block text-xs font-semibold text-gray-400">Servings</label>
+                            <input
+                                type="number"
+                                placeholder="e.g., 1"
+                                value={formData.servings}
+                                onChange={(e) => setFormData({ ...formData, servings: e.target.value })}
+                                className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700"
+                            />
+                        </div>
+                    </div>
+
+                    {/* Row 5: Mixologist Tips */}
+                    <div className="space-y-3">
+                        <label className="block text-xs font-semibold text-gray-400">Mixologist Tips</label>
+                        <textarea
+                            rows={3}
+                            placeholder="Pro tips for the perfect drink..."
+                            value={formData.mixologistTips}
+                            onChange={(e) => setFormData({ ...formData, mixologistTips: e.target.value })}
                             className="w-full bg-[#0a0a0f] border border-white/10 rounded-xl px-5 py-3.5 focus:outline-none focus:border-primary/50 transition-all text-base text-white placeholder:text-gray-700 resize-none"
                         />
                     </div>

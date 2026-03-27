@@ -34,9 +34,9 @@ const AdminBlogList: React.FC = () => {
         authorName: '',
         timeTaken: '',
         difficulty: 'Easy' as 'Easy' | 'Medium' | 'Hard',
-        calories: 0,
+        totalCalories: 0,
         servings: 1,
-        tips: ''
+        mixologistTips: ''
     });
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
@@ -110,9 +110,9 @@ const AdminBlogList: React.FC = () => {
             authorName: blog.authorName || '',
             timeTaken: blog.timeTaken || '',
             difficulty: blog.difficulty || 'Easy',
-            calories: blog.calories || 0,
+            totalCalories: blog.totalCalories || 0,
             servings: blog.servings || 1,
-            tips: blog.tips || ''
+            mixologistTips: blog.mixologistTips || ''
         });
         setIngredients(blog.ingredients || []);
         setCurrentIngredient('');
@@ -131,9 +131,9 @@ const AdminBlogList: React.FC = () => {
             authorName: '',
             timeTaken: '',
             difficulty: 'Easy',
-            calories: 0,
+            totalCalories: 0,
             servings: 1,
-            tips: ''
+            mixologistTips: ''
         });
         setIngredients([]);
         setCurrentIngredient('');
@@ -215,9 +215,9 @@ const AdminBlogList: React.FC = () => {
                 authorId: user?._id || user?.id,
                 timeTaken: formData.timeTaken,
                 difficulty: formData.difficulty,
-                calories: Number(formData.calories),
+                totalCalories: Number(formData.totalCalories),
                 servings: Number(formData.servings),
-                tips: formData.tips
+                mixologistTips: formData.mixologistTips
             };
             
             if (modalMode === 'edit' && editingBlog?._id) {
@@ -470,7 +470,7 @@ const AdminBlogList: React.FC = () => {
                                 <div>
                                     <label className="block text-xs font-semibold text-muted-foreground mb-2">Total Calories</label>
                                     <Input 
-                                        type="number" value={formData.calories} onChange={e => setFormData({...formData, calories: Number(e.target.value)})}
+                                        type="number" value={formData.totalCalories} onChange={e => setFormData({...formData, totalCalories: Number(e.target.value)})}
                                         className="bg-secondary/30 border-border"
                                         placeholder="180"
                                     />
@@ -496,7 +496,7 @@ const AdminBlogList: React.FC = () => {
                             <div>
                                 <label className="block text-xs font-semibold text-muted-foreground mb-2">Mixologist Tips</label>
                                 <textarea 
-                                    rows={3} value={formData.tips} onChange={e => setFormData({...formData, tips: e.target.value})}
+                                    rows={3} value={formData.mixologistTips} onChange={e => setFormData({...formData, mixologistTips: e.target.value})}
                                     className="w-full bg-secondary/30 border border-border rounded-lg px-4 py-3 focus:outline-none focus:ring-1 focus:ring-primary transition-colors text-sm text-foreground resize-y"
                                     placeholder="Add expert tips or recommendations..."
                                 />

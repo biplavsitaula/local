@@ -137,7 +137,7 @@ const BlogPageContent: React.FC = () => {
 
                 {/* Grid */}
                 {loading && page === 1 ? (
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                         {[1, 2, 3, 4, 5, 6].map(i => (
                             <div key={i} className="group relative overflow-hidden rounded-xl border border-border bg-card-purple animate-pulse">
                                 {/* Image placeholder */}
@@ -168,7 +168,7 @@ const BlogPageContent: React.FC = () => {
                     </div>
                 ) : blogs.length > 0 ? (
                     <>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
                             {blogs.map(blog => (
                                 <BlogCard key={blog._id} blog={blog} />
                             ))}

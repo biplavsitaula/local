@@ -17,9 +17,9 @@ export interface Blog {
     isApproved: boolean;
     timeTaken?: string;
     difficulty?: 'Easy' | 'Medium' | 'Hard';
-    calories?: number;
+    totalCalories?: number;
     servings?: number;
-    tips?: string;
+    mixologistTips?: string;
     createdAt?: string;
     updatedAt?: string;
 }

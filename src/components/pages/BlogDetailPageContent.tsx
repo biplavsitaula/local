@@ -109,7 +109,7 @@ interface RelatedCardProps {
 }
 
 const RelatedRecipeCard: React.FC<RelatedCardProps> = ({ blog }) => {
-    const imageUrl = blog.image || "/assets/image_not_found.png";
+    const [imgSrc, setImgSrc] = useState(blog.image || "/assets/image_not_found.png");
     const authorName = typeof blog.authorId === "object" ? blog.authorId.fullName : "Anonymous";
 
     return (
@@ -117,11 +117,12 @@ const RelatedRecipeCard: React.FC<RelatedCardProps> = ({ blog }) => {
             <div className="group relative flex flex-col h-[280px] cursor-pointer overflow-hidden rounded-xl border border-border bg-card transition-all duration-300 hover:border-primary/50 hover:shadow-lg hover:shadow-primary/5">
                 <div className="relative h-[140px] w-full overflow-hidden bg-muted flex-shrink-0">
                     <Image
-                        src={imageUrl}
+                        src={imgSrc}
                         alt={blog.title}
                         fill
                         className="object-cover object-top transition-transform duration-500 group-hover:scale-105"
                         sizes="240px"
+                        onError={() => setImgSrc("/assets/image_not_found.png")}
                     />
                     {blog.category && (
                         <span className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm text-[10px] font-semibold text-primary px-2 py-0.5 rounded-full border border-border">
@@ -163,6 +164,15 @@ const BlogDetailPageContent: React.FC = () => {
 
     // Copy link feedback
     const [copied, setCopied] = useState(false);
+
+    // Image fallback
+    const [heroImg, setHeroImg] = useState(blog?.image || "/assets/image_not_found.png");
+
+    useEffect(() => {
+        if (blog?.image) {
+            setHeroImg(blog.image);
+        }
+    }, [blog]);
 
     useEffect(() => {
         const fetchBlog = async () => {
@@ -272,10 +282,10 @@ const BlogDetailPageContent: React.FC = () => {
         });
 
     const stats = [
-        { icon: <Clock size={16} />, label: 'Prep Time', value: '5 Min' },
-        { icon: <ChefHat size={16} />, label: 'Difficulty', value: 'Easy' },
-        { icon: <Users size={16} />, label: 'Servings', value: '1 Drink' },
-        { icon: <Flame size={16} />, label: 'Calories', value: '180 kcal' },
+        { icon: <Clock size={16} />, label: 'Prep Time', value: blog.timeTaken || '5 Min' },
+        { icon: <ChefHat size={16} />, label: 'Difficulty', value: blog.difficulty || 'Easy' },
+        { icon: <Users size={16} />, label: 'Servings', value: `${blog.servings || 1} ${blog.servings === 1 ? 'Drink' : 'Drinks'}` },
+        { icon: <Flame size={16} />, label: 'Calories', value: `${blog.totalCalories || 0} kcal` },
     ];
 
     return (
@@ -298,12 +308,13 @@ const BlogDetailPageContent: React.FC = () => {
                     <div className="lg:self-start lg:sticky lg:top-8">
                         <div className="relative w-full aspect-[3/4] max-h-[600px] rounded-xl overflow-hidden border border-border">
                             <Image
-                                src={blog.image || "/assets/image_not_found.png"}
+                                src={heroImg}
                                 alt={blog.title}
                                 fill
                                 className="object-cover"
                                 priority
                                 sizes="(max-width: 1024px) 100vw, 45vw"
+                                onError={() => setHeroImg("/assets/image_not_found.png")}
                             />
                         </div>
                     </div>
