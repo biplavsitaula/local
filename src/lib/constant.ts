@@ -6,10 +6,10 @@ export const getApiUrl = (): string => {
   // Use production URL by default, can be overridden with environment variables
   if (typeof window !== 'undefined') {
     // Client-side
-    return process.env.NEXT_PUBLIC_API_URL || 'https://flame-node.onrender.com/api';
+    return  'https://flame-node.onrender.com/api';
   }
   // Server-side
-  return process.env.API_URL || 'https://flame-node.onrender.com/api';
+  return  'https://flame-node.onrender.com/api';
 };
 
 /**

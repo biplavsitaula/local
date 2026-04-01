@@ -11,7 +11,12 @@ interface OrderDetailsModalProps {
   onPrint: (order: any) => void;
 }
 
-export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDetailsModalProps) {
+export function OrderDetailsModal({
+  order,
+  isOpen,
+  onClose,
+  onPrint,
+}: OrderDetailsModalProps) {
   if (!order) return null;
 
   // Use actual items from the order, or empty array as fallback
@@ -40,13 +45,13 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: '2-digit',
-        day: '2-digit',
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "2-digit",
+        day: "2-digit",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
         hour12: true,
       });
     } catch {
@@ -56,16 +61,23 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
 
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
-    if (statusLower.includes('placed') || statusLower.includes('pending') || statusLower.includes('processing')) {
-      return 'bg-blue-500/20 text-blue-400';
+    if (
+      statusLower.includes("placed") ||
+      statusLower.includes("pending") ||
+      statusLower.includes("processing")
+    ) {
+      return "bg-blue-500/20 text-blue-400";
     }
-    if (statusLower.includes('completed') || statusLower.includes('delivered')) {
-      return 'bg-green-500/20 text-green-400';
+    if (
+      statusLower.includes("completed") ||
+      statusLower.includes("delivered")
+    ) {
+      return "bg-green-500/20 text-green-400";
     }
-    if (statusLower.includes('cancelled') || statusLower.includes('failed')) {
-      return 'bg-red-500/20 text-red-400';
+    if (statusLower.includes("cancelled") || statusLower.includes("failed")) {
+      return "bg-red-500/20 text-red-400";
     }
-    return 'bg-gray-500/20 text-gray-400';
+    return "bg-gray-500/20 text-gray-400";
   };
 
   return (
@@ -83,7 +95,9 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
           <div className="grid md:grid-cols-2 gap-6 mb-6">
             {/* Customer Info */}
             <div>
-              <h3 className="text-lg font-semibold text-[#f97316] mb-4">Customer Info</h3>
+              <h3 className="text-lg font-semibold text-[#f97316] mb-4">
+                Customer Info
+              </h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Name: </span>
@@ -114,7 +128,9 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
 
             {/* Order Info */}
             <div>
-              <h3 className="text-lg font-semibold text-[#f97316] mb-4">Order Info</h3>
+              <h3 className="text-lg font-semibold text-[#f97316] mb-4">
+                Order Info
+              </h3>
               <div className="space-y-3 text-sm">
                 <div>
                   <span className="text-muted-foreground">Status: </span>
@@ -128,7 +144,9 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                 </div>
                 <div>
                   <span className="text-muted-foreground">Date: </span>
-                  <span className="text-foreground">{formatDate(order.createdAt)}</span>
+                  <span className="text-foreground">
+                    {formatDate(order.createdAt)}
+                  </span>
                 </div>
               </div>
             </div>
@@ -136,15 +154,25 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
 
           {/* Order Items */}
           <div className="mb-6">
-            <h3 className="text-lg font-semibold text-[#f97316] mb-4">Order Items</h3>
+            <h3 className="text-lg font-semibold text-[#f97316] mb-4">
+              Order Items
+            </h3>
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border/50">
-                    <th className="text-left p-3 text-sm font-semibold text-foreground">Product</th>
-                    <th className="text-center p-3 text-sm font-semibold text-foreground">Qty</th>
-                    <th className="text-right p-3 text-sm font-semibold text-foreground">Price (Rs)</th>
-                    <th className="text-right p-3 text-sm font-semibold text-foreground">Total</th>
+                    <th className="text-left p-3 text-sm font-semibold text-foreground">
+                      Product
+                    </th>
+                    <th className="text-center p-3 text-sm font-semibold text-foreground">
+                      Qty
+                    </th>
+                    <th className="text-right p-3 text-sm font-semibold text-foreground">
+                      Price (Rs)
+                    </th>
+                    <th className="text-right p-3 text-sm font-semibold text-foreground">
+                      Total
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -181,7 +209,10 @@ export function OrderDetailsModal({ order, isOpen, onClose, onPrint }: OrderDeta
                     </tr>
                   )}
                   <tr>
-                    <td colSpan={3} className="p-3 text-right text-sm font-semibold text-foreground">
+                    <td
+                      colSpan={3}
+                      className="p-3 text-right text-sm font-semibold text-foreground"
+                    >
                       Total:
                     </td>
                     <td className="p-3 text-right text-lg font-bold text-[#f97316]">

@@ -1,11 +1,11 @@
-import { useMemo, useState, useEffect } from 'react';
-import { ordersService } from '@/services/orders.service';
-import { Order } from '@/hooks/useOrderStore';
-import { useDebounce } from '@/hooks/useDebounce';
-import { useRoleAccess } from '@/hooks/useRoleAccess';
-import { toast } from 'sonner';
-import Image from 'next/image';
-import HeroTitle from '@/components/HeroTitle';
+import { useMemo, useState, useEffect } from "react";
+import { ordersService } from "@/services/orders.service";
+import { Order } from "@/hooks/useOrderStore";
+import { useDebounce } from "@/hooks/useDebounce";
+import { useRoleAccess } from "@/hooks/useRoleAccess";
+import { toast } from "sonner";
+import Image from "next/image";
+import HeroTitle from "@/components/HeroTitle";
 
 interface UseOrderTableProps {
   orders: Order[];
@@ -25,21 +25,21 @@ export function useOrderTable({
   onOrderUpdate,
 }: UseOrderTableProps) {
   const [orders, setOrders] = useState<Order[]>(propOrders || []);
-  const [searchInput, setSearchInput] = useState('');
+  const [searchInput, setSearchInput] = useState("");
   const debouncedSearch = useDebounce(searchInput, 300);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
-    status: '',
-    billNumber: '',
-    location: '',
-    paymentMethod: '',
+    status: "",
+    billNumber: "",
+    location: "",
+    paymentMethod: "",
   });
   const [processingOrderId, setProcessingOrderId] = useState<string | null>(null);
   const [processingAction, setProcessingAction] = useState<'accept' | 'reject' | null>(null);
   const { canEdit } = useRoleAccess();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 25;
-  
+
   // Modal states
   const [confirmModalOpen, setConfirmModalOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<(() => void) | null>(null);
@@ -51,11 +51,16 @@ export function useOrderTable({
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  type SortKey = 'billNumber' | 'customerName' | 'location' | 'totalAmount' | 'status';
-  type SortDir = 'asc' | 'desc';
-  const [sortKey, setSortKey] = useState<SortKey>('billNumber');
-  const [sortDir, setSortDir] = useState<SortDir>('desc');
-  
+  type SortKey =
+    | "billNumber"
+    | "customerName"
+    | "location"
+    | "totalAmount"
+    | "status";
+  type SortDir = "asc" | "desc";
+  const [sortKey, setSortKey] = useState<SortKey>("billNumber");
+  const [sortDir, setSortDir] = useState<SortDir>("desc");
+
   // Expose filters to parent component
   useEffect(() => {
     if (onFiltersChange) {
@@ -83,11 +88,11 @@ export function useOrderTable({
 
   const handleSort = (key: SortKey) => {
     if (key === sortKey) {
-      setSortDir((d) => (d === 'asc' ? 'desc' : 'asc'));
+      setSortDir((d) => (d === "asc" ? "desc" : "asc"));
       return;
     }
     setSortKey(key);
-    setSortDir('asc');
+    setSortDir("asc");
   };
 
   const filteredAndSortedOrders = useMemo(() => {
@@ -105,30 +110,32 @@ export function useOrderTable({
 
     // Apply filters
     if (filters.billNumber) {
-      filtered = filtered.filter(order => 
-        order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
+      filtered = filtered.filter((order) =>
+        order.billNumber
+          .toLowerCase()
+          .includes(filters.billNumber.toLowerCase()),
       );
     }
 
     if (filters.location) {
-      filtered = filtered.filter(order => 
-        order.location.toLowerCase().includes(filters.location.toLowerCase())
+      filtered = filtered.filter((order) =>
+        order.location.toLowerCase().includes(filters.location.toLowerCase()),
       );
     }
 
     // Sort
-    const dir = sortDir === 'asc' ? 1 : -1;
+    const dir = sortDir === "asc" ? 1 : -1;
     filtered.sort((a, b) => {
       switch (sortKey) {
-        case 'billNumber':
+        case "billNumber":
           return dir * a.billNumber.localeCompare(b.billNumber);
-        case 'customerName':
+        case "customerName":
           return dir * a.customerName.localeCompare(b.customerName);
-        case 'location':
+        case "location":
           return dir * a.location.localeCompare(b.location);
-        case 'totalAmount':
+        case "totalAmount":
           return dir * (a.totalAmount - b.totalAmount);
-        case 'status':
+        case "status":
           return dir * a.status.localeCompare(b.status);
         default:
           return 0;
@@ -143,14 +150,18 @@ export function useOrderTable({
 
   const clearFilters = () => {
     setFilters({
-      status: '',
-      billNumber: '',
-      location: '',
-      paymentMethod: '',
+      status: "",
+      billNumber: "",
+      location: "",
+      paymentMethod: "",
     });
   };
 
-  const hasActiveFilters = filters.status || filters.billNumber || filters.location || filters.paymentMethod;
+  const hasActiveFilters =
+    filters.status ||
+    filters.billNumber ||
+    filters.location ||
+    filters.paymentMethod;
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
     try {
@@ -159,14 +170,16 @@ export function useOrderTable({
         onOrderUpdate();
       }
     } catch (err: any) {
-      console.error('Failed to update order status:', err);
+      console.error("Failed to update order status:", err);
     }
   };
 
   const handleAcceptOrder = async (order: Order) => {
     setPendingOrder(order);
     setConfirmTitle("Accept Order");
-    setConfirmMessage(`Are you sure you want to accept order ${order.billNumber}?`);
+    setConfirmMessage(
+      `Are you sure you want to accept order ${order.billNumber}?`,
+    );
     setConfirmAction(() => {
       setConfirmModalOpen(false);
       performAcceptOrder(order);
@@ -180,24 +193,27 @@ export function useOrderTable({
       setProcessingAction('accept');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.acceptOrder(orderId);
-      
+
       if (response.success) {
-        setSuccessMessage(response.message || `Order ${order.billNumber} accepted successfully`);
+        setSuccessMessage(
+          response.message || `Order ${order.billNumber} accepted successfully`,
+        );
         setSuccessModalOpen(true);
-        
+
         if (onOrderUpdate) {
           onOrderUpdate();
         }
       } else {
-        toast.error(response.message || 'Failed to accept order');
+        toast.error(response.message || "Failed to accept order");
       }
     } catch (err: any) {
-      console.error('Error accepting order:', err);
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          'Failed to accept order. Please try again.';
+      console.error("Error accepting order:", err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.message ||
+        err?.message ||
+        "Failed to accept order. Please try again.";
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
@@ -209,7 +225,9 @@ export function useOrderTable({
   const handleRejectOrder = async (order: Order) => {
     setPendingOrder(order);
     setConfirmTitle("Reject Order");
-    setConfirmMessage(`Are you sure you want to reject order ${order.billNumber}?`);
+    setConfirmMessage(
+      `Are you sure you want to reject order ${order.billNumber}?`,
+    );
     setConfirmAction(() => {
       setConfirmModalOpen(false);
       performRejectOrder(order);
@@ -223,24 +241,27 @@ export function useOrderTable({
       setProcessingAction('reject');
       const orderId = (order as any)._id || order.id;
       const response = await ordersService.rejectOrder(orderId);
-      
+
       if (response.success) {
-        setSuccessMessage(response.message || `Order ${order.billNumber} rejected successfully`);
+        setSuccessMessage(
+          response.message || `Order ${order.billNumber} rejected successfully`,
+        );
         setSuccessModalOpen(true);
-        
+
         if (onOrderUpdate) {
           onOrderUpdate();
         }
       } else {
-        toast.error(response.message || 'Failed to reject order');
+        toast.error(response.message || "Failed to reject order");
       }
     } catch (err: any) {
-      console.error('Error rejecting order:', err);
-      const errorMessage = err?.response?.data?.message || 
-                          err?.response?.data?.error ||
-                          err?.response?.message || 
-                          err?.message || 
-                          'Failed to reject order. Please try again.';
+      console.error("Error rejecting order:", err);
+      const errorMessage =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.response?.message ||
+        err?.message ||
+        "Failed to reject order. Please try again.";
       toast.error(errorMessage);
     } finally {
       setProcessingOrderId(null);
@@ -269,10 +290,10 @@ export function useOrderTable({
   const formatDate = (dateString: string) => {
     try {
       const date = new Date(dateString);
-      return date.toLocaleDateString('en-US', {
-        year: 'numeric',
-        month: 'short',
-        day: 'numeric',
+      return date.toLocaleDateString("en-US", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
       });
     } catch {
       return dateString;
@@ -300,7 +321,7 @@ export function useOrderTable({
       
       const printWindow = window.open('', '_blank');
       if (!printWindow) {
-        alert('Please allow popups to print order');
+        alert("Please allow popups to print order");
         return;
       }
 
@@ -314,10 +335,10 @@ export function useOrderTable({
       const customerLocation = fullOrder.customer?.location || fullOrder.customer?.address || fullOrder.location || order.location || 'N/A';
       const paymentLabel = getPaymentMethodLabel(fullOrder.paymentMethod || order.paymentMethod);
       const printDate = new Date(order.createdAt);
-      const formattedDate = printDate.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
+      const formattedDate = printDate.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
       });
 
       const htmlContent = `
@@ -547,7 +568,7 @@ export function useOrderTable({
       printWindow.document.write(htmlContent);
       printWindow.document.close();
       printWindow.focus();
-      
+
       setTimeout(() => {
         printWindow.print();
       }, 250);
@@ -564,15 +585,15 @@ export function useOrderTable({
       const fallbackLocation = order.customer?.location || order.customer?.address || order.location || 'N/A';
       const fallbackPayment = getPaymentMethodLabel(order.paymentMethod);
       const printDate = new Date(order.createdAt);
-      const formattedDate = printDate.toLocaleDateString('en-US', {
-        month: '2-digit',
-        day: '2-digit',
-        year: 'numeric',
+      const formattedDate = printDate.toLocaleDateString("en-US", {
+        month: "2-digit",
+        day: "2-digit",
+        year: "numeric",
       });
 
-      const printWindow = window.open('', '_blank');
+      const printWindow = window.open("", "_blank");
       if (!printWindow) {
-        alert('Please allow popups to print order');
+        alert("Please allow popups to print order");
         return;
       }
 
@@ -673,7 +694,7 @@ export function useOrderTable({
       printWindow.document.write(htmlContent);
       printWindow.document.close();
       printWindow.focus();
-      
+
       setTimeout(() => {
         printWindow.print();
       }, 250);
@@ -682,16 +703,19 @@ export function useOrderTable({
 
   const getStatusColor = (status: string) => {
     const statusLower = status.toLowerCase();
-    if (statusLower.includes('pending') || statusLower.includes('processing')) {
-      return 'bg-warning/20 text-warning';
+    if (statusLower.includes("pending") || statusLower.includes("processing")) {
+      return "bg-warning/20 text-warning";
     }
-    if (statusLower.includes('completed') || statusLower.includes('delivered')) {
-      return 'bg-success/20 text-success';
+    if (
+      statusLower.includes("completed") ||
+      statusLower.includes("delivered")
+    ) {
+      return "bg-success/20 text-success";
     }
-    if (statusLower.includes('cancelled') || statusLower.includes('failed')) {
-      return 'bg-destructive/20 text-destructive';
+    if (statusLower.includes("cancelled") || statusLower.includes("failed")) {
+      return "bg-destructive/20 text-destructive";
     }
-    return 'bg-muted/20 text-muted-foreground';
+    return "bg-muted/20 text-muted-foreground";
   };
 
   // Calculate total filtered items for pagination
@@ -707,13 +731,15 @@ export function useOrderTable({
       );
     }
     if (filters.billNumber) {
-      filtered = filtered.filter(order => 
-        order.billNumber.toLowerCase().includes(filters.billNumber.toLowerCase())
+      filtered = filtered.filter((order) =>
+        order.billNumber
+          .toLowerCase()
+          .includes(filters.billNumber.toLowerCase()),
       );
     }
     if (filters.location) {
-      filtered = filtered.filter(order => 
-        order.location.toLowerCase().includes(filters.location.toLowerCase())
+      filtered = filtered.filter((order) =>
+        order.location.toLowerCase().includes(filters.location.toLowerCase()),
       );
     }
     return filtered;
@@ -751,12 +777,12 @@ export function useOrderTable({
     pendingOrder,
     selectedOrder,
     isModalOpen,
-    
+
     // Sort
     sortKey,
     sortDir,
     handleSort,
-    
+
     // Handlers
     clearFilters,
     hasActiveFilters,
@@ -770,8 +796,3 @@ export function useOrderTable({
     getStatusColor,
   };
 }
-
-
-
-
-

@@ -20,7 +20,7 @@ export interface Order {
   };
   customerName?: string;
   location?: string;
-  items: OrderItem[];
+  items?: OrderItem[];
   totalAmount: number;
   paymentMethod: 'qr' | 'cod' | 'card' | 'online';
   paymentGateway?: 'esewa' | 'khalti' | 'card';

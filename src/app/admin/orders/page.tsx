@@ -1,13 +1,13 @@
 "use client";
 
-import { useState, useCallback, useEffect, useMemo, useRef } from 'react';
-import { OrderTable } from '@/components/features/admin/orders/OrderTable';
-import { OrderStatusSection } from '@/components/features/admin/orders/OrderStatusSection';
-import { ExportButton } from '@/components/features/admin/ExportButton';
-import { ordersService, Order as ApiOrder } from '@/services/orders.service';
-import { Order } from '@/hooks/useOrderStore';
-import { Loader2 } from 'lucide-react';
-import { Pagination } from '@/components/ui/pagination';
+import { useState, useCallback, useEffect, useMemo, useRef } from "react";
+import { OrderTable } from "@/components/features/admin/orders/OrderTable";
+import { OrderStatusSection } from "@/components/features/admin/orders/OrderStatusSection";
+import { ExportButton } from "@/components/features/admin/ExportButton";
+import { ordersService, Order as ApiOrder } from "@/services/orders.service";
+import { Order } from "@/hooks/useOrderStore";
+import { Loader2 } from "lucide-react";
+import { Pagination } from "@/components/ui/pagination";
 
 const ITEMS_PER_PAGE = 25;
 
@@ -25,36 +25,48 @@ const Orders = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
-  
+
   // Use ref to track filters without causing re-renders
   const filtersRef = useRef(orderFilters);
   filtersRef.current = orderFilters;
   const hasFetchedOnce = useRef(false);
 
   // Check if any filter is active
-  const hasActiveFilters = !!(orderFilters.search || orderFilters.status || orderFilters.paymentMethod);
+  const hasActiveFilters = !!(
+    orderFilters.search ||
+    orderFilters.status ||
+    orderFilters.paymentMethod
+  );
 
   const mapApiOrderToOrder = (apiOrder: ApiOrder): Order => {
-    const customerName = (apiOrder.customer as any)?.fullName || 
-                       apiOrder.customer?.name || 
-                       apiOrder.customerName || 
-                       '';
-    const location = (apiOrder.customer as any)?.location || 
-                  apiOrder.customer?.address || 
-                  apiOrder.location || 
-                  '';
-    
-    let paymentMethod: 'cod' | 'qr' = 'cod';
-    const paymentMethodLower = (apiOrder.paymentMethod || '').toLowerCase();
-    if (paymentMethodLower === 'online' || paymentMethodLower === 'qr' || paymentMethodLower === 'qr payment') {
-      paymentMethod = 'qr';
+    const customerName =
+      (apiOrder.customer as any)?.fullName ||
+      apiOrder.customer?.name ||
+      apiOrder.customerName ||
+      "";
+    const location =
+      (apiOrder.customer as any)?.location ||
+      apiOrder.customer?.address ||
+      apiOrder.location ||
+      "";
+    const items = apiOrder.items;
+
+    let paymentMethod: "cod" | "qr" = "cod";
+    const paymentMethodLower = (apiOrder.paymentMethod || "").toLowerCase();
+    if (
+      paymentMethodLower === "online" ||
+      paymentMethodLower === "qr" ||
+      paymentMethodLower === "qr payment"
+    ) {
+      paymentMethod = "qr";
     }
-    
+
     return {
-      id: apiOrder._id || apiOrder.id || '',
+      id: apiOrder._id || apiOrder.id || "",
       billNumber: apiOrder.billNumber,
       customerName,
       location,
+      items,
       totalAmount: apiOrder.totalAmount,
       status: apiOrder.status,
       paymentMethod,
@@ -120,14 +132,23 @@ const Orders = () => {
       fetchOrders(1, false);
     }
     // Only trigger when actual filter values change
-  }, [orderFilters.search, orderFilters.status, orderFilters.paymentMethod, fetchOrders]);
+  }, [
+    orderFilters.search,
+    orderFilters.status,
+    orderFilters.paymentMethod,
+    fetchOrders,
+  ]);
 
   const handleOrderUpdate = useCallback(() => {
     // Refresh using current state
-    const isFiltering = !!(filtersRef.current.search || filtersRef.current.status || filtersRef.current.paymentMethod);
+    const isFiltering = !!(
+      filtersRef.current.search ||
+      filtersRef.current.status ||
+      filtersRef.current.paymentMethod
+    );
     fetchOrders(isFiltering ? 1 : currentPage, isFiltering);
     // Dispatch event for OrderStatusSection to refresh its data
-    window.dispatchEvent(new CustomEvent('orderChanged'));
+    window.dispatchEvent(new CustomEvent("orderChanged"));
   }, [fetchOrders, currentPage]);
 
   // Filter orders based on search and filters for OrderTable (client-side when filtering)
@@ -141,29 +162,35 @@ const Orders = () => {
     // Apply search filter
     if (orderFilters.search) {
       const searchLower = orderFilters.search.toLowerCase();
-      filtered = filtered.filter(order => 
-        order.billNumber.toLowerCase().includes(searchLower) ||
-        order.customerName.toLowerCase().includes(searchLower) ||
-        order.location.toLowerCase().includes(searchLower)
+      filtered = filtered.filter(
+        (order) =>
+          order.billNumber.toLowerCase().includes(searchLower) ||
+          order.customerName.toLowerCase().includes(searchLower) ||
+          order.location.toLowerCase().includes(searchLower),
       );
     }
 
     // Apply status filter
     if (orderFilters.status) {
-      filtered = filtered.filter(order => 
-        order.status.toLowerCase() === orderFilters.status?.toLowerCase()
+      filtered = filtered.filter(
+        (order) =>
+          order.status.toLowerCase() === orderFilters.status?.toLowerCase(),
       );
     }
 
     // Apply payment method filter
     if (orderFilters.paymentMethod) {
       const paymentLower = orderFilters.paymentMethod.toLowerCase();
-      filtered = filtered.filter(order => {
-        if (paymentLower === 'cod' || paymentLower === 'cash on delivery') {
-          return order.paymentMethod === 'cod';
+      filtered = filtered.filter((order) => {
+        if (paymentLower === "cod" || paymentLower === "cash on delivery") {
+          return order.paymentMethod === "cod";
         }
-        if (paymentLower === 'online' || paymentLower === 'qr' || paymentLower === 'qr payment') {
-          return order.paymentMethod === 'qr';
+        if (
+          paymentLower === "online" ||
+          paymentLower === "qr" ||
+          paymentLower === "qr payment"
+        ) {
+          return order.paymentMethod === "qr";
         }
         return true;
       });
@@ -181,8 +208,8 @@ const Orders = () => {
     return filteredOrders;
   }, [filteredOrders, currentPage, hasActiveFilters]);
 
-  const calculatedTotalPages = hasActiveFilters 
-    ? Math.ceil(filteredOrders.length / ITEMS_PER_PAGE) 
+  const calculatedTotalPages = hasActiveFilters
+    ? Math.ceil(filteredOrders.length / ITEMS_PER_PAGE)
     : totalPages;
 
   if (initialLoading) {
@@ -200,23 +227,33 @@ const Orders = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between opacity-0 animate-fade-in">
         <div>
-          <h1 className="text-3xl font-display font-bold text-foreground">Orders</h1>
-          <p className="text-muted-foreground mt-1">Manage customer orders and track deliveries</p>
+          <h1 className="text-3xl font-display font-bold text-foreground">
+            Orders
+          </h1>
+          <p className="text-muted-foreground mt-1">
+            Manage customer orders and track deliveries
+          </p>
         </div>
         <ExportButton defaultDataType="orders" orderFilters={orderFilters} />
       </div>
 
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '100ms' }}>
+      <div
+        className="opacity-0 animate-fade-in"
+        style={{ animationDelay: "100ms" }}
+      >
         {/* Don't pass orders prop - let OrderStatusSection fetch all orders for accurate status counts */}
         <OrderStatusSection onOrderUpdate={handleOrderUpdate} />
       </div>
 
-      <div className="opacity-0 animate-fade-in" style={{ animationDelay: '200ms' }}>
-        <OrderTable 
-          orders={paginatedOrders} 
+      <div
+        className="opacity-0 animate-fade-in"
+        style={{ animationDelay: "200ms" }}
+      >
+        <OrderTable
+          orders={paginatedOrders}
           allOrders={orders}
-          onFiltersChange={setOrderFilters} 
-          onOrderUpdate={handleOrderUpdate} 
+          onFiltersChange={setOrderFilters}
+          onOrderUpdate={handleOrderUpdate}
         />
         {/* Server-side pagination */}
         {calculatedTotalPages > 1 && (
@@ -226,7 +263,7 @@ const Orders = () => {
               totalPages={calculatedTotalPages}
               onPageChange={(page) => {
                 setCurrentPage(page);
-                window.scrollTo({ top: 0, behavior: 'smooth' });
+                window.scrollTo({ top: 0, behavior: "smooth" });
               }}
               itemsPerPage={ITEMS_PER_PAGE}
               totalItems={hasActiveFilters ? filteredOrders.length : totalItems}
