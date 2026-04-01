@@ -185,11 +185,28 @@ export default function BrandCarousel() {
             {loading ? (
               <>
                 {Array.from({ length: itemsPerPage }).map((_, i) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-xl animate-pulse ${theme === 'dark' ? 'bg-muted/40' : 'bg-gray-200'}`} />
-                    <div className={`h-3 w-14 sm:w-16 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/30' : 'bg-gray-200'}`} />
-                    <div className={`h-2.5 w-10 sm:w-12 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/20' : 'bg-gray-100'}`} />
+                  <div key={i} className="flex flex-col gap-3 p-3 rounded-[16px] bg-card-purple border border-border animate-pulse w-24 sm:w-28 md:w-32 lg:w-40 shrink-0">
+                    {/* Top image/logo placeholder */}
+                    <div className="w-full aspect-square rounded-2xl bg-muted-foreground/10" />
+
+                    {/* Content text area */}
+                    <div className="space-y-2 px-1">
+                      <div className="h-2 w-8 rounded-full bg-muted-foreground/10" />
+                      <div className="h-3.5 w-full rounded-full bg-muted-foreground/20" />
+                      <div className="h-2 w-16 rounded-full bg-muted-foreground/10" />
+
+                      {/* Optional bottom tags/pills */}
+                      <div className="flex gap-2 pt-1">
+                        <div className="h-2.5 w-10 rounded-full bg-muted-foreground/10" />
+                        <div className="h-2.5 w-10 rounded-full bg-muted-foreground/10" />
+                      </div>
+                    </div>
                   </div>
+                  // <div key={i} className="flex flex-col items-center gap-2">
+                  //   <div className={`w-20 h-20 sm:w-24 sm:h-24 md:w-28 md:h-28 lg:w-32 lg:h-32 rounded-xl animate-pulse ${theme === 'dark' ? 'bg-muted/40' : 'bg-gray-200'}`} />
+                  //   <div className={`h-3 w-14 sm:w-16 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/30' : 'bg-gray-200'}`} />
+                  //   <div className={`h-2.5 w-10 sm:w-12 rounded animate-pulse ${theme === 'dark' ? 'bg-muted/20' : 'bg-gray-100'}`} />
+                  // </div>
                 ))}
               </>
             ) : brands.length === 0 ? (
